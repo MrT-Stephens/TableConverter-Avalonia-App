@@ -1,0 +1,954 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:TableConverter.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TableConverter.Views.MainView"
+             x:DataType="vm:MainViewModel">
+  <Design.DataContext>
+    <!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+    <vm:MainViewModel />
+  </Design.DataContext>
+
+  <!--Application Menu Code-->
+  <SplitView
+    Name="MenuSplitView"
+    DisplayMode="CompactInline"
+    CompactPaneLength="25"
+    PanePlacement="Right"
+    Background="{DynamicResource BackgroundBrush}"
+    Loaded="MenuSplitViewLoaded">
+
+    <!--Application Menu Panel Code-->
+    <SplitView.Pane>
+      <Border
+        Background="{DynamicResource BackgroundBrush}"
+        BorderBrush="{DynamicResource BorderBrush}"
+        BorderThickness="0 0 0 0">
+
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="25"/>
+            <ColumnDefinition Width="*"/>
+          </Grid.ColumnDefinitions>
+
+          <Border
+            Grid.Column="0"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Background="{DynamicResource HeaderBackgroundBrush}">
+
+            <Button
+              Background="Transparent"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch"
+              Button.Click="MenuButtonClicked">
+
+              <PathIcon
+                Name="MenuArrowIcon"
+                Height="20"
+                Width="20"
+                Foreground="{DynamicResource BorderBrush}"/>
+
+            </Button>
+          </Border>
+
+          <ScrollViewer Grid.Column="1">
+            <StackPanel>
+
+              <!--Infomation Section Code-->
+              <Border
+                Padding="10 0 10 0"
+                Margin="10 20 10 10">
+
+                <Grid
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Stretch">
+
+                  <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                  </Grid.RowDefinitions>
+
+                  <TextBlock
+                    Grid.Row="0"
+                    Margin="5"
+                    Foreground="{DynamicResource ForegroundBrush}"
+                    FontWeight="Bold"
+                    TextWrapping="Wrap"
+                    FontSize="18"
+                    Text="{Binding InfomationTitleText}"/>
+
+                  <WrapPanel
+                    Grid.Row="1">
+
+                    <WrapPanel.Styles>
+                      <Style Selector="Button">
+                        <Setter Property="Margin" Value="5"/>
+                        <Setter Property="Width" Value="40"/>
+                        <Setter Property="Height" Value="40"/>
+                        <Setter Property="Background" Value="Transparent"/>
+                      </Style>
+                    </WrapPanel.Styles>
+
+                    <Button
+                      Button.Click="GitHubButtonClicked">
+
+                      <PathIcon
+                        Data="{StaticResource GitHubIcon}"
+                        Foreground="{DynamicResource ForegroundBrush}"
+                        Height="38"
+                        Width="38">
+
+                        <PathIcon.RenderTransform>
+                          <TransformGroup>
+                            <RotateTransform Angle="180"/>
+                            <ScaleTransform ScaleX="-1" />
+                          </TransformGroup>
+                        </PathIcon.RenderTransform>
+
+                      </PathIcon>
+                    </Button>
+
+                    <Button
+                      Button.Click="LinkedinButtonClicked">
+                      <PathIcon
+                        Data="{StaticResource LinkedinIcon}"
+                        Foreground="#0072b1"
+                        Height="38"
+                        Width="38">
+
+                        <PathIcon.RenderTransform>
+                          <TransformGroup>
+                            <RotateTransform Angle="180"/>
+                            <ScaleTransform ScaleX="-1" />
+                          </TransformGroup>
+                        </PathIcon.RenderTransform>
+
+                      </PathIcon>
+                    </Button>
+
+                    <TextBlock
+                      Margin="5"
+                      VerticalAlignment="Center"
+                      Foreground="{DynamicResource BorderBrush}"
+                      Text="Follow My Socials"/>
+
+                  </WrapPanel>
+
+                  <TextBlock
+                    Grid.Row="2"
+                    Margin="5"
+                    Foreground="{DynamicResource ForegroundBrush}"
+                    TextWrapping="Wrap"
+                    Text="{Binding InfomationText}"/>
+
+                </Grid>
+
+              </Border>
+
+              <!--Input Converter Type Section Code-->
+              <Border
+                Name="InputConverterTypeView"
+                Padding="10"
+                Margin="10 10 10 10"
+                CornerRadius="20"
+                BorderThickness="2"
+                BorderBrush="{DynamicResource BorderBrush}"
+                Background="{DynamicResource BackgroundBrush}">
+
+                <Grid
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Stretch">
+
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                  </Grid.ColumnDefinitions>
+
+                  <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                  </Grid.RowDefinitions>
+
+                  <StackPanel
+                    Orientation="Horizontal"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Left"
+                    Grid.Column="0"
+                    Grid.Row="0">
+
+                    <TextBlock
+                      Margin="5 5 0 5"
+                      Foreground="{DynamicResource ForegroundBrush}"
+                      FontWeight="Bold"
+                      FontSize="18"
+                      Text="What is "/>
+
+                    <TextBlock
+                      Margin="0 5 0 5"
+                      Foreground="{DynamicResource ForegroundBrush}"
+                      FontWeight="Bold"
+                      FontSize="18"
+                      Text="{Binding InputSelectedConverterType.name}"/>
+
+                    <TextBlock
+                      Margin="0 5 5 5"
+                      Foreground="{DynamicResource ForegroundBrush}"
+                      FontWeight="Bold"
+                      FontSize="18"
+                      Text="?"/>
+
+                  </StackPanel>
+
+                  <Border
+                    Grid.Column="1"
+                    Grid.Row="0"
+                    CornerRadius="10"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Right"
+                    Background="{DynamicResource BorderBrush}">
+
+                    <TextBlock
+                      Margin="5"
+                      Foreground="{DynamicResource ForegroundBrush}"
+                      Text="{Binding InputSelectedConverterType.extension}"/>
+
+                  </Border>
+
+                  <TextBlock
+                    Grid.Column="0"
+                    Grid.Row="1"
+                    Margin="5"
+                    Grid.ColumnSpan="2"
+                    Foreground="{DynamicResource ForegroundBrush}"
+                    TextWrapping="Wrap"
+                    Text="{Binding InputSelectedConverterType.description}"
+                    ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+
+                </Grid>
+              </Border>
+
+              <!--Output Converter Type Section Code-->
+              <Border
+                Name="OutputConverterTypeView"
+                Padding="10"
+                Margin="10 10 10 10"
+                CornerRadius="20"
+                BorderThickness="2"
+                BorderBrush="{DynamicResource BorderBrush}"
+                Background="{DynamicResource BackgroundBrush}">
+
+                <Grid
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Stretch">
+
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                  </Grid.ColumnDefinitions>
+
+                  <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                  </Grid.RowDefinitions>
+
+                  <StackPanel
+                    Orientation="Horizontal"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Left"
+                    Grid.Column="0"
+                    Grid.Row="0">
+
+                    <TextBlock
+                      Margin="5 5 0 5"
+                      Foreground="{DynamicResource ForegroundBrush}"
+                      FontWeight="Bold"
+                      FontSize="18"
+                      Text="What is "/>
+
+                    <TextBlock
+                      Margin="0 5 0 5"
+                      Foreground="{DynamicResource ForegroundBrush}"
+                      FontWeight="Bold"
+                      FontSize="18"
+                      Text="{Binding OutputSelectedConverterType.name}"/>
+
+                    <TextBlock
+                      Margin="0 5 5 5"
+                      Foreground="{DynamicResource ForegroundBrush}"
+                      FontWeight="Bold"
+                      FontSize="18"
+                      Text="?"/>
+
+                  </StackPanel>
+
+                  <Border
+                    Grid.Column="1"
+                    Grid.Row="0"
+                    CornerRadius="10"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Right"
+                    Background="{DynamicResource BorderBrush}">
+
+                    <TextBlock
+                      Margin="5"
+                      Foreground="{DynamicResource ForegroundBrush}"
+                      Text="{Binding OutputSelectedConverterType.extension}"/>
+
+                  </Border>
+
+                  <TextBlock
+                    Grid.Column="0"
+                    Grid.Row="1"
+                    Margin="5"
+                    Grid.ColumnSpan="2"
+                    Foreground="{DynamicResource ForegroundBrush}"
+                    TextWrapping="Wrap"
+                    Text="{Binding OutputSelectedConverterType.description}"
+                    ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+
+                </Grid>
+              </Border>
+
+              <!--How to use Section Code-->
+              <Border
+                Padding="10"
+                Margin="10 10 10 20"
+                CornerRadius="20"
+                BorderThickness="2"
+                BorderBrush="{DynamicResource BorderBrush}"
+                Background="{DynamicResource BackgroundBrush}">
+
+                <Grid
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Stretch">
+
+                  <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                  </Grid.RowDefinitions>
+
+                  <TextBlock
+                    Grid.Row="0"
+                    Margin="5"
+                    Foreground="{DynamicResource ForegroundBrush}"
+                    FontWeight="Bold"
+                    TextWrapping="Wrap"
+                    FontSize="18"
+                    Text="{Binding HowToUseTitleText}"/>
+
+                  <TextBlock
+                    Grid.Row="1"
+                    Margin="5"
+                    Foreground="{DynamicResource ForegroundBrush}"
+                    TextWrapping="Wrap"
+                    Text="{Binding HowToUseText}"
+                    ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+
+                </Grid>
+              </Border>
+            </StackPanel>
+          </ScrollViewer>
+        </Grid>
+      </Border>
+    </SplitView.Pane>
+
+    <Grid
+      Name="MainGrid">
+
+      <Grid.RowDefinitions>
+        <RowDefinition Height="50"/>
+        <RowDefinition Height="*"/>
+      </Grid.RowDefinitions>
+
+      <!--Application Header Code-->
+      <Border
+        Grid.Row="0"
+        Margin="10 0 10 0"
+        BorderThickness="2 0 2 2"
+        CornerRadius="0 0 20 20"
+        Background="{DynamicResource HeaderBackgroundBrush}"
+        BorderBrush="{DynamicResource BorderBrush}">
+
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+
+          <TextBlock
+            Grid.Column="0"
+            Text="TableConverter"
+            Margin="10 2 10 2"
+            VerticalAlignment="Center"
+            Foreground="{DynamicResource ForegroundBrush}"
+            HorizontalAlignment="Left"
+            FontWeight="Bold"
+            FontSize="18"/>
+
+          <StackPanel
+            Orientation="Horizontal"
+            Grid.Column="1">
+
+            <AutoCompleteBox
+              Margin="2 2 2 2"
+              VerticalAlignment="Center"
+              Watermark="Search...😊"
+              FilterMode="Contains"
+              ItemsSource="{Binding SearchBarItems}"
+              SelectionChanged="SearchBoxSelectionChanged">
+
+            </AutoCompleteBox>
+
+            <Button
+              Margin="2 2 10 2"
+              Background="Transparent"
+              VerticalAlignment="Center"
+              Button.Click="MenuButtonClicked">
+
+              <PathIcon
+                Foreground="{DynamicResource BorderBrush}"
+                Data="{StaticResource MenuIcon}"
+                Height="25"
+                Width="25"/>
+
+            </Button>
+          </StackPanel>
+
+        </Grid>
+      </Border>
+
+      <ScrollViewer
+        Grid.Row="1"
+        VerticalScrollBarVisibility="Auto">
+
+        <StackPanel>
+
+          <!--Input Data Section Code-->
+          <Border
+            Padding="10"
+            Margin="10 20 10 10"
+            CornerRadius="20"
+            BorderThickness="2"
+            Height="450"
+            BorderBrush="{DynamicResource BorderBrush}"
+            Background="{DynamicResource BackgroundBrush}">
+
+            <Grid
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch">
+
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+              </Grid.ColumnDefinitions>
+
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+              </Grid.RowDefinitions>
+
+              <TextBlock
+                Grid.Row="0"
+                Grid.Column="0"
+                Text="Input"
+                Margin="5"
+                VerticalAlignment="Center"
+                Foreground="{DynamicResource ForegroundBrush}"
+                FontWeight="Bold"
+                FontSize="18"/>
+
+              <StackPanel
+                Name="InputButtonsStackPanel"
+                Grid.Row="0"
+                Grid.Column="2"
+                Orientation="Horizontal"
+                HorizontalAlignment="Right">
+
+                <Button
+                  Margin="5"
+                  Foreground="{DynamicResource ForegroundBrush}"
+                  Button.Click="ExampleButtonClicked">
+                  Example
+                </Button>
+
+                <Button
+                  Margin="5"
+                  Foreground="{DynamicResource ForegroundBrush}"
+                  Name="open_file_button"
+                  Button.Click="OpenFileButtonClicked">
+                  Open
+                </Button>
+
+              </StackPanel>
+
+              <ListBox
+                Grid.Row="1"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
+                Margin="5"
+                ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                Foreground="{DynamicResource ForegroundBrush}"
+                Background="Transparent"
+                BorderThickness="1"
+                SelectionMode="AlwaysSelected"
+                ItemsSource="{Binding InputConverterTypes}"
+                SelectedItem="{Binding InputSelectedConverterType}"
+                SelectionChanged="InputConverterTypeSelectionChanged"
+                BorderBrush="Gray">
+
+                <ListBox.ItemTemplate>
+                  <DataTemplate>
+                    <Label Content="{Binding name}"/>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal"/>
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+              </ListBox>
+
+              <DataGrid
+                Name="TableDataDataGrid"
+                Grid.Row="2"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
+                Margin="5"
+                BorderThickness="1"
+                BorderBrush="Gray"
+                AutoGenerateColumns="False"
+                GridLinesVisibility="All"
+                CanUserResizeColumns="True"
+                Foreground="{DynamicResource ForegroundBrush}">
+
+              </DataGrid>
+            </Grid>
+          </Border>
+
+          <!--Edit Data Section Code-->
+          <Border
+            Padding="10"
+            Margin="10"
+            CornerRadius="20"
+            BorderThickness="2"
+            BorderBrush="{DynamicResource BorderBrush}"
+            Background="{DynamicResource BackgroundBrush}">
+
+            <Grid
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch">
+
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+              </Grid.RowDefinitions>
+
+              <TextBlock
+                Grid.Row="0"
+                Grid.Column="0"
+                Text="Edit Data"
+                Margin="5"
+                VerticalAlignment="Center"
+                Foreground="{DynamicResource ForegroundBrush}"
+                FontWeight="Bold"
+                FontSize="18"/>
+
+              <Button
+                x:Name="InputDataOptionsButton"
+                Grid.Row="0"
+                Grid.Column="1"
+                Margin="5"
+                Foreground="{DynamicResource ForegroundBrush}"
+                HorizontalAlignment="Right"
+                Button.Click="InputDataOptionsButtonClicked">
+                Show Options
+              </Button>
+
+              <!--Input Data Options Section-->
+              <WrapPanel
+                x:Name="InputDataOptionsWrapPanel"
+                Grid.Column="0"
+                Grid.Row="1"
+                Grid.ColumnSpan="2"
+                Orientation="Horizontal"
+                HorizontalAlignment="Center"
+                IsVisible="False">
+
+                <WrapPanel.Styles>
+
+                  <Style Selector="Button">
+                    <Setter Property="Margin" Value="5"/>
+                    <Setter Property="Width" Value="150"/>
+                  </Style>
+
+                  <Style Selector="StackPanel">
+                    <Setter Property="Orientation" Value="Horizontal"/>
+                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                  </Style>
+
+                  <Style Selector="PathIcon">
+                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="Margin" Value="5 0 5 0"/>
+                    <Setter Property="Height" Value="20"/>
+                    <Setter Property="Width" Value="20"/>
+                    <Setter Property="Foreground" Value="{DynamicResource BorderBrush}"/>
+                  </Style>
+
+                  <Style Selector="TextBlock">
+                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="Margin" Value="5 0 5 0"/>
+                    <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}"/>
+                  </Style>
+
+                </WrapPanel.Styles>
+
+                <Button
+                  Button.Click="CapitalizeButtonClicked"
+                  ToolTip.Tip="Uppercase's the first character of every cell within the data.">
+
+                  <StackPanel>
+                    <PathIcon
+                      Data="{StaticResource CapitalizeIcon}">
+
+                      <PathIcon.RenderTransform>
+                        <TransformGroup>
+                          <RotateTransform Angle="180"/>
+                          <ScaleTransform ScaleX="-1" />
+                        </TransformGroup>
+                      </PathIcon.RenderTransform>
+
+                    </PathIcon>
+                    <TextBlock Text="Capitalize"/>
+                  </StackPanel>
+
+                </Button>
+
+                <Button
+                  Button.Click="LowercaseButtonClicked"
+                  ToolTip.Tip="Lowercase's all characters within the data.">
+
+                  <StackPanel>
+                    <PathIcon
+                      Data="{StaticResource LowercaseIcon}"/>
+                    <TextBlock Text="Lowercase"/>
+                  </StackPanel>
+
+                </Button>
+
+                <Button
+                  Button.Click="UppercaseButtonClicked"
+                  ToolTip.Tip="Uppercase's all characters within the data.">
+
+                  <StackPanel>
+                    <PathIcon
+                      Data="{StaticResource UppercaseIcon}"/>
+                    <TextBlock Text="Uppercase"/>
+                  </StackPanel>
+
+                </Button>
+
+                <Button
+                  Button.Click="TransposeButtonClicked"
+                  ToolTip.Tip="Rotates the whole table by 90 degrees anti-clockwise.">
+
+                  <StackPanel>
+                    <PathIcon
+                      Data="{StaticResource TransposeIcon}"/>
+                    <TextBlock Text="Transpose"/>
+                  </StackPanel>
+
+                </Button>
+
+                <Button
+                  Button.Click="DeleteDuplicateRowsButtonClicked"
+                  ToolTip.Tip="Delete all duplicate rows from the data.">
+
+                  <StackPanel>
+                    <PathIcon
+                      Data="{StaticResource DeleteDuplicateRows}"/>
+                    <TextBlock Text="De-duplicate"/>
+                  </StackPanel>
+
+                </Button>
+
+                <Button
+                  Button.Click="DeleteSpacesButtonClicked"
+                  ToolTip.Tip="Delete all spaces from the data.">
+
+                  <StackPanel>
+                    <PathIcon
+                      Data="{StaticResource DeleteSpacesIcon}">
+
+                      <PathIcon.RenderTransform>
+                        <TransformGroup>
+                          <RotateTransform Angle="180"/>
+                          <ScaleTransform ScaleX="-1" />
+                        </TransformGroup>
+                      </PathIcon.RenderTransform>
+
+                    </PathIcon>
+                    <TextBlock Text="De-space"/>
+                  </StackPanel>
+
+                </Button>
+
+                <Button
+                  Button.Click="UndoButtonClicked"
+                  ToolTip.Tip="Undo the last action done to the data.">
+
+                  <StackPanel>
+                    <PathIcon
+                      Data="{StaticResource UndoIcon}"/>
+                    <TextBlock Text="Undo"/>
+                  </StackPanel>
+
+                </Button>
+
+                <Button
+                  Button.Click="RedoButtonClicked"
+                  ToolTip.Tip="Redo the last action done to the data.">
+
+                  <StackPanel>
+                    <PathIcon
+                      Data="{StaticResource RedoIcon}"/>
+                    <TextBlock Text="Redo"/>
+                  </StackPanel>
+
+                </Button>
+
+              </WrapPanel>
+
+              <!--Output Data Options Section Code-->
+              <TextBlock
+                Grid.Row="2"
+                Grid.Column="0"
+                Text="Output Options"
+                Margin="5"
+                VerticalAlignment="Center"
+                Foreground="{DynamicResource ForegroundBrush}"
+                FontWeight="Bold"
+                FontSize="18"/>
+
+              <Button
+                x:Name="OutputDataOptionsButton"
+                Grid.Row="2"
+                Grid.Column="1"
+                Margin="5"
+                Foreground="{DynamicResource ForegroundBrush}"
+                HorizontalAlignment="Right"
+                Button.Click="OutputDataOptionsButtonClicked">
+                Show Options
+              </Button>
+
+              <WrapPanel
+                x:Name="OutputDataOptionsWrapPanel"
+                Grid.Column="0"
+                Grid.Row="3"
+                Grid.ColumnSpan="2"
+                Orientation="Horizontal"
+                HorizontalAlignment="Center"
+                IsVisible="False">
+
+                <WrapPanel.Styles>
+                  <Style Selector="Button">
+                    <Setter Property="Margin" Value="5"/>
+                    <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}"/>
+                    <Setter Property="Width" Value="150"/>
+                    <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                  </Style>
+                  <Style Selector="ComboBox">
+                    <Setter Property="Margin" Value="5"/>
+                    <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}"/>
+                    <Setter Property="Width" Value="150"/>
+                    <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                  </Style>
+                  <Style Selector="TextBox">
+                    <Setter Property="Margin" Value="5"/>
+                    <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}"/>
+                    <Setter Property="Width" Value="150"/>
+                    <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                  </Style>
+                  <Style Selector="CheckBox">
+                    <Setter Property="Margin" Value="5"/>
+                    <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}"/>
+                    <Setter Property="Width" Value="150"/>
+                  </Style>
+                </WrapPanel.Styles>
+
+              </WrapPanel>
+            </Grid>
+          </Border>
+
+          <!--Output Data Section Code-->
+          <Border
+            Padding="10"
+            Margin="10 10 10 20"
+            CornerRadius="20"
+            BorderThickness="2"
+            Height="450"
+            BorderBrush="{DynamicResource BorderBrush}"
+            Background="{DynamicResource BackgroundBrush}">
+
+            <Grid
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch">
+
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+              </Grid.ColumnDefinitions>
+
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+              </Grid.RowDefinitions>
+
+              <TextBlock
+                Grid.Row="0"
+                Grid.Column="0"
+                Text="Output"
+                Margin="5"
+                VerticalAlignment="Center"
+                Foreground="{DynamicResource ForegroundBrush}"
+                FontWeight="Bold"
+                FontSize="18"/>
+
+              <StackPanel
+                Name="OutputButtonsStackPanel"
+                Grid.Row="0"
+                Grid.Column="2"
+                Orientation="Horizontal"
+                HorizontalAlignment="Right">
+
+                <Button
+                  Margin="5"
+                  Foreground="{DynamicResource ForegroundBrush}"
+                  Button.Click="ClearButtonClicked">
+                  Clear
+                </Button>
+
+                <Button
+                  Margin="5"
+                  Foreground="{DynamicResource ForegroundBrush}"
+                  Button.Click="CopyButtonClicked">
+                  Copy
+                </Button>
+
+                <Button
+                  Margin="5"
+                  Foreground="{DynamicResource ForegroundBrush}"
+                  Button.Click="SaveFileButtonClicked">
+                  Save
+                </Button>
+
+              </StackPanel>
+
+              <ListBox
+                Grid.Row="1"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
+                Margin="5"
+                ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                Foreground="{DynamicResource ForegroundBrush}"
+                Background="Transparent"
+                BorderThickness="1"
+                SelectionMode="AlwaysSelected"
+                ItemsSource="{Binding OutputConverterTypes}"
+                SelectedItem="{Binding OutputSelectedConverterType}"
+                SelectionChanged="OutputConverterTypeSelectionChanged"
+                BorderBrush="Gray">
+
+                <ListBox.ItemTemplate>
+                  <DataTemplate>
+                    <Label Content="{Binding name}"/>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal"/>
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+              </ListBox>
+
+              <TextBox
+                Name="ConvertedDataTextBox"
+                Grid.Row="2"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
+                Margin="5"
+                IsReadOnly="True"
+                Foreground="{DynamicResource ForegroundBrush}"
+                Background="Transparent"
+                BorderThickness="1"
+                BorderBrush="Gray"
+                Focusable="False"
+                Text="{Binding TextBoxConvertedData}"
+                ScrollViewer.HorizontalScrollBarVisibility="Auto">
+
+              </TextBox>
+
+              <Grid
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
+                Grid.Row="3"
+                HorizontalAlignment="Stretch">
+
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <ProgressBar
+                  Name="ConvertTimeProgressBar"
+                  Grid.Column="0"
+                  Margin="5"
+                  Minimum="0"
+                  Maximum="1000"
+                  Value="0"
+                  Height="15"
+                  Orientation="Horizontal"
+                  Foreground="{DynamicResource BorderBrush}">
+
+                </ProgressBar>
+
+                <Button
+                  Name="ConvertButton"
+                  Grid.Column="1"
+                  Margin="5"
+                  Foreground="{DynamicResource ForegroundBrush}"
+                  Button.Click="ConvertButtonClicked">
+                  Convert
+                </Button>
+
+              </Grid>
+            </Grid>
+          </Border>
+        </StackPanel>
+      </ScrollViewer>
+    </Grid>
+  </SplitView>
+</UserControl>
