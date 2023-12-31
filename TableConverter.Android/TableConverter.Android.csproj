@@ -10,11 +10,9 @@
     <AndroidPackageFormat>apk</AndroidPackageFormat>
     <AndroidEnableProfiledAot>False</AndroidEnableProfiledAot>
   </PropertyGroup>
-
   <ItemGroup>
-    <AndroidResource Include="Icon.png">
-      <Link>Resources\drawable\Icon.png</Link>
-    </AndroidResource>
+    <None Remove="Icon.png" />
+    <None Remove="Resources\drawable\Icon.png" />
   </ItemGroup>
 
   <ItemGroup>
