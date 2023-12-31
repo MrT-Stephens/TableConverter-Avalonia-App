@@ -92,22 +92,25 @@ public partial class MainView : UserControl
         {
             var view = (MainViewModel)DataContext;
 
-            var top_level_window = TopLevel.GetTopLevel(this);
-
-            var file = await top_level_window.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+            if (view.DataTable.Rows.Count != 0 && view.DataTable.Columns.Count != 0)
             {
-                Title = "Save File",
-                DefaultExtension = view.OutputSelectedConverterType.extension,
-                ShowOverwritePrompt = true,
-                SuggestedFileName = $"{App.Current?.Name}_{DateTime.Now.ToFileTime()}",
-                FileTypeChoices = new List<FilePickerFileType>{
+                var top_level_window = TopLevel.GetTopLevel(this);
+
+                var file = await top_level_window.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+                {
+                    Title = "Save File",
+                    DefaultExtension = view.OutputSelectedConverterType.extension,
+                    ShowOverwritePrompt = true,
+                    SuggestedFileName = $"{App.Current?.Name}_{DateTime.Now.ToFileTime()}",
+                    FileTypeChoices = new List<FilePickerFileType>{
                     new($"{view.OutputSelectedConverterType.name} ({view.OutputSelectedConverterType.extension})")
                 {
                     Patterns = new[]{$"*{view.OutputSelectedConverterType.extension}"}
                 }}
-            });
+                });
 
-            await view.OutputSelectedConverterType.converter_handler.SaveFileAsync(file, view.ConvertedData);
+                await view.OutputSelectedConverterType.converter_handler.SaveFileAsync(file, view.ConvertedData);
+            }
         }
     }
 
@@ -226,15 +229,18 @@ public partial class MainView : UserControl
         {
             var view = (MainViewModel)DataContext;
 
-            LockUnlockItems(true);
+            if (view.DataTable.Rows.Count != 0 && view.DataTable.Columns.Count != 0)
+            {
+                LockUnlockItems(true);
 
-            view.ConvertedData = await view.OutputSelectedConverterType.converter_handler.ConvertAsync(view.DataTable, ConvertTimeProgressBar);
+                view.ConvertedData = await view.OutputSelectedConverterType.converter_handler.ConvertAsync(view.DataTable, ConvertTimeProgressBar);
 
-            LockUnlockItems(false);
+                LockUnlockItems(false);
 
-            ConvertTimeProgressBar.Value = 0;
+                ConvertTimeProgressBar.Value = 0;
 
-            ConvertedDataTextBox.CaretIndex = ConvertedDataTextBox.Text.Length;
+                ConvertedDataTextBox.CaretIndex = ConvertedDataTextBox.Text.Length;
+            }
         }
     }
 
@@ -353,19 +359,13 @@ public partial class MainView : UserControl
         {
             var view = (MainViewModel)DataContext;
 
+            LockUnlockItems(true);
+
             view.DataTable = await view.InputSelectedConverterType.converter_handler.LoadExampleAsync();
 
-            while (TableDataDataGrid.Columns.Count > 0)
-            {
-                TableDataDataGrid.Columns.RemoveAt(TableDataDataGrid.Columns.Count - 1);
-            }
+            LockUnlockItems(false);
 
-            TableDataDataGrid.ItemsSource = view.DataTable.DefaultView;
-
-            foreach (System.Data.DataColumn x in view.DataTable.Columns)
-            {
-                TableDataDataGrid.Columns.Add(new DataGridTextColumn { Header = x.ColumnName, Binding = new Avalonia.Data.Binding($"Row.ItemArray[{x.Ordinal}]") });
-            }
+            RefreshDataTable();
         }
     }
 

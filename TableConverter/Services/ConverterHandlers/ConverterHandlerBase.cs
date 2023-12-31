@@ -11,11 +11,6 @@ namespace TableConverter.Services.ConverterHandlers
     {
         public List<Control>? Controls { get; private set; }
 
-        public ConverterHandlerBase()
-        {
-            InitializeControls();
-        }
-
         /// <summary>
         /// Initializes the controls for the converter type.
         /// Will be overridden by the converter type.
@@ -24,6 +19,11 @@ namespace TableConverter.Services.ConverterHandlers
         public virtual void InitializeControls()
         {
             Controls = new List<Control>();
+        }
+
+        public ConverterHandlerBase()
+        {
+            InitializeControls();
         }
 
         /// <summary>
