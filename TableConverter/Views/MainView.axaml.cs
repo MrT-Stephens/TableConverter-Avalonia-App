@@ -8,6 +8,7 @@ using System;
 using TableConverter.ViewModels;
 using System.Linq;
 using TableConverter.DataModels;
+using Avalonia.Themes.Fluent;
 
 namespace TableConverter.Views;
 
@@ -74,7 +75,7 @@ public partial class MainView : UserControl
 
             foreach (System.Data.DataColumn x in view.DataTable.Columns)
             {
-                TableDataDataGrid.Columns.Add(new DataGridTextColumn { Header = x.ColumnName, Binding = new Avalonia.Data.Binding($"Row.ItemArray[{x.Ordinal}]") });
+                TableDataDataGrid.Columns.Add(new DataGridTextColumn { Header = x.ColumnName, CanUserSort = true, IsReadOnly = false ,Binding = new Avalonia.Data.Binding($"Row.ItemArray[{x.Ordinal}]") });
             }
         }
     }

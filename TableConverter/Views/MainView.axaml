@@ -12,6 +12,19 @@
     <vm:MainViewModel />
   </Design.DataContext>
 
+  <UserControl.ContextMenu>
+    <ContextMenu>
+      <MenuItem Header="Example" Click="ExampleButtonClicked"/>
+      <MenuItem Header="Open" Click="OpenFileButtonClicked"/>
+      <Separator/>
+      <MenuItem Header="Save" Click="SaveFileButtonClicked"/>
+      <MenuItem Header="Copy" Click="CopyButtonClicked"/>
+      <Separator/>
+      <MenuItem Header="Convert" Click="ConvertButtonClicked"/>
+      <MenuItem Header="Clear" Click="ClearButtonClicked"/>
+    </ContextMenu>
+  </UserControl.ContextMenu>
+
   <!--Application Menu Code-->
   <SplitView
     Name="MenuSplitView"
@@ -528,6 +541,7 @@
                 AutoGenerateColumns="False"
                 GridLinesVisibility="All"
                 CanUserResizeColumns="True"
+                IsReadOnly="False"
                 Foreground="{DynamicResource ForegroundBrush}">
 
               </DataGrid>
