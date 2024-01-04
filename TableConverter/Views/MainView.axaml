@@ -12,6 +12,7 @@
     <vm:MainViewModel />
   </Design.DataContext>
 
+  <!--Main Application Context Menu-->
   <UserControl.ContextMenu>
     <ContextMenu>
       <MenuItem Header="Example" Click="ExampleButtonClicked"/>
@@ -942,7 +943,6 @@
                   Margin="5"
                   Minimum="0"
                   Maximum="1000"
-                  Value="0"
                   Height="15"
                   Orientation="Horizontal"
                   Foreground="{DynamicResource BorderBrush}">
