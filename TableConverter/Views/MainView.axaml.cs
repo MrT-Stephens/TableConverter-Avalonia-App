@@ -64,6 +64,11 @@ public partial class MainView : UserControl
         }
     }
 
+    /// <summary>
+    /// Refresh data table function.
+    /// Will refresh the DataGrid with the data in the view model.
+    /// Makes sure the DataGrid is up to date with the data in the view model.
+    /// </summary>
     private void RefreshDataTable()
     {
         if (DataContext is MainViewModel)
@@ -240,7 +245,7 @@ public partial class MainView : UserControl
 
                 view.ConvertedData = await view.OutputSelectedConverterType.converter_handler.ConvertAsync(view.ColumnValues.ToArray(), view.RowValues.ToArray(), ConvertTimeProgressBar);
 
-                ConvertTimeProgressBar.Value = 0;
+                ConvertTimeProgressBar.Value = 1000;
 
                 ConvertedDataTextBox.CaretIndex = ConvertedDataTextBox.Text.Length;
 

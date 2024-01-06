@@ -137,7 +137,7 @@ namespace TableConverter.Services.ConverterHandlers
             {
                 string output = string.Empty;
 
-                for (int i = 0; i < column_values.Length; ++i)
+                for (int i = 0; i < row_values.Length; ++i)
                 {
                     output += $"INSERT INTO {GetQuote()}{TableName.Replace(' ', '_')}{(GetQuote() == "[" ? "]" : GetQuote())} (";
                     
