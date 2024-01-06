@@ -2,8 +2,10 @@
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
 
@@ -77,11 +79,12 @@ namespace TableConverter.Services.ConverterHandlers
             Controls?.Add(MinifyXmlCheckBox);
         }
 
-        public override Task<DataTable> ConvertAsync(IStorageFile input)
+        public override Task<(List<string>, List<string[]>)> ConvertAsync(IStorageFile input)
         {
             return Task.Run(async () =>
             {
-                DataTable data_table = new DataTable();
+                List<string> column_values = new List<string>();
+                List<string[]> row_values = new List<string[]>();
 
                 try
                 {
@@ -92,18 +95,36 @@ namespace TableConverter.Services.ConverterHandlers
 
                     data_set.ReadXml(reader);
 
-                    data_table = data_set.Tables[0];
+                    for (int i = 0; i < data_set.Tables.Count; i++)
+                    {
+                        foreach (DataColumn column in data_set.Tables[i].Columns)
+                        {
+                            column_values.Add(column.ColumnName);
+                        }
+
+                        foreach (DataRow row in data_set.Tables[i].Rows)
+                        {
+                            List<string> row_value = new List<string>();
+
+                            foreach (DataColumn column in data_set.Tables[i].Columns)
+                            {
+                                row_value.Add(row[column].ToString());
+                            }
+
+                            row_values.Add(row_value.ToArray());
+                        }
+                    }
                 }
                 catch (Exception)
                 {
-                    return new DataTable();
+                    return (new List<string>(), new List<string[]>());
                 }
 
-                return data_table;
+                return (column_values, row_values);
             });
         }
 
-        public override Task<string> ConvertAsync(DataTable input, ProgressBar progress_bar)
+        public override Task<string> ConvertAsync(string[] column_values, string[][] row_values, ProgressBar progress_bar)
         {
             return Task.Run(() =>
             {
@@ -118,24 +139,24 @@ namespace TableConverter.Services.ConverterHandlers
                 xml_document.AppendChild(root_element);
 
                 // Iterate over DataTable rows
-                foreach (DataRow row in input.Rows)
+                for (int i = 0; i < row_values.Length; ++i)
                 {
                     // Create record element
                     XmlElement record_element = xml_document.CreateElement((ElementName == string.Empty) ? "Element" : ElementName.Replace(' ', '_'));
 
                     // Iterate over DataTable columns
-                    foreach (DataColumn column in input.Columns)
+                    for (int j = 0; j < column_values.Length; ++j)
                     {
                         // Create element for each column and set its value
-                        XmlElement columnElement = xml_document.CreateElement(column.ColumnName.Replace(' ', '_'));
-                        columnElement.InnerText = row[column].ToString();
+                        XmlElement columnElement = xml_document.CreateElement(column_values[j].Replace(' ', '_'));
+                        columnElement.InnerText = row_values[i][j].ToString();
                         record_element.AppendChild(columnElement);
                     }
 
                     // Append record element to the root
                     root_element.AppendChild(record_element);
 
-                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(input.Rows.IndexOf(row), 0, input.Rows.Count - 1, 0, 1000));
+                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 1000));
                 }
 
                 StringWriter text_writer = new StringWriter();

@@ -149,7 +149,7 @@ namespace TableConverter.Services.ConverterHandlers
             Controls?.Add(ForegroundStackPanel);
         }
 
-        public override Task<string> ConvertAsync(DataTable input, ProgressBar progress_bar)
+        public override Task<string> ConvertAsync(string[] column_values, string[][] row_values, ProgressBar progress_bar)
         {
             return Task.Run(() =>
             {
@@ -162,29 +162,29 @@ namespace TableConverter.Services.ConverterHandlers
                             table.ExtendLastCellsToTableBottom();
                             table.ColumnsDefinition(column_definitions =>
                             {
-                                for (uint i = 0; i < input.Columns.Count; ++i)
+                                for (uint i = 0; i < column_values.Length; ++i)
                                 {
                                     column_definitions.RelativeColumn();
                                 }
                             });
 
-                            for (uint i = 0; i < input.Columns.Count; ++i)
+                            for (uint i = 0; i < column_values.Length; ++i)
                             {
                                 if (BoldHeader)
                                 {
-                                    table.Cell().Row(1).Column(i + 1).Element(Block).Text(input.Columns[(int)i].ColumnName).ExtraBold().FontColor(CurrentForegroundColor);
+                                    table.Cell().Row(1).Column(i + 1).Element(Block).Text(column_values[(int)i]).ExtraBold().FontColor(CurrentForegroundColor);
                                 }
                                 else
                                 {
-                                    table.Cell().Row(1).Column(i + 1).Element(Block).Text(input.Columns[(int)i].ColumnName).FontColor(CurrentForegroundColor);
+                                    table.Cell().Row(1).Column(i + 1).Element(Block).Text(column_values[(int)i]).FontColor(CurrentForegroundColor);
                                 }
                             }
 
-                            for (uint i = 0; i < input.Rows.Count; ++i)
+                            for (uint i = 0; i < row_values.Length; ++i)
                             {
-                                for (uint j = 0; j < input.Columns.Count; ++j)
+                                for (uint j = 0; j < column_values.Length; ++j)
                                 {
-                                    table.Cell().Row(i + 2).Column(j + 1).Element(Block).Text(input.Rows[(int)i][(int)j].ToString()).FontColor(CurrentForegroundColor);
+                                    table.Cell().Row(i + 2).Column(j + 1).Element(Block).Text(row_values[(int)i][(int)j]).FontColor(CurrentForegroundColor);
                                 }
                             }
                         });

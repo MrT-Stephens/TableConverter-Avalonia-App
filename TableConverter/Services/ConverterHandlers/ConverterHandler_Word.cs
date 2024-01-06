@@ -6,6 +6,7 @@ using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using NPOI.XWPF.UserModel;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,11 +22,12 @@ namespace TableConverter.Services.ConverterHandlers
             base.InitializeControls();
         }
 
-        public override Task<DataTable> ConvertAsync(IStorageFile input)
+        public override Task<(List<string>, List<string[]>)> ConvertAsync(IStorageFile input)
         {
             return Task.Run(async () =>
             {
-                DataTable data_table = new DataTable();
+                List<string> column_values = new List<string>();
+                List<string[]> row_values = new List<string[]>();
 
                 try
                 {
@@ -37,12 +39,12 @@ namespace TableConverter.Services.ConverterHandlers
                         {
                             foreach (var cell in row.GetTableCells())
                             {
-                                data_table.Columns.Add(cell.GetText());
+                                column_values.Add(cell.GetText());
                             }
                         }
                         else
                         {
-                            data_table.Rows.Add(row.GetTableCells().Select(cell => cell.GetText()).ToArray());
+                            row_values.Add(row.GetTableCells().Select(cell => cell.GetText()).ToArray());
                         }
                     }
 
@@ -50,34 +52,34 @@ namespace TableConverter.Services.ConverterHandlers
                 }
                 catch (Exception)
                 {
-                    return new DataTable();
+                    return (new List<string>(), new List<string[]>());
                 }
 
-                return data_table;
+                return (column_values, row_values);
             });
         }
 
-        public override Task<string> ConvertAsync(DataTable input, ProgressBar progress_bar)
+        public override Task<string> ConvertAsync(string[] column_values, string[][] row_values, ProgressBar progress_bar)
         {
             return Task.Run(() =>
             {
                 document = new XWPFDocument();
 
-                var table = document.CreateTable(input.Rows.Count + 1, input.Columns.Count);
+                var table = document.CreateTable(row_values.Length + 1, column_values.Length);
 
-                for (int i = 0; i < input.Columns.Count; i++)
+                for (int i = 0; i < column_values.Length; i++)
                 {
-                    table.GetRow(0).GetCell(i).SetText(input.Columns[i].ColumnName);
+                    table.GetRow(0).GetCell(i).SetText(column_values[i]);
                 }
 
-                for (int i = 0; i < input.Rows.Count; i++)
+                for (int i = 0; i < row_values.Length; i++)
                 {
-                    for (int j = 0; j < input.Columns.Count; j++)
+                    for (int j = 0; j < column_values.Length; j++)
                     {
-                        table.GetRow(i + 1).GetCell(j).SetText(input.Rows[i][j].ToString());
+                        table.GetRow(i + 1).GetCell(j).SetText(row_values[i][j]);
                     }
 
-                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, input.Rows.Count - 1, 0, 1000));
+                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 1000));
                 }
 
                 return $"Please download the '.docx' file to view the generated data 😁{Environment.NewLine}";

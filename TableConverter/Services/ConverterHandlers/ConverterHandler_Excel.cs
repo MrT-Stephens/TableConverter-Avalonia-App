@@ -7,6 +7,7 @@ using NPOI.XSSF.UserModel;
 using Avalonia.Threading;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace TableConverter.Services.ConverterHandlers
 {
@@ -42,11 +43,12 @@ namespace TableConverter.Services.ConverterHandlers
             Controls?.Add(SheetNameStackPanel);
         }
 
-        public override Task<DataTable> ConvertAsync(IStorageFile input)
+        public override Task<(List<string>, List<string[]>)> ConvertAsync(IStorageFile input)
         {
             return Task.Run(async () =>
             {
-                DataTable data_table = new DataTable();
+                List<string> column_values = new List<string>();
+                List<string[]> row_values = new List<string[]>();
 
                 try
                 {
@@ -60,12 +62,12 @@ namespace TableConverter.Services.ConverterHandlers
                         {
                             foreach (var cell in row.Cells)
                             {
-                                data_table.Columns.Add(cell.ToString());
+                                column_values.Add(cell.ToString());
                             }
                         }
                         else
                         {
-                            data_table.Rows.Add(row.ToArray());
+                            row_values.Add(row.Select(value => value.ToString()).ToArray());
                         }
                     }
 
@@ -73,14 +75,14 @@ namespace TableConverter.Services.ConverterHandlers
                 }
                 catch (Exception)
                 {
-                    return new DataTable();
+                    return (new List<string>(), new List<string[]>());
                 }
 
-                return data_table;
+                return (column_values, row_values);
             });
         }
 
-        public override Task<string> ConvertAsync(DataTable input, ProgressBar progress_bar)
+        public override Task<string> ConvertAsync(string[] column_values, string[][] row_values, ProgressBar progress_bar)
         {
             return Task.Run(() =>
             {
@@ -90,24 +92,24 @@ namespace TableConverter.Services.ConverterHandlers
 
                 IRow header_row = sheet.CreateRow(0);
 
-                for (int i = 0; i < input.Columns.Count; i++)
+                for (int i = 0; i < column_values.Length; i++)
                 {
-                    header_row.CreateCell(i).SetCellValue(input.Columns[i].ColumnName);
+                    header_row.CreateCell(i).SetCellValue(column_values[i]);
                 }
 
-                for (int i = 0; i < input.Rows.Count; i++)
+                for (int i = 0; i < row_values.Length; i++)
                 {
                     IRow row = sheet.CreateRow(i + 1);
 
-                    for (int j = 0; j < input.Columns.Count; j++)
+                    for (int j = 0; j < column_values.Length; j++)
                     {
-                        row.CreateCell(j).SetCellValue(input.Rows[i][j].ToString());
+                        row.CreateCell(j).SetCellValue(row_values[i][j]);
                     }
 
-                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, input.Rows.Count - 1, 0, 1000));
+                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 1000));
                 }
 
-                for (int i = 0; i < input.Columns.Count; i++)
+                for (int i = 0; i < column_values.Length; i++)
                 {
                     sheet.AutoSizeColumn(i);
                 }

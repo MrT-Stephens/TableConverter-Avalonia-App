@@ -34,30 +34,30 @@ namespace TableConverter.Services.ConverterHandlers
             Controls?.Add(SeparatorStackPanel);
         }
 
-        public override Task<string> ConvertAsync(DataTable input, ProgressBar progress_bar)
+        public override Task<string> ConvertAsync(string[] column_values, string[][] row_values, ProgressBar progress_bar)
         {
             return Task.Run(() =>
             {
                 string output = string.Empty;
 
-                foreach (DataColumn column in input.Columns)
+                foreach (string column in column_values)
                 {
-                    output += column.ColumnName + Environment.NewLine;
+                    output += column + Environment.NewLine;
                 }
 
-                for (int i = 0; i < input.Rows.Count; i++)
+                for (int i = 0; i < row_values.Length; i++)
                 {
                     if (RowSeparator != string.Empty)
                     {
                         output += RowSeparator + Environment.NewLine;
                     }
 
-                    for (int j = 0; j < input.Columns.Count; j++)
+                    for (int j = 0; j < column_values.Length; j++)
                     {
-                        output += input.Rows[i][j].ToString() + Environment.NewLine;
+                        output += row_values[i][j] + Environment.NewLine;
                     }
 
-                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, input.Rows.Count - 1, 0, 1000));
+                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 1000));
                 }
 
                 return output;

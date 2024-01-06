@@ -211,7 +211,7 @@ namespace TableConverter.Services.ConverterHandlers
             Controls?.Add(BoldColumnCheckBox);
         }
 
-        public override Task<string> ConvertAsync(DataTable input, ProgressBar progress_bar)
+        public override Task<string> ConvertAsync(string[] column_values, string[][] row_values, ProgressBar progress_bar)
         {
             return Task.Run(() =>
             {
@@ -245,9 +245,9 @@ namespace TableConverter.Services.ConverterHandlers
 
                     return "\t\\begin{tabular}{" + CurrentTableType switch
                     {
-                        "All" or "MySQL" or "Markdown" => "|" + string.Join("", Enumerable.Repeat($"{text_alignement_char}|", input.Columns.Count)),
-                        "Excel" => $"|{text_alignement_char}|" + string.Join("", Enumerable.Repeat($"{text_alignement_char}", input.Columns.Count - 1)) + "|",
-                        "Horizontal" or "None" => string.Join("", Enumerable.Repeat($"{text_alignement_char}", input.Columns.Count)),
+                        "All" or "MySQL" or "Markdown" => "|" + string.Join("", Enumerable.Repeat($"{text_alignement_char}|", column_values.Length)),
+                        "Excel" => $"|{text_alignement_char}|" + string.Join("", Enumerable.Repeat($"{text_alignement_char}", column_values.Length - 1)) + "|",
+                        "Horizontal" or "None" => string.Join("", Enumerable.Repeat($"{text_alignement_char}", column_values.Length)),
                     } + "}" + Environment.NewLine;
                 };
 
@@ -262,7 +262,7 @@ namespace TableConverter.Services.ConverterHandlers
 
                 var TableHeaderGenerator = () =>
                 {
-                    return GenerateTableRow(input.Columns.Cast<DataColumn>().Select(column => column.ColumnName).ToArray(), BoldHeader, BoldColumn) +
+                    return GenerateTableRow(column_values, BoldHeader, BoldColumn) +
                     CurrentTableType switch
                     {
                         "All" or "MySQL" or "Excel" or "Horizontal" or "Markdown" => " \\hline",
@@ -274,18 +274,18 @@ namespace TableConverter.Services.ConverterHandlers
                 {
                     string temp = string.Empty;
 
-                    for (int i = 0; i < input.Rows.Count; i++)
+                    for (int i = 0; i < row_values.Length; i++)
                     {
-                        temp += GenerateTableRow(input.Rows[i].ItemArray.Select(obj => obj.ToString()).ToArray(), false, BoldColumn);
+                        temp += GenerateTableRow(row_values[i], false, BoldColumn);
 
-                        Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, input.Rows.Count - 1, 0, 1000));
+                        Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 1000));
 
                         if (CurrentTableType == "None")
                         {
                             temp += Environment.NewLine;
                             continue;
                         }
-                        else if (CurrentTableType == "All" || i == input.Rows.Count - 1)
+                        else if (CurrentTableType == "All" || i == row_values.Length - 1)
                         {
                             temp += " \\hline" + Environment.NewLine;
                         }

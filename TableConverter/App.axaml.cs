@@ -22,7 +22,7 @@ public partial class App : Application
         BindingPlugins.DataValidators.RemoveAt(0);
 
         Services.ConverterHandlerService converter_handler_service = new Services.ConverterHandlerService();
-        Services.DataTableConverterService data_table_converter_service = new Services.DataTableConverterService();
+        Services.TableDataConverterService data_table_converter_service = new Services.TableDataConverterService();
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {

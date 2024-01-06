@@ -48,11 +48,12 @@ namespace TableConverter.Services.ConverterHandlers
             Controls?.Add(JsonFormatStackPanel);
         }
 
-        public override Task<DataTable> ConvertAsync(IStorageFile input)
+        public override Task<(List<string>, List<string[]>)> ConvertAsync(IStorageFile input)
         {
             return Task.Run(async () =>
             {
-                DataTable data_table = new DataTable();
+                List<string> column_values = new List<string>();
+                List<string[]> row_values = new List<string[]>();
 
                 try
                 {
@@ -75,13 +76,13 @@ namespace TableConverter.Services.ConverterHandlers
 
                                 if (first_line)
                                 {
-                                    data_table.Columns.Add(key_value[0].Trim('"'));
+                                    column_values.Add(key_value[0].Trim('"'));
                                 }
 
                                 row.Add(key_value[1].Trim('"'));
                             }
 
-                            data_table.Rows.Add(row.ToArray());
+                            row_values.Add(row.ToArray());
                         }
                         else
                         {
@@ -91,12 +92,12 @@ namespace TableConverter.Services.ConverterHandlers
                             {
                                 foreach (string str in strings)
                                 {
-                                    data_table.Columns.Add(str.Trim('"'));
+                                    column_values.Add(str.Trim('"'));
                                 }
                             }
                             else
                             {
-                                data_table.Rows.Add(strings.Select(str => str.Trim('"')).ToArray());
+                                row_values.Add(strings.Select(str => str.Trim('"')).ToArray());
                             }
                         }
 
@@ -105,14 +106,14 @@ namespace TableConverter.Services.ConverterHandlers
                 }
                 catch (Exception)
                 {
-                    return new DataTable();
+                    return (new List<string>(), new List<string[]>());
                 }
 
-                return data_table;
+                return (column_values, row_values);
             });
         }
 
-        public override Task<string> ConvertAsync(DataTable input, ProgressBar progress_bar)
+        public override Task<string> ConvertAsync(string[] column_values, string[][] row_values, ProgressBar progress_bar)
         {
             return Task.Run(() =>
             {
@@ -122,15 +123,15 @@ namespace TableConverter.Services.ConverterHandlers
                 {
                     case "Objects":
                         {
-                            for (int i = 0; i < input.Rows.Count; ++i)
+                            for (int i = 0; i < row_values.Length; ++i)
                             {
                                 output += "{";
 
-                                foreach (DataColumn column in input.Columns)
+                                for (int j = 0; j < column_values.Length; ++j)
                                 {
-                                    output += $"\"{column.ColumnName}\":\"{input.Rows[i][column.ColumnName]}\"";
+                                    output += $"\"{column_values[j]}\":\"{row_values[i][j]}\"";
 
-                                    if (column.Ordinal != input.Columns.Count - 1)
+                                    if (j != row_values.Length - 1)
                                     {
                                         output += ",";
                                     }
@@ -138,34 +139,34 @@ namespace TableConverter.Services.ConverterHandlers
 
                                 output += "}";
 
-                                if (i != input.Rows.Count - 1)
+                                if (i != row_values.Length - 1)
                                 {
                                     output += Environment.NewLine;
                                 }
 
-                                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, input.Rows.Count - 1, 0, 1000));
+                                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 1000));
                             }
 
                             break;
                         }
                     case "Arrays":
                         {
-                            output += "[" + string.Join(",", input.Columns.Cast<DataColumn>().Select(column => $"\"{column.ColumnName}\"").ToArray()) + "]" + Environment.NewLine;
+                            output += "[" + string.Join(",", column_values.Select(column => $"\"{column}\"").ToArray()) + "]" + Environment.NewLine;
 
-                            for (int i = 0; i < input.Rows.Count; ++i)
+                            for (int i = 0; i < row_values.Length; ++i)
                             {
                                 output += "[";
 
-                                output += string.Join(",", input.Rows[i].ItemArray.Select(str => $"\"{str}\"").ToArray());
+                                output += string.Join(",", row_values[i].Select(str => $"\"{str}\"").ToArray());
 
                                 output += "]";
 
-                                if (i != input.Rows.Count - 1)
+                                if (i != row_values.Length - 1)
                                 {
                                     output += Environment.NewLine;
                                 }
 
-                                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, input.Rows.Count - 1, 0, 1000));
+                                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 1000));
                             }
 
                             break;

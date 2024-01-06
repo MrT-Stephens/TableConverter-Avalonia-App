@@ -67,28 +67,39 @@ namespace TableConverter.Services.ConverterHandlers
             Controls?.Add(MinifyJsonCheckBox);
         }
 
-        public override Task<DataTable> ConvertAsync(IStorageFile input)
+        public override Task<(List<string>, List<string[]>)> ConvertAsync(IStorageFile input)
         {
             return Task.Run(async () =>
             {
-                DataTable data_table = new DataTable();
+                List<string> column_values = new List<string>();
+                List<string[]> row_values = new List<string[]>();
 
                 try
                 {
                     using var reader = new StreamReader(await input.OpenReadAsync());
 
-                    data_table = JsonConvert.DeserializeObject<DataTable?>(await reader.ReadToEndAsync()).Copy();
+                    DataTable data_table = JsonConvert.DeserializeObject<DataTable?>(await reader.ReadToEndAsync()).Copy();
+
+                    for (int i = 0; i < data_table.Columns.Count; ++i)
+                    {
+                        column_values.Add(data_table.Columns[i].ColumnName);
+                    }
+
+                    for (int i = 0; i < data_table.Rows.Count; ++i)
+                    {
+                        row_values.Add(data_table.Rows[i].ItemArray.Select(o => o.ToString()).ToArray());
+                    }
                 }
                 catch (Exception)
                 {
-                    return new DataTable();
+                    return (new List<string>(), new List<string[]>());
                 }
 
-                return data_table;
+                return (column_values, row_values);
             });
         }
 
-        public override Task<string> ConvertAsync(DataTable input, ProgressBar progress_bar)
+        public override Task<string> ConvertAsync(string[] column_values, string[][] row_values, ProgressBar progress_bar)
         {
             return Task.Run(() =>
             {
@@ -98,13 +109,18 @@ namespace TableConverter.Services.ConverterHandlers
                 {
                     case "Array of Objects":
                         {
-                            Dictionary<string, object>[] json_objects = new Dictionary<string, object>[input.Rows.Count];
+                            Dictionary<string, object>[] json_objects = new Dictionary<string, object>[row_values.Length];
 
-                            for (int i = 0; i < input.Rows.Count; ++i)
+                            for (int i = 0; i < row_values.Length; ++i)
                             {
-                                json_objects[i] = input.Rows[i].Table.Columns.Cast<DataColumn>().ToDictionary(c => c.ColumnName.Replace(' ', '_'), c => input.Rows[i][c]);
+                                json_objects[i] = new Dictionary<string, object>();
 
-                                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, input.Rows.Count - 1, 0, 1000));
+                                for (int j = 0; j < column_values.Length; ++j)
+                                {
+                                    json_objects[i].Add(column_values[j].Replace(' ', '_'), row_values[i][j]);
+                                }
+
+                                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 1000));
                             }
 
                             output = JsonConvert.SerializeObject(json_objects, MinifyJson ? Formatting.None : Formatting.Indented);
@@ -113,15 +129,15 @@ namespace TableConverter.Services.ConverterHandlers
                         }
                     case "2D Array":
                         {
-                            string[][] json_array = new string[input.Rows.Count + 1][];
+                            string[][] json_array = new string[row_values.Length + 1][];
 
-                            json_array[0] = input.Columns.Cast<DataColumn>().Select(c => c.ColumnName.Replace(' ', '_')).ToArray();
+                            json_array[0] = column_values.Select(c => c.Replace(' ', '_')).ToArray();
 
-                            for (int i = 0; i < input.Rows.Count; ++i)
+                            for (int i = 0; i < row_values.Length; ++i)
                             {
-                                json_array[i + 1] = input.Rows[i].ItemArray.Select(o => o.ToString()).ToArray();
+                                json_array[i + 1] = row_values[i];
 
-                                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, input.Rows.Count - 1, 0, 1000));
+                                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 1000));
                             }
 
                             output = JsonConvert.SerializeObject(json_array, MinifyJson ? Formatting.None : Formatting.Indented);
@@ -130,42 +146,42 @@ namespace TableConverter.Services.ConverterHandlers
                         }
                     case "Column Arrays":
                         {
-                            Dictionary<string, string[]>[] json_obejcts = new Dictionary<string, string[]>[input.Columns.Count];
+                            Dictionary<string, string[]>[] json_objects = new Dictionary<string, string[]>[column_values.Length];
 
-                            for (int i = 0; i < input.Columns.Count; ++i)
+                            for (int i = 0; i < column_values.Length; ++i)
                             {
-                                json_obejcts[i] = new Dictionary<string, string[]>()
+                                json_objects[i] = new Dictionary<string, string[]>()
                                 {
-                                    { input.Columns[i].ColumnName.Replace(' ', '_'), input.Rows.Cast<DataRow>().Select(r => r[i].ToString()).ToArray() }
+                                    { column_values[i].Replace(' ', '_'), row_values.Select(row => row[i]).ToArray() }
                                 };
 
-                                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, input.Columns.Count - 1, 0, 1000));
+                                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, column_values.Length - 1, 0, 1000));
                             }
 
-                            output = JsonConvert.SerializeObject(json_obejcts, MinifyJson ? Formatting.None : Formatting.Indented);
+                            output = JsonConvert.SerializeObject(json_objects, MinifyJson ? Formatting.None : Formatting.Indented);
 
                             break;
                         }
                     case "Keyed Arrays":
                         {
-                            Dictionary<int, string[]>[] json_obejcts = new Dictionary<int, string[]>[input.Rows.Count + 1];
+                            Dictionary<int, string[]>[] json_objects = new Dictionary<int, string[]>[row_values.Length + 1];
 
-                            json_obejcts[0] = new Dictionary<int, string[]> 
+                            json_objects[0] = new Dictionary<int, string[]>
                             {
-                                { 0, input.Columns.Cast<DataColumn>().Select(c => c.ColumnName.Replace(' ', '_')).ToArray() }
+                                { 0, column_values.Select(c => c.Replace(' ', '_')).ToArray() }
                             };
 
-                            for (int i = 0; i < input.Rows.Count; ++i)
+                            for (int i = 0; i < row_values.Length; ++i)
                             {
-                                json_obejcts[i + 1] = new Dictionary<int, string[]>
+                                json_objects[i + 1] = new Dictionary<int, string[]>
                                 {
-                                    { i + 1, input.Rows[i].ItemArray.Select(o => o.ToString()).ToArray() }
+                                    { i + 1, row_values[i] }
                                 };
 
-                                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, input.Rows.Count - 1, 0, 1000));
+                                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 1000));
                             }
 
-                            output = JsonConvert.SerializeObject(json_obejcts, MinifyJson ? Formatting.None : Formatting.Indented);
+                            output = JsonConvert.SerializeObject(json_objects, MinifyJson ? Formatting.None : Formatting.Indented);
 
                             break;
                         }

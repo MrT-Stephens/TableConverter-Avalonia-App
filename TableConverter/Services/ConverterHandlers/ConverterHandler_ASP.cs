@@ -2,6 +2,7 @@
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Threading.Tasks;
@@ -15,11 +16,12 @@ namespace TableConverter.Services.ConverterHandlers
             base.InitializeControls();
         }
 
-        public override Task<DataTable> ConvertAsync(IStorageFile input)
+        public override Task<(List<string>, List<string[]>)> ConvertAsync(IStorageFile input)
         {
             return Task.Run(async () =>
             {
-                DataTable data_table = new DataTable();
+                List<string> column_values = new List<string>();
+                List<string[]> row_values = new List<string[]>();
 
                 try
                 {
@@ -42,12 +44,12 @@ namespace TableConverter.Services.ConverterHandlers
 
                             for (int i = 0; i < columns; i++)
                             {
-                                data_table.Columns.Add();
+                                column_values.Add(string.Empty);
                             }
 
                             for (int i = 0; i < rows - 1; i++)
                             {
-                                data_table.Rows.Add();
+                                row_values.Add(new string[columns]);
                             }
 
                             first_line = false;
@@ -62,11 +64,11 @@ namespace TableConverter.Services.ConverterHandlers
                             {
                                 if (int.Parse(indexes[1]) == 0)
                                 {
-                                    data_table.Columns[int.Parse(indexes[0])].ColumnName = line.Substring(line.IndexOf("=") + 1).Trim();
+                                    column_values[int.Parse(indexes[0])] = line.Substring(line.IndexOf("=") + 1).Trim();
                                 }
                                 else
                                 {
-                                    data_table.Rows[int.Parse(indexes[1]) - 1][int.Parse(indexes[0])] = line.Substring(line.IndexOf("=") + 1).Trim();
+                                    row_values[int.Parse(indexes[1]) - 1][int.Parse(indexes[0])] = line.Substring(line.IndexOf("=") + 1).Trim();
                                 }
                             }
                         }
@@ -74,32 +76,32 @@ namespace TableConverter.Services.ConverterHandlers
                 }
                 catch (Exception)
                 {
-                    return new DataTable();
+                    return (new List<string>(), new List<string[]>());
                 }
 
-                return data_table;
+                return (column_values, row_values);
             });
         }
 
-        public override Task<string> ConvertAsync(DataTable input, ProgressBar progress_bar)
+        public override Task<string> ConvertAsync(string[] column_values, string[][] row_values, ProgressBar progress_bar)
         {
             return Task.Run(() =>
             {
-                string output = $"Dim arr({input.Columns.Count},{input.Rows.Count + 1}){Environment.NewLine}";
+                string output = $"Dim arr({column_values.Length},{row_values.Length + 1}){Environment.NewLine}";
 
-                foreach (DataColumn column in input.Columns)
+                for (int i = 0; i < column_values.Length; ++i)
                 {
-                    output += $"arr({column.Ordinal},0) = {column.ColumnName}{Environment.NewLine}";
+                    output += $"arr({i},0) = {column_values[i]}{Environment.NewLine}";
                 }
 
-                for (int i = 0; i < input.Rows.Count; i++)
+                for (int i = 0; i < row_values.Length; i++)
                 {
-                    for (int j = 0; j < input.Columns.Count; j++)
+                    for (int j = 0; j < column_values.Length; j++)
                     {
-                        output += $"arr({j},{i + 1}) = {input.Rows[i][j]}{Environment.NewLine}";
+                        output += $"arr({j},{i + 1}) = {row_values[i][j]}{Environment.NewLine}";
                     }
 
-                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, input.Rows.Count - 1, 0, 1000));
+                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 1000));
                 }
 
                 return output;

@@ -2,6 +2,7 @@
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Net.Http;
@@ -49,11 +50,12 @@ namespace TableConverter.Services.ConverterHandlers
             Controls?.Add(TheadTbodyCheckBox);
         }
 
-        public override Task<DataTable> ConvertAsync(IStorageFile input)
+        public override Task<(List<string>, List<string[]>)> ConvertAsync(IStorageFile input)
         {
             return Task.Run(async () =>
             {
-                DataTable data_table = new DataTable();
+                List<string> column_values = new List<string>();
+                List<string[]> row_values = new List<string[]>();
 
                 try
                 {
@@ -83,12 +85,12 @@ namespace TableConverter.Services.ConverterHandlers
                                 foreach (Match header_match in header_matches)
                                 {
                                     string header_text = Regex.Replace(header_match.Value, "<.*?>", string.Empty);
-                                    data_table.Columns.Add(header_text.Trim());
+                                    column_values.Add(header_text.Trim());
                                 }
                             }
                             else
                             {
-                                DataRow data_row = data_table.NewRow();
+                                List<string> data_row = new List<string>();
                                 int column_index = 0;
 
                                 // Extract cells from each row
@@ -101,21 +103,21 @@ namespace TableConverter.Services.ConverterHandlers
                                     data_row[column_index++] = cell_text.Trim();
                                 }
 
-                                data_table.Rows.Add(data_row);
+                                row_values.Add(data_row.ToArray());
                             }
                         }
                     }
                 }
                 catch (Exception)
                 {
-                    return new DataTable();
+                    return (new List<string>(), new List<string[]>());
                 }
 
-                return data_table;
+                return (column_values, row_values);
             });
         }
 
-        public override Task<string> ConvertAsync(DataTable input, ProgressBar progress_bar)
+        public override Task<string> ConvertAsync(string[] column_values, string[][] row_values, ProgressBar progress_bar)
         {
             return Task.Run(() =>
             {
@@ -134,10 +136,10 @@ namespace TableConverter.Services.ConverterHandlers
 
                 tab_count++;
 
-                foreach (DataColumn column in input.Columns)
+                for (int i = 0; i < column_values.Length; ++i)
                 {
                     string_writer.Write($"{(MinifyHtml ? "" : new string('\t', tab_count))}<th>");
-                    string_writer.Write(column.ColumnName);
+                    string_writer.Write(column_values[i]);
                     string_writer.Write($"</th>{(MinifyHtml ? "" : Environment.NewLine)}");
                 }
 
@@ -148,7 +150,7 @@ namespace TableConverter.Services.ConverterHandlers
                     string_writer.Write($"{(MinifyHtml ? "" : Environment.NewLine + new string('\t', --tab_count))}</thead>");
                 }
 
-                foreach (DataRow row in input.Rows)
+                for (int i = 0; i < row_values.Length; ++i)
                 {
                     if (TheadTbody)
                     {
@@ -157,10 +159,10 @@ namespace TableConverter.Services.ConverterHandlers
 
                     string_writer.Write($"{(MinifyHtml ? "" : Environment.NewLine + new string('\t', tab_count++))}<tr>");
 
-                    foreach (DataColumn column in input.Columns)
+                    for (int j = 0; j < column_values.Length; ++j)
                     {
                         string_writer.Write($"{(MinifyHtml ? "" : Environment.NewLine + new string('\t', tab_count))}<td>");
-                        string_writer.Write(row[column.ColumnName].ToString());
+                        string_writer.Write(row_values[i][j]);
                         string_writer.Write("</td>");
                     }
 
@@ -171,7 +173,7 @@ namespace TableConverter.Services.ConverterHandlers
                         string_writer.Write($"{(MinifyHtml ? "" : Environment.NewLine + new string('\t', --tab_count))}</tbody>");
                     }
 
-                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(input.Rows.IndexOf(row), 0, input.Rows.Count - 1, 0, 1000));
+                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 1000));
                 }
 
                 string_writer.Write($"{(MinifyHtml ? "" : Environment.NewLine)}</table>");

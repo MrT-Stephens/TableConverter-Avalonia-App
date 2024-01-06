@@ -15,14 +15,17 @@ public partial class MainViewModel : ViewModelBase
     #region Services
 
     private readonly ConverterHandlerService ConverterTypesService;
-    public DataTableConverterService TableConverterService { get; private set; }
+    public TableDataConverterService TableDataConverterService { get; private set; }
 
     #endregion
 
     #region Public Properties
 
     [ObservableProperty]
-    private DataTable _DataTable;
+    private ObservableCollection<string> _ColumnValues;
+
+    [ObservableProperty]
+    private ObservableCollection<string[]> _RowValues;
 
     [ObservableProperty]
     private ObservableCollection<ConverterType> _InputConverterTypes;
@@ -69,12 +72,13 @@ public partial class MainViewModel : ViewModelBase
 
     #region Default Constructor
 
-    public MainViewModel(ConverterHandlerService converter_types_service, DataTableConverterService tableConverterService)
+    public MainViewModel(ConverterHandlerService converter_types_service, TableDataConverterService tableConverterService)
     {
         ConverterTypesService = converter_types_service;
-        TableConverterService = tableConverterService;
+        TableDataConverterService = tableConverterService;
 
-        DataTable = new DataTable();
+        ColumnValues = new ObservableCollection<string>();
+        RowValues = new ObservableCollection<string[]>();
         InputConverterTypes = new ObservableCollection<ConverterType>();
         OutputConverterTypes = new ObservableCollection<ConverterType>();
         SearchBarItems = new ObservableCollection<string>();
@@ -88,9 +92,10 @@ public partial class MainViewModel : ViewModelBase
     public MainViewModel()
     {
         ConverterTypesService = new ConverterHandlerService();
-        TableConverterService = new DataTableConverterService();
+        TableDataConverterService = new TableDataConverterService();
 
-        DataTable = new DataTable();
+        ColumnValues = new ObservableCollection<string>();
+        RowValues = new ObservableCollection<string[]>();
         InputConverterTypes = new ObservableCollection<ConverterType>();
         OutputConverterTypes = new ObservableCollection<ConverterType>();
         SearchBarItems = new ObservableCollection<string>();

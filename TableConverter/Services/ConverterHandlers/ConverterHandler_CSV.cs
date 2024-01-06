@@ -3,9 +3,11 @@ using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Microsoft.VisualBasic.FileIO;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using TableConverter.DataModels;
 
 namespace TableConverter.Services.ConverterHandlers
 {
@@ -67,11 +69,12 @@ namespace TableConverter.Services.ConverterHandlers
             Controls?.Add(QuoteTypeStackPanel);
         }
 
-        public override Task<DataTable> ConvertAsync(IStorageFile input)
+        public override Task<(List<string>, List<string[]>)> ConvertAsync(IStorageFile input)
         {
             return Task.Run(async () =>
             {
-                DataTable data_table = new DataTable();
+                List<string> column_values = new List<string>();
+                List<string[]> row_values = new List<string[]>();
 
                 try
                 {
@@ -80,7 +83,7 @@ namespace TableConverter.Services.ConverterHandlers
                     TextFieldParser parser = new TextFieldParser(stream);
                     {
                         parser.TextFieldType = FieldType.Delimited;
-                        parser.SetDelimiters(new string[] { ",", "\t", ";", "|" });
+                        parser.SetDelimiters(new [] { ",", "\t", ";", "|" });
 
                         bool first_line = true;
 
@@ -90,40 +93,37 @@ namespace TableConverter.Services.ConverterHandlers
 
                             if (first_line && fields != null)
                             {
-                                foreach (var value in fields)
-                                {
-                                    data_table.Columns.Add(value);
-                                }
-
                                 first_line = false;
+
+                                column_values = fields.ToList();
                             }
                             else if (fields != null)
                             {
-                                data_table.Rows.Add(fields.ToArray<object>());
+                                row_values.Add(fields);
                             }
                         }
                     }
                 }
                 catch (Exception)
                 {
-                    return new DataTable();
+                    return (new List<string>(), new List<string[]>());
                 }
 
-                return data_table;
+                return (column_values, row_values);
             });
         }
 
-        public override Task<string> ConvertAsync(DataTable input, ProgressBar progress_bar)
+        public override Task<string> ConvertAsync(string[] column_values, string[][] row_values, ProgressBar progress_bar)
         {
             return Task.Run(() =>
             {
                 string output = string.Empty;
 
-                foreach (DataColumn column in input.Columns)
+                foreach (string column in column_values)
                 {
-                    output += $"{GetQuote()}{column.ColumnName}{GetQuote()}";
+                    output += $"{GetQuote()}{column}{GetQuote()}";
 
-                    if (column.Ordinal != input.Columns.Count - 1)
+                    if (column != column_values.Last())
                     {
                         output += GetDelimiter();
                     }
@@ -131,13 +131,13 @@ namespace TableConverter.Services.ConverterHandlers
 
                 output += "\n";
 
-                for (int i = 0; i < input.Rows.Count; ++i)
+                for (int i = 0; i < row_values.Length; ++i)
                 {
-                    foreach (var item in input.Rows[i].ItemArray)
+                    foreach (string item in row_values[i])
                     {
-                        output += $"{GetQuote()}{item?.ToString()}{GetQuote()}";
+                        output += $"{GetQuote()}{item}{GetQuote()}";
 
-                        if (item != input.Rows[i].ItemArray.Last())
+                        if (item != row_values[i].Last())
                         {
                             output += GetDelimiter();
                         }
@@ -145,7 +145,7 @@ namespace TableConverter.Services.ConverterHandlers
 
                     output += Environment.NewLine;
 
-                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, input.Rows.Count - 1, 0, 1000));
+                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 1000));
                 }
 
                 return output;

@@ -121,7 +121,7 @@ namespace TableConverter.Services.ConverterHandlers
             Controls?.Add(ForceSeparationCheckBox);
         }
 
-        public override Task<string> ConvertAsync(DataTable input, ProgressBar progress_bar)
+        public override Task<string> ConvertAsync(string[] column_values, string[][] row_values, ProgressBar progress_bar)
         {
             return Task.Run(() =>
             {
@@ -144,25 +144,25 @@ namespace TableConverter.Services.ConverterHandlers
                 switch (CurrentTableType)
                 {
                     case "Ascii Table (MySQL)":
-                        output = PrintTable(input, progress_bar, '-', '|', '+', text_alignment, CurrentForceSeparation, CurrentCommentType == "No Comments" ? "" : CurrentCommentType + "    ");
+                        output = PrintTable(column_values, row_values, progress_bar, '-', '|', '+', text_alignment, CurrentForceSeparation, CurrentCommentType == "No Comments" ? "" : CurrentCommentType + "    ");
                         break;
                     case "Ascii Table (Dots)":
-                        output = PrintTable(input, progress_bar, '.', ':', '.', text_alignment, CurrentForceSeparation, CurrentCommentType == "No Comments" ? "" : CurrentCommentType + "    ");
+                        output = PrintTable(column_values, row_values, progress_bar, '.', ':', '.', text_alignment, CurrentForceSeparation, CurrentCommentType == "No Comments" ? "" : CurrentCommentType + "    ");
                         break;
                     case "Ascii Table (Compact)":
-                        output = PrintTable(input, progress_bar, '-', ' ', '-', text_alignment, CurrentForceSeparation, CurrentCommentType == "No Comments" ? "" : CurrentCommentType + "    ");
+                        output = PrintTable(column_values, row_values, progress_bar, '-', ' ', '-', text_alignment, CurrentForceSeparation, CurrentCommentType == "No Comments" ? "" : CurrentCommentType + "    ");
                         break;
                     case "Ascii Table (Simple)":
-                        output = PrintTable(input, progress_bar, '=', ' ', '=', text_alignment, CurrentForceSeparation, CurrentCommentType == "No Comments" ? "" : CurrentCommentType + "    ");
+                        output = PrintTable(column_values, row_values, progress_bar, '=', ' ', '=', text_alignment, CurrentForceSeparation, CurrentCommentType == "No Comments" ? "" : CurrentCommentType + "    ");
                         break;
                     case "Ascii Table (Wavy)":
-                        output = PrintTable(input, progress_bar, '~', '|', '+', text_alignment, CurrentForceSeparation, CurrentCommentType == "No Comments" ? "" : CurrentCommentType + "    ");
+                        output = PrintTable(column_values, row_values, progress_bar, '~', '|', '+', text_alignment, CurrentForceSeparation, CurrentCommentType == "No Comments" ? "" : CurrentCommentType + "    ");
                         break;
                     case "UTF-8 Table (Single Line)":
-                        output = PrintTable(input, progress_bar, '─', '│', '┼', text_alignment, CurrentForceSeparation, CurrentCommentType == "No Comments" ? "" : CurrentCommentType + "    ");
+                        output = PrintTable(column_values, row_values, progress_bar, '─', '│', '┼', text_alignment, CurrentForceSeparation, CurrentCommentType == "No Comments" ? "" : CurrentCommentType + "    ");
                         break;
                     case "UTF-8 Table (Double Line)":
-                        output = PrintTable(input, progress_bar, '═', '║', '╬', text_alignment, CurrentForceSeparation, CurrentCommentType == "No Comments" ? "" : CurrentCommentType + "    ");
+                        output = PrintTable(column_values, row_values, progress_bar, '═', '║', '╬', text_alignment, CurrentForceSeparation, CurrentCommentType == "No Comments" ? "" : CurrentCommentType + "    ");
                         break;
                 }
 
@@ -170,26 +170,26 @@ namespace TableConverter.Services.ConverterHandlers
             });
         }
 
-        public static string PrintTable(DataTable data_table, ProgressBar progress_bar, char horizontal_char, char vertical_char, char intersection_char, TextAlignment text_alignment, bool force_row_separation, string comment_char)
+        public static string PrintTable(string[] column_values, string[][] row_values, ProgressBar progress_bar, char horizontal_char, char vertical_char, char intersection_char, TextAlignment text_alignment, bool force_row_separation, string comment_char)
         {
             int progress_bar_value = 0;
             string output = string.Empty;
 
             // Calculates the max text character widths of every column.
-            int[] max_column_widths = new int[data_table.Columns.Count];
+            int[] max_column_widths = new int[column_values.Length];
 
-            for (int i = 0; i < data_table.Columns.Count; ++i)
+            for (int i = 0; i < column_values.Length; ++i)
             {
-                max_column_widths[i] = data_table.Columns[i].ColumnName.Length + 2;
+                max_column_widths[i] = column_values[i].Length + 2;
             }
 
-            foreach (DataRow row in data_table.Rows)
+            foreach (string[] row in row_values)
             {
-                for (int i = 0; i < data_table.Columns.Count; ++i)
+                for (int i = 0; i < row.Length; ++i)
                 {
                     max_column_widths[i] = Math.Max(max_column_widths[i], row[i].ToString().Length + 2);
 
-                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(progress_bar_value++, 0, data_table.Rows.Count * 2, 0, 1000));
+                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(progress_bar_value++, 0, row_values.Length * 2, 0, 1000));
                 }
             }
 
@@ -197,10 +197,10 @@ namespace TableConverter.Services.ConverterHandlers
             output += comment_char;
             output += PrintSeparator(max_column_widths, horizontal_char, intersection_char);
             output += comment_char;
-            output += PrintRow(data_table.Columns.Cast<DataColumn>().Select(column => column.ColumnName).ToArray(), max_column_widths, vertical_char, text_alignment);
+            output += PrintRow(column_values, max_column_widths, vertical_char, text_alignment);
 
             // Prints the rows of the table.
-            for (int i = 0; i < data_table.Rows.Count; ++i)
+            for (int i = 0; i < row_values.Length; ++i)
             {
                 if (force_row_separation || i == 0)
                 {
@@ -209,15 +209,15 @@ namespace TableConverter.Services.ConverterHandlers
                 }
 
                 output += comment_char;
-                output += PrintRow(data_table.Rows[i].ItemArray.Select(item => item.ToString()).ToArray(), max_column_widths, vertical_char, text_alignment);
+                output += PrintRow(row_values[i], max_column_widths, vertical_char, text_alignment);
 
-                if (i == data_table.Rows.Count - 1)
+                if (i == row_values.Length - 1)
                 {
                     output += comment_char;
                     output += PrintSeparator(max_column_widths, horizontal_char, intersection_char);
                 }
 
-                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(progress_bar_value++, 0, data_table.Rows.Count * 2, 0, 1000));
+                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(progress_bar_value++, 0, row_values.Length * 2, 0, 1000));
             }
 
             return output;

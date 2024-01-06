@@ -2,6 +2,7 @@
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -66,14 +67,16 @@ namespace TableConverter.Services.ConverterHandlers
             Controls?.Add(TableNameStackPanel);
         }
 
-        public override Task<DataTable> ConvertAsync(IStorageFile input)
+        public override Task<(List<string>, List<string[]>)> ConvertAsync(IStorageFile input)
         {
             return Task.Run(async () =>
             {
-                DataTable data_table = new DataTable();
+                List<string> column_values = new List<string>();
+                List<string[]> row_values = new List<string[]>();
 
                 try
                 {
+                    bool first_line = true;
                     using var reader = new StreamReader(await input.OpenReadAsync());
 
                     while (!reader.EndOfStream)
@@ -89,7 +92,7 @@ namespace TableConverter.Services.ConverterHandlers
                             // Gets the column names from the INSERT INTO statement
                             string[] names = Regex.Match(line, @"(?<=\()(.+?)(?=\))").Value.Split(',');
 
-                            if (data_table.Columns.Count == 0)
+                            if (first_line)
                             {
                                 foreach (string value in names)
                                 {
@@ -102,49 +105,47 @@ namespace TableConverter.Services.ConverterHandlers
                                         temp_column = temp_column.Substring(1, temp_column.Length - 2);
                                     }
 
-                                    data_table.Columns.Add(temp_column);
+                                    column_values.Add(temp_column);
                                 }
                             }
 
                             // Gets the values from the INSERT INTO statement
                             string[] values = Regex.Match(line, @"(?<=VALUES \()(.*?)(?=\))").Value.Split(',');
 
-                            DataRow row = data_table.NewRow();
-
                             for (int i = 0; i < values.Length; i++)
                             {
                                 string temp = values[i].Trim();
-                                row[i] = temp.Substring(1, temp.Length - 2);
+                                values[i] = temp.Substring(1, temp.Length - 2);
                             }
 
-                            data_table.Rows.Add(row);
+                            row_values.Add(values);
                         }
                     }   
                 }
                 catch (Exception)
                 {
-                    return new DataTable();
+                    return (new List<string>(), new List<string[]>());
                 }
 
-                return data_table;
+                return (column_values, row_values);
             });
         }
 
-        public override Task<string> ConvertAsync(DataTable input, ProgressBar progress_bar)
+        public override Task<string> ConvertAsync(string[] column_values, string[][] row_values, ProgressBar progress_bar)
         {
             return Task.Run(() =>
             {
                 string output = string.Empty;
 
-                for (int i = 0; i < input.Rows.Count; ++i)
+                for (int i = 0; i < column_values.Length; ++i)
                 {
                     output += $"INSERT INTO {GetQuote()}{TableName.Replace(' ', '_')}{(GetQuote() == "[" ? "]" : GetQuote())} (";
                     
-                    foreach (DataColumn column in input.Columns)
+                    foreach (string column in column_values)
                     {
-                        output += $"{GetQuote()}{column.ColumnName.Replace(' ', '_')}{(GetQuote() == "[" ? "]" : GetQuote())}";
+                        output += $"{GetQuote()}{column.Replace(' ', '_')}{(GetQuote() == "[" ? "]" : GetQuote())}";
 
-                        if (column.Ordinal != input.Columns.Count - 1)
+                        if (column != column_values.Last())
                         {
                             output += ", ";
                         }
@@ -152,11 +153,11 @@ namespace TableConverter.Services.ConverterHandlers
 
                     output += ") VALUES (";
 
-                    foreach (var value in input.Rows[i].ItemArray)
+                    foreach (string value in row_values[i])
                     {
                         output += $"'{value}'";
 
-                        if (value != input.Rows[i].ItemArray.Last())
+                        if (value != row_values[i].Last())
                         {
                             output += ", ";
                         }
@@ -164,7 +165,7 @@ namespace TableConverter.Services.ConverterHandlers
 
                     output += $");{Environment.NewLine}";
 
-                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, input.Rows.Count - 1, 0, 1000));
+                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 1000));
                 }
 
                 return output;

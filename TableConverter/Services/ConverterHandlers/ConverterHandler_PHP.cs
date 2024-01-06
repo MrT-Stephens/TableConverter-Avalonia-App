@@ -2,6 +2,7 @@
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -16,11 +17,12 @@ namespace TableConverter.Services.ConverterHandlers
             base.InitializeControls();
         }
 
-        public override Task<DataTable> ConvertAsync(IStorageFile input)
+        public override Task<(List<string>, List<string[]>)> ConvertAsync(IStorageFile input)
         {
             return Task.Run(async () =>
             {
-                DataTable data_table = new DataTable();
+                List<string> column_values = new List<string>();
+                List<string[]> row_values = new List<string[]>();
 
                 try
                 {
@@ -41,28 +43,28 @@ namespace TableConverter.Services.ConverterHandlers
                             {
                                 foreach (string value in values)
                                 {
-                                    data_table.Columns.Add(value);
+                                    column_values.Add(value);
                                 }
 
                                 first_line = false;
                             }
                             else
                             {
-                                data_table.Rows.Add(values);
+                                row_values.Add(values);
                             }
                         }
                     }
                 }
                 catch (Exception)
                 {
-                    return new DataTable();
+                    return (new List<string>(), new List<string[]>());
                 }
 
-                return data_table;
+                return (column_values, row_values);
             });
         }
 
-        public override Task<string> ConvertAsync(DataTable input, ProgressBar progress_bar)
+        public override Task<string> ConvertAsync(string[] column_values, string[][] row_values, ProgressBar progress_bar)
         {
             return Task.Run(() =>
             {
@@ -70,13 +72,13 @@ namespace TableConverter.Services.ConverterHandlers
 
                 output += "array(" + Environment.NewLine;
 
-                output += GeneratePHPArray(input.Columns.Cast<DataColumn>().Select(col => col.ColumnName).ToArray());
+                output += GeneratePHPArray(column_values);
 
-                for (int i = 0; i < input.Rows.Count; ++i)
+                for (int i = 0; i < row_values.Length; ++i)
                 {
-                    output += GeneratePHPArray(input.Rows[i].ItemArray.ToArray());
+                    output += GeneratePHPArray(row_values[i]);
 
-                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, input.Rows.Count - 1, 0, 1000));
+                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 1000));
                 }
 
                 return output += ");" + Environment.NewLine;

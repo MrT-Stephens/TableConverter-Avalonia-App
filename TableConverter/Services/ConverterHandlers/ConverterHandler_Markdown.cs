@@ -2,9 +2,11 @@
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace TableConverter.Services.ConverterHandlers
 {
@@ -102,11 +104,12 @@ namespace TableConverter.Services.ConverterHandlers
             Controls?.Add(BoldColumnCheckBox);
         }
 
-        public override Task<DataTable> ConvertAsync(IStorageFile input)
+        public override Task<(List<string>, List<string[]>)> ConvertAsync(IStorageFile input)
         {
             return Task.Run(async () =>
             {
-                DataTable data_table = new DataTable();
+                List<string> column_values = new List<string>();
+                List<string[]> rows_values = new List<string[]>();
 
                 try
                 {
@@ -137,7 +140,7 @@ namespace TableConverter.Services.ConverterHandlers
                                     temp_column = temp_column.Substring(2, temp_column.Length - 4);
                                 }
 
-                                data_table.Columns.Add(temp_column);
+                                column_values.Add(temp_column);
                             }
                         }
                         else if ((line.StartsWith("|-") && line.EndsWith("-|")) || (line.StartsWith(" -") && line.EndsWith("- ")) || (line.StartsWith('-')) || (line.EndsWith('-')))
@@ -151,13 +154,11 @@ namespace TableConverter.Services.ConverterHandlers
                                 line = line.Substring(1, line.Length - 2);
                             }
 
-                            string[] row_values = line.Split('|');
+                            string[] row = line.Split('|');
 
-                            DataRow row = data_table.NewRow();
-
-                            for (int i = 0; i < row_values.Length; ++i)
+                            for (int i = 0; i < row.Length; ++i)
                             {
-                                string temp_value = row_values[i].Trim();
+                                string temp_value = row[i].Trim();
 
                                 if (temp_value.StartsWith("**") && temp_value.EndsWith("**"))
                                 {
@@ -167,20 +168,20 @@ namespace TableConverter.Services.ConverterHandlers
                                 row[i] = temp_value;
                             }
 
-                            data_table.Rows.Add(row);
+                            rows_values.Add(row);
                         }
                     }
                 }
                 catch (Exception)
                 {
-                    return new DataTable();
+                    return (new List<string>(), new List<string[]>());
                 }
 
-                return data_table;
+                return (column_values, rows_values);
             });
         }
 
-        public override Task<string> ConvertAsync(DataTable data_table, ProgressBar progress_bar)
+        public override Task<string> ConvertAsync(string[] column_values, string[][] row_values,  ProgressBar progress_bar)
         {
             return Task.Run(() =>
             {
@@ -188,23 +189,23 @@ namespace TableConverter.Services.ConverterHandlers
                 string output = string.Empty;
 
                 // Calculates the max text character widths of every column.
-                int[] max_column_widths = new int[data_table.Columns.Count];
+                int[] max_column_widths = new int[column_values.Length];
 
-                for (int i = 0; i < data_table.Columns.Count; ++i)
+                for (int i = 0; i < column_values.Length; ++i)
                 {
                     if ((i == 0 && CurrentBoldColumn) || CurrentBoldHeader)
                     {
-                        max_column_widths[i] = data_table.Columns[i].ColumnName.Length + 6;
+                        max_column_widths[i] = column_values[i].Length + 6;
                     }
                     else 
                     {
-                        max_column_widths[i] = data_table.Columns[i].ColumnName.Length + 2;
+                        max_column_widths[i] = column_values[i].Length + 2;
                     }
                 }
 
-                foreach (DataRow row in data_table.Rows)
+                foreach (string[] row in row_values)
                 {
-                    for (int i = 0; i < data_table.Columns.Count; ++i)
+                    for (int i = 0; i < column_values.Length; ++i)
                     {
                         if (i == 0 && CurrentBoldColumn)
                         {
@@ -216,7 +217,7 @@ namespace TableConverter.Services.ConverterHandlers
                         }
                     }
 
-                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(progress_bar_value++, 1, (data_table.Rows.Count * 2) - 2, 0, 1000));
+                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(progress_bar_value++, 1, (row_values.Length * 2) - 2, 0, 1000));
                 }
 
                 // Get the current text alignment.
@@ -240,62 +241,62 @@ namespace TableConverter.Services.ConverterHandlers
                 {
                     case "Markdown Table (Normal)":
                         {
-                            for (int i = 0; i < data_table.Columns.Count; ++i)
+                            for (int i = 0; i < column_values.Length; ++i)
                             {
                                 output += "| " + AlignText(
-                                    (((i == 0 && CurrentBoldColumn) || CurrentBoldHeader) ?  $"**{data_table.Columns[i].ColumnName}**" : data_table.Columns[i].ColumnName)
+                                    (((i == 0 && CurrentBoldColumn) || CurrentBoldHeader) ?  $"**{column_values[i]}**" : column_values[i])
                                     , text_alignment, max_column_widths[i] + 2, ' ') + " ";
                             }
 
                             output += "|" + Environment.NewLine;
 
-                            for (int i = 0; i < data_table.Columns.Count; ++i)
+                            for (int i = 0; i < column_values.Length; ++i)
                             {
                                 output += "|-" + AlignText("", text_alignment, max_column_widths[i] + 2, '-') + "-";
                             }
 
                             output += "|" + Environment.NewLine;
 
-                            for (int i = 0; i < data_table.Rows.Count; ++i)
+                            for (int i = 0; i < row_values.Length; ++i)
                             {
-                                for (int j = 0; j < data_table.Columns.Count; ++j)
+                                for (int j = 0; j < column_values.Length; ++j)
                                 {
                                     output += "| " + AlignText(
-                                        ((j == 0 && CurrentBoldColumn) ? $"**{data_table.Rows[i][j]}**" : data_table.Rows[i][j].ToString())
+                                        ((j == 0 && CurrentBoldColumn) ? $"**{row_values[i][j]}**" : row_values[i][j].ToString())
                                         , text_alignment, max_column_widths[j] + 2, ' ') + " ";
                                 }
 
                                 output += "|" + Environment.NewLine;
 
-                                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(progress_bar_value++, 1, (data_table.Rows.Count * 2) - 2, 0, 1000));
+                                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(progress_bar_value++, 1, (row_values.Length * 2) - 2, 0, 1000));
                             }
 
                             break;
                         }
                     case "Markdown Table (Simple)":
                         {
-                            for (int i = 0; i < data_table.Columns.Count; ++i)
+                            for (int i = 0; i < column_values.Length; ++i)
                             {
                                 output += " " + AlignText(
-                                    (((i == 0 && CurrentBoldColumn) || CurrentBoldHeader) ? $"**{data_table.Columns[i].ColumnName}**" : data_table.Columns[i].ColumnName)
-                                    , text_alignment, max_column_widths[i] + 2, ' ') + (i == data_table.Columns.Count - 1 ? $" {Environment.NewLine}" : " |");
+                                    (((i == 0 && CurrentBoldColumn) || CurrentBoldHeader) ? $"**{column_values[i]}**" : column_values[i])
+                                    , text_alignment, max_column_widths[i] + 2, ' ') + (i == column_values.Length - 1 ? $" {Environment.NewLine}" : " |");
                             }
 
-                            for (int i = 0; i < data_table.Columns.Count; ++i)
+                            for (int i = 0; i < column_values.Length; ++i)
                             {
-                                output += " " + AlignText("", text_alignment, max_column_widths[i] + 2, '-') + (i == data_table.Columns.Count - 1 ? $" {Environment.NewLine}" : " |");
+                                output += " " + AlignText("", text_alignment, max_column_widths[i] + 2, '-') + (i == column_values.Length - 1 ? $" {Environment.NewLine}" : " |");
                             }
 
-                            for (int i = 0; i < data_table.Rows.Count; ++i)
+                            for (int i = 0; i < row_values.Length; ++i)
                             {
-                                for (int j = 0; j < data_table.Columns.Count; ++j)
+                                for (int j = 0; j < column_values.Length; ++j)
                                 {
                                     output += " " + AlignText(
-                                        ((j == 0 && CurrentBoldColumn) ? $"**{data_table.Rows[i][j]}**" : data_table.Rows[i][j].ToString())
-                                        , text_alignment, max_column_widths[j] + 2, ' ') + (j == data_table.Columns.Count - 1 ? $" {Environment.NewLine}" : " |");
+                                        ((j == 0 && CurrentBoldColumn) ? $"**{row_values[i][j]}**" : row_values[i][j].ToString())
+                                        , text_alignment, max_column_widths[j] + 2, ' ') + (j == column_values.Length - 1 ? $" {Environment.NewLine}" : " |");
                                 }
 
-                                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(progress_bar_value++, 0, data_table.Rows.Count * 2, 0, 1000));
+                                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(progress_bar_value++, 0, row_values.Length * 2, 0, 1000));
                             }
 
                             break;

@@ -31,46 +31,34 @@ namespace TableConverter.Services.ConverterHandlers
         /// Can be overridden by the converter type.
         /// </summary>
         /// <returns> Task<DataTable> </returns>
-        public virtual Task<DataTable> LoadExampleAsync()
+        public virtual Task<(List<string>, List<string[]>)> LoadExampleAsync()
         {
             return Task.Run(() =>
             {
-                DataTable data_table = new DataTable();
-
-                data_table.Columns.Add("First Name");
-                data_table.Columns.Add("Last Name");
-                data_table.Columns.Add("Age");
-                data_table.Columns.Add("Date of Birth");
-                data_table.Columns.Add("Id");
-
-                data_table.Rows.Add("John", "Stephens", 25, new DateTime(1995, 1, 1).ToLongDateString(), 1);
-                data_table.Rows.Add("Jane", "Doe", 23, new DateTime(1997, 1, 1).ToLongDateString(), 2);
-                data_table.Rows.Add("James", "Smith", 30, new DateTime(1990, 1, 1).ToLongDateString(), 3);
-                data_table.Rows.Add("Matt", "Williams", 28, new DateTime(1992, 1, 1).ToLongDateString(), 4);
-                data_table.Rows.Add("Mary", "Brown", 27, new DateTime(1993, 1, 1).ToLongDateString(), 5);
-                data_table.Rows.Add("Michael", "Jones", 26, new DateTime(1994, 1, 1).ToLongDateString(), 6);
-                data_table.Rows.Add("Jessica", "Miller", 24, new DateTime(1996, 1, 1).ToLongDateString(), 7);
-                data_table.Rows.Add("David", "Davis", 29, new DateTime(1991, 1, 1).ToLongDateString(), 8);
-                data_table.Rows.Add("Ashley", "Wilson", 31, new DateTime(1989, 1, 1).ToLongDateString(), 9);
-                data_table.Rows.Add("Chris", "Taylor", 32, new DateTime(1988, 1, 1).ToLongDateString(), 10);
-                data_table.Rows.Add("Sarah", "Anderson", 33, new DateTime(1987, 1, 1).ToLongDateString(), 11);
-                data_table.Rows.Add("Andrew", "Thomas", 34, new DateTime(1986, 1, 1).ToLongDateString(), 12);
-                data_table.Rows.Add("Elizabeth", "Jackson", 35, new DateTime(1985, 1, 1).ToLongDateString(), 13);
-                data_table.Rows.Add("Justin", "White", 36, new DateTime(1984, 1, 1).ToLongDateString(), 14);
-                data_table.Rows.Add("Samantha", "Harris", 37, new DateTime(1983, 1, 1).ToLongDateString(), 15);
-
-                return data_table;
+                return (new List<string> { "First Name", "Last Name", "Date of Birth", "Id" }, new List<string[]>
+                {
+                    new string[] { "John", "Doe", "01/01/2000", "1" },
+                    new string[] { "Jane", "Doe", "01/01/2000", "2" },
+                    new string[] { "John", "Smith", "01/01/2000", "3" },
+                    new string[] { "Jane", "Smith", "01/01/2000", "4" },
+                    new string[] { "John", "Doe", "01/01/2000", "5" },
+                    new string[] { "Jane", "Doe", "01/01/2000", "6" },
+                    new string[] { "John", "Smith", "01/01/2000", "7" },
+                    new string[] { "Jane", "Smith", "01/01/2000", "8" },
+                    new string[] { "John", "Doe", "01/01/2000", "9" },
+                    new string[] { "Jane", "Doe", "01/01/2000", "10" },
+                });
             });
         }
 
-        public virtual Task<string> ConvertAsync(DataTable input, ProgressBar progress_bar)
+        public virtual Task<string> ConvertAsync(string[] column_values, string[][] row_values, ProgressBar progress_bar)
         {
             return Task.FromResult(string.Empty);
         }
 
-        public virtual Task<DataTable> ConvertAsync(IStorageFile input)
+        public virtual Task<(List<string>, List<string[]>)> ConvertAsync(IStorageFile input)
         {
-            return Task.FromResult(new DataTable());
+            return Task.FromResult((new List<string>(), new List<string[]>()));
         }
 
         public virtual Task SaveFileAsync(IStorageFile output, string data)

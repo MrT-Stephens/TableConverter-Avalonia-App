@@ -8,7 +8,8 @@ using System;
 using TableConverter.ViewModels;
 using System.Linq;
 using TableConverter.DataModels;
-using Avalonia.Themes.Fluent;
+using Avalonia.Data;
+using System.Collections.ObjectModel;
 
 namespace TableConverter.Views;
 
@@ -51,12 +52,15 @@ public partial class MainView : UserControl
             {
                 LockUnlockItems(true);
 
-                view.DataTable = await view.InputSelectedConverterType.converter_handler.ConvertAsync(files[0]);
+                var results = await view.InputSelectedConverterType.converter_handler.ConvertAsync(files[0]);
+
+                view.ColumnValues = new ObservableCollection<string>(results.Item1);
+                view.RowValues = new ObservableCollection<string[]>(results.Item2);
+
+                RefreshDataTable();
 
                 LockUnlockItems(false);
             }
-
-            RefreshDataTable();
         }
     }
 
@@ -71,12 +75,12 @@ public partial class MainView : UserControl
                 TableDataDataGrid.Columns.RemoveAt(TableDataDataGrid.Columns.Count - 1);
             }
 
-            TableDataDataGrid.ItemsSource = view.DataTable.DefaultView;
-
-            foreach (System.Data.DataColumn x in view.DataTable.Columns)
+            for (int i = 0; i < view.ColumnValues.Count; ++i)
             {
-                TableDataDataGrid.Columns.Add(new DataGridTextColumn { Header = x.ColumnName, CanUserSort = true, IsReadOnly = false ,Binding = new Avalonia.Data.Binding($"Row.ItemArray[{x.Ordinal}]") });
+                TableDataDataGrid.Columns.Add(new DataGridTextColumn { Header = view.ColumnValues[i], Binding = new Binding($"[{i}]"), CanUserSort = true, IsReadOnly = false });
             }
+
+            TableDataDataGrid.ItemsSource = view.RowValues;
         }
     }
 
@@ -93,7 +97,7 @@ public partial class MainView : UserControl
         {
             var view = (MainViewModel)DataContext;
 
-            if (view.DataTable.Rows.Count != 0 && view.DataTable.Columns.Count != 0)
+            if (view.RowValues.Count != 0 && view.ColumnValues.Count != 0)
             {
                 var top_level_window = TopLevel.GetTopLevel(this);
 
@@ -230,17 +234,17 @@ public partial class MainView : UserControl
         {
             var view = (MainViewModel)DataContext;
 
-            if (view.DataTable.Rows.Count != 0 && view.DataTable.Columns.Count != 0)
+            if (view.RowValues.Count != 0 && view.ColumnValues.Count != 0)
             {
                 LockUnlockItems(true);
 
-                view.ConvertedData = await view.OutputSelectedConverterType.converter_handler.ConvertAsync(view.DataTable, ConvertTimeProgressBar);
-
-                LockUnlockItems(false);
+                view.ConvertedData = await view.OutputSelectedConverterType.converter_handler.ConvertAsync(view.ColumnValues.ToArray(), view.RowValues.ToArray(), ConvertTimeProgressBar);
 
                 ConvertTimeProgressBar.Value = 0;
 
                 ConvertedDataTextBox.CaretIndex = ConvertedDataTextBox.Text.Length;
+
+                LockUnlockItems(false);
             }
         }
     }
@@ -362,11 +366,14 @@ public partial class MainView : UserControl
 
             LockUnlockItems(true);
 
-            view.DataTable = await view.InputSelectedConverterType.converter_handler.LoadExampleAsync();
+            var result = await view.InputSelectedConverterType.converter_handler.LoadExampleAsync();
 
-            LockUnlockItems(false);
+            view.ColumnValues = new ObservableCollection<string>(result.Item1);
+            view.RowValues = new ObservableCollection<string[]>(result.Item2);
 
             RefreshDataTable();
+
+            LockUnlockItems(false);
         }
     }
 
@@ -383,14 +390,15 @@ public partial class MainView : UserControl
         {
             var view = (MainViewModel)DataContext;
 
-            view.DataTable = new System.Data.DataTable();
+            view.ColumnValues = new ObservableCollection<string>();
+            view.RowValues = new ObservableCollection<string[]>();
 
             while (TableDataDataGrid.Columns.Count > 0)
             {
                 TableDataDataGrid.Columns.RemoveAt(TableDataDataGrid.Columns.Count - 1);
             }
 
-            TableDataDataGrid.ItemsSource = view.DataTable.DefaultView;
+            TableDataDataGrid.ItemsSource = view.RowValues;
 
             view.ConvertedData = string.Empty;
             ConvertTimeProgressBar.Value = 0;
@@ -424,11 +432,21 @@ public partial class MainView : UserControl
         {
             var view = (MainViewModel)DataContext;
 
-            if (view.DataTable != null)
+            if (view.RowValues.Count != 0)
             {
-                view.TableConverterService.Capitalize(view.DataTable);
+                LockUnlockItems(true);
+
+                var result = await view.TableDataConverterService.Capitalize(view.ColumnValues.ToArray(), view.RowValues.ToArray());
+
+                if (result.Item1.Length != 0 && result.Item2.Length != 0)
+                {
+                    view.ColumnValues = new ObservableCollection<string>(result.Item1);
+                    view.RowValues = new ObservableCollection<string[]>(result.Item2);
+                }
 
                 RefreshDataTable();
+
+                LockUnlockItems(false);
             }
         }
     }
@@ -439,11 +457,21 @@ public partial class MainView : UserControl
         {
             var view = (MainViewModel)DataContext;
 
-            if (view.DataTable != null)
+            if (view.RowValues.Count != 0)
             {
-                view.TableConverterService.Lowercase(view.DataTable);
+                LockUnlockItems(true);
+
+                var result = await view.TableDataConverterService.Lowercase(view.ColumnValues.ToArray(), view.RowValues.ToArray());
+
+                if (result.Item1.Length != 0 && result.Item2.Length != 0)
+                {
+                    view.ColumnValues = new ObservableCollection<string>(result.Item1);
+                    view.RowValues = new ObservableCollection<string[]>(result.Item2);
+                }
 
                 RefreshDataTable();
+
+                LockUnlockItems(false);
             }
         }
     }
@@ -454,11 +482,21 @@ public partial class MainView : UserControl
         {
             var view = (MainViewModel)DataContext;
 
-            if (view.DataTable != null)
+            if (view.RowValues.Count != 0)
             {
-                view.TableConverterService.Uppercase(view.DataTable);
+                LockUnlockItems(true);
+
+                var result = await view.TableDataConverterService.Uppercase(view.ColumnValues.ToArray(), view.RowValues.ToArray());
+
+                if (result.Item1.Length != 0 && result.Item2.Length != 0)
+                {
+                    view.ColumnValues = new ObservableCollection<string>(result.Item1);
+                    view.RowValues = new ObservableCollection<string[]>(result.Item2);
+                }
 
                 RefreshDataTable();
+
+                LockUnlockItems(false);
             }
         }
     }
@@ -469,11 +507,21 @@ public partial class MainView : UserControl
         {
             var view = (MainViewModel)DataContext;
 
-            if (view.DataTable != null)
+            if (view.RowValues.Count != 0)
             {
-                view.TableConverterService.Transpose(view.DataTable);
+                LockUnlockItems(true);
+
+                var result = await view.TableDataConverterService.Transpose(view.ColumnValues.ToArray(), view.RowValues.ToArray());
+
+                if (result.Item1.Length != 0 && result.Item2.Length != 0)
+                {
+                    view.ColumnValues = new ObservableCollection<string>(result.Item1);
+                    view.RowValues = new ObservableCollection<string[]>(result.Item2);
+                }
 
                 RefreshDataTable();
+
+                LockUnlockItems(false);
             }
         }
     }
@@ -484,11 +532,21 @@ public partial class MainView : UserControl
         {
             var view = (MainViewModel)DataContext;
 
-            if (view.DataTable != null)
+            if (view.RowValues != null)
             {
-                view.TableConverterService.DeleteSpaces(view.DataTable);
+                LockUnlockItems(true);
+
+                var result = await view.TableDataConverterService.DeleteSpaces(view.ColumnValues.ToArray(), view.RowValues.ToArray());
+
+                if (result.Item1.Length != 0 && result.Item2.Length != 0)
+                {
+                    view.ColumnValues = new ObservableCollection<string>(result.Item1);
+                    view.RowValues = new ObservableCollection<string[]>(result.Item2);
+                }
 
                 RefreshDataTable();
+
+                LockUnlockItems(false);
             }
         }
     }
@@ -499,11 +557,21 @@ public partial class MainView : UserControl
         {
             var view = (MainViewModel)DataContext;
 
-            if (view.DataTable != null)
+            if (view.RowValues != null)
             {
-                view.TableConverterService.DeleteDuplicateRows(view.DataTable);
+                LockUnlockItems(true);
+
+                var result = await view.TableDataConverterService.DeleteDuplicateRows(view.ColumnValues.ToArray(), view.RowValues.ToArray());
+
+                if (result.Item1.Length != 0 && result.Item2.Length != 0)
+                {
+                    view.ColumnValues = new ObservableCollection<string>(result.Item1);
+                    view.RowValues = new ObservableCollection<string[]>(result.Item2);
+                }
 
                 RefreshDataTable();
+
+                LockUnlockItems(false);
             }
         }
     }
@@ -514,11 +582,21 @@ public partial class MainView : UserControl
         {
             var view = (MainViewModel)DataContext;
 
-            if (view.DataTable != null)
+            if (view.RowValues != null)
             {
-                view.TableConverterService.Undo(view.DataTable);
+                LockUnlockItems(true);
+
+                var result = await view.TableDataConverterService.Undo();
+
+                if (result.Item1.Length != 0 && result.Item2.Length != 0)
+                {
+                    view.ColumnValues = new ObservableCollection<string>(result.Item1);
+                    view.RowValues = new ObservableCollection<string[]>(result.Item2);
+                }
 
                 RefreshDataTable();
+
+                LockUnlockItems(false);
             }
         }
     }
@@ -529,11 +607,21 @@ public partial class MainView : UserControl
         {
             var view = (MainViewModel)DataContext;
 
-            if (view.DataTable != null)
+            if (view.RowValues != null)
             {
-                view.TableConverterService.Redo(view.DataTable);
+                LockUnlockItems(true);
+
+                var result = await view.TableDataConverterService.Redo();
+
+                if (result.Item1.Length != 0 && result.Item2.Length != 0)
+                {
+                    view.ColumnValues = new ObservableCollection<string>(result.Item1);
+                    view.RowValues = new ObservableCollection<string[]>(result.Item2);
+                }
 
                 RefreshDataTable();
+
+                LockUnlockItems(false);
             }
         }
     }
