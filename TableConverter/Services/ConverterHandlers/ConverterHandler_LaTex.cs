@@ -278,7 +278,7 @@ namespace TableConverter.Services.ConverterHandlers
                     {
                         temp += GenerateTableRow(row_values[i], false, BoldColumn);
 
-                        Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 1000));
+                        Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 100));
 
                         if (CurrentTableType == "None")
                         {

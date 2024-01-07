@@ -57,7 +57,7 @@ namespace TableConverter.Services.ConverterHandlers
                         output += row_values[i][j] + Environment.NewLine;
                     }
 
-                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 1000));
+                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 100));
                 }
 
                 return output;

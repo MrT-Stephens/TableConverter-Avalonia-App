@@ -444,13 +444,15 @@
 
           <!--Input Data Section Code-->
           <Border
+            x:Name="InputDataSection"
             Padding="10"
             Margin="10 20 10 10"
             CornerRadius="20"
             BorderThickness="2"
             Height="450"
             BorderBrush="{DynamicResource BorderBrush}"
-            Background="{DynamicResource BackgroundBrush}">
+            Background="{DynamicResource BackgroundBrush}"
+            Loaded="InputOutputDataSectionLoaded">
 
             <Grid
               HorizontalAlignment="Stretch"
@@ -815,13 +817,15 @@
 
           <!--Output Data Section Code-->
           <Border
+            x:Name="OutputDataSection"
             Padding="10"
             Margin="10 10 10 20"
             CornerRadius="20"
             BorderThickness="2"
-            Height="450"
+            MinHeight="450"
             BorderBrush="{DynamicResource BorderBrush}"
-            Background="{DynamicResource BackgroundBrush}">
+            Background="{DynamicResource BackgroundBrush}"
+            Loaded="InputOutputDataSectionLoaded">
 
             <Grid
               HorizontalAlignment="Stretch"
@@ -942,8 +946,9 @@
                   Grid.Column="0"
                   Margin="5"
                   Minimum="0"
-                  Maximum="1000"
+                  Maximum="100"
                   Height="15"
+                  ShowProgressText="True"
                   Orientation="Horizontal"
                   Foreground="{DynamicResource BorderBrush}">
 

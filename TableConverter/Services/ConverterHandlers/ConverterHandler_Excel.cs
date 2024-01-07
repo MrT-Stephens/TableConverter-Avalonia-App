@@ -106,7 +106,7 @@ namespace TableConverter.Services.ConverterHandlers
                         row.CreateCell(j).SetCellValue(row_values[i][j]);
                     }
 
-                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 1000));
+                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 100));
                 }
 
                 for (int i = 0; i < column_values.Length; i++)

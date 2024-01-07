@@ -217,7 +217,7 @@ namespace TableConverter.Services.ConverterHandlers
                         }
                     }
 
-                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(progress_bar_value++, 1, (row_values.Length * 2) - 2, 0, 1000));
+                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(progress_bar_value++, 1, (row_values.Length * 2) - 2, 0, 100));
                 }
 
                 // Get the current text alignment.
@@ -268,7 +268,7 @@ namespace TableConverter.Services.ConverterHandlers
 
                                 output += "|" + Environment.NewLine;
 
-                                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(progress_bar_value++, 1, (row_values.Length * 2) - 2, 0, 1000));
+                                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(progress_bar_value++, 1, (row_values.Length * 2) - 2, 0, 100));
                             }
 
                             break;

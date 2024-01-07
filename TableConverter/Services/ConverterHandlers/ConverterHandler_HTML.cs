@@ -173,7 +173,7 @@ namespace TableConverter.Services.ConverterHandlers
                         string_writer.Write($"{(MinifyHtml ? "" : Environment.NewLine + new string('\t', --tab_count))}</tbody>");
                     }
 
-                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 1000));
+                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 100));
                 }
 
                 string_writer.Write($"{(MinifyHtml ? "" : Environment.NewLine)}</table>");

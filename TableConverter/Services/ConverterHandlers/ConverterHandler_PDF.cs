@@ -191,7 +191,7 @@ namespace TableConverter.Services.ConverterHandlers
                     });
                 });
 
-                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = 1000);
+                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = 100);
 
                 return $"Please download the '.pdf' file to view the generated data 😁{Environment.NewLine}";
             });

@@ -156,7 +156,7 @@ namespace TableConverter.Services.ConverterHandlers
                     // Append record element to the root
                     root_element.AppendChild(record_element);
 
-                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 1000));
+                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 100));
                 }
 
                 StringWriter text_writer = new StringWriter();

@@ -120,7 +120,7 @@ namespace TableConverter.Services.ConverterHandlers
                                     json_objects[i].Add(column_values[j].Replace(' ', '_'), row_values[i][j]);
                                 }
 
-                                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 1000));
+                                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 100));
                             }
 
                             output = JsonConvert.SerializeObject(json_objects, MinifyJson ? Formatting.None : Formatting.Indented);
@@ -137,7 +137,7 @@ namespace TableConverter.Services.ConverterHandlers
                             {
                                 json_array[i + 1] = row_values[i];
 
-                                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 1000));
+                                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 100));
                             }
 
                             output = JsonConvert.SerializeObject(json_array, MinifyJson ? Formatting.None : Formatting.Indented);
@@ -155,7 +155,7 @@ namespace TableConverter.Services.ConverterHandlers
                                     { column_values[i].Replace(' ', '_'), row_values.Select(row => row[i]).ToArray() }
                                 };
 
-                                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, column_values.Length - 1, 0, 1000));
+                                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, column_values.Length - 1, 0, 100));
                             }
 
                             output = JsonConvert.SerializeObject(json_objects, MinifyJson ? Formatting.None : Formatting.Indented);
@@ -178,7 +178,7 @@ namespace TableConverter.Services.ConverterHandlers
                                     { i + 1, row_values[i] }
                                 };
 
-                                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 1000));
+                                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 100));
                             }
 
                             output = JsonConvert.SerializeObject(json_objects, MinifyJson ? Formatting.None : Formatting.Indented);

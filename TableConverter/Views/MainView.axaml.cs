@@ -333,6 +333,27 @@ public partial class MainView : UserControl
     }
 
     /// <summary>
+    /// Input output data section loaded event handler.
+    /// Will resize the input and output data sections to the correct height.
+    /// The height will be half the height of the window, but will not be less than 450.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void InputOutputDataSectionLoaded(object sender, RoutedEventArgs e)
+    {
+        var top_level_window = TopLevel.GetTopLevel(this);
+
+        if (sender is Control)
+        {
+            Control control = (Border)sender;
+
+            double height = (top_level_window.ClientSize.Height / 2);
+
+            control.Height = (height < 450) ? 450 : height;
+        }
+    }
+
+    /// <summary>
     /// Locks or unlocks the items which could cause issues if changed while converting.
     /// </summary>
     /// <param name="lock_items"></param>
@@ -348,12 +369,15 @@ public partial class MainView : UserControl
     /// <summary>
     /// Menu split view size changed event handler.
     /// Will resize the menu split view to the correct width.
+    /// Will also resize the input and output data sections to the correct height.
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void MainViewSizeChanged(object? sender, SizeChangedEventArgs e)
     {
         ResizeMenuSplitView();
+        InputOutputDataSectionLoaded(InputDataSection, new RoutedEventArgs());
+        InputOutputDataSectionLoaded(OutputDataSection, new RoutedEventArgs());
     }
 
     /// <summary>

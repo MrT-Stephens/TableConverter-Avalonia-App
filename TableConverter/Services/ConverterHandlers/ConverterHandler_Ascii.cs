@@ -189,7 +189,7 @@ namespace TableConverter.Services.ConverterHandlers
                 {
                     max_column_widths[i] = Math.Max(max_column_widths[i], row[i].ToString().Length + 2);
 
-                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(progress_bar_value++, 0, row_values.Length * 2, 0, 1000));
+                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(progress_bar_value++, 0, row_values.Length * 2, 0, 100));
                 }
             }
 
@@ -217,7 +217,7 @@ namespace TableConverter.Services.ConverterHandlers
                     output += PrintSeparator(max_column_widths, horizontal_char, intersection_char);
                 }
 
-                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(progress_bar_value++, 0, row_values.Length * 2, 0, 1000));
+                Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(progress_bar_value++, 0, row_values.Length * 2, 0, 100));
             }
 
             return output;

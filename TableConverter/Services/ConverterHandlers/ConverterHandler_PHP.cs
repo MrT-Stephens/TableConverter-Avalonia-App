@@ -78,7 +78,7 @@ namespace TableConverter.Services.ConverterHandlers
                 {
                     output += GeneratePHPArray(row_values[i]);
 
-                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 1000));
+                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 100));
                 }
 
                 return output += ");" + Environment.NewLine;

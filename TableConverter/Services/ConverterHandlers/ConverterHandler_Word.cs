@@ -79,7 +79,7 @@ namespace TableConverter.Services.ConverterHandlers
                         table.GetRow(i + 1).GetCell(j).SetText(row_values[i][j]);
                     }
 
-                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 1000));
+                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 100));
                 }
 
                 return $"Please download the '.docx' file to view the generated data 😁{Environment.NewLine}";

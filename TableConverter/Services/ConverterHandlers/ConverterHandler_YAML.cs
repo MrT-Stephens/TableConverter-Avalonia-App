@@ -132,7 +132,7 @@ namespace TableConverter.Services.ConverterHandlers
                         output += $"\t{column_values[j].Replace(' ', '_')}: {quote}{row_values[i][j]}{quote}{Environment.NewLine}";
                     }
 
-                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 1000));
+                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 100));
                 }
 
                 return output;
