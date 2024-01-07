@@ -726,11 +726,20 @@
 
                 <Button
                   Button.Click="TransposeButtonClicked"
-                  ToolTip.Tip="Rotates the whole table by 90 degrees anti-clockwise.">
+                  ToolTip.Tip="Transposes the whole table anti-clockwise.">
 
                   <StackPanel>
                     <PathIcon
-                      Data="{StaticResource TransposeIcon}"/>
+                      Data="{StaticResource TransposeIcon}">
+                      
+                      <PathIcon.RenderTransform>
+                        <TransformGroup>
+                          <RotateTransform Angle="180"/>
+                          <ScaleTransform ScaleX="-1" />
+                        </TransformGroup>
+                      </PathIcon.RenderTransform>
+                      
+                    </PathIcon>
                     <TextBlock Text="Transpose"/>
                   </StackPanel>
 

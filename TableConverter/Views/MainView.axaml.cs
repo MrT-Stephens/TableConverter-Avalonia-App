@@ -434,6 +434,8 @@ public partial class MainView : UserControl
 
             view.ConvertedData = string.Empty;
             ConvertTimeProgressBar.Value = 0;
+
+            view.TableDataConverterService.ClearUndoRedo();
         }
     }
 
@@ -614,13 +616,13 @@ public partial class MainView : UserControl
         {
             var view = (MainViewModel)DataContext;
 
-            if (view.RowValues != null)
+            if (view.RowValues.Count != 0)
             {
                 LockUnlockItems(true);
 
-                var result = await view.TableDataConverterService.Undo();
+                var result = await view.TableDataConverterService.Undo(view.ColumnValues.ToArray(), view.RowValues.ToArray());
 
-                if (result.Item1.Length != 0 && result.Item2.Length != 0)
+                if (result.Item1 != null && result.Item2 != null)
                 {
                     view.ColumnValues = new ObservableCollection<string>(result.Item1);
                     view.RowValues = new ObservableCollection<string[]>(result.Item2);
@@ -639,13 +641,13 @@ public partial class MainView : UserControl
         {
             var view = (MainViewModel)DataContext;
 
-            if (view.RowValues != null)
+            if (view.RowValues.Count != 0)
             {
                 LockUnlockItems(true);
 
-                var result = await view.TableDataConverterService.Redo();
+                var result = await view.TableDataConverterService.Redo(view.ColumnValues.ToArray(), view.RowValues.ToArray());
 
-                if (result.Item1.Length != 0 && result.Item2.Length != 0)
+                if (result.Item1 != null && result.Item2 != null)
                 {
                     view.ColumnValues = new ObservableCollection<string>(result.Item1);
                     view.RowValues = new ObservableCollection<string[]>(result.Item2);

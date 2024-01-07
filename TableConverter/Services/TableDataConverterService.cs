@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using NPOI.Util;
+using Org.BouncyCastle.Crypto.Engines;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace TableConverter.Services
@@ -23,18 +26,7 @@ namespace TableConverter.Services
                 UndoStack.Pop();
             }
 
-            string[] column_values_copy = new string[column_values.Length];
-            string[][] row_values_copy = new string[row_values.Length][];
-
-            column_values.CopyTo(column_values_copy, 0);
-
-            for (int i = 0; i < row_values.Length; i++)
-            {
-                row_values_copy[i] = new string[row_values[i].Length];
-                row_values[i].CopyTo(row_values_copy[i], 0);
-            }
-
-            UndoStack.Push((column_values_copy, row_values_copy));
+            UndoStack.Push((column_values.Copy(), row_values.Copy()));
         }
 
         private void AddRedo(string[] column_values, string[][] row_values)
@@ -44,66 +36,46 @@ namespace TableConverter.Services
                 RedoStack.Pop();
             }
 
-            RedoStack.Push((column_values, row_values));
+            RedoStack.Push((column_values.Copy(), row_values.Copy()));
         }
 
         public void ClearUndoRedo()
         {
-            UndoStack.Clear();
-            RedoStack.Clear();
+            UndoStack = new Stack<(string[], string[][])>();
+            RedoStack = new Stack<(string[], string[][])>();
         }
 
-        public Task<(string[], string[][])> Undo()
+        public Task<(string[], string[][])> Undo(string[] column_values, string[][] row_values)
         {
             return Task.Run(() =>
             {
                 if (UndoStack.Count == 0)
                 {
-                    return (new string[] { }, new string[][] { });
+                    return (null, null);
                 }
 
                 var results = UndoStack.Pop();
-                AddRedo(results.Item1, results.Item2);
 
-                string[] column_values_copy = new string[results.Item1.Length];
-                string[][] row_values_copy = new string[results.Item2.Length][];
+                AddRedo(column_values.Copy(), row_values.Copy());
 
-                results.Item1.CopyTo(column_values_copy, 0);
-
-                for (int i = 0; i < results.Item2.Length; i++)
-                {
-                    row_values_copy[i] = new string[results.Item2[i].Length];
-                    results.Item2[i].CopyTo(row_values_copy[i], 0);
-                }
-
-                return (column_values_copy, row_values_copy);
+                return (results.Item1.Copy(), results.Item2.Copy());
             });
         }
 
-        public Task<(string[], string[][])> Redo()
+        public Task<(string[], string[][])> Redo(string[] column_values, string[][] row_values)
         {
             return Task.Run(() => 
             {
                 if (RedoStack.Count == 0)
                 {
-                    return (new string[] { }, new string[][] { });
+                    return (null, null);
                 }
 
                 var results = RedoStack.Pop();
-                AddUndo(results.Item1, results.Item2);
 
-                string[] column_values_copy = new string[results.Item1.Length];
-                string[][] row_values_copy = new string[results.Item2.Length][];
+                AddUndo(column_values.Copy(), row_values.Copy());
 
-                results.Item1.CopyTo(column_values_copy, 0);
-
-                for (int i = 0; i < results.Item2.Length; i++)
-                {
-                    row_values_copy[i] = new string[results.Item2[i].Length];
-                    results.Item2[i].CopyTo(row_values_copy[i], 0);
-                }
-
-                return (column_values_copy, row_values_copy);
+                return (results.Item1.Copy(), results.Item2.Copy());
             });
         }
 
@@ -186,15 +158,13 @@ namespace TableConverter.Services
 
                 foreach (string[] row in row_values)
                 {
-                    if (!uniqueRows.Contains(row))
+                    if (!uniqueRows.Any((unique_row) => unique_row.SequenceEqual(row)))
                     {
                         uniqueRows.Add(row);
                     }
                 }
 
-                row_values = uniqueRows.ToArray();
-
-                return (column_values, row_values);
+                return (column_values, uniqueRows.ToArray());
             });
         }
 
@@ -204,25 +174,47 @@ namespace TableConverter.Services
             {
                 AddUndo(column_values, row_values);
 
-                var newColumnValues = new string[row_values.Length];
-                var newRowValues = new string[column_values.Length][];
+                // Merge the column and row values into a single array
+                string[][] merged_data = new string[row_values.Length + 1][];
+
+                merged_data[0] = column_values;
 
                 for (int i = 0; i < row_values.Length; i++)
                 {
-                    newColumnValues[i] = row_values[i][0];
+                    merged_data[i + 1] = row_values[i];
                 }
 
-                for (int i = 0; i < column_values.Length; i++)
-                {
-                    newRowValues[i] = new string[row_values.Length];
+                string[][] transposed_data = new string[column_values.Length][];
 
-                    for (int j = 0; j < row_values.Length; j++)
+                // Rotate the array 90 degrees anti-clockwise
+                for (int i = 0; i < transposed_data.Length; i++)
+                {
+                    for (int j = 0; j < merged_data.Length; j++)
                     {
-                        newRowValues[i][j] = row_values[j][i];
+                        if (transposed_data[i] == null)
+                        {
+                            transposed_data[i] = new string[merged_data.Length];
+                        }
+
+                        transposed_data[i][j] = merged_data[j][i];
                     }
                 }
 
-                return (newColumnValues, newRowValues);
+                // Re-assign the column and row values
+                column_values = new string[transposed_data[0].Length];
+
+                column_values = transposed_data[0];
+
+                row_values = new string[transposed_data.Length - 1][];
+
+                for (int i = 1; i < transposed_data.Length; i++)
+                {
+                    row_values[i - 1] = new string[transposed_data[i].Length];
+                    row_values[i - 1] = transposed_data[i];
+                }
+
+                // Return the new column and row values
+                return (column_values, row_values);
             });
         }
 
