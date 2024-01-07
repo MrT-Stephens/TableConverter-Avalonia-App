@@ -28,12 +28,12 @@
 
   <!--Application Menu Code-->
   <SplitView
-    Name="MenuSplitView"
+    Name="InformationSplitView"
     DisplayMode="CompactInline"
     CompactPaneLength="25"
     PanePlacement="Right"
     Background="{DynamicResource BackgroundBrush}"
-    Loaded="MenuSplitViewLoaded">
+    Loaded="InformationSplitViewLoaded">
 
     <!--Application Menu Panel Code-->
     <SplitView.Pane>
@@ -58,7 +58,7 @@
               Background="Transparent"
               HorizontalAlignment="Stretch"
               VerticalAlignment="Stretch"
-              Button.Click="MenuButtonClicked">
+              Button.Click="ShowHideInformationButtonClicked">
 
               <PathIcon
                 Name="MenuArrowIcon"
@@ -408,27 +408,68 @@
             Orientation="Horizontal"
             Grid.Column="1">
 
-            <AutoCompleteBox
-              Margin="2 2 2 2"
-              VerticalAlignment="Center"
-              Watermark="Search...😊"
-              FilterMode="Contains"
-              ItemsSource="{Binding SearchBarItems}"
-              SelectionChanged="SearchBoxSelectionChanged">
-
-            </AutoCompleteBox>
-
             <Button
               Margin="2 2 10 2"
               Background="Transparent"
-              VerticalAlignment="Center"
-              Button.Click="MenuButtonClicked">
+              VerticalAlignment="Center">
 
               <PathIcon
                 Foreground="{DynamicResource BorderBrush}"
                 Data="{StaticResource MenuIcon}"
                 Height="25"
                 Width="25"/>
+
+              <Button.Flyout>
+                <Flyout 
+                  ShowMode="TransientWithDismissOnPointerMoveAway" 
+                  Placement="BottomEdgeAlignedRight">
+                  
+                  <StackPanel>
+                    
+                    <Label Content="Conversion Types...🔍"/>
+                    
+                    <StackPanel
+                      Orientation="Horizontal">
+                      
+                      <AutoCompleteBox 
+                        Margin="2 2 2 2"
+                        VerticalAlignment="Center"
+                        Watermark="Input..."
+                        FilterMode="Contains"
+                        ItemsSource="{Binding InputSearchItems}"
+                        SelectionChanged="InputSearchBoxSelectionChanged"/>
+                      
+                      <Label Content=" to " VerticalAlignment="Center"/>
+                      
+                      <AutoCompleteBox
+                        Margin="2 2 2 2"
+                        VerticalAlignment="Center"
+                        Watermark="Output..."
+                        FilterMode="Contains"
+                        ItemsSource="{Binding OutputSearchItems}"
+                        SelectionChanged="OutputSearchBoxSelectionChanged"/>
+                      
+                    </StackPanel>
+
+                    <Separator Background="{DynamicResource BorderBrush}" Margin="0 6 0 6"/>
+
+                    <Button
+                      x:Name="ShowHideInformationButton"
+                      Content="Show Information"
+                      HorizontalAlignment="Stretch"
+                      Background="Transparent"
+                      Button.Click="ShowHideInformationButtonClicked"/>
+                  
+                    <Separator Background="{DynamicResource BorderBrush}" Margin="0 6 0 6"/>
+                    
+                    <Button
+                      Content="Light Mode"
+                      HorizontalAlignment="Stretch"
+                      Background="Transparent"/>
+                    
+                  </StackPanel>
+                </Flyout>
+              </Button.Flyout>
 
             </Button>
           </StackPanel>

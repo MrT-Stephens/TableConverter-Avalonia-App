@@ -255,30 +255,31 @@ public partial class MainView : UserControl
     }
 
     /// <summary>
-    /// Menu button clicked event handler.
-    /// Will open or close the menu split view.
-    /// It will also change the menu arrow icon to point in the correct direction.
-    /// If the device is a mobile device, it will open the menu split view to the full width of the screen.
+    /// Show or hide information button clicked event handler.
+    /// Will show or hide the information split view.
+    /// Also changes the icon and text of the button.
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="args"></param>
-    private void MenuButtonClicked(object sender, RoutedEventArgs args)
+    private void ShowHideInformationButtonClicked(object sender, RoutedEventArgs args)
     {
         var top_level_window = TopLevel.GetTopLevel(this);
 
-        if (sender is Button && top_level_window != null)
+        if (top_level_window != null)
         {
             ResizeMenuSplitView();
 
-            if (MenuSplitView.IsPaneOpen)
+            if (InformationSplitView.IsPaneOpen)
             {
                 MenuArrowIcon.Data = Geometry.Parse("M450 600L650 800V400z");
-                MenuSplitView.IsPaneOpen = false;
+                InformationSplitView.IsPaneOpen = false;
+                ShowHideInformationButton.Content = "Show Information";
             }
             else
             {
                 MenuArrowIcon.Data = Geometry.Parse("M700 600L500 400V800z");
-                MenuSplitView.IsPaneOpen = true;
+                InformationSplitView.IsPaneOpen = true;
+                ShowHideInformationButton.Content = "Hide Information";
             }
         }
     }
@@ -289,25 +290,27 @@ public partial class MainView : UserControl
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void MenuSplitViewLoaded(object sender, RoutedEventArgs e)
+    private void InformationSplitViewLoaded(object sender, RoutedEventArgs e)
     {
         var top_level_window = TopLevel.GetTopLevel(this);
 
         if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS())
         {
-            MenuSplitView.OpenPaneLength = top_level_window.ClientSize.Width;
+            InformationSplitView.OpenPaneLength = top_level_window.ClientSize.Width;
             MenuArrowIcon.Data = Geometry.Parse("M450 600L650 800V400z");
-            MenuSplitView.DisplayMode = SplitViewDisplayMode.Inline;
+            InformationSplitView.DisplayMode = SplitViewDisplayMode.Inline;
             MainGrid.Margin = new Avalonia.Thickness(0, 0, 0, 0);
-            MenuSplitView.IsPaneOpen = false;
+            InformationSplitView.IsPaneOpen = false;
+            ShowHideInformationButton.Content = "Show Information";
         }
         else
         {
-            MenuSplitView.OpenPaneLength = (top_level_window.ClientSize.Width / 3);
+            InformationSplitView.OpenPaneLength = (top_level_window.ClientSize.Width / 3);
             MenuArrowIcon.Data = Geometry.Parse("M700 600L500 400V800z");
-            MenuSplitView.DisplayMode = SplitViewDisplayMode.CompactInline;
+            InformationSplitView.DisplayMode = SplitViewDisplayMode.CompactInline;
             MainGrid.Margin = new Avalonia.Thickness(30, 0, 30, 0);
-            MenuSplitView.IsPaneOpen = true;
+            InformationSplitView.IsPaneOpen = true;
+            ShowHideInformationButton.Content = "Hide Information";
         }
     }
 
@@ -323,11 +326,11 @@ public partial class MainView : UserControl
         {
             if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS())
             {
-                MenuSplitView.OpenPaneLength = top_level_window.ClientSize.Width;
+                InformationSplitView.OpenPaneLength = top_level_window.ClientSize.Width;
             }
             else
             {
-                MenuSplitView.OpenPaneLength = (top_level_window.ClientSize.Width / 3);
+                InformationSplitView.OpenPaneLength = (top_level_window.ClientSize.Width / 3);
             }
         }
     }
@@ -696,7 +699,7 @@ public partial class MainView : UserControl
         }
     }
 
-    private void SearchBoxSelectionChanged(object sender, SelectionChangedEventArgs args)
+    private void InputSearchBoxSelectionChanged(object sender, SelectionChangedEventArgs args)
     {
         if (DataContext is MainViewModel && sender is AutoCompleteBox)
         {
@@ -705,11 +708,21 @@ public partial class MainView : UserControl
 
             if (auto_complete_box.SelectedItem != null)
             {
-                string[] strings = auto_complete_box.SelectedItem.ToString().Split(" to ");
+                view.InputSelectedConverterType = view.InputConverterTypes.Where((converter_type) => converter_type.name == auto_complete_box.SelectedItem).First();
+            }
+        }
+    }
 
-                view.InputSelectedConverterType = view.InputConverterTypes.Where((converter_type) => converter_type.name == strings[0]).First();
+    private void OutputSearchBoxSelectionChanged(object sender, SelectionChangedEventArgs args)
+    {
+        if (DataContext is MainViewModel && sender is AutoCompleteBox)
+        {
+            var view = (MainViewModel)DataContext;
+            var auto_complete_box = (AutoCompleteBox)sender;
 
-                view.OutputSelectedConverterType = view.OutputConverterTypes.Where((converter_type) => converter_type.name == strings[1]).First();
+            if (auto_complete_box.SelectedItem != null)
+            {
+                view.OutputSelectedConverterType = view.OutputConverterTypes.Where((converter_type) => converter_type.name == auto_complete_box.SelectedItem).First();
             }
         }
     }

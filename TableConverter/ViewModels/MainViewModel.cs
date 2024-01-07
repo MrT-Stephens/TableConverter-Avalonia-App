@@ -34,7 +34,10 @@ public partial class MainViewModel : ViewModelBase
     private ObservableCollection<ConverterType> _OutputConverterTypes;
 
     [ObservableProperty]
-    private ObservableCollection<string> _SearchBarItems;
+    private ObservableCollection<string> _InputSearchItems;
+
+    [ObservableProperty]
+    private ObservableCollection<string> _OutputSearchItems;
 
     [ObservableProperty]
     private ConverterType _InputSelectedConverterType;
@@ -81,7 +84,8 @@ public partial class MainViewModel : ViewModelBase
         RowValues = new ObservableCollection<string[]>();
         InputConverterTypes = new ObservableCollection<ConverterType>();
         OutputConverterTypes = new ObservableCollection<ConverterType>();
-        SearchBarItems = new ObservableCollection<string>();
+        InputSearchItems = new ObservableCollection<string>();
+        OutputSearchItems = new ObservableCollection<string>();
 
         LoadConverterTypesAsync();
 
@@ -98,7 +102,8 @@ public partial class MainViewModel : ViewModelBase
         RowValues = new ObservableCollection<string[]>();
         InputConverterTypes = new ObservableCollection<ConverterType>();
         OutputConverterTypes = new ObservableCollection<ConverterType>();
-        SearchBarItems = new ObservableCollection<string>();
+        InputSearchItems = new ObservableCollection<string>();
+        OutputSearchItems = new ObservableCollection<string>();
 
         LoadConverterTypesAsync();
 
@@ -117,16 +122,8 @@ public partial class MainViewModel : ViewModelBase
         InputConverterTypes = new ObservableCollection<ConverterType>(converter_types.Where((converter_type) => converter_type.convert_from == true));
         OutputConverterTypes = new ObservableCollection<ConverterType>(converter_types.Where((converter_type) => converter_type.convert_to == true));
 
-        await Task.Run(() =>
-        {
-            foreach (var input_converter_type in InputConverterTypes)
-            {
-                foreach (var output_converter_type in OutputConverterTypes)
-                {
-                    SearchBarItems.Add($"{input_converter_type.name} to {output_converter_type.name}");
-                }
-            }
-        });
+        InputSearchItems = new ObservableCollection<string>(InputConverterTypes.Select((converter_type) => converter_type.name));
+        OutputSearchItems = new ObservableCollection<string>(OutputConverterTypes.Select((converter_type) => converter_type.name));
     }
 
     private void HandleConverterCompletion(ref string value)
