@@ -947,7 +947,7 @@
                   Margin="5"
                   Minimum="0"
                   Maximum="100"
-                  Height="15"
+                  Height="20"
                   ShowProgressText="True"
                   Orientation="Horizontal"
                   Foreground="{DynamicResource BorderBrush}">
