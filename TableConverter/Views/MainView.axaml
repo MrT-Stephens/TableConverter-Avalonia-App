@@ -726,7 +726,7 @@
 
                 <Button
                   Button.Click="TransposeButtonClicked"
-                  ToolTip.Tip="Transposes the whole table anti-clockwise.">
+                  ToolTip.Tip="Rotate the columns and rows.">
 
                   <StackPanel>
                     <PathIcon
