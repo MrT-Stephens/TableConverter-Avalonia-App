@@ -728,4 +728,23 @@ public partial class MainView : UserControl
             }
         }
     }
+
+    private void LightDarkModeButtonClicked(object sender, RoutedEventArgs args)
+    {
+        if (sender is Button)
+        {
+            Button button = (Button)sender;
+
+            if (button.Content?.ToString() == "Light Mode")
+            {
+                button.Content = "Dark Mode";
+                App.ThemeManager?.Switch(0);
+            }
+            else
+            {
+                button.Content = "Light Mode";
+                App.ThemeManager?.Switch(1);
+            }
+        }
+    }
 }

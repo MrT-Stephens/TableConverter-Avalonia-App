@@ -2,7 +2,6 @@
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
-
 using TableConverter.ViewModels;
 using TableConverter.Views;
 
@@ -10,8 +9,14 @@ namespace TableConverter;
 
 public partial class App : Application
 {
+    public static Avalonia.ThemeManager.IThemeManager? ThemeManager;
+
     public override void Initialize()
     {
+        ThemeManager = new Avalonia.ThemeManager.FluentThemeManager();
+
+        ThemeManager.Initialize(this);
+
         AvaloniaXamlLoader.Load(this);
     }
 
@@ -22,20 +27,20 @@ public partial class App : Application
         BindingPlugins.DataValidators.RemoveAt(0);
 
         Services.ConverterHandlerService converter_handler_service = new Services.ConverterHandlerService();
-        Services.TableDataConverterService data_table_converter_service = new Services.TableDataConverterService();
+        Services.TableDataConverterService table_data_converter_service = new Services.TableDataConverterService();
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainViewModel(converter_handler_service, data_table_converter_service)
+                DataContext = new MainViewModel(converter_handler_service, table_data_converter_service)
             };
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
         {
             singleViewPlatform.MainView = new MainView
             {
-                DataContext = new MainViewModel(converter_handler_service, data_table_converter_service)
+                DataContext = new MainViewModel(converter_handler_service, table_data_converter_service)
             };
         }
 

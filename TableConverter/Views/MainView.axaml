@@ -465,7 +465,8 @@
                     <Button
                       Content="Light Mode"
                       HorizontalAlignment="Stretch"
-                      Background="Transparent"/>
+                      Background="Transparent"
+                      Button.Click="LightDarkModeButtonClicked"/>
                     
                   </StackPanel>
                 </Flyout>
