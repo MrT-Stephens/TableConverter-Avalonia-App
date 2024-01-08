@@ -103,15 +103,11 @@ namespace TableConverter.Services.ConverterHandlers
 
                     for (int j = 0; j < column_values.Length; j++)
                     {
+                        sheet.AutoSizeColumn(i);
                         row.CreateCell(j).SetCellValue(row_values[i][j]);
                     }
 
                     Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 100));
-                }
-
-                for (int i = 0; i < column_values.Length; i++)
-                {
-                    sheet.AutoSizeColumn(i);
                 }
 
                 return $"Please download the '.xlsx' file to view the generated data 😁{Environment.NewLine}";
