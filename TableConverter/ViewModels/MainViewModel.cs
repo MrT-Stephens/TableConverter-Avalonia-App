@@ -168,9 +168,10 @@ public partial class MainViewModel : ViewModelBase
         HowToUseText =
             $"1. Simply open your {InputSelectedConverterType?.name} file—it boasts the file extension '{InputSelectedConverterType?.extension}'. The data seamlessly populates the grid view upon opening, setting the stage for effortless management.{Environment.NewLine}{Environment.NewLine}" +
             $"2. Navigate through your {InputSelectedConverterType?.name} dataset with ease. The 'Edit Data' options offer a user-friendly interface to tailor your data as needed.{Environment.NewLine}{Environment.NewLine}" +
-            $"3. When satisfied with your edits, effortlessly transform your {InputSelectedConverterType?.name} data into the desired {OutputSelectedConverterType?.name} file type. Witness the conversion process in real-time, courtesy of the intuitive progress bar.{Environment.NewLine}{Environment.NewLine}" +
-            $"4. Upon completion, choose to either save your refined {OutputSelectedConverterType?.name} file with a simple click of the 'Save File' button or swiftly copy the transformed data using the 'Copy' button.{Environment.NewLine}{Environment.NewLine}" +
-            $"5. Enjoy your transformed data 😁";
+            $"3. Explore both the 'Edit Data' and 'Output Options' to customize your {InputSelectedConverterType?.name} dataset. The 'Output Options' allow you to fine-tune settings related to the output file type, ensuring your converted data meets your specific requirements.{Environment.NewLine}{Environment.NewLine}" +
+            $"4. When satisfied with your edits, effortlessly transform your {InputSelectedConverterType?.name} data into the desired {OutputSelectedConverterType?.name} file type. Witness the conversion process in real-time, courtesy of the intuitive progress bar.{Environment.NewLine}{Environment.NewLine}" +
+            $"5. Upon completion, choose to either save your refined {OutputSelectedConverterType?.name} file with a simple click of the 'Save File' button or swiftly copy the transformed data using the 'Copy' button.{Environment.NewLine}{Environment.NewLine}" +
+            $"6. Enjoy your transformed data 😁";
     }
 
     #endregion
