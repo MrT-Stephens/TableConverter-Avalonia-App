@@ -6,7 +6,7 @@
         xmlns:views="clr-namespace:TableConverter.Views"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="TableConverter.Views.MainWindow"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/TableConverter-512.ico"
         Title="TableConverter">
         <views:MainView />
 </Window>

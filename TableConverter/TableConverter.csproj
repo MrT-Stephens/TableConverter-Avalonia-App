@@ -14,6 +14,11 @@
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
 
+  
+  <ItemGroup>
+    <None Remove="Assets\TableConverter-512.ico" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.0.6" />
     <PackageReference Include="Avalonia.ThemeManager" Version="11.0.0" />
