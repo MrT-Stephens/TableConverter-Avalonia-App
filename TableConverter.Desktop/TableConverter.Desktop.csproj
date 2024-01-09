@@ -7,6 +7,10 @@
     <Nullable>enable</Nullable>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyName>TableConverter</AssemblyName>
+    <SignAssembly>False</SignAssembly>
+    <Title>TableConverter</Title>
+    <Authors>MrT Stephens</Authors>
   </PropertyGroup>
 
   <ItemGroup>

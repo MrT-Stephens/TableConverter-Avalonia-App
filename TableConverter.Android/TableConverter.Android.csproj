@@ -9,6 +9,9 @@
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
     <AndroidPackageFormat>apk</AndroidPackageFormat>
     <AndroidEnableProfiledAot>False</AndroidEnableProfiledAot>
+    <PackageId>TableConverter</PackageId>
+    <Title>TableConverter</Title>
+    <Authors>MrT Stephens</Authors>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Icon.png" />

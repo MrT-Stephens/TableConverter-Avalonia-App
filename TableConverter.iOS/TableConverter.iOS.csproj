@@ -6,6 +6,9 @@
     <ProvisioningType>manual</ProvisioningType>
     <Nullable>enable</Nullable>
     <RuntimeIdentifier>iossimulator-x64</RuntimeIdentifier>
+    <AssemblyName>TableConverter</AssemblyName>
+    <Title>TableConverter</Title>
+    <Authors>MrT Stephens</Authors>
     
     <!-- These properties need to be set in order to run on a real iDevice -->
     <!--<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>-->

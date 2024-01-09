@@ -4,6 +4,9 @@
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     <IsPublishable>False</IsPublishable>
+    <Title>TableConverter</Title>
+    <Authors>MrT Stephens</Authors>
+    <AssemblyName>TableConverter_Internal</AssemblyName>
   </PropertyGroup>
 
   

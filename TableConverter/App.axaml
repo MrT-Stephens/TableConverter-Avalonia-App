@@ -37,7 +37,7 @@
       </ResourceDictionary.ThemeDictionaries>
     </ResourceDictionary>
 
-    <FontFamily x:Key="JetBrainsMono">avares://TableConverter/Assets/Fonts/JetBrainsMono-Regular.ttf#JetBrains</FontFamily>
+    <FontFamily x:Key="JetBrainsMono">avares://TableConverter_Internal/Assets/Fonts/JetBrainsMono-Regular.ttf#JetBrains</FontFamily>
 
     <StreamGeometry x:Key="MenuIcon">
       M1536 192v-128c0 -35 -29 -64 -64 -64h-1408c-35 0 -64 29 -64 64v128c0 35 29 64 64 64h1408c35 0 64 -29 64 -64zM1536 704v-128c0 -35 -29 -64 -64 -64h-1408c-35 0 -64 29 -64 64v128c0 35 29 64 64 64h1408c35 0 64 -29 64 -64zM1536 1216v-128 c0 -35 -29 -64 -64 -64h-1408c-35 0 -64 29 -64 64v128c0 35 29 64 64 64h1408c35 0 64 -29 64 -64z
