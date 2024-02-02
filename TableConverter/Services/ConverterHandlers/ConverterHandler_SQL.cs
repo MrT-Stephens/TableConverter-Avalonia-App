@@ -17,6 +17,8 @@ namespace TableConverter.Services.ConverterHandlers
 
         private string CurrentQuoteType { get; set; } = "No Quotes";
         private string TableName { get; set; } = "";
+        private string ProcedureName { get; set; } = "";
+        private bool GererateProcedure { get; set; } = false;
 
         public override void InitializeControls()
         {
@@ -63,8 +65,47 @@ namespace TableConverter.Services.ConverterHandlers
             TableNameStackPanel.Children.Add(TableNameLabel);
             TableNameStackPanel.Children.Add(TableNameTextBox);
 
+            var GenerateProcedureStackPanel = new StackPanel { Orientation = Avalonia.Layout.Orientation.Vertical };
+
+            var GenerateProcedureLabel = new Label { Content = "Generate Procedure:" };
+
+            var GenerateProcedureCheckBox = new CheckBox { Content = "Generate" };
+
+            GenerateProcedureCheckBox.IsCheckedChanged += (sender, e) =>
+            {
+                if (sender is CheckBox)
+                {
+                    GererateProcedure = ((CheckBox)sender).IsChecked.Value;
+                }
+            };
+
+            GenerateProcedureStackPanel.Children.Add(GenerateProcedureLabel);
+            GenerateProcedureStackPanel.Children.Add(GenerateProcedureCheckBox);
+
+            var ProcedureNameStackPanel = new StackPanel { Orientation = Avalonia.Layout.Orientation.Vertical };
+
+            var ProcedureNameLabel = new Label { Content = "Procedure Name:" };
+
+            var ProcedureNameTextBox = new TextBox
+            {
+                Text = ProcedureName
+            };
+
+            ProcedureNameTextBox.TextChanged += (sender, e) =>
+            {
+                if (sender is TextBox)
+                {
+                    ProcedureName = ((TextBox)sender).Text;
+                }
+            };
+
+            ProcedureNameStackPanel.Children.Add(ProcedureNameLabel);
+            ProcedureNameStackPanel.Children.Add(ProcedureNameTextBox);
+
             Controls?.Add(QuoteTypeStackPanel);
             Controls?.Add(TableNameStackPanel);
+            Controls?.Add(GenerateProcedureStackPanel);
+            Controls?.Add(ProcedureNameStackPanel);
         }
 
         public override Task<(List<string>, List<string[]>)> ConvertAsync(IStorageFile input)
@@ -137,35 +178,59 @@ namespace TableConverter.Services.ConverterHandlers
             {
                 string output = string.Empty;
 
-                for (int i = 0; i < row_values.Length; ++i)
+                if (GererateProcedure)
                 {
-                    output += $"INSERT INTO {GetQuote()}{TableName.Replace(' ', '_')}{(GetQuote() == "[" ? "]" : GetQuote())} (";
-                    
-                    foreach (string column in column_values)
+                    for (int i = 0; i < row_values.Length; ++i)
                     {
-                        output += $"{GetQuote()}{column.Replace(' ', '_')}{(GetQuote() == "[" ? "]" : GetQuote())}";
+                        output += $"{ProcedureName.Replace(' ', '_')}(";
 
-                        if (column != column_values.Last())
+                        foreach (string value in row_values[i])
                         {
-                            output += ", ";
+                            output += $"'{value}'";
+
+                            if (value != row_values[i].Last())
+                            {
+                                output += ", ";
+                            }
                         }
+
+                        output += $");{Environment.NewLine}";
+
+                        Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 100));
                     }
-
-                    output += ") VALUES (";
-
-                    foreach (string value in row_values[i])
+                }
+                else
+                {
+                    for (int i = 0; i < row_values.Length; ++i)
                     {
-                        output += $"'{value}'";
+                        output += $"INSERT INTO {GetQuote()}{TableName.Replace(' ', '_')}{(GetQuote() == "[" ? "]" : GetQuote())} (";
 
-                        if (value != row_values[i].Last())
+                        foreach (string column in column_values)
                         {
-                            output += ", ";
+                            output += $"{GetQuote()}{column.Replace(' ', '_')}{(GetQuote() == "[" ? "]" : GetQuote())}";
+
+                            if (column != column_values.Last())
+                            {
+                                output += ", ";
+                            }
                         }
+
+                        output += ") VALUES (";
+
+                        foreach (string value in row_values[i])
+                        {
+                            output += $"'{value}'";
+
+                            if (value != row_values[i].Last())
+                            {
+                                output += ", ";
+                            }
+                        }
+
+                        output += $");{Environment.NewLine}";
+
+                        Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 100));
                     }
-
-                    output += $");{Environment.NewLine}";
-
-                    Dispatcher.UIThread.InvokeAsync(() => progress_bar.Value = MapValue(i, 0, row_values.Length - 1, 0, 100));
                 }
 
                 return output;
