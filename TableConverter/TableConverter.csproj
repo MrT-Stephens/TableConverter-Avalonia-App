@@ -3,10 +3,6 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
-    <IsPublishable>False</IsPublishable>
-    <Title>TableConverter</Title>
-    <Authors>MrT Stephens</Authors>
-    <AssemblyName>TableConverter_Internal</AssemblyName>
   </PropertyGroup>
 
   
@@ -14,23 +10,15 @@
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
 
-  
   <ItemGroup>
-    <None Remove="Assets\TableConverter-512.ico" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.0.6" />
+    <PackageReference Include="Avalonia" Version="11.0.10" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.0.10" />
     <PackageReference Include="Avalonia.ThemeManager" Version="11.0.0" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.6" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.6" />
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
-    <PackageReference Condition="'$(Configuration)' == 'Release'" Include="Avalonia.Controls.DataGrid" Version="11.0.6" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.0" />
 
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.6" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="NPOI" Version="2.6.2" />
-    <PackageReference Include="QuestPDF" Version="2023.12.1" />
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
   </ItemGroup>
 </Project>

@@ -7,14 +7,10 @@
     <Nullable>enable</Nullable>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <AssemblyName>TableConverter</AssemblyName>
-    <SignAssembly>False</SignAssembly>
-    <Title>TableConverter</Title>
-    <Authors>MrT Stephens</Authors>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia.Desktop" Version="11.0.6" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.0.10" />
   </ItemGroup>
 
   <ItemGroup>

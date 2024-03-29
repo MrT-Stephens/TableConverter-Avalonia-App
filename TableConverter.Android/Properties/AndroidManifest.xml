@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:installLocation="auto" package="MrT_Stephens.TableConverter">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:installLocation="auto">
 	<uses-permission android:name="android.permission.INTERNET" />
-	<application android:label="TableConverter" android:icon="@drawable/icon" android:theme="@style/MyTheme" />
-	<uses-sdk android:minSdkVersion="21" />
+	<application android:label="AvaloniaTest" android:icon="@drawable/Icon" />
 </manifest>

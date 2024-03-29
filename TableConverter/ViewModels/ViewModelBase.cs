@@ -4,4 +4,5 @@ namespace TableConverter.ViewModels;
 
 public class ViewModelBase : ObservableObject
 {
+
 }

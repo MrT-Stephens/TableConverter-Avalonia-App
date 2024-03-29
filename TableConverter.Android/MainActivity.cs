@@ -1,16 +1,15 @@
 ﻿using Android.App;
 using Android.Content.PM;
+
 using Avalonia;
 using Avalonia.Android;
 
 namespace TableConverter.Android;
 
 [Activity(
-    Label = "TableConverter",
-    Name = "MrT_Stephens.TableConverter",
-    Icon = "@drawable/icon",
+    Label = "TableConverter.Android",
     Theme = "@style/MyTheme.NoActionBar",
-    AlwaysRetainTaskState = true,
+    Icon = "@drawable/icon",
     MainLauncher = true,
     ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize | ConfigChanges.UiMode)]
 public class MainActivity : AvaloniaMainActivity<App>
