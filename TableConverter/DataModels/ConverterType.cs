@@ -1,10 +1,15 @@
-﻿namespace TableConverter.DataModels
+﻿using TableConverter.Interfaces;
+
+namespace TableConverter.DataModels
 {
     public record ConverterType(
         string name,
-        string extension,
+        string[] extensions,
+        string[] mime_types,
         string description,
         bool convert_from,
-        bool convert_to
+        bool convert_to,
+        IConverterHanderInput? input_converter,
+        IConverterHandlerOutput? output_converter
     );
 }

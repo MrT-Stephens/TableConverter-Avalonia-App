@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System;
+using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using System.Linq;
 using TableConverter.DataModels;
@@ -93,7 +93,7 @@ public partial class MainViewModel : ViewModelBase
         AboutHowToConvertText = [
             new StringWithIndex(0, 
             $"Simply open your {SelectedInputConverter?.name} file—it boasts the file extension " +
-            $"'{SelectedInputConverter?.extension}'. The data seamlessly populates the grid view " +
+            $"'{SelectedInputConverter?.extensions[0]}'. The data seamlessly populates the grid view " +
             "upon opening, setting the stage for effortless management."),
 
             new StringWithIndex(1,

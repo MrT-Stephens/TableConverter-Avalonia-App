@@ -3,6 +3,9 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using System;
 using Avalonia.Interactivity;
+using Avalonia.Platform.Storage;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace TableConverter.Views;
 
@@ -31,18 +34,13 @@ public partial class MainView : UserControl
 
     private void ResizeInformationSidePanel()
     {
-        var top_level_window = TopLevel.GetTopLevel(this);
-
-        if (top_level_window is not null)
+        if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS())
         {
-            if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS())
-            {
-                MainSplitView.OpenPaneLength = top_level_window.ClientSize.Width;
-            }
-            else
-            {
-                MainSplitView.OpenPaneLength = top_level_window.ClientSize.Width / 3;
-            }
+            MainSplitView.OpenPaneLength = TopLevel.GetTopLevel(this)!.ClientSize.Width;
+        }
+        else
+        {
+            MainSplitView.OpenPaneLength = TopLevel.GetTopLevel(this)!.ClientSize.Width / 3;
         }
     }
 
@@ -89,5 +87,43 @@ public partial class MainView : UserControl
     private void HeaderMenuAboutButtonClicked(object? sender, RoutedEventArgs e)
     {
         MainSplitView.IsPaneOpen = !MainSplitView.IsPaneOpen;
+    }
+
+    private async void OpenFileButtonClicked(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is ViewModels.MainViewModel main_view_model)
+        {
+            var files = await TopLevel.GetTopLevel(this)!.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+            {
+                Title = $"Open {main_view_model.SelectedInputConverter.name} File",
+                AllowMultiple = false,
+                FileTypeFilter = new List<FilePickerFileType>{
+                    new(main_view_model.SelectedInputConverter.name)
+                    {
+                        Patterns = main_view_model.SelectedInputConverter.extensions.Select(ext => $"*{ext}").ToArray(),
+                        MimeTypes = main_view_model.SelectedInputConverter.mime_types
+                    },
+                    FilePickerFileTypes.All
+                }
+            });
+
+            if (files.Count >= 1)
+            {
+                main_view_model.InputTextBoxText = await main_view_model.SelectedInputConverter.input_converter!.ReadFileAsync(files[0]);
+            }
+        }
+    }
+
+    private async void PasteFileButtonClicked(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is ViewModels.MainViewModel main_view_model)
+        {
+            var clipboard_text = await TopLevel.GetTopLevel(this)!.Clipboard!.GetTextAsync();
+
+            if (!string.IsNullOrWhiteSpace(clipboard_text))
+            {
+                main_view_model.InputTextBoxText = clipboard_text;
+            }
+        }
     }
 }
