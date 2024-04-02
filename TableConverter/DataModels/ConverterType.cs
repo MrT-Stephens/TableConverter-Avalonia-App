@@ -1,11 +1,12 @@
-﻿using TableConverter.Interfaces;
+﻿using System.Collections.ObjectModel;
+using TableConverter.Interfaces;
 
 namespace TableConverter.DataModels
 {
     public record ConverterType(
         string name,
-        string[] extensions,
-        string[] mime_types,
+        Collection<string> extensions,
+        Collection<string> mime_types,
         string description,
         bool convert_from,
         bool convert_to,

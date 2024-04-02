@@ -34,12 +34,18 @@ public partial class MainView : UserControl
 
     private void ResizeInformationSidePanel()
     {
-        if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS())
+        var top_level_window = TopLevel.GetTopLevel(this);
+
+        if (top_level_window!.ClientSize.Width < 1000)
         {
+            MainSplitView.IsPaneOpen = false;
+            MainSplitView.DisplayMode = SplitViewDisplayMode.Overlay;
             MainSplitView.OpenPaneLength = TopLevel.GetTopLevel(this)!.ClientSize.Width;
         }
         else
         {
+            MainSplitView.DisplayMode = SplitViewDisplayMode.Inline;
+            MainSplitView.IsPaneOpen = (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS() ? false : true);
             MainSplitView.OpenPaneLength = TopLevel.GetTopLevel(this)!.ClientSize.Width / 3;
         }
     }

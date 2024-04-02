@@ -10,7 +10,7 @@ namespace TableConverter.Services
         {
             return Task.FromResult(new List<ConverterType>()
             {
-                new ConverterType("CSV", [ ".csv" ], [ "text/csv" ],
+                new ConverterType("CSV", [ ".csv", ".txt" ], [ "text/csv" ],
                         "CSV stands for Comma-Separated Values. CSV file format is a text file that has a specific format which allows data to be saved in a table structured format.",
                         true, true, null, null),
                 new ConverterType("SQL", [ ".sql" ], [ "" ],
