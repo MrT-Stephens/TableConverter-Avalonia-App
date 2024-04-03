@@ -71,15 +71,9 @@ public partial class MainViewModel : ViewModelBase
         OutputConverterSearchItems = OutputConverters.ToList().Select(c => c.name).ToArray();
     }
 
-    partial void OnSelectedInputConverterChanged(ConverterType value)
-    {
-        GenerateAboutText();
-    }
+    partial void OnSelectedInputConverterChanged(ConverterType value) => GenerateAboutText();
 
-    partial void OnSelectedOutputConverterChanged(ConverterType value)
-    {
-        GenerateAboutText();
-    }
+    partial void OnSelectedOutputConverterChanged(ConverterType value) => GenerateAboutText();
 
     private void GenerateAboutText()
     {
@@ -93,7 +87,7 @@ public partial class MainViewModel : ViewModelBase
         AboutHowToConvertText = [
             new StringWithIndex(0, 
             $"Simply open your {SelectedInputConverter?.name} file—it boasts the file extension " +
-            $"'{SelectedInputConverter?.extensions[0]}'. The data seamlessly populates the grid view " +
+            $"'{string.Join(" or ", SelectedInputConverter!.extensions)}'. The data seamlessly populates the grid view " +
             "upon opening, setting the stage for effortless management."),
 
             new StringWithIndex(1,

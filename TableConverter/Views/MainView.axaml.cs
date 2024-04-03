@@ -40,13 +40,13 @@ public partial class MainView : UserControl
         {
             MainSplitView.IsPaneOpen = false;
             MainSplitView.DisplayMode = SplitViewDisplayMode.Overlay;
-            MainSplitView.OpenPaneLength = TopLevel.GetTopLevel(this)!.ClientSize.Width;
+            MainSplitView.OpenPaneLength = top_level_window.ClientSize.Width;
         }
         else
         {
             MainSplitView.DisplayMode = SplitViewDisplayMode.Inline;
             MainSplitView.IsPaneOpen = (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS() ? false : true);
-            MainSplitView.OpenPaneLength = TopLevel.GetTopLevel(this)!.ClientSize.Width / 3;
+            MainSplitView.OpenPaneLength = top_level_window.ClientSize.Width / 3;
         }
     }
 
@@ -131,5 +131,10 @@ public partial class MainView : UserControl
                 main_view_model.InputTextBoxText = clipboard_text;
             }
         }
+    }
+
+    private void ConverterListBoxSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        AboutSectionOutputConverterInfomation.IsVisible = (InputConverterListBox.SelectedItem == OutputConverterListBox.SelectedItem) ? false : true;
     }
 }
