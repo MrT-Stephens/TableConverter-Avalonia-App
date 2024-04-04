@@ -12,7 +12,7 @@ namespace TableConverter.Services
             {
                 new ConverterType("CSV", [ ".csv", ".txt" ], [ "text/csv" ],
                         "CSV stands for Comma-Separated Values. CSV file format is a text file that has a specific format which allows data to be saved in a table structured format.",
-                        true, true, null, null),
+                        true, true, new ConverterHandlerCsvInputService(), null),
                 new ConverterType("SQL", [ ".sql" ], [ "" ],
                         "SQL stands for Structured Query Language. It is used for storing, retrieving, managing and manipulating data in relational database management system (RDMS).",
                         true, true, null, null),

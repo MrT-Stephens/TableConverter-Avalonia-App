@@ -1,12 +1,14 @@
-﻿using Avalonia.Platform.Storage;
+﻿using Avalonia.Controls;
+using Avalonia.Platform.Storage;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
 namespace TableConverter.Interfaces
 {
     public interface IConverterHandlerOutput
     {
-        public List<Avalonia.Controls.Control>? Controls { get; init; }
+        public Collection<Control>? Controls { get; init; }
 
         public void InitializeControls();
 

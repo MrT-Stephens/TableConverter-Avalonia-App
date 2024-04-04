@@ -31,7 +31,6 @@
             <GradientStop Color="#4299E1" Offset="1"/>
           </LinearGradientBrush>
           <SolidColorBrush x:Key="ForegroundBrush">#FFFFFF</SolidColorBrush>
-          <SolidColorBrush x:Key="HeaderBackgroundBrush">#404040</SolidColorBrush>
         </ResourceDictionary>
         <ResourceDictionary x:Key="Light">
           <LinearGradientBrush x:Key="BackgroundBrush">
@@ -43,7 +42,6 @@
             <GradientStop Color="#4299E1" Offset="1"/>
           </LinearGradientBrush>
           <SolidColorBrush x:Key="ForegroundBrush">#000000</SolidColorBrush>
-          <SolidColorBrush x:Key="HeaderBackgroundBrush">#C0C0C0</SolidColorBrush>
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>
     </ResourceDictionary>

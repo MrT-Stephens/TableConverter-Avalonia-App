@@ -1,5 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using System.Linq;
 using TableConverter.DataModels;
@@ -56,7 +55,16 @@ public partial class MainViewModel : ViewModelBase
     private string _InputTextBoxText = string.Empty;
 
     [ObservableProperty]
+    private ObservableCollection<string> _EditColumnValues = new();
+
+    [ObservableProperty]
+    private ObservableCollection<string[]> _EditRowValues = new();
+
+    [ObservableProperty]
     private string _OutputTextBoxText = string.Empty;
+
+    [ObservableProperty]
+    private double _OutputConverterProgressValue;
 
     #endregion
 

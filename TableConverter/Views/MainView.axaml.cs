@@ -6,6 +6,12 @@ using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
+using Avalonia.Layout;
+using Avalonia.Media;
+using System.Collections.ObjectModel;
+using Avalonia.Data;
+using TableConverter.ViewModels;
 
 namespace TableConverter.Views;
 
@@ -115,7 +121,50 @@ public partial class MainView : UserControl
 
             if (files.Count >= 1)
             {
-                main_view_model.InputTextBoxText = await main_view_model.SelectedInputConverter.input_converter!.ReadFileAsync(files[0]);
+                if (main_view_model.SelectedInputConverter.input_converter!.Controls is not null)
+                {
+                    DialogHostOptionsView options = new DialogHostOptionsView()
+                    {
+                        Title = $"How would you like your {main_view_model.SelectedInputConverter.name} file to be inputted?",
+                        DialogOptions = main_view_model.SelectedInputConverter.input_converter!.Controls,
+                        OkButtonClick = async () =>
+                        {
+                            MainViewDialogHost.CurrentSession?.Close();
+
+                            main_view_model.InputTextBoxText = await main_view_model.SelectedInputConverter.input_converter!.ReadFileAsync(files[0]);
+
+                            var (column_values, row_values) = await main_view_model.SelectedInputConverter.input_converter!.ReadTextAsync(main_view_model.InputTextBoxText);
+
+                            if (column_values is not null && row_values is not null)
+                            {
+                                main_view_model.EditColumnValues = new ObservableCollection<string>(column_values);
+                                main_view_model.EditRowValues = new ObservableCollection<string[]>(row_values);
+
+                                RefreshEditDataGrid();
+                            }
+                        },
+                        CancelButtonClick = () =>
+                        {
+                            MainViewDialogHost.CurrentSession?.Close();
+                        }
+                    };
+
+                    await DialogHostAvalonia.DialogHost.Show(options, MainViewDialogHost);
+                }
+                else
+                {
+                    main_view_model.InputTextBoxText = await main_view_model.SelectedInputConverter.input_converter!.ReadFileAsync(files[0]);
+
+                    var (column_values, row_values) = await main_view_model.SelectedInputConverter.input_converter!.ReadTextAsync(main_view_model.InputTextBoxText);
+
+                    if (column_values is not null && row_values is not null)
+                    {
+                        main_view_model.EditColumnValues = new ObservableCollection<string>(column_values);
+                        main_view_model.EditRowValues = new ObservableCollection<string[]>(row_values);
+
+                        RefreshEditDataGrid();
+                    }
+                }
             }
         }
     }
@@ -136,5 +185,30 @@ public partial class MainView : UserControl
     private void ConverterListBoxSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
         AboutSectionOutputConverterInfomation.IsVisible = (InputConverterListBox.SelectedItem == OutputConverterListBox.SelectedItem) ? false : true;
+    }
+
+    private void RefreshEditDataGrid()
+    {
+        if (DataContext is MainViewModel main_view_model)
+        {
+            while (EditDataDataGrid.Columns.Count > 0)
+            {
+                EditDataDataGrid.Columns.RemoveAt(EditDataDataGrid.Columns.Count - 1);
+            }
+
+            for (int i = 0; i < main_view_model.EditColumnValues.Count; ++i)
+            {
+                EditDataDataGrid.Columns.Add(new DataGridTextColumn 
+                    { 
+                        Header = main_view_model.EditColumnValues[i], 
+                        Binding = new Binding($"[{i}]"), 
+                        CanUserSort = false, 
+                        IsReadOnly = false,
+                        CanUserReorder = false,
+                        CanUserResize = true
+                    }
+                );
+            }
+        }
     }
 }
