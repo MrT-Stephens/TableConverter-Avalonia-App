@@ -131,9 +131,9 @@ public partial class MainView : UserControl
                         {
                             MainViewDialogHost.CurrentSession?.Close();
 
-                            main_view_model.InputTextBoxText = await main_view_model.SelectedInputConverter.input_converter!.ReadFileAsync(files[0]);
+                            main_view_model.ActualInputTextBoxText = await main_view_model.SelectedInputConverter.input_converter!.ReadFileAsync(files[0]);
 
-                            var (column_values, row_values) = await main_view_model.SelectedInputConverter.input_converter!.ReadTextAsync(main_view_model.InputTextBoxText);
+                            var (column_values, row_values) = await main_view_model.SelectedInputConverter.input_converter!.ReadTextAsync(main_view_model.ActualInputTextBoxText);
 
                             if (column_values is not null && row_values is not null)
                             {
@@ -153,9 +153,9 @@ public partial class MainView : UserControl
                 }
                 else
                 {
-                    main_view_model.InputTextBoxText = await main_view_model.SelectedInputConverter.input_converter!.ReadFileAsync(files[0]);
+                    main_view_model.ActualInputTextBoxText = await main_view_model.SelectedInputConverter.input_converter!.ReadFileAsync(files[0]);
 
-                    var (column_values, row_values) = await main_view_model.SelectedInputConverter.input_converter!.ReadTextAsync(main_view_model.InputTextBoxText);
+                    var (column_values, row_values) = await main_view_model.SelectedInputConverter.input_converter!.ReadTextAsync(main_view_model.ActualInputTextBoxText);
 
                     if (column_values is not null && row_values is not null)
                     {

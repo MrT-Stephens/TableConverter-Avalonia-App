@@ -1,6 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text;
 using TableConverter.DataModels;
 using TableConverter.Services;
 
@@ -54,6 +56,19 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     private string _InputTextBoxText = string.Empty;
 
+    private string _ActualInputTextBoxText = string.Empty;
+
+    public string ActualInputTextBoxText
+    {
+        get => _ActualInputTextBoxText;
+        set
+        {
+            SetProperty(ref _ActualInputTextBoxText, value);
+            InputTextBoxText = ReduceLargeString(ref _ActualInputTextBoxText, 10000,
+                               "The input data is too large to display in this text box. Only showing 10,000 characters here to improve performance 😁");
+        }
+    }
+
     [ObservableProperty]
     private ObservableCollection<string> _EditColumnValues = new();
 
@@ -62,6 +77,19 @@ public partial class MainViewModel : ViewModelBase
 
     [ObservableProperty]
     private string _OutputTextBoxText = string.Empty;
+
+    private string _ActualOutputTextBoxText = string.Empty;
+
+    public string ActualOutputTextBoxText
+    {
+        get => _ActualOutputTextBoxText;
+        set
+        {
+            SetProperty(ref _ActualOutputTextBoxText, value);
+            OutputTextBoxText = ReduceLargeString(ref _ActualOutputTextBoxText, 10000,
+                                "Only showing 10,000 characters here to improve performance. Please download or copy to view all generated data 😁");
+        }
+    }
 
     [ObservableProperty]
     private double _OutputConverterProgressValue;
@@ -123,5 +151,24 @@ public partial class MainViewModel : ViewModelBase
         InputTextBoxWatermarkText = $"Please open or paste a {SelectedInputConverter?.name} file to begin the conversion process 😊";
 
         OutputTextBoxWatermarkText = $"Once the {SelectedInputConverter?.name} file is converted you will be able to view the converted {SelectedOutputConverter?.name} file data here 🫠";
+    }
+
+    private static string ReduceLargeString(ref string large_string, int max_length, string message)
+    {
+        if (large_string.Length > max_length)
+        {
+            byte[]? bytes = Encoding.UTF8.GetBytes(large_string);
+
+            if (bytes is not null)
+            {
+                string new_string = Encoding.UTF8.GetString(bytes, 0, max_length);
+
+                new_string += $"{Environment.NewLine}[...]{Environment.NewLine}{Environment.NewLine}{message}{Environment.NewLine}";
+
+                return new_string;
+            }
+        }
+
+        return large_string;
     }
 }
