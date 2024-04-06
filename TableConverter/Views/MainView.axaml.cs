@@ -7,8 +7,6 @@ using Avalonia.Platform.Storage;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
-using Avalonia.Layout;
-using Avalonia.Media;
 using System.Collections.ObjectModel;
 using Avalonia.Data;
 using TableConverter.ViewModels;
@@ -165,19 +163,6 @@ public partial class MainView : UserControl
                         RefreshEditDataGrid();
                     }
                 }
-            }
-        }
-    }
-
-    private async void PasteFileButtonClicked(object? sender, RoutedEventArgs e)
-    {
-        if (DataContext is ViewModels.MainViewModel main_view_model)
-        {
-            var clipboard_text = await TopLevel.GetTopLevel(this)!.Clipboard!.GetTextAsync();
-
-            if (!string.IsNullOrWhiteSpace(clipboard_text))
-            {
-                main_view_model.InputTextBoxText = clipboard_text;
             }
         }
     }

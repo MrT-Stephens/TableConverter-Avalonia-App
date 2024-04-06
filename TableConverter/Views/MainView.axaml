@@ -413,11 +413,11 @@
                         <Button>
                           <StackPanel Orientation="Horizontal"
                                       Spacing="10">
-                            <PathIcon Data="{StaticResource TableIcon}"
+                            <PathIcon Data="{StaticResource GenerateIcon}"
                                       Height="20"
                                       Width="20">
                             </PathIcon>
-                            <TextBlock Text="Example"
+                            <TextBlock Text="Generate Data"
                                        FontFamily="{StaticResource JetBrainsMono}"
                                        VerticalAlignment="Center">
                             </TextBlock>
@@ -431,19 +431,6 @@
                                       Width="20">
                             </PathIcon>
                             <TextBlock Text="Open"
-                                       FontFamily="{StaticResource JetBrainsMono}"
-                                       VerticalAlignment="Center">
-                            </TextBlock>
-                          </StackPanel>
-                        </Button>
-                        <Button Button.Click="PasteFileButtonClicked">
-                          <StackPanel Orientation="Horizontal"
-                                      Spacing="10">
-                            <PathIcon Data="{StaticResource PasteIcon}"
-                                      Height="20"
-                                      Width="20">
-                            </PathIcon>
-                            <TextBlock Text="Paste"
                                        FontFamily="{StaticResource JetBrainsMono}"
                                        VerticalAlignment="Center">
                             </TextBlock>

@@ -50,21 +50,22 @@ namespace TableConverter.Services
         {
             return Task.Run(() =>
             {
-                var lines = text.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
-                var column_names = new List<string>();
+                var headers = new List<string>();
                 var rows = new List<string[]>();
+
+                var lines = text.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
 
                 if (lines.Length > 0)
                 {
-                    column_names = lines[0].Split(Delimiter)[..^1].ToList();
+                    headers = lines[0].Split(Delimiter).ToList();
 
                     for (int i = 1; i < lines.Length; i++)
                     {
-                        rows.Add(lines[i].Split(Delimiter)[..^1]);
+                        rows.Add(lines[i].Split(Delimiter));
                     }
                 }
 
-                return (column_names, rows);
+                return (headers, rows);
             }); 
         }
     }
