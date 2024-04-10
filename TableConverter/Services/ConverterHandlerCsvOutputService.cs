@@ -1,18 +1,20 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
+using CsvHelper;
 using CsvHelper.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using TableConverter.Interfaces;
 
 namespace TableConverter.Services
 {
-    public class ConverterHandlerCsvInputService : ConverterHandlerInputAbstract
+    public class ConverterHandlerCsvOutputService : ConverterHandlerOutputAbstract
     {
         private string Delimiter = ",";
         private bool HasHeader = true;
@@ -70,7 +72,7 @@ namespace TableConverter.Services
 
             var has_header_label = new Label()
             {
-                Content = "Has Header",
+                Content = "Print Header",
                 FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 VerticalAlignment = VerticalAlignment.Center
             };
@@ -81,39 +83,32 @@ namespace TableConverter.Services
             Controls?.Add(has_header_stack_panel);
         }
 
-        public override Task<(List<string>, List<string[]>)> ReadTextAsync(string text)
+        public override Task<string> ConvertAsync(string[] headers, string[][] rows, object? progress_bar)
         {
             return Task.Run(() =>
             {
-                var headers = new List<string>();
-                var rows = new List<string[]>();
-
-                using (var csv_reader = new CsvHelper.CsvReader(new StringReader(text), new CsvConfiguration(CultureInfo.InvariantCulture)
+                using (var writer = new StringWriter())
+                using (var csv = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture)
                 {
                     Delimiter = Delimiter,
                     NewLine = Environment.NewLine
                 }))
                 {
-                    csv_reader.GetRecords<dynamic>().ToList().ForEach(row =>
+                    if (HasHeader)
                     {
-                        if (HasHeader && headers.Count == 0)
-                        {
-                            headers.AddRange(((IDictionary<string, object>)row).Keys.ToList());
-                        }
-                        else if (!HasHeader && headers.Count == 0)
-                        {
-                            for (int i = 0; i < ((IDictionary<string, object>)row).Keys.Count; i++)
-                            {
-                                headers.Add(i.ToString());
-                            }
-                        }
-                        
-                        rows.Add(((IDictionary<string, object>)row).Select(x => x.Value?.ToString() ?? string.Empty).ToArray());
-                    });
-                }
+                        csv.WriteField(headers);
+                        csv.NextRecord();
+                    }
 
-                return (headers, rows);
-            }); 
+                    foreach (var row in rows)
+                    {
+                        csv.WriteField(row);
+                        csv.NextRecord();
+                    }
+
+                    return writer.ToString();
+                }
+            });
         }
     }
 }
