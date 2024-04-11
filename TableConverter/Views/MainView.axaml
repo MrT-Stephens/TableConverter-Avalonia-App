@@ -595,7 +595,7 @@
                       <StackPanel Grid.Column="2"
                                   Orientation="Horizontal"
                                   Spacing="10">
-                        <Button>
+                        <Button Button.Click="ClearButtonClicked">
                           <StackPanel Orientation="Horizontal"
                                       Spacing="10">
                             <PathIcon Data="{StaticResource ClearIcon}"
@@ -608,7 +608,7 @@
                             </TextBlock>
                           </StackPanel>
                         </Button>
-                        <Button>
+                        <Button Button.Click="CopyButtonClicked">
                           <StackPanel Orientation="Horizontal"
                                       Spacing="10">
                             <PathIcon Data="{StaticResource CopyIcon}"
@@ -621,7 +621,7 @@
                             </TextBlock>
                           </StackPanel>
                         </Button>
-                        <Button>
+                        <Button Button.Click="SaveButtonClicked">
                           <StackPanel Orientation="Horizontal"
                                       Spacing="10">
                             <PathIcon Data="{StaticResource SaveIcon}"
@@ -700,7 +700,8 @@
                         <ColumnDefinition Width="Auto" />
                       </Grid.ColumnDefinitions>
                       <!-- Output Data Section Convert Progress -->
-                      <ProgressBar Grid.Column="0"
+                      <ProgressBar Name="ConvertProgressBar"
+                                   Grid.Column="0"
                                    HorizontalAlignment="Stretch"
                                    VerticalAlignment="Center"
                                    Minimum="0"
@@ -713,7 +714,8 @@
                                    Value="{Binding OutputConverterProgressValue}">
                       </ProgressBar>
                       <!-- Output Data Section Convert Button -->
-                      <Button Grid.Column="1">
+                      <Button Grid.Column="1"
+                              Button.Click="ConvertButtonClicked">
                         <StackPanel Orientation="Horizontal"
                                     Spacing="10">
                           <PathIcon Data="{StaticResource ConvertIcon}"

@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using System;
@@ -31,7 +32,7 @@ namespace TableConverter.Interfaces
             }
         }
 
-        private static void SetProgressBarValue(object? progress_bar, double value, double from_low, double from_high)
+        protected static void SetProgressBarValue(object? progress_bar, double value, double from_low, double from_high)
         {
             Dispatcher.UIThread.Invoke(() =>
             {
@@ -39,7 +40,7 @@ namespace TableConverter.Interfaces
                 {   
                     bar.Value = (Math.Max(from_low, Math.Min(from_high, value)) - from_low) / (from_high - from_low) * (bar.Maximum - bar.Minimum) + bar.Minimum;
                 }
-            });
+            }, DispatcherPriority.Render);
         }
     }
 }

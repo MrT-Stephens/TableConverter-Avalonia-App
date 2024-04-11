@@ -5,10 +5,9 @@ using CsvHelper;
 using CsvHelper.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TableConverter.Interfaces;
 
@@ -91,20 +90,27 @@ namespace TableConverter.Services
                 using (var csv = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture)
                 {
                     Delimiter = Delimiter,
-                    NewLine = Environment.NewLine
+                    NewLine = Environment.NewLine,
+                    HasHeaderRecord = HasHeader
                 }))
                 {
-                    if (HasHeader)
+                    List<object> records = new List<object>();
+
+                    for (long i = 0; i < rows.LongLength; i++)
                     {
-                        csv.WriteField(headers);
-                        csv.NextRecord();
+                        dynamic record = new ExpandoObject();
+
+                        for (int j = 0; j < headers.Length; j++)
+                        {
+                            ((IDictionary<string, object>)record)[headers[j]] = rows[i][j];
+                        }
+
+                        records.Add(record);
+
+                        SetProgressBarValue(progress_bar, i, 0, rows.LongLength);
                     }
 
-                    foreach (var row in rows)
-                    {
-                        csv.WriteField(row);
-                        csv.NextRecord();
-                    }
+                    csv.WriteRecords(records);
 
                     return writer.ToString();
                 }

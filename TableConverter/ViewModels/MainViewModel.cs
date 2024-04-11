@@ -94,7 +94,7 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [ObservableProperty]
-    private double _OutputConverterProgressValue;
+    private double _OutputConverterProgressValue = 0;
 
     #endregion
 
@@ -102,8 +102,8 @@ public partial class MainViewModel : ViewModelBase
     {
         var converters = await ConverterTypesService.GetConverterTypesAsync();
 
-        InputConverters = new ObservableCollection<ConverterType>(converters.Where(c => c.convert_from).ToList());
-        OutputConverters = new ObservableCollection<ConverterType>(converters.Where(c => c.convert_to).ToList());
+        InputConverters = new ObservableCollection<ConverterType>(converters.Where(c => c.input_converter is not null).ToArray());
+        OutputConverters = new ObservableCollection<ConverterType>(converters.Where(c => c.output_converter is not null).ToArray());
 
         InputConverterSearchItems = InputConverters.ToList().Select(c => c.name).ToArray();
         OutputConverterSearchItems = OutputConverters.ToList().Select(c => c.name).ToArray();

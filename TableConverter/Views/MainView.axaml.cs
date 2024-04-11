@@ -196,4 +196,90 @@ public partial class MainView : UserControl
             }
         }
     }
+
+    private async void ConvertButtonClicked(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel main_view_model && !string.IsNullOrEmpty(main_view_model.InputTextBoxText))
+        {
+            if (main_view_model.SelectedOutputConverter.output_converter!.Controls is not null)
+            {
+                DialogHostOptionsView options = new DialogHostOptionsView()
+                {
+                    Title = $"How would you like your {main_view_model.SelectedOutputConverter.name} file to be outputted?",
+                    DialogOptions = main_view_model.SelectedOutputConverter.output_converter!.Controls,
+                    OkButtonClick = async () =>
+                    {
+                        MainViewDialogHost.CurrentSession?.Close();
+
+                        main_view_model.ActualOutputTextBoxText = await main_view_model.SelectedOutputConverter.output_converter!.ConvertAsync(
+                            main_view_model.EditColumnValues.ToArray(),
+                            main_view_model.EditRowValues.ToArray().Select(row => row.ToArray()).ToArray(),
+                            ConvertProgressBar
+                        );
+                    },
+                    CancelButtonClick = () =>
+                    {
+                        MainViewDialogHost.CurrentSession?.Close();
+                    }
+                };
+
+                await DialogHostAvalonia.DialogHost.Show(options, MainViewDialogHost);
+            }
+            else
+            {
+                main_view_model.ActualOutputTextBoxText = await main_view_model.SelectedOutputConverter.output_converter!.ConvertAsync(
+                    main_view_model.EditColumnValues.ToArray(),
+                    main_view_model.EditRowValues.ToArray().Select(row => row.ToArray()).ToArray(),
+                    ConvertProgressBar
+                );
+            }
+        }
+    }
+
+    private void ClearButtonClicked(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel main_view_model)
+        {
+            main_view_model.ActualInputTextBoxText = string.Empty;
+            main_view_model.EditColumnValues = new ObservableCollection<string>();
+            main_view_model.EditRowValues = new ObservableCollection<string[]>();
+            main_view_model.ActualOutputTextBoxText = string.Empty;
+
+
+            RefreshEditDataGrid();
+        }
+    }
+
+    private async void CopyButtonClicked(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel main_view_model && !string.IsNullOrEmpty(main_view_model.ActualOutputTextBoxText))
+        {
+            await TopLevel.GetTopLevel(this)!.Clipboard!.SetTextAsync(main_view_model.ActualOutputTextBoxText);
+        }
+    }
+
+    private async void SaveButtonClicked(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel main_view_model && !string.IsNullOrEmpty(main_view_model.ActualOutputTextBoxText))
+        {
+            var files = await TopLevel.GetTopLevel(this)!.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+            {
+                Title = $"Open {main_view_model.SelectedInputConverter.name} File",
+                AllowMultiple = false,
+                FileTypeFilter = new List<FilePickerFileType>{
+                    new(main_view_model.SelectedInputConverter.name)
+                    {
+                        Patterns = main_view_model.SelectedInputConverter.extensions.Select(ext => $"*{ext}").ToArray(),
+                        MimeTypes = main_view_model.SelectedInputConverter.mime_types
+                    },
+                    FilePickerFileTypes.All
+                }
+            });
+
+            if (files.Count >= 1)
+            {
+                await main_view_model.SelectedOutputConverter.output_converter!.SaveFileAsync(files[0], main_view_model.ActualOutputTextBoxText);
+            }
+        }
+    }
 }

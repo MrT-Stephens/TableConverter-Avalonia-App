@@ -8,8 +8,6 @@ namespace TableConverter.DataModels
         Collection<string> extensions,
         Collection<string> mime_types,
         string description,
-        bool convert_from,
-        bool convert_to,
         IConverterHanderInput? input_converter,
         IConverterHandlerOutput? output_converter
     );
