@@ -11,6 +11,7 @@
   <Border Background="{DynamicResource BackgroundBrush}"
           BorderBrush="{DynamicResource BorderBrush}"
           BorderThickness="1"
+          CornerRadius="10"
           MinHeight="{Binding MinDialogHeight}"
           MinWidth="{Binding MinDialogWidth}"
           MaxHeight="{Binding MaxDialogHeight}"

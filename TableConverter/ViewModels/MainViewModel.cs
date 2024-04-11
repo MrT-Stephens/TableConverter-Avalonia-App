@@ -93,9 +93,6 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    [ObservableProperty]
-    private double _OutputConverterProgressValue = 0;
-
     #endregion
 
     private async void LoadConverterTypes()

@@ -15,7 +15,9 @@
 
   <dialogHost:DialogHost Name="MainViewDialogHost"
                          IsOpen="False"
-                         CloseOnClickAway="False">
+                         CloseOnClickAway="False"
+                         DisableOpeningAnimation="True"
+                         dialogHost:DialogHostStyle.CornerRadius="10">
     <dialogHost:DialogHost.Content>
       <SplitView Name="MainSplitView"
                  IsPaneOpen="True" 
@@ -523,10 +525,27 @@
                                  Margin="0 0 10 0"
                                  FontWeight="ExtraBold"
                                  FontFamily="{StaticResource JetBrainsMono}" />
-                      <!-- Edit Data Section Buttons -->
+                      <!-- Edit Data Section Right Items -->
                       <StackPanel Grid.Column="2"
                                   Orientation="Horizontal"
                                   Spacing="10">
+                        <!-- Edit Data Section DataGrid Row and Columns Count -->
+                        <StackPanel Orientation="Horizontal"
+                                    VerticalAlignment="Center">
+                          <TextBlock Text="Rows: "
+                                     FontFamily="{StaticResource JetBrainsMono}">
+                          
+                          </TextBlock>
+                          <TextBlock Text="{Binding EditRowValues.Count}"
+                                     FontFamily="{StaticResource JetBrainsMono}">
+                          </TextBlock>
+                          <TextBlock Text=", Columns: "
+                                     FontFamily="{StaticResource JetBrainsMono}">
+                          </TextBlock>
+                          <TextBlock Text="{Binding EditColumnValues.Count}"
+                                     FontFamily="{StaticResource JetBrainsMono}">
+                          </TextBlock>
+                        </StackPanel>
                       </StackPanel>
                     </Grid>
                     <!-- Edit Data DataGrid -->
@@ -711,7 +730,7 @@
                                    Margin="0 0 10 0"
                                    FontFamily="{StaticResource JetBrainsMono}"
                                    Foreground="{DynamicResource BorderBrush}"
-                                   Value="{Binding OutputConverterProgressValue}">
+                                   Value="0">
                       </ProgressBar>
                       <!-- Output Data Section Convert Button -->
                       <Button Grid.Column="1"

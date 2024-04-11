@@ -24,11 +24,11 @@ namespace TableConverter.Interfaces
 
         public abstract Task<string> ConvertAsync(string[] headers, string[][] rows, object? progress_bar);
 
-        public virtual async Task SaveFileAsync(IStorageFile output, string data)
+        public virtual async Task SaveFileAsync(IStorageFile output, ReadOnlyMemory<byte> buffer)
         {
             using (var stream = await output.OpenWriteAsync())
             {
-                stream.Write(Encoding.UTF8.GetBytes(data));
+                stream.Write(buffer.Span);
             }
         }
 

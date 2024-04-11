@@ -10,6 +10,7 @@ using System.Reactive.Linq;
 using System.Collections.ObjectModel;
 using Avalonia.Data;
 using TableConverter.ViewModels;
+using System.Text;
 
 namespace TableConverter.Views;
 
@@ -101,7 +102,7 @@ public partial class MainView : UserControl
 
     private async void OpenFileButtonClicked(object? sender, RoutedEventArgs e)
     {
-        if (DataContext is ViewModels.MainViewModel main_view_model)
+        if (DataContext is MainViewModel main_view_model)
         {
             var files = await TopLevel.GetTopLevel(this)!.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
             {
@@ -244,7 +245,7 @@ public partial class MainView : UserControl
             main_view_model.EditColumnValues = new ObservableCollection<string>();
             main_view_model.EditRowValues = new ObservableCollection<string[]>();
             main_view_model.ActualOutputTextBoxText = string.Empty;
-
+            ConvertProgressBar.Value = 0;
 
             RefreshEditDataGrid();
         }
@@ -262,23 +263,25 @@ public partial class MainView : UserControl
     {
         if (DataContext is MainViewModel main_view_model && !string.IsNullOrEmpty(main_view_model.ActualOutputTextBoxText))
         {
-            var files = await TopLevel.GetTopLevel(this)!.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+            var file = await TopLevel.GetTopLevel(this)!.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
             {
-                Title = $"Open {main_view_model.SelectedInputConverter.name} File",
-                AllowMultiple = false,
-                FileTypeFilter = new List<FilePickerFileType>{
+                Title = $"Save {main_view_model.SelectedInputConverter.name} File",
+                FileTypeChoices = new List<FilePickerFileType>{
                     new(main_view_model.SelectedInputConverter.name)
                     {
                         Patterns = main_view_model.SelectedInputConverter.extensions.Select(ext => $"*{ext}").ToArray(),
                         MimeTypes = main_view_model.SelectedInputConverter.mime_types
                     },
                     FilePickerFileTypes.All
-                }
+                },
+                DefaultExtension = main_view_model.SelectedInputConverter.extensions[0],
+                ShowOverwritePrompt = true,
+                SuggestedFileName = $"TableConverter-{main_view_model.SelectedInputConverter.name}-{main_view_model.SelectedOutputConverter.name}-{DateTime.Now.ToFileTime()}"
             });
 
-            if (files.Count >= 1)
+            if (file is not null)
             {
-                await main_view_model.SelectedOutputConverter.output_converter!.SaveFileAsync(files[0], main_view_model.ActualOutputTextBoxText);
+                await main_view_model.SelectedOutputConverter.output_converter!.SaveFileAsync(file, Encoding.UTF8.GetBytes(main_view_model.ActualOutputTextBoxText));
             }
         }
     }
