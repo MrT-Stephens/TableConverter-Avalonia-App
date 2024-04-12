@@ -191,7 +191,8 @@ public partial class MainView : UserControl
                         CanUserSort = false, 
                         IsReadOnly = false,
                         CanUserReorder = false,
-                        CanUserResize = true
+                        CanUserResize = true,
+                        DisplayIndex = i
                     }
                 );
             }
