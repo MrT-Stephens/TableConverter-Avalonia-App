@@ -15,7 +15,7 @@ namespace TableConverter.Services
                         new ConverterHandlerCsvInputService(), new ConverterHandlerCsvOutputService()),
                 new ConverterType("SQL", [ ".sql", ".txt" ], [ "text/sql" ],
                         "SQL stands for Structured Query Language. It is used for storing, retrieving, managing and manipulating data in relational database management system (RDMS).",
-                        null, null),
+                        new ConverterHandlerSQLInputService(), new ConverterHandlerSQLOutputService()),
                 new ConverterType("Ascii", [ ".txt" ], [ "" ],
                         "ASCII stands for American Standard Code for Information Interchange,It is a code for representing 128 English characters as numbers, with each letter assigned a number from 0 to 127.",
                         null, null),
