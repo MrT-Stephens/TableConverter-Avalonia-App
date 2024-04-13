@@ -266,16 +266,16 @@ public partial class MainView : UserControl
         {
             var file = await TopLevel.GetTopLevel(this)!.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
             {
-                Title = $"Save {main_view_model.SelectedInputConverter.name} File",
+                Title = $"Save {main_view_model.SelectedOutputConverter.name} File",
                 FileTypeChoices = new List<FilePickerFileType>{
-                    new(main_view_model.SelectedInputConverter.name)
+                    new(main_view_model.SelectedOutputConverter.name)
                     {
-                        Patterns = main_view_model.SelectedInputConverter.extensions.Select(ext => $"*{ext}").ToArray(),
-                        MimeTypes = main_view_model.SelectedInputConverter.mime_types
+                        Patterns = main_view_model.SelectedOutputConverter.extensions.Select(ext => $"*{ext}").ToArray(),
+                        MimeTypes = main_view_model.SelectedOutputConverter.mime_types
                     },
                     FilePickerFileTypes.All
                 },
-                DefaultExtension = main_view_model.SelectedInputConverter.extensions[0],
+                DefaultExtension = main_view_model.SelectedOutputConverter.extensions[0],
                 ShowOverwritePrompt = true,
                 SuggestedFileName = $"TableConverter-{main_view_model.SelectedInputConverter.name}-{main_view_model.SelectedOutputConverter.name}-{DateTime.Now.ToFileTime()}"
             });

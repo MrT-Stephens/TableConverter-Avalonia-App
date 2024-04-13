@@ -12,7 +12,7 @@ namespace TableConverter.Services
 {
     internal class ConverterHandlerSQLInputService : ConverterHandlerInputAbstract
     {
-        private Dictionary<string, string> QuoteTypes = new()
+        private readonly Dictionary<string, string> QuoteTypes = new()
         {
             { "No Quotes", "" },
             { "Double Quotes (\")", "\""},
