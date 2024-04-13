@@ -4,7 +4,7 @@ using TableConverter.DataModels;
 
 namespace TableConverter.Services
 {
-    public static class ConverterTypesService
+    internal static class ConverterTypesService
     {
         public static Task<List<ConverterType>> GetConverterTypesAsync()
         {
@@ -13,10 +13,10 @@ namespace TableConverter.Services
                 new ConverterType("CSV", [ ".csv", ".txt" ], [ "text/csv" ],
                         "CSV stands for Comma-Separated Values. CSV file format is a text file that has a specific format which allows data to be saved in a table structured format.",
                         new ConverterHandlerCsvInputService(), new ConverterHandlerCsvOutputService()),
-                new ConverterType("SQL", [ ".sql", ".txt" ], [ "text/sql" ],
+                new ConverterType("SQL", [ ".sql", ".txt" ], [ "text/plain" ],
                         "SQL stands for Structured Query Language. It is used for storing, retrieving, managing and manipulating data in relational database management system (RDMS).",
                         new ConverterHandlerSQLInputService(), new ConverterHandlerSQLOutputService()),
-                new ConverterType("Ascii", [ ".txt" ], [ "" ],
+                new ConverterType("Ascii Tables", [ ".txt" ], [ "text/plain" ],
                         "ASCII stands for American Standard Code for Information Interchange,It is a code for representing 128 English characters as numbers, with each letter assigned a number from 0 to 127.",
                         null, null),
                 new ConverterType("Markdown", [ ".md" ], [ "" ],

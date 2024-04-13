@@ -10,16 +10,16 @@ using System.Text;
 
 namespace TableConverter.Services
 {
-    public class ConverterHandlerSQLOutputService : ConverterHandlerOutputAbstract
+    internal class ConverterHandlerSQLOutputService : ConverterHandlerOutputAbstract
     {
         private string TableName = "table_name";
 
         private Dictionary<string, string> QuoteTypes = new()
         {
             { "No Quotes", "" },
-            { "Double Quotes", "\""},
-            { "MySQL Quotes", "`" },
-            { "SQL Server Quotes", "[" },
+            { "Double Quotes (\")", "\""},
+            { "MySQL Quotes (`)", "`" },
+            { "SQL Server Quotes ([])", "[" },
         };
 
         private string SelectedQuoteType = "No Quotes";
@@ -101,7 +101,7 @@ namespace TableConverter.Services
                         $"{(QuoteTypes[SelectedQuoteType] == "[" ? "]" : QuoteTypes[SelectedQuoteType])}"
                         ));
 
-                for (int i = 0; i < rows.LongLength; i++)
+                for (long i = 0; i < rows.LongLength; i++)
                 {
                     var row_text = string.Join(", ", rows[i].Select(val => $"\'{val}\'"));
 
@@ -112,7 +112,7 @@ namespace TableConverter.Services
                             $"({headers_text}) VALUES ({row_text});"
                             );
 
-                    SetProgressBarValue(progress_bar, i, 0, rows.LongLength);
+                    SetProgressBarValue(progress_bar, i, 0, rows.LongLength - 1);
                 }
 
                 return sql_builder.ToString();

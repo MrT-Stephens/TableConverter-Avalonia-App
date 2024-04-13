@@ -1,6 +1,6 @@
 ﻿namespace TableConverter.DataModels
 {
-    public record StringWithIndex(
+    internal record StringWithIndex(
         int index,
         string value
     );

@@ -12,7 +12,7 @@ using TableConverter.Interfaces;
 
 namespace TableConverter.Services
 {
-    public class ConverterHandlerCsvInputService : ConverterHandlerInputAbstract
+    internal class ConverterHandlerCsvInputService : ConverterHandlerInputAbstract
     {
         private string Delimiter = ",";
         private bool HasHeader = true;
@@ -102,7 +102,7 @@ namespace TableConverter.Services
                         }
                         else if (!HasHeader && headers.Count == 0)
                         {
-                            for (int i = 0; i < ((IDictionary<string, object>)row).Keys.Count; i++)
+                            for (long i = 0; i < ((IDictionary<string, object>)row).Keys.LongCount(); i++)
                             {
                                 headers.Add(i.ToString());
                             }

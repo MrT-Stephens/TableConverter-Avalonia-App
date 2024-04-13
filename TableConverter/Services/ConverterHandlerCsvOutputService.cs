@@ -13,7 +13,7 @@ using TableConverter.Interfaces;
 
 namespace TableConverter.Services
 {
-    public class ConverterHandlerCsvOutputService : ConverterHandlerOutputAbstract
+    internal class ConverterHandlerCsvOutputService : ConverterHandlerOutputAbstract
     {
         private string Delimiter = ",";
         private bool HasHeader = true;
@@ -100,14 +100,14 @@ namespace TableConverter.Services
                     {
                         dynamic record = new ExpandoObject();
 
-                        for (int j = 0; j < headers.Length; j++)
+                        for (long j = 0; j < headers.LongLength; j++)
                         {
                             ((IDictionary<string, object>)record)[headers[j]] = rows[i][j];
                         }
 
                         records.Add(record);
 
-                        SetProgressBarValue(progress_bar, i, 0, rows.LongLength);
+                        SetProgressBarValue(progress_bar, i, 0, rows.LongLength - 1);
                     }
 
                     csv.WriteRecords(records);

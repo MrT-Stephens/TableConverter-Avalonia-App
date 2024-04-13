@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TableConverter.Interfaces
 {
-    public interface IConverterHanderInput
+    internal interface IConverterHanderInput
     {
         public Collection<Control>? Controls { get; init; }
 

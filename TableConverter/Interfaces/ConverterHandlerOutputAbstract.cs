@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace TableConverter.Interfaces
 {
-    public abstract class ConverterHandlerOutputAbstract : IConverterHandlerOutput
+    internal abstract class ConverterHandlerOutputAbstract : IConverterHandlerOutput
     {
         public Collection<Control>? Controls { get; init; }
 
@@ -32,7 +32,7 @@ namespace TableConverter.Interfaces
             }
         }
 
-        protected static void SetProgressBarValue(object? progress_bar, double value, double from_low, double from_high)
+        protected static void SetProgressBarValue(object? progress_bar, long value, long from_low, long from_high)
         {
             Dispatcher.UIThread.Invoke(() =>
             {
