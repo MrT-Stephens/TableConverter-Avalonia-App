@@ -9,7 +9,7 @@ namespace TableConverter.Interfaces
 {
     public interface IConverterHandlerOutput
     {
-        public Collection<Control>? Controls { get; init; }
+        public Collection<Control>? Controls { get; set; }
 
         public void InitializeControls();
 

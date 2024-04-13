@@ -694,7 +694,9 @@
                                AcceptsReturn="False"
                                IsReadOnly="True"
                                IsUndoEnabled="False"
-                               Focusable="False">
+                               Focusable="False"
+                               ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                               ScrollViewer.VerticalScrollBarVisibility="Auto">
                       </TextBox>
                       <PathIcon Data="{StaticResource ResizeYIcon}"
                                 Opacity="50"

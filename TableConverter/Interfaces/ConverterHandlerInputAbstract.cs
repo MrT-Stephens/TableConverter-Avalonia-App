@@ -8,7 +8,7 @@ namespace TableConverter.Interfaces
 {
     internal abstract class ConverterHandlerInputAbstract : IConverterHanderInput
     {
-        public Collection<Control>? Controls { get; init; }
+        public Collection<Control>? Controls { get; set; }
 
         protected ConverterHandlerInputAbstract()
         {

@@ -11,7 +11,7 @@ namespace TableConverter.Interfaces
 {
     internal abstract class ConverterHandlerOutputAbstract : IConverterHandlerOutput
     {
-        public Collection<Control>? Controls { get; init; }
+        public Collection<Control>? Controls { get; set; }
 
         protected ConverterHandlerOutputAbstract()
         {
