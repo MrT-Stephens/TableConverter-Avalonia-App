@@ -3,7 +3,7 @@ using TableConverter.Interfaces;
 
 namespace TableConverter.DataModels
 {
-    internal record ConverterType(
+    public record ConverterType(
         string name,
         Collection<string> extensions,
         Collection<string> mime_types,
