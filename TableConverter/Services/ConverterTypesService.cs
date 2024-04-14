@@ -36,7 +36,7 @@ namespace TableConverter.Services
                         new ConverterHandlerJsonInputService(), new ConverterHandlerJsonOutputService()),
                 new ConverterType("JSONLines", [ ".jsonl" ], [ "" ],
                         "JSON Lines is a convenient format for storing structured data that may be processed one record at a time. It works well with unix-style text processing tools and shell pipelines. It's a great format for log files. It's also a flexible format for passing messages between cooperating processes.",
-                        null, null),
+                        new ConverterHandlerJsonLinesInputService(), new ConverterHandlerJsonLinesOutputService()),
                 new ConverterType("Excel", [ ".xlsx" ], [ "" ],
                         "Microsoft Excel is an electronic spreadsheet application that enables users to store, organize, calculate and manipulate the data with formulas using a spreadsheet system broken up by rows and columns.",
                         null, null),
