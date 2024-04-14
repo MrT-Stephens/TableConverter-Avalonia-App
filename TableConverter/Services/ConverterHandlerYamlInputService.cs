@@ -34,13 +34,14 @@ namespace TableConverter.Services
                         {
                             continue;
                         }
+
                         if (line.StartsWith('-') && line.EndsWith('-'))
                         {
-                            if (yaml_data != null)
+                            if (yaml_data.Count >  0)
                             {
                                 if (first_line)
                                 {
-                                    headers = yaml_data.Select(values => values.Key).ToList();
+                                    headers = yaml_data.Keys.ToList();
                                     first_line = false;
                                 }
 
