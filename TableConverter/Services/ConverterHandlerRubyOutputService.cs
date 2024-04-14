@@ -1,17 +1,12 @@
-﻿using Avalonia.Controls;
-using Avalonia.Layout;
-using NPOI.OpenXmlFormats.Shared;
+﻿using Avalonia.Threading;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TableConverter.Interfaces;
 
 namespace TableConverter.Services
 {
-    internal class ConverterHandlerPhpOutputService : ConverterHandlerOutputAbstract
+    internal class ConverterHandlerRubyOutputService : ConverterHandlerOutputAbstract
     {
         public override void InitializeControls()
         {
@@ -24,19 +19,19 @@ namespace TableConverter.Services
             {
                 using (var writer = new StringWriter())
                 {
-                    writer.Write("array(");
+                    writer.Write("[");
                     writer.Write(Environment.NewLine);
 
-                    writer.Write(GeneratePHPArray(headers));
+                    writer.Write(GenerateRubyArray(headers));
 
                     for (long i = 0; i < rows.LongLength; i++)
                     {
-                        writer.Write(GeneratePHPArray(rows[i]));
+                        writer.Write(GenerateRubyArray(rows[i]));
 
                         SetProgressBarValue(progress_bar, i, 0, rows.LongLength - 1);
                     }
 
-                    writer.Write(");"); 
+                    writer.Write("];");
                     writer.Write(Environment.NewLine);
 
                     return writer.ToString();
@@ -44,11 +39,11 @@ namespace TableConverter.Services
             });
         }
 
-        private static string GeneratePHPArray(object?[] values)
+        private static string GenerateRubyArray(object?[] values)
         {
             using (var writer = new StringWriter())
             {
-                writer.Write("\tarray(");
+                writer.Write("\t{");
 
                 for (long i = 0; i < values.LongLength; i++)
                 {
@@ -60,7 +55,7 @@ namespace TableConverter.Services
                     }
                 }
 
-                writer.Write(")");
+                writer.Write("}");
                 writer.Write(Environment.NewLine);
 
                 return writer.ToString();
