@@ -33,7 +33,7 @@ namespace TableConverter.Services
                         null, new ConverterHandlerLaTexOutputService()),
                 new ConverterType("JSON", [ ".json" ], [ "" ],
                         "JSON stands for JavaScript Object Notation. JSON file is a text-based format for representing structured data based on JavaScript object syntax.",
-                        null, null),
+                        new ConverterHandlerJsonInputService(), new ConverterHandlerJsonOutputService()),
                 new ConverterType("JSONLines", [ ".jsonl" ], [ "" ],
                         "JSON Lines is a convenient format for storing structured data that may be processed one record at a time. It works well with unix-style text processing tools and shell pipelines. It's a great format for log files. It's also a flexible format for passing messages between cooperating processes.",
                         null, null),

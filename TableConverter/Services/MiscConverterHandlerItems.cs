@@ -2,7 +2,7 @@
 
 namespace TableConverter.Services
 {
-    internal static class ConverterHandlerMiscItems
+    internal static class MiscConverterHandlerItems
     {
         public static string AlignText(string text, HorizontalAlignment text_alignment, int amount, char padding_character)
         {

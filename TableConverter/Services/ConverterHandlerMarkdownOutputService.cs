@@ -276,7 +276,7 @@ namespace TableConverter.Services
 
             for (long i = 0; i < row.LongLength; i++)
             {
-                data_row.Append(ConverterHandlerMiscItems.AlignText(row[i], text_alignment, (int)column_widths[i], ' '));
+                data_row.Append(MiscConverterHandlerItems.AlignText(row[i], text_alignment, (int)column_widths[i], ' '));
 
                 data_row.Append(i == row.LongLength - 1 ? "" : intersection_char);
             }
