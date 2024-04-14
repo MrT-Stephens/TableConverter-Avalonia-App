@@ -60,7 +60,7 @@ namespace TableConverter.Services
                         null, new ConverterHandlerPdfOutputService()),
                 new ConverterType("YAML", [ ".yaml" ], [ "application/x-yaml" ],
                         "YAML stands for YAML Ain't Markup Language. YAML is a human-readable data serialization language. It is commonly used for configuration files and in applications where data is being stored or transmitted.",
-                        null, null)
+                        new ConverterHandlerYamlInputService(), new ConverterHandlerYamlOutputService())
             });
         }
     }
