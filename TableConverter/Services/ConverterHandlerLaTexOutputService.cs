@@ -375,7 +375,7 @@ namespace TableConverter.Services
                     {
                         "All" or "MySQL" or "Markdown" => "|" + string.Join("", Enumerable.Repeat($"{text_alignement_char}|", headers.Length)),
                         "Excel" => $"|{text_alignement_char}|" + string.Join("", Enumerable.Repeat($"{text_alignement_char}", headers.Length - 1)) + "|",
-                        "Horizontal" or "None" => string.Join("", Enumerable.Repeat($"{text_alignement_char}", headers.Length)),
+                        "Horizontal" or "None" or _ => string.Join("", Enumerable.Repeat($"{text_alignement_char}", headers.Length)),
                     } + "}" + Environment.NewLine;
                 };
 

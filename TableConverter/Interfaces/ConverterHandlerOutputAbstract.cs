@@ -24,12 +24,17 @@ namespace TableConverter.Interfaces
 
         public abstract Task<string> ConvertAsync(string[] headers, string[][] rows, object? progress_bar);
 
-        public virtual async Task SaveFileAsync(IStorageFile output, ReadOnlyMemory<byte> buffer)
+        public virtual Task SaveFileAsync(IStorageFile output, ReadOnlyMemory<byte> buffer)
         {
-            using (var stream = await output.OpenWriteAsync())
+            return Task.Run(async () =>
             {
-                stream.Write(buffer.Span);
-            }
+                using (var writer = await output.OpenWriteAsync())
+                {
+                    writer.Write(buffer.Span);
+
+                    writer.Close();
+                }
+            });
         }
 
         protected static void SetProgressBarValue(object? progress_bar, long value, long from_low, long from_high)
