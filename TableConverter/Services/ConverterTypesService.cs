@@ -57,7 +57,7 @@ namespace TableConverter.Services
                         new ConverterHandlerMultiLineInputService(), new ConverterHandlerMultiLineOutputService()),
                 new ConverterType("PDF", [ ".pdf" ], [ "application/pdf" ],
                         "PDF stands for Portable Document Format. PDF is a file format developed by Adobe in the 1990s to present documents, including text formatting and images, in a manner independent of application software, hardware, and operating systems.",
-                        null, null),
+                        null, new ConverterHandlerPdfOutputService()),
                 new ConverterType("YAML", [ ".yaml" ], [ "application/x-yaml" ],
                         "YAML stands for YAML Ain't Markup Language. YAML is a human-readable data serialization language. It is commonly used for configuration files and in applications where data is being stored or transmitted.",
                         null, null)
