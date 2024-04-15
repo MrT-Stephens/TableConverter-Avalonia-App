@@ -8,5 +8,5 @@
         x:Class="TableConverter.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         Title="TableConverter">
-        <views:MainView />
+        <views:DataGenerationView />
 </Window>

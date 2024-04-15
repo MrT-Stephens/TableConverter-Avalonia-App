@@ -1,0 +1,170 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:vm="clr-namespace:TableConverter.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TableConverter.Views.DataGenerationView"
+             x:DataType="vm:DataGenerationViewModel">
+  <Design.DataContext>
+    <!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+    <vm:DataGenerationViewModel />
+  </Design.DataContext>
+
+  <dialogHost:DialogHost Name="DataGenerationDialogHost"
+                         IsOpen="False"
+                         CloseOnClickAway="False"
+                         DisableOpeningAnimation="True"
+                         dialogHost:DialogHostStyle.CornerRadius="10">
+    <dialogHost:DialogHost.Content>
+      <Grid Background="{DynamicResource BackgroundBrush}">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="100" />
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="100" />
+        </Grid.ColumnDefinitions>
+        <!-- Main Content -->
+        <DockPanel Grid.Column="1">
+          <!-- Header of main content section -->
+          <Border DockPanel.Dock="Top"
+                  Margin="0 0 0 30"
+                  Background="{DynamicResource BackgroundBrush}"
+                  BorderBrush="{DynamicResource BorderBrush}"
+                  BorderThickness="1 0 1 1"
+                  CornerRadius="0 0 10 10">
+            <Grid Margin="10 10 10 10">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+              </Grid.ColumnDefinitions>
+              <!-- Header Section Title -->
+              <TextBlock Grid.Column="0"
+                         Text="TableConverter"
+                         FontSize="20"
+                         FontFamily="{StaticResource JetBrainsMono}"
+                         VerticalAlignment="Center">
+              </TextBlock>
+              <StackPanel Grid.Column="2"
+                          Orientation="Horizontal"
+                          Spacing="10">
+                <!-- Header Section Menu Button -->
+                <Button>
+                  <PathIcon Data="{StaticResource MenuIcon}"
+                            Height="24"
+                            Width="24"
+                            Foreground="{DynamicResource BorderBrush}">
+                  </PathIcon>
+                  <Button.Flyout>
+                    <!-- Header Section Menu Button Flyout -->
+                    <Flyout ShowMode="TransientWithDismissOnPointerMoveAway"
+                            Placement="BottomEdgeAlignedRight">
+                      <StackPanel Spacing="10"
+                                  Width="300">
+                        <!-- Header Section Back Button -->
+                        <Button HorizontalAlignment="Stretch">
+                          <StackPanel Orientation="Horizontal"
+                                      Spacing="10">
+                            <PathIcon Data="{StaticResource LeftArrow}"
+                                      Height="24"
+                                      Width="24">
+                            </PathIcon>
+                            <TextBlock Text="Go Back"
+                                       FontFamily="{StaticResource JetBrainsMono}"
+                                       VerticalAlignment="Center">
+                            </TextBlock>
+                          </StackPanel>
+                        </Button>
+                        <Separator Background="{DynamicResource BorderBrush}" />
+                        <!-- Header Section Menu Light/Dark Button -->
+                        <Button HorizontalAlignment="Stretch"
+                                Button.Click="HeaderMenuLightDarkModeButtonClicked">
+                          <StackPanel Orientation="Horizontal"
+                                      Spacing="10">
+                            <PathIcon Data="{StaticResource LightDarkIcon}"
+                                      Height="24"
+                                      Width="24">
+                            </PathIcon>
+                            <TextBlock Text="Light/Dark Mode"
+                                       FontFamily="{StaticResource JetBrainsMono}"
+                                       VerticalAlignment="Center">
+                            </TextBlock>
+                          </StackPanel>
+                        </Button>
+                      </StackPanel>
+                    </Flyout>
+                  </Button.Flyout>
+                </Button>
+              </StackPanel>
+            </Grid>
+          </Border>
+          <ScrollViewer Name="MainContentScrollViewer">
+            <!-- Main Content Area -->
+            <StackPanel Orientation="Vertical"
+                        Spacing="30">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="150" />
+                  <ColumnDefinition Width="150" />
+                  <ColumnDefinition Width="*" />
+                  <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                
+                <TextBlock Grid.Column="0"
+                           Grid.Row="0"
+                           Text="Field Name:"
+                           FontFamily="{StaticResource JetBrainsMono}"
+                           VerticalAlignment="Center">
+                </TextBlock>
+
+                <TextBlock Grid.Column="1"
+                           Grid.Row="0"
+                           Text="Field Type:"
+                           FontFamily="{StaticResource JetBrainsMono}"
+                           VerticalAlignment="Center">
+                </TextBlock>
+
+                <TextBlock Grid.Column="2"
+                           Grid.Row="0"
+                           Text="Field Options:"
+                           FontFamily="{StaticResource JetBrainsMono}"
+                           VerticalAlignment="Center">
+                </TextBlock>
+                
+                <!-- Data Generation Fields Area -->
+                <ItemsControl Grid.Row="1"
+                              Grid.ColumnSpan="4">
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <StackPanel Orientation="Vertical"
+                                  Spacing="10">
+                      </StackPanel>
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <Grid>
+                        <Grid.ColumnDefinitions>
+                          <ColumnDefinition Width="100" />
+                          <ColumnDefinition Width="100" />
+                          <ColumnDefinition Width="*" />
+                          <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </Grid>
+            </StackPanel>
+          </ScrollViewer>
+        </DockPanel>
+      </Grid>
+    </dialogHost:DialogHost.Content>  
+  </dialogHost:DialogHost>
+</UserControl>
