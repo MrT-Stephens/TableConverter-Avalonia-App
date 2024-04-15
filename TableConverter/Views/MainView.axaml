@@ -378,7 +378,8 @@
                 </StackPanel>
               </Grid>
             </Border>
-            <ScrollViewer Name="MainContentScrollViewer">
+            <ScrollViewer Name="MainContentScrollViewer"
+                          HorizontalScrollBarVisibility="Auto">
               <!-- Input Data Section -->
               <StackPanel Orientation="Vertical" 
                           Spacing="30">

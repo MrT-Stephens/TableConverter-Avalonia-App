@@ -29,7 +29,7 @@
         <DockPanel Grid.Column="1">
           <!-- Header of main content section -->
           <Border DockPanel.Dock="Top"
-                  Margin="0 0 0 30"
+                  Margin="0 0 0 0"
                   Background="{DynamicResource BackgroundBrush}"
                   BorderBrush="{DynamicResource BorderBrush}"
                   BorderThickness="1 0 1 1"
@@ -100,46 +100,52 @@
               </StackPanel>
             </Grid>
           </Border>
-          <ScrollViewer Name="MainContentScrollViewer">
+          <ScrollViewer Name="MainContentScrollViewer"
+                        Margin="0 30 0 30"
+                        HorizontalScrollBarVisibility="Auto">
             <!-- Main Content Area -->
             <StackPanel Orientation="Vertical"
-                        Spacing="30">
+                        Spacing="30"
+                        VerticalAlignment="Center">
               <Grid>
                 <Grid.ColumnDefinitions>
                   <ColumnDefinition Width="150" />
+                  <ColumnDefinition Width="10" MinWidth="10" />
                   <ColumnDefinition Width="150" />
+                  <ColumnDefinition Width="10" MinWidth="10" />
                   <ColumnDefinition Width="*" />
+                  <ColumnDefinition Width="10" MinWidth="10"/>
                   <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                   <RowDefinition Height="Auto" />
+                  <RowDefinition Height="10" MinHeight="10" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="10" MinHeight="10" />
                   <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                
+                <!-- Data Generation Fields Header -->
                 <TextBlock Grid.Column="0"
                            Grid.Row="0"
                            Text="Field Name:"
                            FontFamily="{StaticResource JetBrainsMono}"
                            VerticalAlignment="Center">
                 </TextBlock>
-
-                <TextBlock Grid.Column="1"
+                <TextBlock Grid.Column="2"
                            Grid.Row="0"
                            Text="Field Type:"
                            FontFamily="{StaticResource JetBrainsMono}"
                            VerticalAlignment="Center">
                 </TextBlock>
-
-                <TextBlock Grid.Column="2"
+                <TextBlock Grid.Column="4"
                            Grid.Row="0"
                            Text="Field Options:"
                            FontFamily="{StaticResource JetBrainsMono}"
                            VerticalAlignment="Center">
                 </TextBlock>
-                
                 <!-- Data Generation Fields Area -->
-                <ItemsControl Grid.Row="1"
-                              Grid.ColumnSpan="4">
+                <ItemsControl Grid.Row="2"
+                              Grid.ColumnSpan="7">
                   <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                       <StackPanel Orientation="Vertical"
@@ -151,15 +157,99 @@
                     <DataTemplate>
                       <Grid>
                         <Grid.ColumnDefinitions>
-                          <ColumnDefinition Width="100" />
-                          <ColumnDefinition Width="100" />
-                          <ColumnDefinition Width="*" />
+                          <ColumnDefinition Width="150" />
+                          <ColumnDefinition Width="10" MinWidth="10" />
+                          <ColumnDefinition Width="150" />
+                          <ColumnDefinition Width="10" MinWidth="10" />
+                          <ColumnDefinition Width="*" MaxWidth="100" />
+                          <ColumnDefinition Width="10" MinWidth="10" />
                           <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                       </Grid>
                     </DataTemplate>
                   </ItemsControl.ItemTemplate>
                 </ItemsControl>
+                <!-- Data Generation Buttons Area -->
+                <Button Grid.Row="4"
+                        Grid.Column="0"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center">
+                  <StackPanel Orientation="Horizontal"
+                              Spacing="10">
+                    <PathIcon Data="{StaticResource AddIcon}"
+                              Height="24"
+                              Width="24">
+                    </PathIcon>
+                    <TextBlock Text="Add Field"
+                               FontFamily="{StaticResource JetBrainsMono}"
+                               VerticalAlignment="Center">
+                    </TextBlock>
+                  </StackPanel>
+                </Button>
+              </Grid>
+              <!-- Data Generation Options Area -->
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="300" />
+                  <ColumnDefinition Width="*" MinWidth="10" />
+                  <ColumnDefinition Width="150" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="1" />
+                  <RowDefinition Height="10" MinHeight="10" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="10" MinHeight="10" />
+                  <RowDefinition Height="1" />
+                </Grid.RowDefinitions>
+                <Border Grid.Row="0"
+                        Grid.ColumnSpan="3"
+                        BorderThickness="0 1 0 0"
+                        BorderBrush="{DynamicResource BorderBrush}">
+                </Border>
+                <!-- Data Generation Number of Rows Selector -->
+                <Grid Grid.Row="2"
+                      Grid.Column="0">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="*" />
+                  </Grid.ColumnDefinitions>
+                  <TextBlock Grid.Column="0"
+                             Text="Number of Rows:"
+                             FontFamily="{StaticResource JetBrainsMono}"
+                             VerticalAlignment="Center">
+                  </TextBlock>
+                  <NumericUpDown Grid.Column="2"
+                                 Minimum="1"
+                                 Maximum="10000"
+                                 FormatString="0"
+                                 FontFamily="{StaticResource JetBrainsMono}"
+                                 VerticalAlignment="Center"
+                                 HorizontalAlignment="Stretch">
+                  </NumericUpDown>
+                </Grid>
+                <!-- Data Generation Generate Button -->
+                <Button Grid.Row="2"
+                        Grid.Column="2"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center">
+                  <StackPanel Orientation="Horizontal"
+                              Spacing="10">
+                    <PathIcon Data="{StaticResource ConvertIcon}"
+                              Height="24"
+                              Width="24">
+                    </PathIcon>
+                    <TextBlock Text="Generate"
+                               FontFamily="{StaticResource JetBrainsMono}"
+                               VerticalAlignment="Center">
+                    </TextBlock>
+                  </StackPanel>
+                </Button>
+                <Border Grid.Row="4"
+                        Grid.ColumnSpan="3"
+                        BorderThickness="0 0 0 1"
+                        BorderBrush="{DynamicResource BorderBrush}">
+                </Border>
               </Grid>
             </StackPanel>
           </ScrollViewer>
