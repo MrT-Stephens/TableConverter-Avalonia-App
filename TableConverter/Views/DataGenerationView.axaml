@@ -101,10 +101,75 @@
               </StackPanel>
             </Grid>
           </Border>
+          <!-- Data Generation Options Area -->
+          <Grid DockPanel.Dock="Bottom">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="300" />
+              <ColumnDefinition Width="*" MinWidth="10" />
+              <ColumnDefinition Width="150" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+              <RowDefinition Height="1" />
+              <RowDefinition Height="10" MinHeight="10" />
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="10" MinHeight="10" />
+              <RowDefinition Height="1" />
+              <RowDefinition Height="10" MinHeight="10" />
+            </Grid.RowDefinitions>
+            <Border Grid.Row="0"
+                    Grid.ColumnSpan="3"
+                    BorderThickness="0 1 0 0"
+                    BorderBrush="{DynamicResource BorderBrush}">
+            </Border>
+            <!-- Data Generation Number of Rows Selector -->
+            <Grid Grid.Row="2"
+                  Grid.Column="0">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="*" />
+              </Grid.ColumnDefinitions>
+              <TextBlock Grid.Column="0"
+                         Text="Number of Rows:"
+                         FontFamily="{StaticResource JetBrainsMono}"
+                         VerticalAlignment="Center">
+              </TextBlock>
+              <NumericUpDown Grid.Column="2"
+                             Minimum="1"
+                             Maximum="10000"
+                             FormatString="0"
+                             FontFamily="{StaticResource JetBrainsMono}"
+                             VerticalAlignment="Center"
+                             HorizontalAlignment="Stretch">
+              </NumericUpDown>
+            </Grid>
+            <!-- Data Generation Generate Button -->
+            <Button Grid.Row="2"
+                    Grid.Column="2"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center">
+              <StackPanel Orientation="Horizontal"
+                          Spacing="10">
+                <PathIcon Data="{StaticResource ConvertIcon}"
+                          Height="24"
+                          Width="24">
+                </PathIcon>
+                <TextBlock Text="Generate"
+                           FontFamily="{StaticResource JetBrainsMono}"
+                           VerticalAlignment="Center">
+                </TextBlock>
+              </StackPanel>
+            </Button>
+            <Border Grid.Row="4"
+                    Grid.ColumnSpan="3"
+                    BorderThickness="0 0 0 1"
+                    BorderBrush="{DynamicResource BorderBrush}">
+            </Border>
+          </Grid>
+          <!-- Data Generation Fields Area -->
           <ScrollViewer Name="MainContentScrollViewer"
                         Margin="0 30 0 30"
                         HorizontalScrollBarVisibility="Auto">
-            <!-- Main Content Area -->
             <StackPanel Orientation="Vertical"
                         Spacing="30"
                         VerticalAlignment="Center">
@@ -187,70 +252,6 @@
                     </TextBlock>
                   </StackPanel>
                 </Button>
-              </Grid>
-              <!-- Data Generation Options Area -->
-              <Grid>
-                <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="300" />
-                  <ColumnDefinition Width="*" MinWidth="10" />
-                  <ColumnDefinition Width="150" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                  <RowDefinition Height="1" />
-                  <RowDefinition Height="10" MinHeight="10" />
-                  <RowDefinition Height="Auto" />
-                  <RowDefinition Height="10" MinHeight="10" />
-                  <RowDefinition Height="1" />
-                </Grid.RowDefinitions>
-                <Border Grid.Row="0"
-                        Grid.ColumnSpan="3"
-                        BorderThickness="0 1 0 0"
-                        BorderBrush="{DynamicResource BorderBrush}">
-                </Border>
-                <!-- Data Generation Number of Rows Selector -->
-                <Grid Grid.Row="2"
-                      Grid.Column="0">
-                  <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="10" />
-                    <ColumnDefinition Width="*" />
-                  </Grid.ColumnDefinitions>
-                  <TextBlock Grid.Column="0"
-                             Text="Number of Rows:"
-                             FontFamily="{StaticResource JetBrainsMono}"
-                             VerticalAlignment="Center">
-                  </TextBlock>
-                  <NumericUpDown Grid.Column="2"
-                                 Minimum="1"
-                                 Maximum="10000"
-                                 FormatString="0"
-                                 FontFamily="{StaticResource JetBrainsMono}"
-                                 VerticalAlignment="Center"
-                                 HorizontalAlignment="Stretch">
-                  </NumericUpDown>
-                </Grid>
-                <!-- Data Generation Generate Button -->
-                <Button Grid.Row="2"
-                        Grid.Column="2"
-                        HorizontalAlignment="Stretch"
-                        HorizontalContentAlignment="Center">
-                  <StackPanel Orientation="Horizontal"
-                              Spacing="10">
-                    <PathIcon Data="{StaticResource ConvertIcon}"
-                              Height="24"
-                              Width="24">
-                    </PathIcon>
-                    <TextBlock Text="Generate"
-                               FontFamily="{StaticResource JetBrainsMono}"
-                               VerticalAlignment="Center">
-                    </TextBlock>
-                  </StackPanel>
-                </Button>
-                <Border Grid.Row="4"
-                        Grid.ColumnSpan="3"
-                        BorderThickness="0 0 0 1"
-                        BorderBrush="{DynamicResource BorderBrush}">
-                </Border>
               </Grid>
             </StackPanel>
           </ScrollViewer>
