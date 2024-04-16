@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -168,4 +169,14 @@ public partial class TableConverterViewModel : ViewModelBase
 
         return large_string;
     }
+
+    #region Commands
+
+    [RelayCommand]
+    private void GenerateDataButtonClicked()
+    {
+        PageRouterService.NavigatePage<DataGenerationViewModel>();
+    }
+
+    #endregion
 }

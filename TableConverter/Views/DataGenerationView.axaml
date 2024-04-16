@@ -64,7 +64,8 @@
                       <StackPanel Spacing="10"
                                   Width="300">
                         <!-- Header Section Back Button -->
-                        <Button HorizontalAlignment="Stretch">
+                        <Button HorizontalAlignment="Stretch"
+                                Command="{Binding GoBackButtonClickedCommand}">
                           <StackPanel Orientation="Horizontal"
                                       Spacing="10">
                             <PathIcon Data="{StaticResource LeftArrow}"
@@ -80,7 +81,7 @@
                         <Separator Background="{DynamicResource BorderBrush}" />
                         <!-- Header Section Menu Light/Dark Button -->
                         <Button HorizontalAlignment="Stretch"
-                                Button.Click="HeaderMenuLightDarkModeButtonClicked">
+                                Command="{Binding LightDarkModeButtonClickedCommand}">
                           <StackPanel Orientation="Horizontal"
                                       Spacing="10">
                             <PathIcon Data="{StaticResource LightDarkIcon}"

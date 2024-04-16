@@ -32,11 +32,6 @@ public partial class TableConverterView : UserControl
         SizeChanged += (sender, e) => ResizeInformationSidePanel();
     }
 
-    private void HeaderMenuLightDarkModeButtonClicked(object? sender, RoutedEventArgs e)
-    {
-        App.ThemeManager?.Switch(App.Current?.ActualThemeVariant.ToString() == "Dark" ? 0 : 1);
-    }
-
     private void ResizeInformationSidePanel()
     {
         var top_level_window = TopLevel.GetTopLevel(this);

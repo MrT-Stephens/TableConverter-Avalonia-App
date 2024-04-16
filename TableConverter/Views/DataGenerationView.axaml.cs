@@ -14,10 +14,5 @@ namespace TableConverter.Views
         {
             InitializeComponent(true);
         }
-
-        private void HeaderMenuLightDarkModeButtonClicked(object? sender, RoutedEventArgs e)
-        {
-            App.ThemeManager?.Switch(App.Current?.ActualThemeVariant.ToString() == "Dark" ? 0 : 1);
-        }
     }
 }

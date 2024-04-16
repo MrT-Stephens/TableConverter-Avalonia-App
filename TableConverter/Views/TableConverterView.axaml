@@ -358,7 +358,7 @@
                           <Separator Background="{DynamicResource BorderBrush}" />
                           <!-- Header Section Menu Light/Dark Button -->
                           <Button HorizontalAlignment="Stretch"
-                                  Button.Click="HeaderMenuLightDarkModeButtonClicked">
+                                  Command="{Binding LightDarkModeButtonClickedCommand}">
                             <StackPanel Orientation="Horizontal"
                                         Spacing="10">
                               <PathIcon Data="{StaticResource LightDarkIcon}"
@@ -412,7 +412,7 @@
                       <StackPanel Grid.Column="2"
                                   Orientation="Horizontal"
                                   Spacing="10">
-                        <Button>
+                        <Button Command="{Binding GenerateDataButtonClickedCommand}">
                           <StackPanel Orientation="Horizontal"
                                       Spacing="10">
                             <PathIcon Data="{StaticResource GenerateIcon}"
