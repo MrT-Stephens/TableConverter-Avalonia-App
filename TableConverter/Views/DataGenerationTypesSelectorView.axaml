@@ -1,0 +1,165 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:TableConverter.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TableConverter.Views.DataGenerationTypesSelectorView"
+             x:DataType="vm:DataGenerationTypesSelectorViewModel">
+  <Design.DataContext>
+    <!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+    <vm:DataGenerationTypesSelectorViewModel />
+  </Design.DataContext>
+
+  <Border Name="MainBorder"
+          Background="{DynamicResource BackgroundBrush}"
+          BorderBrush="{DynamicResource BorderBrush}"
+          BorderThickness="1">
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
+      <!-- Data Generation Types Header -->
+      <Border Grid.Row="0"
+              BorderBrush="{DynamicResource BorderBrush}"
+              BorderThickness="0 0 0 1"
+              Padding="20 20 20 20">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+          </Grid.ColumnDefinitions>
+          <!-- Data Generation Types Header Title -->
+          <TextBlock Grid.Column="0"
+                     Text="Select a Type"
+                     FontSize="20"
+                     FontFamily="{DynamicResource JetBrainsMono}"
+                     HorizontalAlignment="Left"
+                     VerticalAlignment="Center">
+          </TextBlock>
+          <StackPanel Grid.Column="2"
+                      Orientation="Horizontal"
+                      Spacing="10">
+            <!-- Data Generation Types Header Search Box -->
+            <Grid VerticalAlignment="Center">
+              <PathIcon Data="{StaticResource SearchIcon}"
+                        Height="20"
+                        Width="20"
+                        Foreground="{DynamicResource ForegroundBrush}"
+                        Margin="0 0 15 0"
+                        ZIndex="1"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Right">
+              </PathIcon>
+              <AutoCompleteBox Width="200"
+                               Margin="0 0 10 0"
+                               ItemsSource="{Binding TypesSearchItems}"
+                               FilterMode="Contains"
+                               Watermark="Search for a Type"
+                               VerticalAlignment="Center">
+              </AutoCompleteBox>
+            </Grid>
+            <!-- Data Generation Types Header Close Button -->
+            <Button HorizontalAlignment="Right"
+                    HorizontalContentAlignment="Center"
+                    Margin="0 0 0 0"
+                    Button.Click="CloseButtonClicked">
+              <PathIcon Data="{StaticResource RemoveIcon}"
+                        Height="20"
+                        Width="20">
+              </PathIcon>
+            </Button>
+          </StackPanel>
+        </Grid>
+      </Border>
+      <!-- Data Generation Types List -->
+      <SplitView Name="MainSplitView"
+                 Grid.Row="1"
+                 IsPaneOpen="True"
+                 PanePlacement="Left"
+                 DisplayMode="CompactInline"
+                 CompactPaneLength="20">
+        <SplitView.Pane>
+          <Border Grid.Column="0"
+                  BorderBrush="{DynamicResource BorderBrush}">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="20" />
+              </Grid.ColumnDefinitions>
+              <!-- Left Side Categories Panel -->
+              <ListBox Grid.Column="0"
+                       ItemsSource="{Binding TypesCategories}"
+                       SelectedItem="{Binding SelectedCategory}"
+                       SelectionMode="AlwaysSelected,Single"
+                       SelectionChanged="TypesCategoriesListBoxSelectionChanged">
+                <ListBox.ItemTemplate>
+                  <DataTemplate>
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="20"
+                                Margin="5 5 5 5">
+                      <TextBlock Text="{Binding Key}"
+                                  FontFamily="{DynamicResource JetBrainsMono}"
+                                  FontSize="16">
+                      </TextBlock>
+                      <TextBlock Text="{Binding Value}"
+                                  FontFamily="{DynamicResource JetBrainsMono}"
+                                  FontSize="16">
+                      </TextBlock>
+                    </StackPanel>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
+              <!-- Split View Compact Close Button -->
+              <Button Grid.Column="1"
+                      Name="MainSplitViewButton"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch"
+                      VerticalContentAlignment="Center"
+                      HorizontalContentAlignment="Center"
+                      Background="Transparent"
+                      Button.Click="SplitViewPaneButtonClicked">
+              </Button>
+            </Grid>
+          </Border>
+        </SplitView.Pane>
+        <SplitView.Content>
+          <!-- Right Side Data Generation Types Panel -->
+          <ListBox ItemsSource="{Binding CurrentDataGenerationTypes}"
+                   SelectedItem="{Binding SelectedDataGenerationType}"
+                   SelectionMode="Single"
+                   SelectionChanged="TypesListBoxSelectionChanged">
+            <ListBox.ItemsPanel>
+              <ItemsPanelTemplate>
+                <UniformGrid Columns="2">
+                </UniformGrid>
+              </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <StackPanel Margin="10 20 10 20"
+                            Orientation="Vertical"
+                            Spacing="10"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Left">
+                  <TextBlock Text="{Binding Name}"
+                             FontFamily="{DynamicResource JetBrainsMono}"
+                             FontSize="16">
+                  </TextBlock>
+                  <TextBlock Text="{Binding Description}"
+                             FontFamily="{DynamicResource JetBrainsMono}"
+                             FontSize="12"
+                             TextWrapping="Wrap">
+                  </TextBlock>
+                </StackPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </SplitView.Content>
+      </SplitView>
+    </Grid>
+  </Border>
+</UserControl>

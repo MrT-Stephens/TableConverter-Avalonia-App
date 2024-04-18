@@ -26,9 +26,14 @@
           <ColumnDefinition Width="100" />
         </Grid.ColumnDefinitions>
         <!-- Main Content -->
-        <DockPanel Grid.Column="1">
+        <Grid Grid.Column="1">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
           <!-- Header of main content section -->
-          <Border DockPanel.Dock="Top"
+          <Border Grid.Row="0"
                   Margin="0 0 0 0"
                   Background="{DynamicResource BackgroundBrush}"
                   BorderBrush="{DynamicResource BorderBrush}"
@@ -101,79 +106,15 @@
               </StackPanel>
             </Grid>
           </Border>
-          <!-- Data Generation Options Area -->
-          <Grid DockPanel.Dock="Bottom">
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="300" />
-              <ColumnDefinition Width="*" MinWidth="10" />
-              <ColumnDefinition Width="150" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-              <RowDefinition Height="1" />
-              <RowDefinition Height="10" MinHeight="10" />
-              <RowDefinition Height="Auto" />
-              <RowDefinition Height="10" MinHeight="10" />
-              <RowDefinition Height="1" />
-              <RowDefinition Height="10" MinHeight="10" />
-            </Grid.RowDefinitions>
-            <Border Grid.Row="0"
-                    Grid.ColumnSpan="3"
-                    BorderThickness="0 1 0 0"
-                    BorderBrush="{DynamicResource BorderBrush}">
-            </Border>
-            <!-- Data Generation Number of Rows Selector -->
-            <Grid Grid.Row="2"
-                  Grid.Column="0">
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="10" />
-                <ColumnDefinition Width="*" />
-              </Grid.ColumnDefinitions>
-              <TextBlock Grid.Column="0"
-                         Text="Number of Rows:"
-                         FontFamily="{StaticResource JetBrainsMono}"
-                         VerticalAlignment="Center">
-              </TextBlock>
-              <NumericUpDown Grid.Column="2"
-                             Minimum="1"
-                             Maximum="10000"
-                             FormatString="0"
-                             Value="{Binding NumberOfRows}"
-                             FontFamily="{StaticResource JetBrainsMono}"
-                             VerticalAlignment="Center"
-                             HorizontalAlignment="Stretch">
-              </NumericUpDown>
-            </Grid>
-            <!-- Data Generation Generate Button -->
-            <Button Grid.Row="2"
-                    Grid.Column="2"
-                    HorizontalAlignment="Stretch"
-                    HorizontalContentAlignment="Center">
-              <StackPanel Orientation="Horizontal"
-                          Spacing="10">
-                <PathIcon Data="{StaticResource ConvertIcon}"
-                          Height="24"
-                          Width="24">
-                </PathIcon>
-                <TextBlock Text="Generate"
-                           FontFamily="{StaticResource JetBrainsMono}"
-                           VerticalAlignment="Center">
-                </TextBlock>
-              </StackPanel>
-            </Button>
-            <Border Grid.Row="4"
-                    Grid.ColumnSpan="3"
-                    BorderThickness="0 0 0 1"
-                    BorderBrush="{DynamicResource BorderBrush}">
-            </Border>
-          </Grid>
           <!-- Data Generation Fields Area -->
-          <DataGrid ItemsSource="{Binding DataGenerationFields}"
+          <DataGrid Grid.Row="1"
+                    Margin="0 30 0 30"
+                    Name="DataGenerationFieldsDataGrid"
+                    ItemsSource="{Binding DataGenerationFields}"
                     SelectionMode="Single"
                     CanUserResizeColumns="False"
                     CanUserSortColumns="False"
                     CanUserReorderColumns="False"
-                    Margin="0 30 0 30"
                     FontFamily="{StaticResource JetBrainsMono}"
                     Foreground="{DynamicResource ForegroundBrush}"
                     BorderBrush="{DynamicResource BorderBrush}"
@@ -203,7 +144,8 @@
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate>
                     <Button HorizontalAlignment="Stretch"
-                            VerticalAlignment="Stretch">
+                            VerticalAlignment="Stretch"
+                            Button.Click="ChooseFieldTypeButtonClicked">
                       <Grid>
                         <TextBlock Text="Choose a Type"
                                     FontFamily="{StaticResource JetBrainsMono}"
@@ -226,6 +168,12 @@
                                       MinWidth="200">
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate>
+                    <TextBlock Text="No Options"
+                                Margin="30 0 30 0"
+                                FontFamily="{StaticResource JetBrainsMono}"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Stretch">
+                    </TextBlock>
                   </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
               </DataGridTemplateColumn>
@@ -255,7 +203,9 @@
                       </Grid.ColumnDefinitions>
                       <Button Grid.Column="0"
                               HorizontalAlignment="Stretch"
-                              VerticalAlignment="Stretch">
+                              VerticalAlignment="Stretch"
+                              Command="{Binding ((vm:DataGenerationViewModel)DataContext).RemoveFieldButtonClickedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                              CommandParameter="{Binding .}">
                         <PathIcon Data="{StaticResource RemoveIcon}"
                                   Height="24"
                                   Width="24"
@@ -264,7 +214,9 @@
                       </Button>
                       <Button Grid.Column="1"
                               HorizontalAlignment="Stretch"
-                              VerticalAlignment="Stretch">
+                              VerticalAlignment="Stretch"
+                              Command="{Binding ((vm:DataGenerationViewModel)DataContext).AddFieldButtonClickedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                              CommandParameter="{Binding .}">
                         <PathIcon Data="{StaticResource AddIcon}"
                                   Height="24"
                                   Width="24"
@@ -277,7 +229,56 @@
               </DataGridTemplateColumn>
             </DataGrid.Columns>
           </DataGrid>
-        </DockPanel>
+          <!-- Data Generation Generate Options Area -->
+          <Border Grid.Row="2"
+                  BorderBrush="{DynamicResource BorderBrush}"
+                  BorderThickness="0 1 0 1"
+                  Padding="0 10 0 10"
+                  Margin="0 0 0 10">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+              </Grid.ColumnDefinitions>
+              <!-- Data Generation Number of Rows -->
+              <TextBlock Grid.Column="0"
+                         Text="Number of Rows: "
+                         FontFamily="{StaticResource JetBrainsMono}"
+                         VerticalAlignment="Center">
+              </TextBlock>
+              <NumericUpDown Grid.Column="1"
+                             MinWidth="150"
+                             Minimum="1"
+                             Maximum="10000"
+                             ParsingNumberStyle="Integer"
+                             FormatString="N0"
+                             Value="{Binding NumberOfRows}"
+                             FontFamily="{StaticResource JetBrainsMono}"
+                             VerticalAlignment="Center"
+                             HorizontalAlignment="Stretch"
+                             VerticalContentAlignment="Center">
+              </NumericUpDown>
+              <!-- Data Generation Generate Button -->
+              <Button Grid.Column="3"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch">
+                <StackPanel Orientation="Horizontal"
+                            Spacing="10">
+                  <PathIcon Data="{StaticResource GenerateIcon}"
+                            Height="24"
+                            Width="24">
+                  </PathIcon>
+                  <TextBlock Text="Generate Data"
+                             FontFamily="{StaticResource JetBrainsMono}"
+                             VerticalAlignment="Center">
+                  </TextBlock>
+                </StackPanel>
+              </Button>
+            </Grid>
+          </Border>
+        </Grid>
       </Grid>
     </dialogHost:DialogHost.Content>  
   </dialogHost:DialogHost>

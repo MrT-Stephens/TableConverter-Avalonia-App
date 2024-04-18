@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using System.Linq;
 using TableConverter.DataModels;
 
 namespace TableConverter.ViewModels;
@@ -13,24 +14,43 @@ public partial class DataGenerationViewModel : ViewModelBase
     private ObservableCollection<DataGenerationField> _DataGenerationFields = new();
 
     [ObservableProperty]
-    private int _NumberOfRows;
+    private int _NumberOfRows = 100;
 
     #endregion
 
     public DataGenerationViewModel()
     {
         DataGenerationFields.Add(new DataGenerationField());
-        DataGenerationFields.Add(new DataGenerationField());
-        DataGenerationFields.Add(new DataGenerationField());
-        DataGenerationFields.Add(new DataGenerationField());
     }
 
     #region Commands
 
     [RelayCommand]
-    public void GoBackButtonClicked()
+    private void GoBackButtonClicked()
     {
         PageRouterService.NavigateBack();
+    }
+
+    [RelayCommand]
+    private void AddFieldButtonClicked(DataGenerationField field)
+    {
+        if (DataGenerationFields.Last() == field)
+        {
+            DataGenerationFields.Add(new DataGenerationField());
+        }
+        else
+        {
+            DataGenerationFields.Insert(DataGenerationFields.IndexOf(field) + 1, new DataGenerationField());
+        }
+    }
+
+    [RelayCommand]
+    private void RemoveFieldButtonClicked(DataGenerationField field)
+    {
+        if (DataGenerationFields.Count > 1)
+        {
+            DataGenerationFields.Remove(field);
+        }
     }
 
     #endregion

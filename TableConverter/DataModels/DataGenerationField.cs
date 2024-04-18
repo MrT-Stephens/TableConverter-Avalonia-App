@@ -11,6 +11,6 @@ namespace TableConverter.DataModels
         private string _Type = string.Empty;
 
         [ObservableProperty]
-        private int _BlankPercentage;
+        private int _BlankPercentage = 0;
     }
 }
