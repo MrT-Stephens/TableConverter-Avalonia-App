@@ -57,6 +57,7 @@
               <AutoCompleteBox Width="200"
                                Margin="0 0 10 0"
                                ItemsSource="{Binding TypesSearchItems}"
+                               FontFamily="{DynamicResource JetBrainsMono}"
                                FilterMode="Contains"
                                Watermark="Search for a Type"
                                VerticalAlignment="Center">
