@@ -147,7 +147,7 @@
                             VerticalAlignment="Stretch"
                             Button.Click="ChooseFieldTypeButtonClicked">
                       <Grid>
-                        <TextBlock Text="Choose a Type"
+                        <TextBlock Text="{Binding Type}"
                                     FontFamily="{StaticResource JetBrainsMono}"
                                     VerticalAlignment="Center"
                                     HorizontalAlignment="Left">

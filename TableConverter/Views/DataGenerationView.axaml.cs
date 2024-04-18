@@ -62,8 +62,9 @@ namespace TableConverter.Views
                     },
                     TypesSelectorViewClose = (DataGenerationType? data_generation_type) =>
                     {
-                        if (data_generation_type is not null)
+                        if (DataGenerationFieldsDataGrid.SelectedItem is DataGenerationField field)
                         {
+                            field.Type = data_generation_type is not null ? data_generation_type.Name : "Choose a Type";
                         }
 
                         DataGenerationDialogHost.CurrentSession?.Close();

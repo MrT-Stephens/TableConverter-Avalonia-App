@@ -8,7 +8,7 @@ namespace TableConverter.DataModels
         private string _Name = string.Empty;
 
         [ObservableProperty]
-        private string _Type = string.Empty;
+        private string _Type = "Choose a Type";
 
         [ObservableProperty]
         private int _BlankPercentage = 0;
