@@ -20,6 +20,7 @@
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto" />
         <RowDefinition Height="*" />
+        <RowDefinition Height="Auto" />
       </Grid.RowDefinitions>
       <!-- Data Generation Types Header -->
       <Border Grid.Row="0"
@@ -40,40 +41,29 @@
                      HorizontalAlignment="Left"
                      VerticalAlignment="Center">
           </TextBlock>
-          <StackPanel Grid.Column="2"
-                      Orientation="Horizontal"
-                      Spacing="10">
-            <!-- Data Generation Types Header Search Box -->
-            <Grid VerticalAlignment="Center">
-              <PathIcon Data="{StaticResource SearchIcon}"
-                        Height="20"
-                        Width="20"
-                        Foreground="{DynamicResource ForegroundBrush}"
-                        Margin="0 0 15 0"
-                        ZIndex="1"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Right">
-              </PathIcon>
-              <AutoCompleteBox Width="200"
-                               Margin="0 0 10 0"
-                               ItemsSource="{Binding TypesSearchItems}"
-                               FontFamily="{DynamicResource JetBrainsMono}"
-                               FilterMode="Contains"
-                               Watermark="Search for a Type"
-                               VerticalAlignment="Center">
-              </AutoCompleteBox>
-            </Grid>
-            <!-- Data Generation Types Header Close Button -->
-            <Button HorizontalAlignment="Right"
-                    HorizontalContentAlignment="Center"
-                    Margin="0 0 0 0"
-                    Button.Click="CloseButtonClicked">
-              <PathIcon Data="{StaticResource RemoveIcon}"
-                        Height="20"
-                        Width="20">
-              </PathIcon>
-            </Button>
-          </StackPanel>
+          <!-- Data Generation Types Header Search Box -->
+          <Grid Grid.Column="2"
+                VerticalAlignment="Center">
+            <PathIcon Data="{StaticResource SearchIcon}"
+                      Height="20"
+                      Width="20"
+                      Foreground="{DynamicResource ForegroundBrush}"
+                      Margin="0 0 15 0"
+                      ZIndex="1"
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Right">
+            </PathIcon>
+            <AutoCompleteBox Width="200"
+                             Margin="10 0 0 0"
+                             Text="{Binding SearchText}"
+                             ItemsSource="{Binding TypesSearchItems}"
+                             FontFamily="{DynamicResource JetBrainsMono}"
+                             FilterMode="Contains"
+                             Watermark="Search for a Type"
+                             VerticalAlignment="Center"
+                             SelectionChanged="SearchForTypeAutoCompleteBoxSelectionChanged">
+            </AutoCompleteBox>
+          </Grid>
         </Grid>
       </Border>
       <!-- Data Generation Types List -->
@@ -129,13 +119,15 @@
         </SplitView.Pane>
         <SplitView.Content>
           <!-- Right Side Data Generation Types Panel -->
-          <ListBox ItemsSource="{Binding CurrentDataGenerationTypes}"
+          <ListBox Name="DataGenerationTypesListBox"
+                   ItemsSource="{Binding CurrentDataGenerationTypes}"
                    SelectedItem="{Binding SelectedDataGenerationType}"
-                   SelectionMode="Single"
-                   SelectionChanged="TypesListBoxSelectionChanged">
+                   SelectionMode="Single">
             <ListBox.ItemsPanel>
               <ItemsPanelTemplate>
-                <UniformGrid Columns="2">
+                <UniformGrid Columns="2"
+                             HorizontalAlignment="Stretch"
+                             VerticalAlignment="Top">
                 </UniformGrid>
               </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
@@ -161,6 +153,54 @@
           </ListBox>
         </SplitView.Content>
       </SplitView>
+      <!-- Data Generation Types Footer -->
+      <Border Grid.Row="2"
+              BorderBrush="{DynamicResource BorderBrush}"
+              BorderThickness="0 1 0 0"
+              Padding="10 10 10 10">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+          </Grid.ColumnDefinitions>
+          <StackPanel Grid.Column="1"
+                      Orientation="Horizontal"
+                      Spacing="10">
+            <!-- Data Generation Types Footer Close Button -->
+            <Button HorizontalAlignment="Right"
+                    HorizontalContentAlignment="Center"
+                    Margin="0 0 0 0"
+                    Button.Click="CloseButtonClicked">
+              <StackPanel Orientation="Horizontal"
+                          Spacing="10">
+                <PathIcon Data="{StaticResource RemoveIcon}"
+                          Height="20"
+                          Width="20">
+                </PathIcon>
+                <TextBlock Text="Close"
+                           FontFamily="{DynamicResource JetBrainsMono}">
+                </TextBlock>
+              </StackPanel>
+            </Button>
+            <!-- Data Generation Types Footer Ok Button -->
+            <Button HorizontalAlignment="Right"
+                    HorizontalContentAlignment="Center"
+                    Margin="0 0 0 0"
+                    Button.Click="OkButtonClicked">
+              <StackPanel Orientation="Horizontal"
+                          Spacing="10">
+                <PathIcon Data="{StaticResource OkIcon}"
+                          Height="20"
+                          Width="20">
+                </PathIcon>
+                <TextBlock Text="Ok"
+                           FontFamily="{DynamicResource JetBrainsMono}">
+                </TextBlock>
+              </StackPanel>
+            </Button>
+          </StackPanel>
+        </Grid>
+      </Border>
     </Grid>
   </Border>
 </UserControl>

@@ -28,6 +28,9 @@ public partial class DataGenerationTypesSelectorViewModel : ViewModelBase
     [ObservableProperty]
     private DataGenerationType? _SelectedDataGenerationType;
 
+    [ObservableProperty]
+    private string _SearchText = string.Empty;
+
     #endregion
 
     partial void OnDataGenerationTypesChanged(ObservableCollection<DataGenerationType> value)
@@ -45,5 +48,24 @@ public partial class DataGenerationTypesSelectorViewModel : ViewModelBase
         TypesSearchItems = new ObservableCollection<string>(value.Select(x => x.Name));
 
         SelectedCategory = TypesCategories.First();
+    }
+
+    partial void OnSearchTextChanged(string value)
+    {
+        if (!string.IsNullOrEmpty(value))
+        {
+            CurrentDataGenerationTypes = new ObservableCollection<DataGenerationType>(DataGenerationTypes.Where(x => x.Name.ToLower().Contains(value.ToLower())));
+        }
+        else
+        {
+            if (SelectedCategory.Key == "All")
+            {
+                CurrentDataGenerationTypes = new ObservableCollection<DataGenerationType>(DataGenerationTypes);
+            }
+            else
+            {
+                CurrentDataGenerationTypes = new ObservableCollection<DataGenerationType>(DataGenerationTypes.Where(x => x.Category == SelectedCategory.Key));
+            }
+        }
     }
 }

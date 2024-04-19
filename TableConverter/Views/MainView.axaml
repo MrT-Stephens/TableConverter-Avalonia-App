@@ -12,7 +12,7 @@
     <vm:MainViewModel />
   </Design.DataContext>
 
-  <ContentControl Background="{DynamicResource BackgroundBrush}"
-                  Content="{Binding CurrentView}">
-  </ContentControl>
+  <ContentPresenter Background="{DynamicResource BackgroundBrush}"
+                    Content="{Binding CurrentView}">
+  </ContentPresenter>
 </UserControl>

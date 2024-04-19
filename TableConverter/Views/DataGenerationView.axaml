@@ -174,8 +174,7 @@
               </DataGridTemplateColumn>
               <!-- Data Generation Field Options -->
               <DataGridTemplateColumn Header="Field Options"
-                                      Width="Auto"
-                                      MinWidth="200">
+                                      Width="Auto">
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate>
                     <ItemsControl ItemsSource="{Binding TypeHandler.OptionsControls}">
@@ -188,6 +187,12 @@
                     </ItemsControl>
                   </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTemplateColumn Width="*"
+                                      MinWidth="0">
+                <DataTemplate>
+                  <Control />
+                </DataTemplate>
               </DataGridTemplateColumn>
               <!-- Data Generation Field Number of Blanks -->
               <DataGridTemplateColumn Header="Blanks Percentage">

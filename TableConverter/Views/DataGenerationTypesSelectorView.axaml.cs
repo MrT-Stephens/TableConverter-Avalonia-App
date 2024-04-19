@@ -1,6 +1,8 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.LogicalTree;
 using Avalonia.Media;
 using System;
 using System.Linq;
@@ -40,26 +42,44 @@ public partial class DataGenerationTypesSelectorView : UserControl
     {
         if (DataContext is DataGenerationTypesSelectorViewModel data_generation_types_view_model)
         {
-            if (data_generation_types_view_model.SelectedCategory.Key == "All")
+            if (!string.IsNullOrEmpty(data_generation_types_view_model.SearchText))
             {
-                data_generation_types_view_model.CurrentDataGenerationTypes = new(data_generation_types_view_model.DataGenerationTypes);
+                if (data_generation_types_view_model.SelectedCategory.Key == "All")
+                {
+                    data_generation_types_view_model.CurrentDataGenerationTypes = new(data_generation_types_view_model.DataGenerationTypes.Where(
+                        x => x.Name.ToLower().Contains(data_generation_types_view_model.SearchText.ToLower()))
+                    );
+                }
+                else
+                {
+                    data_generation_types_view_model.CurrentDataGenerationTypes = new(data_generation_types_view_model.DataGenerationTypes.Where(
+                        x => x.Category == data_generation_types_view_model.SelectedCategory.Key && x.Name.ToLower().Contains(data_generation_types_view_model.SearchText.ToLower()))
+                    );
+                }
             }
             else
             {
-                data_generation_types_view_model.CurrentDataGenerationTypes = new(data_generation_types_view_model.DataGenerationTypes.Where(
-                    x => x.Category == data_generation_types_view_model.SelectedCategory.Key)
-                );
+                if (data_generation_types_view_model.SelectedCategory.Key == "All")
+                {
+                    data_generation_types_view_model.CurrentDataGenerationTypes = new(data_generation_types_view_model.DataGenerationTypes);
+                }
+                else
+                {
+                    data_generation_types_view_model.CurrentDataGenerationTypes = new(data_generation_types_view_model.DataGenerationTypes.Where(
+                        x => x.Category == data_generation_types_view_model.SelectedCategory.Key)
+                    );
+                }
             }
         }
     }
 
-    private void TypesListBoxSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    private void SearchForTypeAutoCompleteBoxSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
         if (DataContext is DataGenerationTypesSelectorViewModel data_generation_types_view_model)
         {
-            if (data_generation_types_view_model.SelectedDataGenerationType is not null)
+            if (e.AddedItems.Count > 0)
             {
-                TypesSelectorViewClose?.Invoke(data_generation_types_view_model.SelectedDataGenerationType);
+                data_generation_types_view_model.SelectedDataGenerationType = data_generation_types_view_model.DataGenerationTypes.FirstOrDefault(x => x?.Name == e?.AddedItems[0]?.ToString(), null);
             }
         }
     }
@@ -67,6 +87,14 @@ public partial class DataGenerationTypesSelectorView : UserControl
     private void CloseButtonClicked(object? sender, RoutedEventArgs e)
     {
         TypesSelectorViewClose?.Invoke(null);
+    }
+
+    private void OkButtonClicked(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is DataGenerationTypesSelectorViewModel data_generation_types_view_model)
+        {
+            TypesSelectorViewClose?.Invoke(data_generation_types_view_model.SelectedDataGenerationType);
+        }
     }
 
     public void HandleResize()
@@ -84,7 +112,7 @@ public partial class DataGenerationTypesSelectorView : UserControl
             if (window_width < 1000)
             {
                 MainSplitView.IsPaneOpen = false;
-                MainSplitView.OpenPaneLength = window_width;
+                MainSplitView.OpenPaneLength = (window_width < 800) ? top_level_window.ClientSize.Width - 40 : window_width;
             }
             else
             {
