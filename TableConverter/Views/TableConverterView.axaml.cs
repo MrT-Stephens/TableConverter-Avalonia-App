@@ -11,6 +11,7 @@ using System.Collections.ObjectModel;
 using Avalonia.Data;
 using TableConverter.ViewModels;
 using System.Text;
+using Avalonia.Threading;
 
 namespace TableConverter.Views;
 
@@ -279,6 +280,14 @@ public partial class TableConverterView : UserControl
             {
                 await table_converter_view_model.SelectedOutputConverter.output_converter!.SaveFileAsync(file, Encoding.UTF8.GetBytes(table_converter_view_model.ActualOutputTextBoxText));
             }
+        }
+    }
+
+    private async void MainContentScrollViewerLoaded(object? sender, RoutedEventArgs e)
+    {
+        if (sender is ScrollViewer scroll_viewer)
+        {
+            await Dispatcher.UIThread.InvokeAsync(scroll_viewer.ScrollToHome);
         }
     }
 }
