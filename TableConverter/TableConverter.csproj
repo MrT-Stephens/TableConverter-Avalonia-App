@@ -33,8 +33,4 @@
       <DependentUpon>DataGenerationTypesSelectorView.axaml</DependentUpon>
     </Compile>
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Services\DataGenerationHandlerServices\" />
-  </ItemGroup>
 </Project>

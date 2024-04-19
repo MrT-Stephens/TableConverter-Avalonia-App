@@ -78,7 +78,7 @@ public partial class DataGenerationTypesSelectorView : UserControl
             var window_width = top_level_window.ClientSize.Width / 1.5;
             var window_height = top_level_window.ClientSize.Height / 1.5;
 
-            MainBorder.Width = window_width;
+            MainBorder.Width = (window_width < 800) ? top_level_window.ClientSize.Width - 40 : window_width;
             MainBorder.Height = window_height;
 
             if (window_width < 1000)

@@ -6,10 +6,10 @@ namespace TableConverter.Interfaces
 {
     public interface IDataGenerationTypeHandler
     {
-        public Collection<Control>? OptionsControls { get; set; }
+        public Collection<Control> OptionsControls { get; set; }
 
         public void InitializeOptionsControls();
 
-        public Task<string> GenerateData(long rows, int blanks_percentage);
+        public Task<string[]> GenerateData(long rows, int blanks_percentage);
     }
 }

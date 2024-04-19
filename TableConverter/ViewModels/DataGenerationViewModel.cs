@@ -1,8 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using TableConverter.DataModels;
+using TableConverter.Services;
 
 namespace TableConverter.ViewModels;
 
@@ -16,11 +19,15 @@ public partial class DataGenerationViewModel : ViewModelBase
     [ObservableProperty]
     private int _NumberOfRows = 100;
 
+    public Dictionary<DataGenerationType, Type> DataGenerationTypes { get; set; } = new();
+
     #endregion
 
     public DataGenerationViewModel()
     {
         DataGenerationFields.Add(new DataGenerationField());
+
+        LoadDataGenerationTypes();
     }
 
     #region Commands
@@ -54,4 +61,9 @@ public partial class DataGenerationViewModel : ViewModelBase
     }
 
     #endregion
+
+    private async void LoadDataGenerationTypes()
+    {
+        DataGenerationTypes = await DataGenerationTypesService.GetDataGenerationTypesAsync();
+    }
 }

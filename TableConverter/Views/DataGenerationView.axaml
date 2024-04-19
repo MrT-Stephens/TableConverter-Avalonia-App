@@ -125,6 +125,7 @@
             <DataGrid.Columns>
               <!-- Data Generation Field Name -->
               <DataGridTemplateColumn Header="Field Name"
+                                      Width="Auto"
                                       MinWidth="200">
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate>
@@ -147,15 +148,24 @@
                             VerticalAlignment="Stretch"
                             Button.Click="ChooseFieldTypeButtonClicked">
                       <Grid>
-                        <TextBlock Text="{Binding Type}"
-                                    FontFamily="{StaticResource JetBrainsMono}"
-                                    VerticalAlignment="Center"
-                                    HorizontalAlignment="Left">
+                        <Grid.ColumnDefinitions>
+                          <ColumnDefinition Width="Auto" />
+                          <ColumnDefinition Width="*" />
+                          <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0"
+                                   Text="{Binding Type}"
+                                   FontFamily="{StaticResource JetBrainsMono}"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Left"
+                                   Margin="0 0 5 0">
                         </TextBlock>
-                        <PathIcon Data="{StaticResource UpDownIcon}"
+                        <PathIcon Grid.Column="2"
+                                  Data="{StaticResource UpDownIcon}"
                                   Height="24"
                                   Width="24"
-                                  HorizontalAlignment="Right">
+                                  HorizontalAlignment="Right"
+                                  Margin="5 0 0 0">
                         </PathIcon>
                       </Grid>
                     </Button>
@@ -164,16 +174,18 @@
               </DataGridTemplateColumn>
               <!-- Data Generation Field Options -->
               <DataGridTemplateColumn Header="Field Options"
-                                      Width="*"
+                                      Width="Auto"
                                       MinWidth="200">
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate>
-                    <TextBlock Text="No Options"
-                                Margin="30 0 30 0"
-                                FontFamily="{StaticResource JetBrainsMono}"
-                                VerticalAlignment="Center"
-                                HorizontalAlignment="Stretch">
-                    </TextBlock>
+                    <ItemsControl ItemsSource="{Binding TypeHandler.OptionsControls}">
+                      <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                          <Grid>
+                          </Grid>
+                        </ItemsPanelTemplate>
+                      </ItemsControl.ItemsPanel>
+                    </ItemsControl>
                   </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
               </DataGridTemplateColumn>
@@ -182,12 +194,12 @@
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate>
                     <NumericUpDown Minimum="0"
-                                    Maximum="100"
-                                    Value="{Binding BlankPercentage}"
-                                    FontFamily="{StaticResource JetBrainsMono}"
-                                    VerticalAlignment="Stretch"
-                                    HorizontalAlignment="Stretch"
-                                    VerticalContentAlignment="Center">
+                                   Maximum="100"
+                                   Value="{Binding BlankPercentage}"
+                                   FontFamily="{StaticResource JetBrainsMono}"
+                                   VerticalAlignment="Stretch"
+                                   HorizontalAlignment="Stretch"
+                                   VerticalContentAlignment="Center">
                     </NumericUpDown>
                   </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>

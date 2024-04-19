@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using TableConverter.Interfaces;
 
 namespace TableConverter.DataModels
 {
@@ -12,5 +13,8 @@ namespace TableConverter.DataModels
 
         [ObservableProperty]
         private int _BlankPercentage = 0;
+
+        [ObservableProperty]
+        private IDataGenerationTypeHandler? _TypeHandler = null;
     }
 }
