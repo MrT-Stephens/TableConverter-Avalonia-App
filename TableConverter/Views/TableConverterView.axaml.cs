@@ -29,7 +29,12 @@ public partial class TableConverterView : UserControl
     {
         InitializeComponent(true);
 
-        MainSplitView.Loaded += (sender, e) => ResizeInformationSidePanel();
+        MainSplitView.Loaded += (sender, e) => 
+        {
+            CheckIfDataGenerationOnLoaded();
+            ResizeInformationSidePanel(); 
+        };
+
         SizeChanged += (sender, e) => ResizeInformationSidePanel();
     }
 
@@ -288,6 +293,28 @@ public partial class TableConverterView : UserControl
         if (sender is ScrollViewer scroll_viewer)
         {
             await Dispatcher.UIThread.InvokeAsync(scroll_viewer.ScrollToHome);
+        }
+    }
+
+    private async void CheckIfDataGenerationOnLoaded()
+    {
+        if (DataContext is TableConverterViewModel table_converter_view_model && !string.IsNullOrEmpty(ViewModelBase.GeneratedData))
+        {
+            table_converter_view_model.SelectedInputConverter = table_converter_view_model.InputConverters.First(converter => converter.name == "Generated Data");
+
+            table_converter_view_model.ActualInputTextBoxText = ViewModelBase.GeneratedData;
+
+            ViewModelBase.GeneratedData = null;
+
+            var (column_values, row_values) = await table_converter_view_model.SelectedInputConverter.input_converter!.ReadTextAsync(table_converter_view_model.ActualInputTextBoxText);
+
+            if (column_values is not null && row_values is not null)
+            {
+                table_converter_view_model.EditColumnValues = new ObservableCollection<string>(column_values);
+                table_converter_view_model.EditRowValues = new ObservableCollection<string[]>(row_values);
+
+                RefreshEditDataGrid();
+            }
         }
     }
 }

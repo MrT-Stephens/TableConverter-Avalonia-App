@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using TableConverter.DataModels;
 using TableConverter.Services;
 
@@ -58,6 +59,14 @@ public partial class DataGenerationViewModel : ViewModelBase
         {
             DataGenerationFields.Remove(field);
         }
+    }
+
+    [RelayCommand]
+    private async Task GenerateDataButtonClicked()
+    {
+        GeneratedData = await DataGenerationTypesService.GetDataGenerationDataAsync(DataGenerationFields.ToArray(), NumberOfRows);
+
+        GoBackButtonClicked();
     }
 
     #endregion

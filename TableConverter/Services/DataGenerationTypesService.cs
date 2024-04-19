@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TableConverter.DataModels;
@@ -22,6 +23,42 @@ namespace TableConverter.Services
                         "Creates a sequence of characters, numbers, and symbols."),
                         typeof(DataGenerationCharacterSequenceHandler)
                 }
+            });
+        }
+
+        public static Task<string> GetDataGenerationDataAsync(DataGenerationField[] data_generation_fields, long number_of_rows) 
+        {
+            return Task.Run(async () =>
+            {
+                List<string> headers = new List<string>();
+
+                List<string[]> rows = new List<string[]>();
+
+                for (long i = 0; i < number_of_rows; i++)
+                {
+                    rows.Add(new string[data_generation_fields.LongLength]);
+                }
+
+                for (long i = 0; i < data_generation_fields.LongLength; i++)
+                {
+                    if (data_generation_fields[i].TypeHandler is not null)
+                    {
+                        headers.Add((!string.IsNullOrEmpty(data_generation_fields[i].Name)) ? data_generation_fields[i].Name : $"Column {i + 1}");
+
+                        string[] column = await data_generation_fields[i].TypeHandler!.GenerateData(number_of_rows, data_generation_fields[i].BlankPercentage);
+
+                        for (long j = 0; j < column.LongLength; j++)
+                        {
+                            rows[(int)j][i] = column[j];
+                        }
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+
+                return JsonConvert.SerializeObject((headers, rows));
             });
         }
     }

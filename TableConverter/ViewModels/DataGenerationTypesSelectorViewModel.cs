@@ -6,7 +6,7 @@ using TableConverter.DataModels;
 
 namespace TableConverter.ViewModels;
 
-public partial class DataGenerationTypesSelectorViewModel : ViewModelBase
+public partial class DataGenerationTypesSelectorViewModel : ObservableObject
 {
     #region Properties
 

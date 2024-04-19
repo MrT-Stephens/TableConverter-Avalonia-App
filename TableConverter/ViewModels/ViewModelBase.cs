@@ -1,6 +1,7 @@
 ﻿using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System.Collections.Generic;
 using TableConverter.Services;
 
 namespace TableConverter.ViewModels;
@@ -10,6 +11,8 @@ public partial class ViewModelBase : ObservableObject
     #region Services
 
     protected static readonly PageRouterService PageRouterService = new();
+
+    public static string? GeneratedData = null;
 
     #endregion
 
