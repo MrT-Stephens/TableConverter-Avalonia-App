@@ -80,7 +80,7 @@ namespace TableConverter.Services.DataGenerationHandlerServices
 
                 for (int i = 0; i < rows; i++)
                 {
-                    data[i] = GenerateSequence(CharacterSequence);
+                    data[i] = CheckBlank(GenerateSequence(CharacterSequence), blanks_percentage);
                 }
 
                 return data;

@@ -1,6 +1,4 @@
-﻿using TableConverter.Interfaces;
-
-namespace TableConverter.DataModels
+﻿namespace TableConverter.DataModels
 {
     public record DataGenerationType(
         string Name,

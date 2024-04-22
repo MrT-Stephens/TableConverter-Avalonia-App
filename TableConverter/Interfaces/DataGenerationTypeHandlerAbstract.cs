@@ -10,10 +10,13 @@ namespace TableConverter.Interfaces
 {
     internal abstract class DataGenerationTypeHandlerAbstract : IDataGenerationTypeHandler
     {
+        public Random Random { get; set; }
+
         public Collection<Control> OptionsControls { get; set; }
 
         protected DataGenerationTypeHandlerAbstract()
         {
+            Random = new Random((int)DateTime.Now.ToBinary());
             OptionsControls = new Collection<Control>();
 
             InitializeOptionsControls();
@@ -31,5 +34,25 @@ namespace TableConverter.Interfaces
         }
 
         public abstract Task<string[]> GenerateData(long rows, int blanks_percentage);
+
+        public string CheckBlank(string data, int blanks_percentage)
+        {
+            if (blanks_percentage is not 0 && Random.Next(0, 100) < blanks_percentage)
+            {
+                return string.Empty;
+            }
+
+            return data;
+        }
+
+        public string CheckBlank<Func>(Func func, int blanks_percentage) where Func : Delegate
+        {
+            if (blanks_percentage is not 0 && Random.Next(0, 100) < blanks_percentage)
+            {
+                return string.Empty;
+            }
+
+            return func?.DynamicInvoke()?.ToString() ?? "";
+        }
     }
 }

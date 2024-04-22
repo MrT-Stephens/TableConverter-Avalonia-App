@@ -14,7 +14,7 @@ namespace TableConverter.Services.DataGenerationHandlerServices
 
                 for (int i = 0; i < rows; i++)
                 {
-                    data.Add((i + 1).ToString());
+                    data.Add(CheckBlank((i + 1).ToString(), blanks_percentage));
                 }
 
                 return data.ToArray();
