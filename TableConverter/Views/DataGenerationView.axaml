@@ -19,14 +19,11 @@
                          DisableOpeningAnimation="True"
                          dialogHost:DialogHostStyle.CornerRadius="10">
     <dialogHost:DialogHost.Content>
-      <Grid Background="{DynamicResource BackgroundBrush}">
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="100" />
-          <ColumnDefinition Width="*" />
-          <ColumnDefinition Width="100" />
-        </Grid.ColumnDefinitions>
+      <Border Background="{DynamicResource BackgroundBrush}"
+              Padding="100 0 100 0"
+              Loaded="MainContentBorderLoaded">
         <!-- Main Content -->
-        <Grid Grid.Column="1">
+        <Grid>
           <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -302,7 +299,7 @@
             </Grid>
           </Border>
         </Grid>
-      </Grid>
+      </Border>
     </dialogHost:DialogHost.Content>  
   </dialogHost:DialogHost>
 </UserControl>

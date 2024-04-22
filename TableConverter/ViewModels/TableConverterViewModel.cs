@@ -14,9 +14,6 @@ public partial class TableConverterViewModel : ViewModelBase
     public TableConverterViewModel()
     {
         LoadConverterTypes();
-
-        SelectedInputConverter = InputConverters[0];
-        SelectedOutputConverter = OutputConverters[0];
     }
 
     #region Properties
@@ -28,10 +25,10 @@ public partial class TableConverterViewModel : ViewModelBase
     private ObservableCollection<ConverterType> _OutputConverters = new();
 
     [ObservableProperty]
-    private ConverterType _SelectedInputConverter;
+    private ConverterType? _SelectedInputConverter = null;
 
     [ObservableProperty]
-    private ConverterType _SelectedOutputConverter;
+    private ConverterType? _SelectedOutputConverter = null;
 
     [ObservableProperty]
     private string[] _InputConverterSearchItems = System.Array.Empty<string>();

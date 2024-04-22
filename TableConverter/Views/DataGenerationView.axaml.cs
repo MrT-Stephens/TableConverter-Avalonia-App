@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using System;
@@ -57,6 +58,17 @@ namespace TableConverter.Views
                 await DialogHostAvalonia.DialogHost.Show(data_generation_types_selector_view, DataGenerationDialogHost);
 
                 SizeChanged -= resize_func;
+            }
+        }
+
+        private void MainContentBorderLoaded(object? sender, RoutedEventArgs e)
+        {
+            if (sender is Border ctrl)
+            {
+                if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS())
+                {
+                    ctrl.Padding = new Thickness(5, 0, 5, 0);
+                }
             }
         }
     }

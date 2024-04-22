@@ -10,7 +10,7 @@ public partial class MainViewModel : ViewModelBase
 
     public MainViewModel()
     {
-        PageRouterService.Initialise((view) => CurrentView = view);
+        PageRouterService.Initialise((view) => { CurrentView = view; });
 
         PageRouterService.NavigatePage<TableConverterViewModel>();
     }

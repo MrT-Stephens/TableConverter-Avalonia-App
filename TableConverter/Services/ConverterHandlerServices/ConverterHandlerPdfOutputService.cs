@@ -42,6 +42,7 @@ namespace TableConverter.Services.ConverterHandlerServices
             QuestPDF.Settings.License = LicenseType.Community;
             QuestPDF.Settings.CheckIfAllTextGlyphsAreAvailable = false;
             QuestPDF.Settings.EnableCaching = true;
+            QuestPDF.Settings.EnableDebugging = false;
         }
 
         public override void InitializeControls()

@@ -273,7 +273,8 @@
                     Background="{DynamicResource BackgroundBrush}"
                     BorderBrush="{DynamicResource BorderBrush}"
                     BorderThickness="1 0 1 1"
-                    CornerRadius="0 0 10 10">
+                    CornerRadius="0 0 10 10"
+                    Loaded="HeaderBorderLoaded">
               <Grid Margin="10 10 10 10">
                 <Grid.ColumnDefinitions>
                   <ColumnDefinition Width="Auto" />
@@ -379,12 +380,13 @@
               </Grid>
             </Border>
             <ScrollViewer Name="MainContentScrollViewer"
-                          Loaded="MainContentScrollViewerLoaded">
+                          Loaded="MainContentScrollViewerLoaded"
+                          Margin="40 0 40 0">
               <!-- Input Data Section -->
               <StackPanel Orientation="Vertical"
                           Spacing="30">
                 <Border Background="{DynamicResource BackgroundBrush}"
-                        Margin="40 0 40 0"
+                        Margin="0 0 0 0"
                         CornerRadius="10 10 10 10"
                         BorderBrush="{DynamicResource BorderBrush}"
                         BorderThickness="1 1 1 1">
@@ -502,7 +504,7 @@
                 </Border>
                 <!-- Edit Data Section -->
                 <Border Background="{DynamicResource BackgroundBrush}"
-                        Margin="40 0 40 0"
+                        Margin="0 0 0 0"
                         CornerRadius="10 10 10 10"
                         BorderBrush="{DynamicResource BorderBrush}"
                         BorderThickness="1 1 1 1">
@@ -585,7 +587,7 @@
                 </Border>
                 <!-- Output Data Section -->
                 <Border Background="{DynamicResource BackgroundBrush}"
-                        Margin="40 0 40 30"
+                        Margin="0 0 0 30"
                         CornerRadius="10 10 10 10"
                         BorderBrush="{DynamicResource BorderBrush}"
                         BorderThickness="1 1 1 1">

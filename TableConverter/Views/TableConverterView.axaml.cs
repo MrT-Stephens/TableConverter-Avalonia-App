@@ -293,6 +293,11 @@ public partial class TableConverterView : UserControl
         if (sender is ScrollViewer scroll_viewer)
         {
             await Dispatcher.UIThread.InvokeAsync(scroll_viewer.ScrollToHome);
+
+            if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS())
+            {
+                scroll_viewer.Margin = new Thickness(5, 0, 5, 0);
+            }
         }
     }
 
@@ -314,6 +319,17 @@ public partial class TableConverterView : UserControl
                 table_converter_view_model.EditRowValues = new ObservableCollection<string[]>(row_values);
 
                 RefreshEditDataGrid();
+            }
+        }
+    }
+
+    private void HeaderBorderLoaded(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Control ctrl)
+        {
+            if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS())
+            {
+                ctrl.Margin = new Thickness(5, ctrl.Margin.Top, 5, ctrl.Margin.Bottom);
             }
         }
     }
