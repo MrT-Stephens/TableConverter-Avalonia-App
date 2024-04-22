@@ -180,8 +180,10 @@
                     <ItemsControl ItemsSource="{Binding TypeHandler.OptionsControls}">
                       <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                          <Grid>
-                          </Grid>
+                          <StackPanel Orientation="Horizontal"
+                                      HorizontalAlignment="Stretch"
+                                      VerticalAlignment="Stretch">
+                          </StackPanel>
                         </ItemsPanelTemplate>
                       </ItemsControl.ItemsPanel>
                     </ItemsControl>

@@ -22,6 +22,11 @@ namespace TableConverter.Services
                     new DataGenerationType("Character Sequence", "Advanced",
                         "Creates a sequence of characters, numbers, and symbols."),
                         typeof(DataGenerationCharacterSequenceHandler)
+                },
+                {
+                    new DataGenerationType("Date Time", "Basic",
+                        "Generates a date and time between a range and in a certain format."),
+                        typeof(DataGenerationDateTimeHandler)
                 }
             });
         }

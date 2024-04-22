@@ -13,11 +13,6 @@ namespace TableConverter.Services.DataGenerationHandlerServices
 
         public override void InitializeOptionsControls()
         {
-            var character_sequence_stack_panel = new StackPanel()
-            {
-                Orientation = Orientation.Horizontal
-            };
-
             var sequence_text_box = new TextBox()
             {
                 Watermark = "Example: ^^-@@-##",
@@ -66,10 +61,8 @@ namespace TableConverter.Services.DataGenerationHandlerServices
                 ShowMode = FlyoutShowMode.TransientWithDismissOnPointerMoveAway
             };
 
-            character_sequence_stack_panel.Children.Add(sequence_text_box);
-            character_sequence_stack_panel.Children.Add(flyout_button);
-
-            OptionsControls.Add(character_sequence_stack_panel);
+            OptionsControls.Add(sequence_text_box);
+            OptionsControls.Add(flyout_button);
         }
 
         public override Task<string[]> GenerateData(long rows, int blanks_percentage)
@@ -80,7 +73,7 @@ namespace TableConverter.Services.DataGenerationHandlerServices
 
                 for (int i = 0; i < rows; i++)
                 {
-                    data[i] = CheckBlank(GenerateSequence(CharacterSequence), blanks_percentage);
+                    data[i] = CheckBlank(() => GenerateSequence(CharacterSequence), blanks_percentage);
                 }
 
                 return data;
