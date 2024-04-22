@@ -28,7 +28,7 @@ namespace TableConverter.Services.DataGenerationHandlerServices
             { "dddd, MMMM dd, yyyy", "dddd, MMMM dd, yyyy" },
             { "yyyy MMMM", "yyyy MMMM" },
             { "MMMM, yyyy", "MMMM, yyyy" },
-            { "ISO8601 UTC", "yyyy-MM-ddTHH:mm:ssZ" }
+            { "ISO8601 UTC", "yyyy-MM-ddTHH:mm:ssZ" },
             { "SQL DateTime", "yyyy-MM-dd HH:mm:ss.fff" }
         };
 

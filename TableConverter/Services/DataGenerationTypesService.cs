@@ -27,6 +27,16 @@ namespace TableConverter.Services
                     new DataGenerationType("Date Time", "Basic",
                         "Generates a date and time between a range and in a certain format."),
                         typeof(DataGenerationDateTimeHandler)
+                },
+                {
+                    new DataGenerationType("Hex Colour", "Basic",
+                        "Generates a random hex colour. For example #FFFFFF."),
+                        typeof(DataGenerationHexColourHandler)
+                },
+                {
+                    new DataGenerationType("Colour", "Basic",
+                        "Generates a random colour. For example Green, Blue, Yellow, etc."),
+                        typeof(DataGenerationColourHandler)
                 }
             });
         }

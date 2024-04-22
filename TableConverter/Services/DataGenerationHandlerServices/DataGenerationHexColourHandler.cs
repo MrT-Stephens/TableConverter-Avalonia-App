@@ -4,7 +4,7 @@ using TableConverter.Interfaces;
 
 namespace TableConverter.Services.DataGenerationHandlerServices
 {
-    internal class DataGenerationRowNumberHandler : DataGenerationTypeHandlerAbstract
+    internal class DataGenerationHexColourHandler : DataGenerationTypeHandlerAbstract
     {
         public override Task<string[]> GenerateData(long rows, int blanks_percentage)
         {
@@ -14,7 +14,11 @@ namespace TableConverter.Services.DataGenerationHandlerServices
 
                 for (int i = 0; i < rows; i++)
                 {
-                    data.Add(CheckBlank(() => (i + 1).ToString(), blanks_percentage));
+                    data.Add(CheckBlank(() =>
+                    {
+                        return $"#{Random.Next(0, 256):X2}{Random.Next(0, 256):X2}{Random.Next(0, 256):X2}";
+                    }
+                    , blanks_percentage));
                 }
 
                 return data.ToArray();
