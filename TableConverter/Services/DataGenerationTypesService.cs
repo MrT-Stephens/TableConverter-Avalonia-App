@@ -47,6 +47,21 @@ namespace TableConverter.Services
                     new DataGenerationType("Guid", "Basic",
                         "Generates a random GUID (Globally Unique Identifier)."),
                         typeof(DataGenerationGuidHandler)
+                },
+                {
+                    new DataGenerationType("IP Address", "Web",
+                        "Generates random IPv4 or IPv6 addresses."),
+                        typeof(DataGenerationIPAddressHandler)
+                },
+                {
+                    new DataGenerationType("MAC Address", "Web",
+                        "Generates random MAC addresses."),
+                        typeof(DataGenerationMacAddressHandler)
+                },
+                {
+                    new DataGenerationType("App Version", "Basic",
+                        "Generates a random app version. For example 1.0.0."),
+                        typeof(DataGenerationAppVersionHandler)
                 }
             });
         }
