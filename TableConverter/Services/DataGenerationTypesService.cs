@@ -37,6 +37,16 @@ namespace TableConverter.Services
                     new DataGenerationType("Colour", "Basic",
                         "Generates a random colour. For example Green, Blue, Yellow, etc."),
                         typeof(DataGenerationColourHandler)
+                },
+                {
+                    new DataGenerationType("Custom List", "Advanced",
+                        "Generates a random item from a list of items."),
+                        typeof(DataGenerationCustomListHandler)
+                },
+                {
+                    new DataGenerationType("Guid", "Basic",
+                        "Generates a random GUID (Globally Unique Identifier)."),
+                        typeof(DataGenerationGuidHandler)
                 }
             });
         }
