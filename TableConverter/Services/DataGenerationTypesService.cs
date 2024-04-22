@@ -62,6 +62,26 @@ namespace TableConverter.Services
                     new DataGenerationType("App Version", "Basic",
                         "Generates a random app version. For example 1.0.0."),
                         typeof(DataGenerationAppVersionHandler)
+                },
+                {
+                    new DataGenerationType("Latitude", "Location",
+                        "Generates random latitude coordinate."),
+                        typeof(DataGenerationLatitudeHandler)
+                },
+                {
+                    new DataGenerationType("Longitude", "Location",
+                        "Generates random longitude coordinate."),
+                        typeof(DataGenerationLongitudeHandler)
+                },
+                {
+                    new DataGenerationType("Country Code", "Location",
+                        "Generates random country code. For example US, GB, FR."),
+                        typeof(DataGenerationCountryCodeHandler)
+                },
+                {
+                    new DataGenerationType("Country", "Location",
+                        "Generates random country name. For example United States, United Kingdom, France."),
+                        typeof(DataGenerationCountryHandler)
                 }
             });
         }

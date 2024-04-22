@@ -31,7 +31,8 @@ namespace TableConverter.Services.DataGenerationHandlerServices
                         }
 
                         return version;
-                    }, blanks_percentage));
+                    }
+                    , blanks_percentage));
                 }
 
                 return data.ToArray();
