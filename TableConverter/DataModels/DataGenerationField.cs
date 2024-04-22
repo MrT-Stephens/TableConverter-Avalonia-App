@@ -12,7 +12,7 @@ namespace TableConverter.DataModels
         private string _Type = "Choose a Type";
 
         [ObservableProperty]
-        private int _BlankPercentage = 0;
+        private int? _BlankPercentage = 0;
 
         [ObservableProperty]
         private IDataGenerationTypeHandler? _TypeHandler = null;

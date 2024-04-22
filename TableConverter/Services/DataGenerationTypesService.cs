@@ -45,7 +45,7 @@ namespace TableConverter.Services
                     {
                         headers.Add((!string.IsNullOrEmpty(data_generation_fields[i].Name)) ? data_generation_fields[i].Name : $"Column {i + 1}");
 
-                        string[] column = await data_generation_fields[i].TypeHandler!.GenerateData(number_of_rows, data_generation_fields[i].BlankPercentage);
+                        string[] column = await data_generation_fields[i].TypeHandler!.GenerateData(number_of_rows, data_generation_fields[i].BlankPercentage.GetValueOrDefault());
 
                         for (long j = 0; j < column.LongLength; j++)
                         {

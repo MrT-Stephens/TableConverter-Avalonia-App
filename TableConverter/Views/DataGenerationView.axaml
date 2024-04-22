@@ -200,9 +200,12 @@
                   <DataTemplate>
                     <NumericUpDown Minimum="0"
                                    Maximum="100"
+                                   ParsingNumberStyle="Integer"
+                                   FormatString="N0"
                                    Value="{Binding BlankPercentage}"
                                    FontFamily="{StaticResource JetBrainsMono}"
                                    VerticalAlignment="Stretch"
+                                   Watermark="Enter a Percentage"
                                    HorizontalAlignment="Stretch"
                                    VerticalContentAlignment="Center">
                     </NumericUpDown>
