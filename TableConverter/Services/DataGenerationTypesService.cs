@@ -118,7 +118,7 @@ namespace TableConverter.Services
                     }
                 }
 
-                return JsonConvert.SerializeObject((headers, rows));
+                return JsonConvert.SerializeObject((headers, rows), Formatting.Indented);
             });
         }
     }

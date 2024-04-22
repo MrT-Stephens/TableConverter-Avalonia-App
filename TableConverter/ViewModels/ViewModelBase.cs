@@ -10,7 +10,7 @@ public partial class ViewModelBase : ObservableObject
 
     protected static readonly PageRouterService PageRouterService = new();
 
-    public static string? GeneratedData = null;
+    public static string? GeneratedData { get; set; } = null;
 
     #endregion
 
