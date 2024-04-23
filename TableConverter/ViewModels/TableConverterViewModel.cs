@@ -19,10 +19,10 @@ public partial class TableConverterViewModel : ViewModelBase
     #region Properties
 
     [ObservableProperty]
-    private ObservableCollection<ConverterType> _InputConverters = new();
+    private ObservableCollection<ConverterType> _InputConverters = [];
 
     [ObservableProperty]
-    private ObservableCollection<ConverterType> _OutputConverters = new();
+    private ObservableCollection<ConverterType> _OutputConverters = [];
 
     [ObservableProperty]
     private ConverterType? _SelectedInputConverter = null;
@@ -31,10 +31,10 @@ public partial class TableConverterViewModel : ViewModelBase
     private ConverterType? _SelectedOutputConverter = null;
 
     [ObservableProperty]
-    private string[] _InputConverterSearchItems = System.Array.Empty<string>();
+    private string[] _InputConverterSearchItems = [];
 
     [ObservableProperty]
-    private string[] _OutputConverterSearchItems = System.Array.Empty<string>();
+    private string[] _OutputConverterSearchItems = [];
 
     [ObservableProperty]
     private string _AboutTitle = string.Empty;
@@ -43,7 +43,7 @@ public partial class TableConverterViewModel : ViewModelBase
     private string _AboutText = string.Empty;
 
     [ObservableProperty]
-    private ObservableCollection<StringWithIndex> _AboutHowToConvertText = new();
+    private ObservableCollection<StringWithIndex> _AboutHowToConvertText = [];
 
     [ObservableProperty]
     private string _InputTextBoxWatermarkText = string.Empty;
@@ -68,10 +68,10 @@ public partial class TableConverterViewModel : ViewModelBase
     }
 
     [ObservableProperty]
-    private ObservableCollection<string> _EditColumnValues = new();
+    private ObservableCollection<string> _EditColumnValues = [];
 
     [ObservableProperty]
-    private ObservableCollection<string[]> _EditRowValues = new();
+    private ObservableCollection<string[]> _EditRowValues = [];
 
     [ObservableProperty]
     private string _OutputTextBoxText = string.Empty;
@@ -102,9 +102,9 @@ public partial class TableConverterViewModel : ViewModelBase
         OutputConverterSearchItems = OutputConverters.ToList().Select(c => c.name).ToArray();
     }
 
-    partial void OnSelectedInputConverterChanged(ConverterType value) => GenerateAboutText();
+    partial void OnSelectedInputConverterChanged(ConverterType? value) => GenerateAboutText();
 
-    partial void OnSelectedOutputConverterChanged(ConverterType value) => GenerateAboutText();
+    partial void OnSelectedOutputConverterChanged(ConverterType? value) => GenerateAboutText();
 
     private void GenerateAboutText()
     {
@@ -170,7 +170,7 @@ public partial class TableConverterViewModel : ViewModelBase
     #region Commands
 
     [RelayCommand]
-    private void GenerateDataButtonClicked()
+    private static void GenerateDataButtonClicked()
     {
         PageRouterService.NavigatePage<DataGenerationViewModel>();
     }

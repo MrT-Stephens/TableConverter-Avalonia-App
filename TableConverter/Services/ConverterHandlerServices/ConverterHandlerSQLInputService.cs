@@ -106,7 +106,7 @@ namespace TableConverter.Services.ConverterHandlerServices
 
                     bool first_loop = true;
 
-                    foreach (Match match in matches)
+                    foreach (Match match in matches.Cast<Match>())
                     {
                         string[] columns = match.Groups[2].Value.Split(',');
                         string[] values = match.Groups[3].Value.Split(',');
@@ -136,7 +136,7 @@ namespace TableConverter.Services.ConverterHandlerServices
                 {
                     MatchCollection matches = Regex.Matches(text, sql_regex_wo_column_names, RegexOptions.Singleline);
 
-                    foreach (Match match in matches)
+                    foreach (Match match in matches.Cast<Match>())
                     {
                         string[] values = match.Groups[2].Value.Split(',');
 

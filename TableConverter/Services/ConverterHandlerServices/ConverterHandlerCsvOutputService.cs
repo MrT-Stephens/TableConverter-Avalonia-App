@@ -41,7 +41,7 @@ namespace TableConverter.Services.ConverterHandlerServices
             {
                 if (sender is TextBox text_box && !string.IsNullOrEmpty(text_box.Text))
                 {
-                    text_box.Text = Delimiter = text_box.Text!.Substring(0, 1);
+                    text_box.Text = Delimiter = text_box.Text.Substring(0, 1);
                 }
             };
 
@@ -86,15 +86,15 @@ namespace TableConverter.Services.ConverterHandlerServices
         {
             return Task.Run(() =>
             {
-                using (var writer = new StringWriter())
-                using (var csv = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture)
+                using var writer = new StringWriter();
+                using var csv = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture)
                 {
                     Delimiter = Delimiter,
                     NewLine = Environment.NewLine,
                     HasHeaderRecord = HasHeader
-                }))
+                });
                 {
-                    List<object> records = new List<object>();
+                    List<object> records = [];
 
                     for (long i = 0; i < rows.LongLength; i++)
                     {
