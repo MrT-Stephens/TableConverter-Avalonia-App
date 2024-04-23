@@ -62,6 +62,49 @@
                     </PathIcon>
                   </Button>
                 </Grid>
+                <!-- About Section Links Buttons -->
+                <StackPanel Orientation="Horizontal"
+                            Spacing="10">
+                  <Button Background="Transparent"
+                          ToolTip.Tip="GitHub"
+                          ToolTip.Placement="Bottom">
+                    <PathIcon Foreground="{DynamicResource ForegroundBrush}"
+                              Data="{StaticResource GitHubIcon}"
+                              Height="30"
+                              Width="30"
+                              VerticalAlignment="Center"
+                              HorizontalAlignment="Center">
+                    </PathIcon>
+                  </Button>
+                  <Button Background="Transparent"
+                          ToolTip.Tip="Linkedin"
+                          ToolTip.Placement="Bottom">
+                    <PathIcon Foreground="#0A66C2"
+                              Data="{StaticResource LinkedinIcon}"
+                              Height="30"
+                              Width="30"
+                              VerticalAlignment="Center"
+                              HorizontalAlignment="Center">
+                    </PathIcon>
+                  </Button>
+                  <Button Background="Transparent"
+                          ToolTip.Tip="Personal Website"
+                          ToolTip.Placement="Bottom">
+                    <PathIcon Foreground="{DynamicResource ForegroundBrush}"
+                              Data="{StaticResource WebsiteIcon}"
+                              Height="30"
+                              Width="30"
+                              VerticalAlignment="Center"
+                              HorizontalAlignment="Center">
+                    </PathIcon>
+                  </Button>
+                  <TextBlock Text="← Check out these!"
+                             FontFamily="{StaticResource JetBrainsMono}"
+                             Foreground="{DynamicResource BorderBrush}"
+                             VerticalAlignment="Center"
+                             HorizontalAlignment="Center">
+                  </TextBlock>
+                </StackPanel>
                 <!-- About Section Text -->
                 <TextBlock Text="{Binding AboutText}"
                             FontFamily="{StaticResource JetBrainsMono}"
@@ -322,7 +365,8 @@
                                                Watermark="Input..."
                                                FilterMode="Contains"
                                                ItemsSource="{Binding InputConverterSearchItems}"
-                                               FontFamily="{StaticResource JetBrainsMono}">
+                                               FontFamily="{StaticResource JetBrainsMono}"
+                                               SelectionChanged="InputSearchBoxSelectionChanged">
                               </AutoCompleteBox>
                               <Label Grid.Column="1"
                                      Content=" to "
@@ -336,7 +380,8 @@
                                                Watermark="Output..."
                                                FilterMode="Contains"
                                                ItemsSource="{Binding OutputConverterSearchItems}"
-                                               FontFamily="{StaticResource JetBrainsMono}">
+                                               FontFamily="{StaticResource JetBrainsMono}"
+                                               SelectionChanged="OutputSearchBoxSelectionChanged">
                               </AutoCompleteBox>
                             </Grid>
                           </StackPanel>

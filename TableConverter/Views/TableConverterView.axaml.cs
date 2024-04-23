@@ -51,7 +51,7 @@ public partial class TableConverterView : UserControl
         else
         {
             MainSplitView.DisplayMode = SplitViewDisplayMode.Inline;
-            MainSplitView.IsPaneOpen = (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS() ? false : true);
+            MainSplitView.IsPaneOpen = OperatingSystem.IsAndroid() || OperatingSystem.IsIOS() ? false : true;
             MainSplitView.OpenPaneLength = top_level_window.ClientSize.Width / 3;
         }
     }
@@ -109,21 +109,21 @@ public partial class TableConverterView : UserControl
             {
                 Title = $"Open {table_converter_view_model.SelectedInputConverter.name} File",
                 AllowMultiple = false,
-                FileTypeFilter = new List<FilePickerFileType>{
+                FileTypeFilter = [
                     new(table_converter_view_model.SelectedInputConverter.name)
                     {
                         Patterns = table_converter_view_model.SelectedInputConverter.extensions.Select(ext => $"*{ext}").ToArray(),
                         MimeTypes = table_converter_view_model.SelectedInputConverter.mime_types
                     },
                     FilePickerFileTypes.All
-                }
+                ]
             });
 
             if (files.Count >= 1)
             {
                 if (table_converter_view_model.SelectedInputConverter.input_converter!.Controls is not null)
                 {
-                    DialogHostOptionsView options = new DialogHostOptionsView()
+                    DialogHostOptionsView options = new()
                     {
                         Title = $"How would you like your {table_converter_view_model.SelectedInputConverter.name} file to be inputted?",
                         DialogOptions = table_converter_view_model.SelectedInputConverter.input_converter!.Controls,
@@ -171,7 +171,7 @@ public partial class TableConverterView : UserControl
 
     private void ConverterListBoxSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        AboutSectionOutputConverterInfomation.IsVisible = (InputConverterListBox.SelectedItem == OutputConverterListBox.SelectedItem) ? false : true;
+        AboutSectionOutputConverterInfomation.IsVisible = InputConverterListBox.SelectedItem == OutputConverterListBox.SelectedItem ? false : true;
     }
 
     private void RefreshEditDataGrid()
@@ -206,7 +206,7 @@ public partial class TableConverterView : UserControl
         {
             if (table_converter_view_model.SelectedOutputConverter.output_converter!.Controls is not null)
             {
-                DialogHostOptionsView options = new DialogHostOptionsView()
+                DialogHostOptionsView options = new()
                 {
                     Title = $"How would you like your {table_converter_view_model.SelectedOutputConverter.name} file to be outputted?",
                     DialogOptions = table_converter_view_model.SelectedOutputConverter.output_converter!.Controls,
@@ -244,8 +244,8 @@ public partial class TableConverterView : UserControl
         if (DataContext is TableConverterViewModel table_converter_view_model)
         {
             table_converter_view_model.ActualInputTextBoxText = string.Empty;
-            table_converter_view_model.EditColumnValues = new ObservableCollection<string>();
-            table_converter_view_model.EditRowValues = new ObservableCollection<string[]>();
+            table_converter_view_model.EditColumnValues = [];
+            table_converter_view_model.EditRowValues = [];
             table_converter_view_model.ActualOutputTextBoxText = string.Empty;
             ConvertProgressBar.Value = 0;
 
@@ -268,14 +268,14 @@ public partial class TableConverterView : UserControl
             var file = await TopLevel.GetTopLevel(this)!.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
             {
                 Title = $"Save {table_converter_view_model.SelectedOutputConverter.name} File",
-                FileTypeChoices = new List<FilePickerFileType>{
+                FileTypeChoices = [
                     new(table_converter_view_model.SelectedOutputConverter.name)
                     {
                         Patterns = table_converter_view_model.SelectedOutputConverter.extensions.Select(ext => $"*{ext}").ToArray(),
                         MimeTypes = table_converter_view_model.SelectedOutputConverter.mime_types
                     },
                     FilePickerFileTypes.All
-                },
+                ],
                 DefaultExtension = table_converter_view_model.SelectedOutputConverter.extensions[0],
                 ShowOverwritePrompt = true,
                 SuggestedFileName = $"TableConverter-{table_converter_view_model.SelectedInputConverter.name}-{table_converter_view_model.SelectedOutputConverter.name}-{DateTime.Now.ToFileTime()}"
@@ -331,6 +331,28 @@ public partial class TableConverterView : UserControl
             {
                 ctrl.Margin = new Thickness(5, ctrl.Margin.Top, 5, ctrl.Margin.Bottom);
             }
+        }
+    }
+
+    private void InputSearchBoxSelectionChanged(object sender, SelectionChangedEventArgs args)
+    {
+        if (DataContext is TableConverterViewModel table_converter_view_model && 
+            sender is AutoCompleteBox auto_complete_box &&
+            auto_complete_box.SelectedItem is not null)
+        {
+            table_converter_view_model.SelectedInputConverter = 
+                table_converter_view_model.InputConverters.Where((converter_type) => converter_type.name == auto_complete_box.SelectedItem.ToString()).First();
+        }
+    }
+
+    private void OutputSearchBoxSelectionChanged(object sender, SelectionChangedEventArgs args)
+    {
+        if (DataContext is TableConverterViewModel table_converter_view_model &&
+            sender is AutoCompleteBox auto_complete_box &&
+            auto_complete_box.SelectedItem is not null)
+        {
+            table_converter_view_model.SelectedOutputConverter =
+                table_converter_view_model.OutputConverters.Where((converter_type) => converter_type.name == auto_complete_box.SelectedItem.ToString()).First();
         }
     }
 }
