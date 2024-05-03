@@ -4,7 +4,6 @@ using Avalonia.Input;
 using System;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Collections.ObjectModel;
@@ -329,7 +328,7 @@ public partial class TableConverterView : UserControl
         {
             if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS())
             {
-                ctrl.Margin = new Thickness(5, ctrl.Margin.Top, 5, ctrl.Margin.Bottom);
+                ctrl.Margin = new Thickness(10, ctrl.Margin.Top, 10, ctrl.Margin.Bottom);
             }
         }
     }

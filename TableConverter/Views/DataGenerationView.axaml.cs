@@ -67,7 +67,7 @@ namespace TableConverter.Views
             {
                 if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS())
                 {
-                    ctrl.Padding = new Thickness(5, 0, 5, 0);
+                    ctrl.Padding = new Thickness(10, ctrl.Padding.Top, 10, ctrl.Padding.Bottom);
                 }
             }
         }
