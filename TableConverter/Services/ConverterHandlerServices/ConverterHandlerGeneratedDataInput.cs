@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TableConverter.DataModels;
 using TableConverter.Interfaces;
 
 namespace TableConverter.Services.ConverterHandlerServices
@@ -12,11 +13,11 @@ namespace TableConverter.Services.ConverterHandlerServices
             Controls = null;
         }
 
-        public override Task<(List<string>, List<string[]>)> ReadTextAsync(string text)
+        public override Task<TableData> ReadTextAsync(string text)
         {
             return Task.Run(() =>
             {
-                return JsonConvert.DeserializeObject<(List<string>, List<string[]>)>(text);
+                return JsonConvert.DeserializeObject<TableData>(text) ?? new TableData(new(), new());
             });
         }
     }

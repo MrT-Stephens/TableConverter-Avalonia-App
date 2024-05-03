@@ -11,6 +11,9 @@ using Avalonia.Data;
 using TableConverter.ViewModels;
 using System.Text;
 using Avalonia.Threading;
+using TableConverter.DataModels;
+using Avalonia.Controls.Templates;
+using Avalonia.Media;
 
 namespace TableConverter.Views;
 
@@ -132,12 +135,12 @@ public partial class TableConverterView : UserControl
 
                             table_converter_view_model.ActualInputTextBoxText = await table_converter_view_model.SelectedInputConverter.input_converter!.ReadFileAsync(files[0]);
 
-                            var (column_values, row_values) = await table_converter_view_model.SelectedInputConverter.input_converter!.ReadTextAsync(table_converter_view_model.ActualInputTextBoxText);
+                            TableData data = await table_converter_view_model.SelectedInputConverter.input_converter!.ReadTextAsync(table_converter_view_model.ActualInputTextBoxText);
 
-                            if (column_values is not null && row_values is not null)
+                            if (data.headers is not null && data.rows is not null)
                             {
-                                table_converter_view_model.EditColumnValues = new ObservableCollection<string>(column_values);
-                                table_converter_view_model.EditRowValues = new ObservableCollection<string[]>(row_values);
+                                table_converter_view_model.EditColumnValues = new ObservableCollection<string>(data.headers);
+                                table_converter_view_model.EditRowValues = new ObservableCollection<string[]>(data.rows);
 
                                 RefreshEditDataGrid();
                             }
@@ -154,12 +157,12 @@ public partial class TableConverterView : UserControl
                 {
                     table_converter_view_model.ActualInputTextBoxText = await table_converter_view_model.SelectedInputConverter.input_converter!.ReadFileAsync(files[0]);
 
-                    var (column_values, row_values) = await table_converter_view_model.SelectedInputConverter.input_converter!.ReadTextAsync(table_converter_view_model.ActualInputTextBoxText);
+                    TableData data = await table_converter_view_model.SelectedInputConverter.input_converter!.ReadTextAsync(table_converter_view_model.ActualInputTextBoxText);
 
-                    if (column_values is not null && row_values is not null)
+                    if (data.headers is not null && data.rows is not null)
                     {
-                        table_converter_view_model.EditColumnValues = new ObservableCollection<string>(column_values);
-                        table_converter_view_model.EditRowValues = new ObservableCollection<string[]>(row_values);
+                        table_converter_view_model.EditColumnValues = new ObservableCollection<string>(data.headers);
+                        table_converter_view_model.EditRowValues = new ObservableCollection<string[]>(data.rows);
 
                         RefreshEditDataGrid();
                     }
@@ -186,15 +189,20 @@ public partial class TableConverterView : UserControl
             {
                 EditDataDataGrid.Columns.Add(new DataGridTextColumn
                 {
-                    Header = table_converter_view_model.EditColumnValues[i],
+                    Header = new TextBox
+                    {
+                        [!TextBox.TextProperty] = new Binding($"EditColumnValues[{i}]"),
+                        HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
+                        VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
+                        FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException()
+                    },
                     Binding = new Binding($"[{i}]"),
                     CanUserSort = false,
                     IsReadOnly = false,
                     CanUserReorder = false,
                     CanUserResize = true,
                     DisplayIndex = i
-                }
-                );
+                });
             }
         }
     }

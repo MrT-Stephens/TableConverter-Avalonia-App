@@ -1,8 +1,8 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Platform.Storage;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using TableConverter.DataModels;
 
 namespace TableConverter.Interfaces
 {
@@ -14,6 +14,6 @@ namespace TableConverter.Interfaces
 
         public Task<string> ReadFileAsync(IStorageFile storage_file);
 
-        public Task<(List<string>, List<string[]>)> ReadTextAsync(string text);
+        public Task<TableData> ReadTextAsync(string text);
     }
 }

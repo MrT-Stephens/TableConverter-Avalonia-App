@@ -4,10 +4,12 @@ using Avalonia.Media;
 using CsvHelper.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using TableConverter.DataModels;
 using TableConverter.Interfaces;
 
 namespace TableConverter.Services.ConverterHandlerServices
@@ -81,7 +83,7 @@ namespace TableConverter.Services.ConverterHandlerServices
             Controls?.Add(has_header_stack_panel);
         }
 
-        public override Task<(List<string>, List<string[]>)> ReadTextAsync(string text)
+        public override Task<TableData> ReadTextAsync(string text)
         {
             return Task.Run(() =>
             {
@@ -94,7 +96,7 @@ namespace TableConverter.Services.ConverterHandlerServices
                     NewLine = Environment.NewLine
                 }))
                 {
-                    csv_reader.GetRecords<dynamic>().ToList().ForEach(row =>
+                    foreach (var row in csv_reader.GetRecords<dynamic>())
                     {
                         if (HasHeader && headers.Count == 0)
                         {
@@ -107,12 +109,12 @@ namespace TableConverter.Services.ConverterHandlerServices
                                 headers.Add(i.ToString());
                             }
                         }
-                        
+
                         rows.Add(((IDictionary<string, object>)row).Select(x => x.Value?.ToString() ?? string.Empty).ToArray());
-                    });
+                    }
                 }
 
-                return (headers, rows);
+                return new TableData(headers, rows);
             }); 
         }
     }

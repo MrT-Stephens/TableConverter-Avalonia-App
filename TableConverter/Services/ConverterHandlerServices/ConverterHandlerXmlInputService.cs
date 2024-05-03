@@ -3,6 +3,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using TableConverter.DataModels;
 using TableConverter.Interfaces;
 
 namespace TableConverter.Services.ConverterHandlerServices
@@ -14,7 +15,7 @@ namespace TableConverter.Services.ConverterHandlerServices
             Controls = null;
         }
 
-        public override Task<(List<string>, List<string[]>)> ReadTextAsync(string text)
+        public override Task<TableData> ReadTextAsync(string text)
         {
             return Task.Run(() =>
             {
@@ -39,7 +40,7 @@ namespace TableConverter.Services.ConverterHandlerServices
                     }
                 }
 
-                return (headers, rows);
+                return new TableData(headers, rows);
             });
         }
     }

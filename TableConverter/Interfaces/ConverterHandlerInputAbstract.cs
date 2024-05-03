@@ -1,8 +1,8 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Platform.Storage;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using TableConverter.DataModels;
 
 namespace TableConverter.Interfaces
 {
@@ -30,6 +30,6 @@ namespace TableConverter.Interfaces
 
         public abstract void InitializeControls();
 
-        public abstract Task<(List<string>, List<string[]>)> ReadTextAsync(string text);
+        public abstract Task<TableData> ReadTextAsync(string text);
     }
 }

@@ -6,6 +6,7 @@ using System;
 using System.Threading.Tasks;
 using TableConverter.Interfaces;
 using NPOI.XSSF.UserModel;
+using TableConverter.DataModels;
 
 namespace TableConverter.Services.ConverterHandlerServices
 {
@@ -18,7 +19,7 @@ namespace TableConverter.Services.ConverterHandlerServices
             Controls = null;
         }
 
-        public override Task<(List<string>, List<string[]>)> ReadTextAsync(string text)
+        public override Task<TableData> ReadTextAsync(string text)
         {
             return Task.Run(() =>
             {
@@ -45,7 +46,22 @@ namespace TableConverter.Services.ConverterHandlerServices
                         }
                         else
                         {
-                            rows.Add(row.Select(value => value.ToString() ?? "").ToArray());
+                            List<string> values = new List<string>();
+
+                            for (int i = 0; i < headers.Count; i++)
+                            {
+                                var cell = row.GetCell(i);
+
+                                if (cell == null)
+                                {
+                                    values.Add("");
+                                    continue;
+                                }
+
+                                values.Add(cell.ToString() ?? "");
+                            }
+
+                            rows.Add(values.ToArray());
                         }
                     }
 
@@ -58,7 +74,7 @@ namespace TableConverter.Services.ConverterHandlerServices
                     throw new Exception("Error while reading the Excel file.", ex);
                 }
 
-                return (headers, rows);
+                return new TableData(headers, rows);
             });
         }
 

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using TableConverter.DataModels;
 using TableConverter.Interfaces;
 
 namespace TableConverter.Services.ConverterHandlerServices
@@ -90,7 +91,7 @@ namespace TableConverter.Services.ConverterHandlerServices
             Controls?.Add(has_column_names_stack_panel);
         }
 
-        public override Task<(List<string>, List<string[]>)> ReadTextAsync(string text)
+        public override Task<TableData> ReadTextAsync(string text)
         {
             return Task.Run(() =>
             {
@@ -146,7 +147,7 @@ namespace TableConverter.Services.ConverterHandlerServices
                     headers.AddRange(Enumerable.Range(1, rows[0].Length).Select(i => $"Column {i}"));
                 }
 
-                return (headers, rows);
+                return new TableData(headers, rows);
             });
         }
     }

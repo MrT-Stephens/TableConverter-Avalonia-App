@@ -1,10 +1,8 @@
-﻿using Avalonia;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using System;
 using System.Collections.ObjectModel;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace TableConverter.Interfaces
@@ -39,7 +37,7 @@ namespace TableConverter.Interfaces
 
         protected static void SetProgressBarValue(object? progress_bar, long value, long from_low, long from_high)
         {
-            Dispatcher.UIThread.Invoke(() =>
+            Dispatcher.UIThread.InvokeAsync(() =>
             {
                 if (progress_bar is ProgressBar bar)
                 {   
