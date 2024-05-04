@@ -24,6 +24,8 @@ namespace TableConverter.Services.ConverterHandlerServices
 
         private string SelectedQuoteType = "No Quotes";
 
+        private bool InsertMultiRowsAtOnce = false;
+
         public override void InitializeControls()
         {
             var table_name_stack_panel = new StackPanel()
@@ -87,6 +89,37 @@ namespace TableConverter.Services.ConverterHandlerServices
             quote_type_stack_panel.Children.Add(quote_type_combo_box);
 
             Controls?.Add(quote_type_stack_panel);
+
+            var insert_multi_rows_at_once_stack_panel = new StackPanel()
+            {
+                Orientation = Orientation.Horizontal,
+                Spacing = 10
+            };
+
+            var insert_multi_rows_at_once_check_box = new CheckBox()
+            {
+                IsChecked = InsertMultiRowsAtOnce
+            };
+
+            insert_multi_rows_at_once_check_box.IsCheckedChanged += (sender, e) =>
+            {
+                if (sender is CheckBox check_box)
+                {
+                    InsertMultiRowsAtOnce = check_box.IsChecked ?? false;
+                }
+            };
+
+            var insert_multi_rows_at_once_label = new Label()
+            {
+                Content = "Insert Multiple Rows at Once",
+                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+
+            insert_multi_rows_at_once_stack_panel.Children.Add(insert_multi_rows_at_once_check_box);
+            insert_multi_rows_at_once_stack_panel.Children.Add(insert_multi_rows_at_once_label);
+
+            Controls?.Add(insert_multi_rows_at_once_stack_panel);
         }
 
         public override Task<string> ConvertAsync(string[] headers, string[][] rows, object? progress_bar)
@@ -105,12 +138,35 @@ namespace TableConverter.Services.ConverterHandlerServices
                 {
                     var row_text = string.Join(", ", rows[i].Select(val => $"\'{val}\'"));
 
-                    sql_builder.AppendLine($"INSERT INTO " +
-                            $"{QuoteTypes[SelectedQuoteType]}" +
-                            $"{TableName.Replace(' ', '_')}" +
-                            $"{(QuoteTypes[SelectedQuoteType] == "[" ? "]" : QuoteTypes[SelectedQuoteType])} " +
-                            $"({headers_text}) VALUES ({row_text});"
-                            );
+                    if (InsertMultiRowsAtOnce)
+                    {
+                        if (i == 0)
+                        {
+                            sql_builder.Append($"INSERT INTO " +
+                                    $"{QuoteTypes[SelectedQuoteType]}" +
+                                    $"{TableName.Replace(' ', '_')}" +
+                                    $"{(QuoteTypes[SelectedQuoteType] == "[" ? "]" : QuoteTypes[SelectedQuoteType])} " +
+                                    $"({headers_text}) VALUES{Environment.NewLine} ({row_text})");
+                        }
+                        else
+                        {
+                            sql_builder.Append($",{Environment.NewLine} ({row_text})");
+
+                            if (i == rows.LongLength - 1)
+                            {
+                                sql_builder.Append($";{Environment.NewLine}");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        sql_builder.AppendLine($"INSERT INTO " +
+                                $"{QuoteTypes[SelectedQuoteType]}" +
+                                $"{TableName.Replace(' ', '_')}" +
+                                $"{(QuoteTypes[SelectedQuoteType] == "[" ? "]" : QuoteTypes[SelectedQuoteType])} " +
+                                $"({headers_text}) VALUES ({row_text});"
+                                );
+                    }
 
                     SetProgressBarValue(progress_bar, i, 0, rows.LongLength - 1);
                 }

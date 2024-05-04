@@ -194,6 +194,8 @@ public partial class TableConverterView : UserControl
                         [!TextBox.TextProperty] = new Binding($"EditColumnValues[{i}]"),
                         HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
                         VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
+                        Background = new SolidColorBrush(Colors.Transparent),
+                        BorderBrush = new SolidColorBrush(Colors.Transparent),
                         FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException()
                     },
                     Binding = new Binding($"[{i}]"),
