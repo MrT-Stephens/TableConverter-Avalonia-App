@@ -297,7 +297,7 @@ public partial class TableConverterView : UserControl
         }
     }
 
-    private async void MainContentScrollViewerLoaded(object? sender, RoutedEventArgs e)
+    private async void MainContentScrollViewerStackPanelLoaded(object? sender, RoutedEventArgs e)
     {
         if (sender is ScrollViewer scroll_viewer)
         {
@@ -305,7 +305,7 @@ public partial class TableConverterView : UserControl
 
             if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS())
             {
-                scroll_viewer.Margin = new Thickness(5, 0, 5, 0);
+                scroll_viewer.Margin = new Thickness(10, 0, 10, 0);
             }
         }
     }

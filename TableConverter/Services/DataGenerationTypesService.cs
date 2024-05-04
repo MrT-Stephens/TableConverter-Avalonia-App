@@ -101,7 +101,7 @@ namespace TableConverter.Services
                 {
                     if (data_generation_fields[i].TypeHandler is not null)
                     {
-                        headers.Add((!string.IsNullOrEmpty(data_generation_fields[i].Name)) ? data_generation_fields[i].Name : $"Column {i + 1}");
+                        headers.Add((!string.IsNullOrEmpty(data_generation_fields[i].Name)) ? data_generation_fields[i].Name : data_generation_fields[i].Type);
 
                         string[] column = await data_generation_fields[i].TypeHandler!.GenerateData(number_of_rows, data_generation_fields[i].BlankPercentage.GetValueOrDefault());
 
