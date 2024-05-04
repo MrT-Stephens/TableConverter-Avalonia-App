@@ -12,8 +12,8 @@ using TableConverter.ViewModels;
 using System.Text;
 using Avalonia.Threading;
 using TableConverter.DataModels;
-using Avalonia.Controls.Templates;
 using Avalonia.Media;
+using DialogHostAvalonia;
 
 namespace TableConverter.Views;
 
@@ -33,8 +33,8 @@ public partial class TableConverterView : UserControl
 
         MainSplitView.Loaded += (sender, e) => 
         {
-            CheckIfDataGenerationOnLoaded();
-            ResizeInformationSidePanel(); 
+            ResizeInformationSidePanel();
+            RefreshEditDataGrid();
         };
 
         SizeChanged += (sender, e) => ResizeInformationSidePanel();
@@ -105,7 +105,7 @@ public partial class TableConverterView : UserControl
 
     private async void OpenFileButtonClicked(object? sender, RoutedEventArgs e)
     {
-        if (DataContext is TableConverterViewModel table_converter_view_model)
+        if (DataContext is MainViewModel table_converter_view_model)
         {
             var files = await TopLevel.GetTopLevel(this)!.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
             {
@@ -123,7 +123,7 @@ public partial class TableConverterView : UserControl
 
             if (files.Count >= 1)
             {
-                if (table_converter_view_model.SelectedInputConverter.input_converter!.Controls is not null)
+                if (table_converter_view_model.SelectedInputConverter.input_converter!.Controls is not null && Parent is DialogHost dialog_host)
                 {
                     DialogHostOptionsView options = new()
                     {
@@ -131,7 +131,7 @@ public partial class TableConverterView : UserControl
                         DialogOptions = table_converter_view_model.SelectedInputConverter.input_converter!.Controls,
                         OkButtonClick = async () =>
                         {
-                            MainViewDialogHost.CurrentSession?.Close();
+                            dialog_host.CurrentSession?.Close();
 
                             table_converter_view_model.ActualInputTextBoxText = await table_converter_view_model.SelectedInputConverter.input_converter!.ReadFileAsync(files[0]);
 
@@ -147,11 +147,11 @@ public partial class TableConverterView : UserControl
                         },
                         CancelButtonClick = () =>
                         {
-                            MainViewDialogHost.CurrentSession?.Close();
+                            dialog_host.CurrentSession?.Close();
                         }
                     };
 
-                    await DialogHostAvalonia.DialogHost.Show(options, MainViewDialogHost);
+                    await DialogHost.Show(options, dialog_host);
                 }
                 else
                 {
@@ -178,7 +178,7 @@ public partial class TableConverterView : UserControl
 
     private void RefreshEditDataGrid()
     {
-        if (DataContext is TableConverterViewModel table_converter_view_model)
+        if (DataContext is MainViewModel table_converter_view_model)
         {
             while (EditDataDataGrid.Columns.Count > 0)
             {
@@ -211,9 +211,9 @@ public partial class TableConverterView : UserControl
 
     private async void ConvertButtonClicked(object? sender, RoutedEventArgs e)
     {
-        if (DataContext is TableConverterViewModel table_converter_view_model && !string.IsNullOrEmpty(table_converter_view_model.InputTextBoxText))
+        if (DataContext is MainViewModel table_converter_view_model && !string.IsNullOrEmpty(table_converter_view_model.InputTextBoxText))
         {
-            if (table_converter_view_model.SelectedOutputConverter.output_converter!.Controls is not null)
+            if (table_converter_view_model.SelectedOutputConverter.output_converter!.Controls is not null && Parent is DialogHost dialog_host)
             {
                 DialogHostOptionsView options = new()
                 {
@@ -221,7 +221,7 @@ public partial class TableConverterView : UserControl
                     DialogOptions = table_converter_view_model.SelectedOutputConverter.output_converter!.Controls,
                     OkButtonClick = async () =>
                     {
-                        MainViewDialogHost.CurrentSession?.Close();
+                        dialog_host.CurrentSession?.Close();
 
                         table_converter_view_model.ActualOutputTextBoxText = await table_converter_view_model.SelectedOutputConverter.output_converter!.ConvertAsync(
                             table_converter_view_model.EditColumnValues.ToArray(),
@@ -231,11 +231,11 @@ public partial class TableConverterView : UserControl
                     },
                     CancelButtonClick = () =>
                     {
-                        MainViewDialogHost.CurrentSession?.Close();
+                        dialog_host.CurrentSession?.Close();
                     }
                 };
 
-                await DialogHostAvalonia.DialogHost.Show(options, MainViewDialogHost);
+                await DialogHost.Show(options, dialog_host);
             }
             else
             {
@@ -250,7 +250,7 @@ public partial class TableConverterView : UserControl
 
     private void ClearButtonClicked(object? sender, RoutedEventArgs e)
     {
-        if (DataContext is TableConverterViewModel table_converter_view_model)
+        if (DataContext is MainViewModel table_converter_view_model)
         {
             table_converter_view_model.ActualInputTextBoxText = string.Empty;
             table_converter_view_model.EditColumnValues = [];
@@ -264,7 +264,7 @@ public partial class TableConverterView : UserControl
 
     private async void CopyButtonClicked(object? sender, RoutedEventArgs e)
     {
-        if (DataContext is TableConverterViewModel table_converter_view_model && !string.IsNullOrEmpty(table_converter_view_model.ActualOutputTextBoxText))
+        if (DataContext is MainViewModel table_converter_view_model && !string.IsNullOrEmpty(table_converter_view_model.ActualOutputTextBoxText))
         {
             await TopLevel.GetTopLevel(this)!.Clipboard!.SetTextAsync(table_converter_view_model.ActualOutputTextBoxText);
         }
@@ -272,7 +272,7 @@ public partial class TableConverterView : UserControl
 
     private async void SaveButtonClicked(object? sender, RoutedEventArgs e)
     {
-        if (DataContext is TableConverterViewModel table_converter_view_model && !string.IsNullOrEmpty(table_converter_view_model.ActualOutputTextBoxText))
+        if (DataContext is MainViewModel table_converter_view_model && !string.IsNullOrEmpty(table_converter_view_model.ActualOutputTextBoxText))
         {
             var file = await TopLevel.GetTopLevel(this)!.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
             {
@@ -310,28 +310,6 @@ public partial class TableConverterView : UserControl
         }
     }
 
-    private async void CheckIfDataGenerationOnLoaded()
-    {
-        if (DataContext is TableConverterViewModel table_converter_view_model && !string.IsNullOrEmpty(ViewModelBase.GeneratedData))
-        {
-            table_converter_view_model.SelectedInputConverter = table_converter_view_model.InputConverters.First(converter => converter.name == "Generated Data");
-
-            table_converter_view_model.ActualInputTextBoxText = ViewModelBase.GeneratedData;
-
-            ViewModelBase.GeneratedData = null;
-
-            var (column_values, row_values) = await table_converter_view_model.SelectedInputConverter.input_converter!.ReadTextAsync(table_converter_view_model.ActualInputTextBoxText);
-
-            if (column_values is not null && row_values is not null)
-            {
-                table_converter_view_model.EditColumnValues = new ObservableCollection<string>(column_values);
-                table_converter_view_model.EditRowValues = new ObservableCollection<string[]>(row_values);
-
-                RefreshEditDataGrid();
-            }
-        }
-    }
-
     private void HeaderBorderLoaded(object? sender, RoutedEventArgs e)
     {
         if (sender is Control ctrl)
@@ -345,7 +323,7 @@ public partial class TableConverterView : UserControl
 
     private void InputSearchBoxSelectionChanged(object sender, SelectionChangedEventArgs args)
     {
-        if (DataContext is TableConverterViewModel table_converter_view_model && 
+        if (DataContext is MainViewModel table_converter_view_model && 
             sender is AutoCompleteBox auto_complete_box &&
             auto_complete_box.SelectedItem is not null)
         {
@@ -356,12 +334,23 @@ public partial class TableConverterView : UserControl
 
     private void OutputSearchBoxSelectionChanged(object sender, SelectionChangedEventArgs args)
     {
-        if (DataContext is TableConverterViewModel table_converter_view_model &&
+        if (DataContext is MainViewModel table_converter_view_model &&
             sender is AutoCompleteBox auto_complete_box &&
             auto_complete_box.SelectedItem is not null)
         {
             table_converter_view_model.SelectedOutputConverter =
                 table_converter_view_model.OutputConverters.Where((converter_type) => converter_type.name == auto_complete_box.SelectedItem.ToString()).First();
+        }
+    }
+
+    private void GenerateDataButtonClicked(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel table_converter_view_model)
+        {
+            table_converter_view_model.CurrentView = new DataGenerationView()
+            {
+                DataContext = table_converter_view_model
+            };
         }
     }
 }

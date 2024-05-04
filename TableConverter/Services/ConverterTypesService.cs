@@ -62,9 +62,6 @@ namespace TableConverter.Services
                 new ConverterType("YAML", [ ".yaml" ], [ "application/x-yaml" ],
                         "YAML stands for YAML Ain't Markup Language. YAML is a human-readable data serialization language. It is commonly used for configuration files and in applications where data is being stored or transmitted.",
                         new ConverterHandlerYamlInputService(), new ConverterHandlerYamlOutputService()),
-                new ConverterType("Generated Data", [ "" ], [ "" ],
-                        "Generated Data is a feature built-in to TableConverter that allows your to generate test data sets and the output them as any of the available output file types. Click the 'Generate Data' button to get started with this feature.",
-                        new ConverterHandlerGeneratedDataInput(), null)
             });
         }
     }

@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TableConverter.DataModels;
@@ -86,12 +85,11 @@ namespace TableConverter.Services
             });
         }
 
-        public static Task<string> GetDataGenerationDataAsync(DataGenerationField[] data_generation_fields, long number_of_rows) 
+        public static Task<TableData> GetDataGenerationDataAsync(DataGenerationField[] data_generation_fields, long number_of_rows) 
         {
             return Task.Run(async () =>
             {
                 List<string> headers = new List<string>();
-
                 List<string[]> rows = new List<string[]>();
 
                 for (long i = 0; i < number_of_rows; i++)
@@ -118,7 +116,7 @@ namespace TableConverter.Services
                     }
                 }
 
-                return JsonConvert.SerializeObject((headers, rows), Formatting.Indented);
+                return new TableData(headers, rows);
             });
         }
     }

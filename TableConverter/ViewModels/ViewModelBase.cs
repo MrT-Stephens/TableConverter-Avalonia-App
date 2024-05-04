@@ -1,19 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using TableConverter.Services;
 
 namespace TableConverter.ViewModels;
 
 public partial class ViewModelBase : ObservableObject
 {
-    #region Services
-
-    protected static readonly PageRouterService PageRouterService = new();
-
-    public static string? GeneratedData { get; set; } = null;
-
-    #endregion
-
     #region Commands
 
     [RelayCommand]

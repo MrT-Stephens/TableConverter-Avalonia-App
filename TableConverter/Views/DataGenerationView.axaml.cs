@@ -1,10 +1,13 @@
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using DialogHostAvalonia;
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using TableConverter.DataModels;
 using TableConverter.Interfaces;
+using TableConverter.Services;
 using TableConverter.ViewModels;
 
 namespace TableConverter.Views
@@ -23,7 +26,7 @@ namespace TableConverter.Views
 
         private async void ChooseFieldTypeButtonClicked(object? sender, RoutedEventArgs e)
         {
-            if (DataContext is DataGenerationViewModel data_generation_view_model)
+            if (DataContext is MainViewModel data_generation_view_model && Parent is DialogHost dialog_host)
             {
                 DataGenerationTypesSelectorView data_generation_types_selector_view = new DataGenerationTypesSelectorView()
                 {
@@ -47,7 +50,7 @@ namespace TableConverter.Views
                             }
                         }
 
-                        DataGenerationDialogHost.CurrentSession?.Close();
+                        dialog_host.CurrentSession?.Close();
                     }
                 };
 
@@ -55,7 +58,7 @@ namespace TableConverter.Views
 
                 SizeChanged += resize_func;
 
-                await DialogHostAvalonia.DialogHost.Show(data_generation_types_selector_view, DataGenerationDialogHost);
+                await DialogHost.Show(data_generation_types_selector_view, dialog_host);
 
                 SizeChanged -= resize_func;
             }
@@ -69,6 +72,35 @@ namespace TableConverter.Views
                 {
                     ctrl.Padding = new Thickness(10, ctrl.Padding.Top, 10, ctrl.Padding.Bottom);
                 }
+            }
+        }
+
+        private async void GenerateDataButtonClicked(object? sender, RoutedEventArgs e)
+        {
+            if (DataContext is MainViewModel data_generation_view_model)
+            {
+                TableData data = await DataGenerationTypesService.GetDataGenerationDataAsync(data_generation_view_model.DataGenerationFields.ToArray(), data_generation_view_model.NumberOfRows);
+
+                data_generation_view_model.ActualInputTextBoxText = "Data generated successfully. The generated data can not be viewed here 😭";
+
+                data_generation_view_model.EditColumnValues = new ObservableCollection<string>(data.headers);
+                data_generation_view_model.EditRowValues = new ObservableCollection<string[]>(data.rows);
+
+                data_generation_view_model.CurrentView = new TableConverterView()
+                {
+                    DataContext = data_generation_view_model
+                };
+            }
+        }
+
+        private void GoBackButtonClicked(object? sender, RoutedEventArgs e)
+        {
+            if (DataContext is MainViewModel data_generation_view_model)
+            {
+                data_generation_view_model.CurrentView = new TableConverterView()
+                {
+                    DataContext = data_generation_view_model
+                };
             }
         }
     }
