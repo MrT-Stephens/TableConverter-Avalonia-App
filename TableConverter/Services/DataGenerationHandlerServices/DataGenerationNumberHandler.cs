@@ -116,7 +116,7 @@ namespace TableConverter.Services.DataGenerationHandlerServices
 
                 for (long i = 0; i < rows; i++)
                 {
-                    data.Add((Random.NextInt64(MinValue, MaxValue) + Random.NextDouble()).ToString($"N{DecimalPlaces}"));
+                    data.Add(CheckBlank(() => (Random.NextInt64(MinValue, MaxValue) + Random.NextDouble()).ToString($"N{DecimalPlaces}"), blanks_percentage));
                 }
 
                 return data.ToArray();

@@ -21,7 +21,7 @@ namespace TableConverter.Services.DataGenerationHandlerServices
 
                 for (int i = 0; i < rows; i++)
                 {
-                    data[i] = NatoPhoneticAlphabet[Random.Next(0, NatoPhoneticAlphabet.Length)];
+                    data[i] = CheckBlank(() => NatoPhoneticAlphabet[Random.Next(0, NatoPhoneticAlphabet.Length)], blanks_percentage);
                 }
 
                 return data;

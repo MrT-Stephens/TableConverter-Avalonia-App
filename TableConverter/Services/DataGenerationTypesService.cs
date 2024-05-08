@@ -91,6 +91,11 @@ namespace TableConverter.Services
                     new DataGenerationType("Nato Phonetic", "Advanced",
                         "Generates a random word from the Nato Phonetic Alphabet."),
                         typeof(DataGenerationNatoPhoneticHandler)
+                },
+                {
+                    new DataGenerationType("Gender", "Personal",
+                        "Generates a random gender. For example \'Male\' or \'M\'."),
+                        typeof(DataGenerationGenderHandler)
                 }
             });
         }
