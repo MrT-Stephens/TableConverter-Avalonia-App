@@ -36,7 +36,7 @@ namespace TableConverter.Services.DataGenerationHandlerServices
 
         private DateTime ToDateTime { get; set; } = DateTime.MaxValue;
 
-        private string SelectedDateTimeFormat = "Standard";
+        private string SelectedDateTimeFormat { get; set; } = "Standard";
 
         public override void InitializeOptionsControls()
         {

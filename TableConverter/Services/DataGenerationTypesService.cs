@@ -81,6 +81,16 @@ namespace TableConverter.Services
                     new DataGenerationType("Country", "Location",
                         "Generates random country name. For example United States, United Kingdom, France."),
                         typeof(DataGenerationCountryHandler)
+                },
+                {
+                    new DataGenerationType("Number", "Basic",
+                        "Generates a random number between a range."),
+                        typeof(DataGenerationNumberHandler)
+                },
+                {
+                    new DataGenerationType("Nato Phonetic", "Advanced",
+                        "Generates a random word from the Nato Phonetic Alphabet."),
+                        typeof(DataGenerationNatoPhoneticHandler)
                 }
             });
         }

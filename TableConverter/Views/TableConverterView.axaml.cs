@@ -351,6 +351,15 @@ public partial class TableConverterView : UserControl
             {
                 DataContext = table_converter_view_model
             };
+
+            foreach (DataGenerationField field in table_converter_view_model.DataGenerationFields)
+            {
+                if (field.TypeHandler is not null)
+                {
+                    field.TypeHandler.OptionsControls.Clear();
+                    field.TypeHandler.InitializeOptionsControls();
+                }
+            }
         }
     }
 }
