@@ -5,11 +5,14 @@ using Avalonia.Media;
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using TableConverter.Services;
 
 namespace TableConverter.Interfaces
 {
     internal abstract class DataGenerationTypeHandlerAbstract : IDataGenerationTypeHandler
     {
+        protected static DataGenerationDataBaseService DbConnection { get; } = new();
+
         public Random Random { get; set; }
 
         public Collection<Control> OptionsControls { get; set; }

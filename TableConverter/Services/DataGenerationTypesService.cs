@@ -96,6 +96,11 @@ namespace TableConverter.Services
                     new DataGenerationType("Gender", "Personal",
                         "Generates a random gender. For example \'Male\' or \'M\'."),
                         typeof(DataGenerationGenderHandler)
+                },
+                {
+                    new DataGenerationType("First Name", "Personal",
+                        "Generates a random first name."),
+                        typeof(DataGenerationFirstNameHandler)
                 }
             });
         }
