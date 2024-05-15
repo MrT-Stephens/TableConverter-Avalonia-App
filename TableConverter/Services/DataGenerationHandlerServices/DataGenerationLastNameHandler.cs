@@ -11,7 +11,7 @@ using TableConverter.Interfaces;
 
 namespace TableConverter.Services.DataGenerationHandlerServices
 {
-    internal class DataGenerationFirstNameHandler : DataGenerationTypeHandlerAbstract
+    internal class DataGenerationLastNameHandler : DataGenerationTypeHandlerAbstract
     {
         private string[]? CountryCodes { get; set; }
 
@@ -73,7 +73,7 @@ namespace TableConverter.Services.DataGenerationHandlerServices
                 string[] data = new string[rows];
 
                 using (var reader = DbConnection.ExecuteCommand(
-                    $"SELECT C.COUNTRY_CODE, N.FIRST_NAME FROM FIRST_LAST_NAMES_TABLE N INNER JOIN COUNTRY_CODES_TABLE C ON C.COUNTRY_CODE = '{CountryCode ?? "GB"}' WHERE N.ID IN (SELECT ID FROM FIRST_LAST_NAMES_TABLE ORDER BY RANDOM() LIMIT {rows});"
+                    $"SELECT C.COUNTRY_CODE, N.LAST_NAME FROM FIRST_LAST_NAMES_TABLE N INNER JOIN COUNTRY_CODES_TABLE C ON C.COUNTRY_CODE = '{CountryCode ?? "GB"}' WHERE N.ID IN (SELECT ID FROM FIRST_LAST_NAMES_TABLE ORDER BY RANDOM() LIMIT {rows});"
                 ))
                 {
                     if (!reader.HasRows)

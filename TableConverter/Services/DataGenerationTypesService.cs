@@ -101,6 +101,31 @@ namespace TableConverter.Services
                     new DataGenerationType("First Name", "Personal",
                         "Generates a random first name."),
                         typeof(DataGenerationFirstNameHandler)
+                },
+                {
+                    new DataGenerationType("Last Name", "Personal",
+                        "Generates a random last name."),
+                        typeof(DataGenerationLastNameHandler)
+                },
+                {
+                    new DataGenerationType("Full Name", "Personal",
+                        "Generates a random first and last name together."),
+                        typeof(DataGenerationFirstLastNameHandler)
+                },
+                {
+                    new DataGenerationType("Title", "Personal",
+                        "Generates a random title. For example Mr, Mrs, Dr."),
+                        typeof(DataGenerationTitleHandler)
+                },
+                {
+                    new DataGenerationType("Shirt Size", "Personal",
+                        "Generates a random shirt size. For example S, M, L, or XL."),
+                        typeof(DataGenerationShirtSizesHandler)
+                },
+                {
+                    new DataGenerationType("Website URL", "Web",
+                        "Generates a random website URL."),
+                        typeof(DataGenerationWebsiteUrlHandler)
                 }
             });
         }

@@ -136,7 +136,7 @@ namespace TableConverter.Services.ConverterHandlerServices
 
                 for (long i = 0; i < rows.LongLength; i++)
                 {
-                    var row_text = string.Join(", ", rows[i].Select(val => $"\'{val}\'"));
+                    var row_text = string.Join(", ", rows[i].Select(val => $"\'{val.Replace("\'", "\'\'")}\'"));
 
                     if (InsertMultiRowsAtOnce)
                     {

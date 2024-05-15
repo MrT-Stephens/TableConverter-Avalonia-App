@@ -106,7 +106,7 @@ namespace TableConverter.Services.ConverterHandlerServices
                         {
                             for (long i = 0; i < ((IDictionary<string, object>)row).Keys.LongCount(); i++)
                             {
-                                headers.Add(i.ToString());
+                                headers.Add($"Column {i}");
                             }
                         }
 

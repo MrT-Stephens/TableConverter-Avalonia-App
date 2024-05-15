@@ -11,7 +11,7 @@ using TableConverter.Interfaces;
 
 namespace TableConverter.Services.DataGenerationHandlerServices
 {
-    internal class DataGenerationFirstNameHandler : DataGenerationTypeHandlerAbstract
+    internal class DataGenerationFirstLastNameHandler : DataGenerationTypeHandlerAbstract
     {
         private string[]? CountryCodes { get; set; }
 
@@ -73,7 +73,7 @@ namespace TableConverter.Services.DataGenerationHandlerServices
                 string[] data = new string[rows];
 
                 using (var reader = DbConnection.ExecuteCommand(
-                    $"SELECT C.COUNTRY_CODE, N.FIRST_NAME FROM FIRST_LAST_NAMES_TABLE N INNER JOIN COUNTRY_CODES_TABLE C ON C.COUNTRY_CODE = '{CountryCode ?? "GB"}' WHERE N.ID IN (SELECT ID FROM FIRST_LAST_NAMES_TABLE ORDER BY RANDOM() LIMIT {rows});"
+                    $"SELECT C.COUNTRY_CODE, N.FIRST_NAME, N.LAST_NAME FROM FIRST_LAST_NAMES_TABLE N INNER JOIN COUNTRY_CODES_TABLE C ON C.COUNTRY_CODE = '{CountryCode ?? "GB"}' WHERE N.ID IN (SELECT ID FROM FIRST_LAST_NAMES_TABLE ORDER BY RANDOM() LIMIT {rows});"
                 ))
                 {
                     if (!reader.HasRows)
@@ -85,7 +85,7 @@ namespace TableConverter.Services.DataGenerationHandlerServices
 
                     while (reader.Read())
                     {
-                        data[i++] = CheckBlank(() => reader.GetString(1), blanks_percentage);
+                        data[i++] = CheckBlank(() => $"{reader.GetString(1)} {reader.GetString(2)}", blanks_percentage);
                     }
                 };
 
