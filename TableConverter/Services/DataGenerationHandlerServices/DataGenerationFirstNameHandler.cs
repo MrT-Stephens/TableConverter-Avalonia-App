@@ -28,7 +28,7 @@ namespace TableConverter.Services.DataGenerationHandlerServices
             };
 
             using (var reader = DbConnection.ExecuteCommand(
-                "SELECT COUNTRY_CODE FROM COUNTRY_CODES_TABLE;"
+                "SELECT DISTINCT CC.COUNTRY_CODE FROM FIRST_LAST_NAMES_TABLE FL JOIN COUNTRY_CODES_TABLE CC ON FL.COUNTRY_CODE = CC.COUNTRY_CODE;"
             ))
             {
                 if (reader.HasRows)
@@ -39,6 +39,8 @@ namespace TableConverter.Services.DataGenerationHandlerServices
                     {
                         country_codes.Add(reader.GetString(0));
                     }
+
+                    country_codes.Sort();
 
                     CountryCodes = country_codes.ToArray();
 

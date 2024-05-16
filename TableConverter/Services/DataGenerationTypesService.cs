@@ -126,6 +126,11 @@ namespace TableConverter.Services
                     new DataGenerationType("Website URL", "Web",
                         "Generates a random website URL."),
                         typeof(DataGenerationWebsiteUrlHandler)
+                },
+                {
+                    new DataGenerationType("Company Name", "Business",
+                        "Generates a random company name."),
+                        typeof(DataGenerationCompanyNameHandler)
                 }
             });
         }
