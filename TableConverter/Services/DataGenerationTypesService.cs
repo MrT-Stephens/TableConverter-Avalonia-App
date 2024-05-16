@@ -141,6 +141,21 @@ namespace TableConverter.Services
                     new DataGenerationType("Mobile Model", "Products",
                         "Generates a random mobile model."),
                         typeof(DataGenerationMobileBrandsModelsHandler)
+                },
+                {
+                    new DataGenerationType("Mobile OS", "Products",
+                        "Generates a random mobile operating system. For example iOS, Android."),
+                        typeof(DataGenerationMobileOsHandler)
+                },
+                {
+                    new DataGenerationType("Movie Title", "Entertainment",
+                        "Generates a random movie title. For example Plane, Fast X."),
+                        typeof(DataGenerationMoviesHandler)
+                },
+                {
+                    new DataGenerationType("Movie Genre", "Entertainment",
+                        "Generates a random music genre. For example Action, Sci-Fi."),
+                        typeof(DataGenerationMovieGenresHandler)
                 }
             });
         }

@@ -5,8 +5,21 @@ using TableConverter.Interfaces;
 
 namespace TableConverter.Services.DataGenerationHandlerServices
 {
-    internal class DataGenerationColourHandler : DataGenerationTypeHandlerAbstract
+    internal class DataGenerationMobileOsHandler : DataGenerationTypeHandlerAbstract
     {
+        private readonly string[] MobileOperatingSystems =
+        [
+            "Android",
+            "iOS",
+            "Windows Phone",
+            "BlackBerry OS",
+            "BlackBerry 10",
+            "Symbian OS",
+            "Ubuntu Touch",
+            "Firefox OS",
+            "KaiOS"
+        ];
+
         public override Task<string[]> GenerateData(long rows, int blanks_percentage)
         {
             return Task.Run(() =>
@@ -15,12 +28,7 @@ namespace TableConverter.Services.DataGenerationHandlerServices
 
                 for (int i = 0; i < rows; i++)
                 {
-                    data.Add(CheckBlank(() =>
-                    {
-                        ConsoleColor[] colorsArray = (ConsoleColor[])Enum.GetValues(typeof(ConsoleColor));
-                        return colorsArray.GetValue(Random.Next(0, colorsArray.Length))?.ToString();
-                    }
-                    , blanks_percentage));
+                    data.Add(CheckBlank(() => MobileOperatingSystems[Random.Next(0, MobileOperatingSystems.Length)], blanks_percentage));
                 }
 
                 return data.ToArray();
