@@ -89,6 +89,14 @@ namespace TableConverter.Services.DataGenerationHandlerServices
                     {
                         data[i++] = CheckBlank(() => reader.GetString(1), blanks_percentage);
                     }
+
+                    if (i < rows)
+                    {
+                        for (long j = i; j < rows; j++)
+                        {
+                            data[j] = data[j - i];
+                        }
+                    }
                 };
 
                 return data;

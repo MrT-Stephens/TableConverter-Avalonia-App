@@ -1,34 +1,34 @@
-﻿using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Layout;
-using Avalonia.Media;
+﻿using Avalonia.Controls;
+using Avalonia;
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
 using System.Threading.Tasks;
 using TableConverter.Interfaces;
+using Avalonia.Layout;
+using Avalonia.Media;
 
 namespace TableConverter.Services.DataGenerationHandlerServices
 {
-    internal class DataGenerationLastNameHandler : DataGenerationTypeHandlerAbstract
+    internal class DataGenerationMobileBrandsModelsHandler : DataGenerationTypeHandlerAbstract
     {
-        private string[]? CountryCodes { get; set; }
+        private string[]? MobileBrands { get; set; }
 
-        private string? CountryCode { get; set; }
+        private string? MobileBrand { get; set; }
 
         public override void InitializeOptionsControls()
         {
             var country_code_label = new Label()
             {
-                Content = "Country Code:",
+                Content = "Mobile Brand:",
                 Margin = new Thickness(5, 0, 5, 0),
                 VerticalAlignment = VerticalAlignment.Center,
                 FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
             };
 
             using (var reader = DbConnection.ExecuteCommand(
-                "SELECT DISTINCT CC.COUNTRY_CODE FROM FIRST_LAST_NAMES_TABLE FL JOIN COUNTRY_CODES_TABLE CC ON FL.COUNTRY_CODE = CC.COUNTRY_CODE;"
+                "SELECT DISTINCT NAME FROM MOBILE_BRANDS_TABLE;"
             ))
             {
                 if (reader.HasRows)
@@ -42,15 +42,15 @@ namespace TableConverter.Services.DataGenerationHandlerServices
 
                     country_codes.Sort();
 
-                    CountryCodes = country_codes.ToArray();
+                    MobileBrands = country_codes.ToArray();
 
-                    CountryCode = CountryCodes.First();
+                    MobileBrand = MobileBrands.First();
                 }
             }
 
             var country_code_combo_box = new ComboBox()
             {
-                ItemsSource = CountryCodes,
+                ItemsSource = MobileBrands,
                 SelectedIndex = 0,
                 VerticalAlignment = VerticalAlignment.Stretch,
                 FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
@@ -60,7 +60,7 @@ namespace TableConverter.Services.DataGenerationHandlerServices
             {
                 if (sender is ComboBox combo_box && combo_box.SelectedItem is string item)
                 {
-                    CountryCode = item;
+                    MobileBrand = item;
                 }
             };
 
@@ -75,7 +75,7 @@ namespace TableConverter.Services.DataGenerationHandlerServices
                 string[] data = new string[rows];
 
                 using (var reader = DbConnection.ExecuteCommand(
-                    $"SELECT C.COUNTRY_CODE, N.LAST_NAME FROM FIRST_LAST_NAMES_TABLE N INNER JOIN COUNTRY_CODES_TABLE C ON C.COUNTRY_CODE = '{CountryCode ?? "GB"}' WHERE N.ID IN (SELECT ID FROM FIRST_LAST_NAMES_TABLE ORDER BY RANDOM() LIMIT {rows});"
+                    $"SELECT MM.NAME FROM MOBILE_BRANDS_MODELS_TABLE MM INNER JOIN MOBILE_BRANDS_TABLE MB ON MB.ID = MM.BRAND_ID WHERE MB.NAME = '{MobileBrand}' AND MM.ID IN (SELECT ID FROM MOBILE_BRANDS_MODELS_TABLE WHERE BRAND_ID = MB.ID ORDER BY RANDOM() LIMIT {rows});"
                 ))
                 {
                     if (!reader.HasRows)
@@ -87,7 +87,7 @@ namespace TableConverter.Services.DataGenerationHandlerServices
 
                     while (reader.Read())
                     {
-                        data[i++] = CheckBlank(() => reader.GetString(1), blanks_percentage);
+                        data[i++] = CheckBlank(() => reader.GetString(0), blanks_percentage);
                     }
 
                     if (i < rows)

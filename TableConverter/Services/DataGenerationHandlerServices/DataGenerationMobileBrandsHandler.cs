@@ -4,7 +4,7 @@ using TableConverter.Interfaces;
 
 namespace TableConverter.Services.DataGenerationHandlerServices
 {
-    internal class DataGenerationWebsiteUrlHandler : DataGenerationTypeHandlerAbstract
+    internal class DataGenerationMobileBrandsHandler : DataGenerationTypeHandlerAbstract
     {
         public override Task<string[]> GenerateData(long rows, int blanks_percentage)
         {
@@ -13,7 +13,7 @@ namespace TableConverter.Services.DataGenerationHandlerServices
                 string[] data = new string[rows];
 
                 using (var reader = DbConnection.ExecuteCommand(
-                    $"SELECT URL FROM WEBSITE_URLS_TABLE WHERE ID IN (SELECT ID FROM WEBSITE_URLS_TABLE ORDER BY RANDOM() LIMIT {rows});"
+                    $"SELECT NAME FROM MOBILE_BRANDS_TABLE WHERE ID IN (SELECT ID FROM MOBILE_BRANDS_TABLE ORDER BY RANDOM() LIMIT {rows});"
                 ))
                 {
                     if (!reader.HasRows)

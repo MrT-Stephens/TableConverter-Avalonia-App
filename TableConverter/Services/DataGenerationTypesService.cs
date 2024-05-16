@@ -131,6 +131,16 @@ namespace TableConverter.Services
                     new DataGenerationType("Company Name", "Business",
                         "Generates a random company name."),
                         typeof(DataGenerationCompanyNameHandler)
+                },
+                {
+                    new DataGenerationType("Mobile Brand", "Products",
+                        "Generates a random mobile brand. For example Apple, Samsung."),
+                        typeof(DataGenerationMobileBrandsHandler)
+                },
+                {
+                    new DataGenerationType("Mobile Model", "Products",
+                        "Generates a random mobile model."),
+                        typeof(DataGenerationMobileBrandsModelsHandler)
                 }
             });
         }

@@ -40,6 +40,8 @@ namespace TableConverter.Services.DataGenerationHandlerServices
                         country_codes.Add(reader.GetString(0));
                     }
 
+                    country_codes.Sort();
+
                     CountryCodes = country_codes.ToArray();
 
                     CountryCode = CountryCodes.First();
@@ -86,6 +88,14 @@ namespace TableConverter.Services.DataGenerationHandlerServices
                     while (reader.Read())
                     {
                         data[i++] = CheckBlank(() => reader.GetString(1), blanks_percentage);
+                    }
+
+                    if (i < rows)
+                    {
+                        for (long j = i; j < rows; j++)
+                        {
+                            data[j] = data[j - i];
+                        }
                     }
                 };
 
