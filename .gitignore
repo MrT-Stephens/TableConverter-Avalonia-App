@@ -363,5 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # TableConverter Items
-./TableConverter/TableConverter-Data-Generation.db
 /TableConverter/TableConverter-Data-Generation.db
