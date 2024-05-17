@@ -93,7 +93,8 @@ namespace TableConverter.Services.ConverterHandlerServices
                 using (var csv_reader = new CsvHelper.CsvReader(new StringReader(text), new CsvConfiguration(CultureInfo.InvariantCulture)
                 {
                     Delimiter = Delimiter,
-                    NewLine = Environment.NewLine
+                    NewLine = Environment.NewLine,
+                    BadDataFound = null,
                 }))
                 {
                     foreach (var row in csv_reader.GetRecords<dynamic>())

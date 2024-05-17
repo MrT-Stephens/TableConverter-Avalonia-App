@@ -13,9 +13,9 @@ namespace TableConverter.Services
         {
             return Task.FromResult(new Dictionary<DataGenerationType, Type>()
             {
-                { 
-                    new DataGenerationType("Row Number", "Basic", 
-                        "Generates a row number. For example 1, 2, 3."), 
+                {
+                    new DataGenerationType("Row Number", "Basic",
+                        "Generates a row number. For example 1, 2, 3."),
                         typeof(DataGenerationRowNumberHandler)
                 },
                 {
@@ -172,6 +172,26 @@ namespace TableConverter.Services
                     new DataGenerationType("Song Artist", "Entertainment",
                         "Generates a random song artist."),
                         typeof(DataGenerationSongArtistsHandler)
+                },
+                {
+                    new DataGenerationType("Book Title", "Entertainment",
+                        "Generates a random book title."),
+                        typeof(DataGenerationBookTitleHandler)
+                },
+                {
+                    new DataGenerationType("Book Author", "Entertainment",
+                        "Generates a random book author."),
+                        typeof(DataGenerationBookAuthorHandler)
+                },
+                {
+                    new DataGenerationType("Book Publisher", "Entertainment",
+                        "Generates a random book publisher."),
+                        typeof(DataGenerationBookPublisherHandler)
+                },
+                {
+                    new DataGenerationType("Book ISBN", "Entertainment",
+                        "Generates a random book ISBN."),
+                        typeof(DataGenerationBookIsbnHandler)
                 }
             }.OrderBy(val => val.Key.Name).ToDictionary(entry => entry.Key, entry => entry.Value));
         }
