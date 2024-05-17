@@ -155,8 +155,23 @@ namespace TableConverter.Services
                 },
                 {
                     new DataGenerationType("Movie Genre", "Entertainment",
-                        "Generates a random music genre. For example Action, Sci-Fi."),
+                        "Generates a random movie genre. For example Action, Sci-Fi."),
                         typeof(DataGenerationMovieGenresHandler)
+                },
+                {
+                    new DataGenerationType("Song Name", "Entertainment",
+                        "Generates a random song name."),
+                        typeof(DataGenerationSongsHandler)
+                },
+                {
+                    new DataGenerationType("Song Genre", "Entertainment",
+                        "Generates a random song genre. For example Pop, Rock."),
+                        typeof(DataGenerationSongGenresHandler)
+                },
+                {
+                    new DataGenerationType("Song Artist", "Entertainment",
+                        "Generates a random song artist."),
+                        typeof(DataGenerationSongArtistsHandler)
                 }
             }.OrderBy(val => val.Key.Name).ToDictionary(entry => entry.Key, entry => entry.Value));
         }
