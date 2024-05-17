@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TableConverter.DataModels;
 using TableConverter.Services.DataGenerationHandlerServices;
@@ -157,7 +158,7 @@ namespace TableConverter.Services
                         "Generates a random music genre. For example Action, Sci-Fi."),
                         typeof(DataGenerationMovieGenresHandler)
                 }
-            });
+            }.OrderBy(val => val.Key.Name).ToDictionary(entry => entry.Key, entry => entry.Value));
         }
 
         public static Task<TableData> GetDataGenerationDataAsync(DataGenerationField[] data_generation_fields, long number_of_rows) 

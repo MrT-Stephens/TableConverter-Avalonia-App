@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Linq;
 using TableConverter.DataModels;
 
 namespace TableConverter.ViewModels;
@@ -35,17 +36,20 @@ public partial class DataGenerationTypesSelectorViewModel : ObservableObject
 
     partial void OnDataGenerationTypesChanged(ObservableCollection<DataGenerationType> value)
     {
-        TypesCategories = new ObservableCollection<KeyValuePair<string, string>>
-        {
-            new KeyValuePair<string, string>("All", $"({value.Count})")
-        };
+        var categories = new List<KeyValuePair<string, string>>();
 
         foreach (string category in value.Select(x => x.Category).Distinct())
         {
-            TypesCategories.Add(new KeyValuePair<string, string>(category, $"({value.Count(x => x.Category == category)})"));
+            categories.Add(new(category, $"({value.Count(x => x.Category == category)})"));
         }
 
-        TypesSearchItems = new ObservableCollection<string>(value.Select(x => x.Name));
+        categories.Sort((x, y) => x.Key.CompareTo(y.Key));
+
+        categories.Insert(0, new("All", $"({value.Count})"));
+
+        TypesCategories = new(categories);
+
+        TypesSearchItems = new(value.Select(x => x.Name));
 
         SelectedCategory = TypesCategories.First();
     }
@@ -54,17 +58,17 @@ public partial class DataGenerationTypesSelectorViewModel : ObservableObject
     {
         if (!string.IsNullOrEmpty(value))
         {
-            CurrentDataGenerationTypes = new ObservableCollection<DataGenerationType>(DataGenerationTypes.Where(x => x.Name.ToLower().Contains(value.ToLower())));
+            CurrentDataGenerationTypes = new(DataGenerationTypes.Where(x => x.Name.ToLower().Contains(value.ToLower())));
         }
         else
         {
             if (SelectedCategory.Key == "All")
             {
-                CurrentDataGenerationTypes = new ObservableCollection<DataGenerationType>(DataGenerationTypes);
+                CurrentDataGenerationTypes = new(DataGenerationTypes);
             }
             else
             {
-                CurrentDataGenerationTypes = new ObservableCollection<DataGenerationType>(DataGenerationTypes.Where(x => x.Category == SelectedCategory.Key));
+                CurrentDataGenerationTypes = new(DataGenerationTypes.Where(x => x.Category == SelectedCategory.Key));
             }
         }
     }
