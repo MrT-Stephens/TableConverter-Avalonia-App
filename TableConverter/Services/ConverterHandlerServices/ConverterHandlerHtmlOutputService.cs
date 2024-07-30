@@ -3,8 +3,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using System.Threading.Tasks;
 using System;
-using TableConverter.Interfaces;
-using Avalonia.Threading;
+using TableConverter.DataModels;
 using System.IO;
 
 namespace TableConverter.Services.ConverterHandlerServices
@@ -40,7 +39,6 @@ namespace TableConverter.Services.ConverterHandlerServices
             var minify_html_label = new Label()
             {
                 Content = "Minify HTML",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 VerticalAlignment = VerticalAlignment.Center
             };
 
@@ -71,7 +69,6 @@ namespace TableConverter.Services.ConverterHandlerServices
             var include_thead_tbody_label = new Label()
             {
                 Content = "Include thead/tbody",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 VerticalAlignment = VerticalAlignment.Center
             };
 

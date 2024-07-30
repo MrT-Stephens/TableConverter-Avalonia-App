@@ -2,11 +2,9 @@
 using Avalonia.Layout;
 using Avalonia.Media;
 using System;
-using System.Text;
 using System.Threading.Tasks;
-using TableConverter.Interfaces;
+using TableConverter.DataModels;
 using System.Xml;
-using Avalonia.Threading;
 using System.IO;
 
 namespace TableConverter.Services.ConverterHandlerServices
@@ -29,13 +27,11 @@ namespace TableConverter.Services.ConverterHandlerServices
             var xml_root_node_name_label = new Label()
             {
                 Content = "XML Root Node Name:",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
             };
 
             var xml_root_node_name_text_box = new TextBox()
             {
                 Text = XmlElementNodeName,
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
             };
 
             xml_root_node_name_text_box.TextChanged += (sender, e) =>
@@ -59,13 +55,11 @@ namespace TableConverter.Services.ConverterHandlerServices
             var xml_element_node_name_label = new Label()
             {
                 Content = "XML Element Node Name:",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
             };
 
             var xml_element_node_name_text_box = new TextBox()
             {
                 Text = XmlRootNodeName,
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
             };
 
             xml_element_node_name_text_box.TextChanged += (sender, e) =>
@@ -103,7 +97,6 @@ namespace TableConverter.Services.ConverterHandlerServices
             var minify_xml_label = new Label()
             {
                 Content = "Minify XML",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 VerticalAlignment = VerticalAlignment.Center
             };
 

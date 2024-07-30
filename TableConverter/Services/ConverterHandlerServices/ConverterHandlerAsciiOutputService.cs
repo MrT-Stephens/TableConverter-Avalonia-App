@@ -1,18 +1,12 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
-using CsvHelper.Configuration;
-using CsvHelper;
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TableConverter.Interfaces;
-using Avalonia.Threading;
+using TableConverter.DataModels;
 
 namespace TableConverter.Services.ConverterHandlerServices
 {
@@ -110,14 +104,12 @@ namespace TableConverter.Services.ConverterHandlerServices
             var table_type_label = new Label()
             {
                 Content = "Table Type:",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
             };
 
             var table_type_combo_box = new ComboBox()
             {
                 ItemsSource = TableTypes.Keys.ToArray(),
                 SelectedItem = SelectedTableType,
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 HorizontalAlignment = HorizontalAlignment.Stretch,
             };
 
@@ -142,14 +134,12 @@ namespace TableConverter.Services.ConverterHandlerServices
             var text_alignment_label = new Label()
             {
                 Content = "Text Alignment:",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
             };
 
             var text_alignment_combo_box = new ComboBox()
             {
                 ItemsSource = TextAlignment.Keys.ToArray(),
                 SelectedItem = SelectedTextAlignment,
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 HorizontalAlignment = HorizontalAlignment.Stretch,
             };
 
@@ -174,14 +164,12 @@ namespace TableConverter.Services.ConverterHandlerServices
             var comment_type_label = new Label()
             {
                 Content = "Comment Type:",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
             };
 
             var comment_type_combo_box = new ComboBox()
             {
                 ItemsSource = CommentTypes.Keys.ToArray(),
                 SelectedItem = SelectedCommentType,
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 HorizontalAlignment = HorizontalAlignment.Stretch,
             };
 
@@ -219,7 +207,6 @@ namespace TableConverter.Services.ConverterHandlerServices
             var force_row_separators_label = new Label()
             {
                 Content = "Force Row Separators",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 VerticalAlignment = VerticalAlignment.Center
             };
 

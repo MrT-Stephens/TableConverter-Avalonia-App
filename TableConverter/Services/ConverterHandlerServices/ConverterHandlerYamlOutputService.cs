@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using TableConverter.Interfaces;
+using TableConverter.DataModels;
 
 namespace TableConverter.Services.ConverterHandlerServices
 {

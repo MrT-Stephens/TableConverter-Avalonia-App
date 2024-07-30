@@ -3,7 +3,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using TableConverter.DataModels;
-using TableConverter.Interfaces;
 
 namespace TableConverter.Services.ConverterHandlerServices
 {
@@ -62,7 +61,14 @@ namespace TableConverter.Services.ConverterHandlerServices
                                 data_row.Add(cell_text.Trim());
                             }
 
-                            rows.AddRange((IEnumerable<string[]>)data_row);
+                            foreach (var item in data_row)
+                            {
+                                if (item != "")
+                                {
+                                    rows.Add(data_row.ToArray());
+                                    break;
+                                }
+                            }
                         }
                     }
                 }

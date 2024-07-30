@@ -1,8 +1,7 @@
-﻿using Avalonia.Threading;
+﻿using TableConverter.DataModels;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using TableConverter.Interfaces;
 
 namespace TableConverter.Services.ConverterHandlerServices
 {

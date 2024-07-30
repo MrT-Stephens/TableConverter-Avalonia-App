@@ -9,7 +9,7 @@ using System.Dynamic;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
-using TableConverter.Interfaces;
+using TableConverter.DataModels;
 
 namespace TableConverter.Services.ConverterHandlerServices
 {
@@ -28,13 +28,11 @@ namespace TableConverter.Services.ConverterHandlerServices
             var delimiter_label = new Label()
             {
                 Content = "Delimiter:",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
             };
 
             var delimiter_text_box = new TextBox()
             {
                 Text = Delimiter,
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
             };
 
             delimiter_text_box.TextChanged += (sender, e) =>
@@ -72,7 +70,6 @@ namespace TableConverter.Services.ConverterHandlerServices
             var has_header_label = new Label()
             {
                 Content = "Print Header",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 VerticalAlignment = VerticalAlignment.Center
             };
 

@@ -10,14 +10,8 @@ namespace TableConverter;
 
 public partial class App : Application
 {
-    public static Avalonia.ThemeManager.IThemeManager? ThemeManager;
-
     public override void Initialize()
     {
-        ThemeManager = new Avalonia.ThemeManager.FluentThemeManager();
-
-        ThemeManager.Initialize(this);
-
         AvaloniaXamlLoader.Load(this);
     }
 

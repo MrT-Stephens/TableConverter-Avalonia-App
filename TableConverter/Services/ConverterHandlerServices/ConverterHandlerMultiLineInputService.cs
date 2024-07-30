@@ -3,11 +3,8 @@ using Avalonia.Layout;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TableConverter.DataModels;
-using TableConverter.Interfaces;
 
 namespace TableConverter.Services.ConverterHandlerServices
 {
@@ -25,13 +22,11 @@ namespace TableConverter.Services.ConverterHandlerServices
             var row_separator_label = new Label()
             {
                 Content = "Row Separator:",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as Avalonia.Media.FontFamily ?? throw new NullReferenceException(),
             };
 
             var row_separator_text_box = new TextBox()
             {
                 Text = RowSeparator,
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as Avalonia.Media.FontFamily ?? throw new NullReferenceException(),
             };
 
             row_separator_text_box.TextChanged += (sender, e) =>

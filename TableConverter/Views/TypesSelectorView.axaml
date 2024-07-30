@@ -1,0 +1,54 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:TableConverter.ViewModels"
+             xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+             xmlns:components="clr-namespace:TableConverter.Components"
+             x:Class="TableConverter.Views.TypesSelectorView"
+             x:DataType="vm:TypesSelectorViewModel"
+             d:DesignHeight="450"
+             d:DesignWidth="800"
+             mc:Ignorable="d">
+  <Design.DataContext>
+    <!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+    <vm:TypesSelectorViewModel />
+  </Design.DataContext>
+
+  <sukiUi:GlassCard IsAnimated="True"
+                    IsOpaque="True">
+    <StackPanel Orientation="Vertical"
+                Margin="20"
+                Spacing="20">
+      <StackPanel Orientation="Horizontal"
+                  HorizontalAlignment="Center"
+                  Spacing="20">
+        <PathIcon Data="{Binding Icon}"
+                  VerticalAlignment="Center"
+                  Classes="Primary"
+                  Height="75" 
+                  Width="75" />
+        <TextBlock Classes="h3"
+                   Text="{Binding Title}"
+                   VerticalAlignment="Center" />
+      </StackPanel>
+      <ItemsControl ItemsSource="{Binding Values}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <UniformGrid />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <Button Classes="Large"
+                    Content="{Binding}"
+                    Margin="2"
+                    Command="{Binding DataContext.ItemClickedCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                    CommandParameter="{Binding}" />
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+  </sukiUi:GlassCard>
+</UserControl>

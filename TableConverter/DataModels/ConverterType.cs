@@ -6,9 +6,9 @@ namespace TableConverter.DataModels
     public record ConverterType(
         string name,
         Collection<string> extensions,
-        Collection<string> mime_types,
+        Collection<string> mimeTypes,
         string description,
-        IConverterHanderInput? input_converter,
-        IConverterHandlerOutput? output_converter
+        IConverterHanderInput? inputConverter,
+        IConverterHandlerOutput? outputConverter
     );
 }

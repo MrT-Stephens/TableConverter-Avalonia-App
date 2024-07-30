@@ -4,13 +4,11 @@ using Avalonia.Media;
 using CsvHelper.Configuration;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using TableConverter.DataModels;
-using TableConverter.Interfaces;
 
 namespace TableConverter.Services.ConverterHandlerServices
 {
@@ -29,13 +27,11 @@ namespace TableConverter.Services.ConverterHandlerServices
             var delimiter_label = new Label()
             {
                 Content = "Delimiter:",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
             };
 
             var delimiter_text_box = new TextBox()
             {
                 Text = Delimiter,
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
             };
 
             delimiter_text_box.TextChanged += (sender, e) =>
@@ -73,7 +69,6 @@ namespace TableConverter.Services.ConverterHandlerServices
             var has_header_label = new Label()
             {
                 Content = "Has Header",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 VerticalAlignment = VerticalAlignment.Center
             };
 

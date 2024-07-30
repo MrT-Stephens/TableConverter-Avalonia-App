@@ -6,7 +6,7 @@ using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
 using System;
 using System.Threading.Tasks;
-using TableConverter.Interfaces;
+using TableConverter.DataModels;
 
 namespace TableConverter.Services.ConverterHandlerServices
 {
@@ -65,7 +65,6 @@ namespace TableConverter.Services.ConverterHandlerServices
                 var text_block = new TextBlock 
                 { 
                     Text = item,
-                    FontFamily = App.Current?.Resources["JetBrainsMono"] as Avalonia.Media.FontFamily ?? throw new NullReferenceException(),
                 };
 
                 stack_panel.Children.Add(square);
@@ -82,14 +81,12 @@ namespace TableConverter.Services.ConverterHandlerServices
             var background_colour_label = new Label()
             {
                 Content = "Background Colour:",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as Avalonia.Media.FontFamily ?? throw new NullReferenceException(),
             };
 
             var background_colour_combo_box = new ComboBox()
             {
                 ItemsSource = Colours,
                 SelectedItem = SelectedBackgroundColor,
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as Avalonia.Media.FontFamily ?? throw new NullReferenceException(),
                 HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
             };
 
@@ -116,14 +113,12 @@ namespace TableConverter.Services.ConverterHandlerServices
             var foreground_colour_label = new Label()
             {
                 Content = "Text Colour:",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as Avalonia.Media.FontFamily ?? throw new NullReferenceException(),
             };
 
             var foreground_colour_combo_box = new ComboBox()
             {
                 ItemsSource = Colours,
                 SelectedItem = SelectedForegroundColor,
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as Avalonia.Media.FontFamily ?? throw new NullReferenceException(),
                 HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
             };
 
@@ -164,7 +159,6 @@ namespace TableConverter.Services.ConverterHandlerServices
             var bold_header_label = new Label()
             {
                 Content = "Bold Header",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as Avalonia.Media.FontFamily ?? throw new NullReferenceException(),
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center
             };
 
@@ -195,7 +189,6 @@ namespace TableConverter.Services.ConverterHandlerServices
             var show_grid_lines_label = new Label()
             {
                 Content = "Show Grid Lines",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as Avalonia.Media.FontFamily ?? throw new NullReferenceException(),
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center
             };
 

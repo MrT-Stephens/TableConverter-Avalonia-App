@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using TableConverter.Interfaces;
 using Newtonsoft.Json;
 using Avalonia.Controls;
 using Avalonia.Layout;
@@ -7,6 +6,7 @@ using Avalonia.Media;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TableConverter.DataModels;
 
 namespace TableConverter.Services.ConverterHandlerServices
 {
@@ -33,14 +33,12 @@ namespace TableConverter.Services.ConverterHandlerServices
             var json_format_type_label = new Label()
             {
                 Content = "JSON File Format:",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
             };
 
             var json_format_type_combo_box = new ComboBox()
             {
                 ItemsSource = JsonFormatTypes,
                 SelectedItem = SelectedJsonFormatType,
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 HorizontalAlignment = HorizontalAlignment.Stretch,
             };
 
@@ -79,7 +77,6 @@ namespace TableConverter.Services.ConverterHandlerServices
             var minify_json_label = new Label()
             {
                 Content = "Minify JSON",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 VerticalAlignment = VerticalAlignment.Center
             };
 

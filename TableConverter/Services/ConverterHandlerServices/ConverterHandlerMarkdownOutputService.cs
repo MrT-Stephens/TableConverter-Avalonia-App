@@ -1,14 +1,12 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
-using Avalonia.Threading;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TableConverter.Interfaces;
+using TableConverter.DataModels;
 
 namespace TableConverter.Services.ConverterHandlerServices
 {
@@ -44,14 +42,12 @@ namespace TableConverter.Services.ConverterHandlerServices
             var table_type_label = new Label()
             {
                 Content = "Table Type:",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
             };
 
             var table_type_combo_box = new ComboBox()
             {
                 ItemsSource = TableTypes,
                 SelectedItem = SelectedTableType,
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 HorizontalAlignment = HorizontalAlignment.Stretch,
             };
 
@@ -76,14 +72,12 @@ namespace TableConverter.Services.ConverterHandlerServices
             var text_alignment_label = new Label()
             {
                 Content = "Text Alignment:",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
             };
 
             var text_alignment_combo_box = new ComboBox()
             {
                 ItemsSource = TextAlignment.Keys.ToArray(),
                 SelectedItem = SelectedTextAlignment,
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 HorizontalAlignment = HorizontalAlignment.Stretch,
             };
 
@@ -122,7 +116,6 @@ namespace TableConverter.Services.ConverterHandlerServices
             var bold_column_names_label = new Label()
             {
                 Content = "Bold Column Names",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 VerticalAlignment = VerticalAlignment.Center
             };
 
@@ -153,7 +146,6 @@ namespace TableConverter.Services.ConverterHandlerServices
             var bold_first_column_label = new Label()
             {
                 Content = "Bold First Column",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 VerticalAlignment = VerticalAlignment.Center
             };
 

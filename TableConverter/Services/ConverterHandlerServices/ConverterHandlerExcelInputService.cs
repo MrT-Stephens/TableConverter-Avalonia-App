@@ -1,10 +1,8 @@
 ﻿using Avalonia.Platform.Storage;
 using NPOI.SS.UserModel;
 using System.Collections.Generic;
-using System.Linq;
 using System;
 using System.Threading.Tasks;
-using TableConverter.Interfaces;
 using NPOI.XSSF.UserModel;
 using TableConverter.DataModels;
 

@@ -1,12 +1,11 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
-using Avalonia.Threading;
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using TableConverter.Interfaces;
+using TableConverter.DataModels;
 
 namespace TableConverter.Services.ConverterHandlerServices
 {
@@ -60,14 +59,12 @@ namespace TableConverter.Services.ConverterHandlerServices
             var table_type_label = new Label()
             {
                 Content = "LaTex Table Type:",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
             };
 
             var table_type_combo_box = new ComboBox()
             {
                 ItemsSource = TableTypes,
                 SelectedItem = SelectedTableType,
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 HorizontalAlignment = HorizontalAlignment.Stretch,
             };
 
@@ -92,14 +89,12 @@ namespace TableConverter.Services.ConverterHandlerServices
             var text_alignment_label = new Label()
             {
                 Content = "Text Alignment:",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
             };
 
             var text_alignment_combo_box = new ComboBox()
             {
                 ItemsSource = Alignments,
                 SelectedItem = SelectedTextAlignment,
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 HorizontalAlignment = HorizontalAlignment.Stretch,
             };
 
@@ -124,14 +119,12 @@ namespace TableConverter.Services.ConverterHandlerServices
             var table_alignment_label = new Label()
             {
                 Content = "Table Alignment:",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
             };
 
             var table_alignment_combo_box = new ComboBox()
             {
                 ItemsSource = Alignments,
                 SelectedItem = SelectedTableAlignment,
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 HorizontalAlignment = HorizontalAlignment.Stretch,
             };
 
@@ -156,14 +149,12 @@ namespace TableConverter.Services.ConverterHandlerServices
             var caption_alignment_label = new Label()
             {
                 Content = "Caption Alignment:",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
             };
 
             var caption_alignment_combo_box = new ComboBox()
             {
                 ItemsSource = CaptionAlignments,
                 SelectedItem = SelectedCaptionAlignment,
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 HorizontalAlignment = HorizontalAlignment.Stretch,
             };
 
@@ -188,13 +179,11 @@ namespace TableConverter.Services.ConverterHandlerServices
             var caption_name_label = new Label()
             {
                 Content = "Caption Name:",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
             };
 
             var caption_name_text_box = new TextBox()
             {
                 Text = CaptionName,
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 HorizontalAlignment = HorizontalAlignment.Stretch,
             };
 
@@ -219,13 +208,11 @@ namespace TableConverter.Services.ConverterHandlerServices
             var label_name_label = new Label()
             {
                 Content = "Label Name:",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
             };
 
             var label_name_text_box = new TextBox()
             {
                 Text = LabelName,
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 HorizontalAlignment = HorizontalAlignment.Stretch,
             };
 
@@ -264,7 +251,6 @@ namespace TableConverter.Services.ConverterHandlerServices
             var minimal_working_example_label = new Label()
             {
                 Content = "Minimal Working Example",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 VerticalAlignment = VerticalAlignment.Center
             };
 
@@ -295,7 +281,6 @@ namespace TableConverter.Services.ConverterHandlerServices
             var bold_header_label = new Label()
             {
                 Content = "Bold Header",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 VerticalAlignment = VerticalAlignment.Center
             };
 
@@ -326,7 +311,6 @@ namespace TableConverter.Services.ConverterHandlerServices
             var bold_first_column_label = new Label()
             {
                 Content = "Bold First Column",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 VerticalAlignment = VerticalAlignment.Center
             };
 

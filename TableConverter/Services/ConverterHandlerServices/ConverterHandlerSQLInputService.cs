@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using TableConverter.DataModels;
-using TableConverter.Interfaces;
 
 namespace TableConverter.Services.ConverterHandlerServices
 {
@@ -35,14 +34,12 @@ namespace TableConverter.Services.ConverterHandlerServices
             var quote_type_label = new Label()
             {
                 Content = "Quote Type:",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
             };
 
             var quote_type_combo_box = new ComboBox()
             {
                 ItemsSource = QuoteTypes.Keys.ToArray(),
                 SelectedItem = SelectedQuoteType,
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 HorizontalAlignment = HorizontalAlignment.Stretch,
             };
 
@@ -81,7 +78,6 @@ namespace TableConverter.Services.ConverterHandlerServices
             var has_column_names_label = new Label()
             {
                 Content = "Has Column Names",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 VerticalAlignment = VerticalAlignment.Center
             };
 

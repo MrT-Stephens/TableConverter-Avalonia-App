@@ -3,7 +3,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using System.Threading.Tasks;
 using System;
-using TableConverter.Interfaces;
+using TableConverter.DataModels;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,13 +36,11 @@ namespace TableConverter.Services.ConverterHandlerServices
             var table_name_label = new Label()
             {
                 Content = "Table Name:",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
             };
 
             var table_name_text_box = new TextBox()
             {
                 Text = TableName,
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
             };
 
             table_name_text_box.TextChanged += (sender, e) =>
@@ -66,14 +64,12 @@ namespace TableConverter.Services.ConverterHandlerServices
             var quote_type_label = new Label()
             {
                 Content = "Quote Type:",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
             };
 
             var quote_type_combo_box = new ComboBox()
             {
                 ItemsSource = QuoteTypes.Keys.ToArray(),
                 SelectedItem = SelectedQuoteType,
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 HorizontalAlignment = HorizontalAlignment.Stretch,
             };
 
@@ -112,7 +108,6 @@ namespace TableConverter.Services.ConverterHandlerServices
             var insert_multi_rows_at_once_label = new Label()
             {
                 Content = "Insert Multiple Rows at Once",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 VerticalAlignment = VerticalAlignment.Center
             };
 

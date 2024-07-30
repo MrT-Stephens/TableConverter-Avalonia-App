@@ -5,7 +5,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using TableConverter.Interfaces;
+using TableConverter.DataModels;
 
 namespace TableConverter.Services.ConverterHandlerServices
 {
@@ -28,14 +28,12 @@ namespace TableConverter.Services.ConverterHandlerServices
             var json_lines_format_type_label = new Label()
             {
                 Content = "JSONLines File Format:",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
             };
 
             var json_lines_format_type_combo_box = new ComboBox()
             {
                 ItemsSource = JsonLinesFormatTypes,
                 SelectedItem = SelectedJsonLinesFormatType,
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 HorizontalAlignment = HorizontalAlignment.Stretch,
             };
 

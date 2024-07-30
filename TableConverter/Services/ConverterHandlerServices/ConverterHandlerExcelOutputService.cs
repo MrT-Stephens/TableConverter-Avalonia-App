@@ -2,10 +2,10 @@
 using Avalonia.Layout;
 using System;
 using System.Threading.Tasks;
-using TableConverter.Interfaces;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using Avalonia.Platform.Storage;
+using TableConverter.DataModels;
 
 namespace TableConverter.Services.ConverterHandlerServices
 {
@@ -25,13 +25,11 @@ namespace TableConverter.Services.ConverterHandlerServices
             var delimiter_label = new Label()
             {
                 Content = "Excel Workbook Sheet Name:",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as Avalonia.Media.FontFamily ?? throw new NullReferenceException(),
             };
 
             var delimiter_text_box = new TextBox()
             {
                 Text = ExcelSheetName,
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as Avalonia.Media.FontFamily ?? throw new NullReferenceException(),
             };
 
             delimiter_text_box.TextChanged += (sender, e) =>

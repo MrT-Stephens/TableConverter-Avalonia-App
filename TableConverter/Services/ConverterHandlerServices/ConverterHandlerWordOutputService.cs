@@ -1,14 +1,9 @@
 ﻿using Avalonia.Controls;
-using Avalonia.Layout;
 using Avalonia.Platform.Storage;
-using Avalonia.Threading;
-using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
 using NPOI.XWPF.UserModel;
 using System;
-using System.Reflection.Metadata;
 using System.Threading.Tasks;
-using TableConverter.Interfaces;
+using TableConverter.DataModels;
 
 namespace TableConverter.Services.ConverterHandlerServices
 {

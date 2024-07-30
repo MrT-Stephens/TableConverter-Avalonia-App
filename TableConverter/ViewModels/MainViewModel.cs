@@ -1,42 +1,25 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Media;
+using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System.Collections.ObjectModel;
-using System.Text;
+using SukiUI.Controls;
+using SukiUI.Models;
 using System;
+using System.Collections.ObjectModel;
+using System.Linq;
 using TableConverter.DataModels;
 using TableConverter.Services;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using TableConverter.Views;
 
 namespace TableConverter.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {
-    public MainViewModel()
-    {
-        LoadConverterTypes();
-        LoadDataGenerationTypes();
-
-        SelectedInputConverter = InputConverters.First();
-        SelectedOutputConverter = OutputConverters.First();
-        DataGenerationFields.Add(new DataGenerationField());
-
-        CurrentView = new TableConverterView()
-        {
-            DataContext = this
-        };
-    }
-
     #region Properties
 
-    // Main view properties
-    [ObservableProperty]
-    private Control? _CurrentView = null;
-
-    // Table converter view properties
+    // File converter view properties
     [ObservableProperty]
     private ObservableCollection<ConverterType> _InputConverters = [];
 
@@ -44,183 +27,155 @@ public partial class MainViewModel : ViewModelBase
     private ObservableCollection<ConverterType> _OutputConverters = [];
 
     [ObservableProperty]
-    private ConverterType _SelectedInputConverter;
+    private ObservableCollection<ConvertDocumentViewModel>? _ConvertDocuments = null;
 
     [ObservableProperty]
-    private ConverterType _SelectedOutputConverter;
-
-    [ObservableProperty]
-    private string[] _InputConverterSearchItems = [];
-
-    [ObservableProperty]
-    private string[] _OutputConverterSearchItems = [];
-
-    [ObservableProperty]
-    private string _AboutTitle = string.Empty;
-
-    [ObservableProperty]
-    private string _AboutText = string.Empty;
-
-    [ObservableProperty]
-    private ObservableCollection<StringWithIndex> _AboutHowToConvertText = [];
-
-    [ObservableProperty]
-    private string _InputTextBoxWatermarkText = string.Empty;
-
-    [ObservableProperty]
-    private string _OutputTextBoxWatermarkText = string.Empty;
-
-    [ObservableProperty]
-    private string _InputTextBoxText = string.Empty;
-
-    private string _ActualInputTextBoxText = string.Empty;
-
-    public string ActualInputTextBoxText
-    {
-        get => _ActualInputTextBoxText;
-        set
-        {
-            SetProperty(ref _ActualInputTextBoxText, value);
-            InputTextBoxText = ReduceLargeString(ref _ActualInputTextBoxText, 10000,
-                               "The input data is too large to display in this text box. Only showing 10,000 characters here to improve performance 😁");
-        }
-    }
-
-    [ObservableProperty]
-    private ObservableCollection<string> _EditColumnValues = [];
-
-    [ObservableProperty]
-    private ObservableCollection<string[]> _EditRowValues = [];
-
-    [ObservableProperty]
-    private string _OutputTextBoxText = string.Empty;
-
-    private string _ActualOutputTextBoxText = string.Empty;
-
-    public string ActualOutputTextBoxText
-    {
-        get => _ActualOutputTextBoxText;
-        set
-        {
-            SetProperty(ref _ActualOutputTextBoxText, value);
-            OutputTextBoxText = ReduceLargeString(ref _ActualOutputTextBoxText, 10000,
-                                "Only showing 10,000 characters here to improve performance. Please download or copy to view all generated data 😁");
-        }
-    }
-
-    // Data generation view properties
-    [ObservableProperty]
-    private ObservableCollection<DataGenerationField> _DataGenerationFields = new();
-
-    [ObservableProperty]
-    private int _NumberOfRows = 100;
-
-    public Dictionary<DataGenerationType, Type> DataGenerationTypes { get; set; } = new();
+    private ConvertDocumentViewModel? _SelectedConvertDocument = null;
 
     #endregion
+
+    #region Constructor
+
+    public MainViewModel()
+    {
+        LoadConverterTypes();
+
+        if (ConvertDocuments is null)
+        {
+            ConvertDocuments = new()
+            {
+                ExampleConverterDocument()
+            };
+        }
+    }
+
+    #endregion
+
+    #region Commands 
+
+    [RelayCommand]
+    private void ConvertFileNewFileButtonClicked()
+    {
+        SukiHost.ShowDialog(new TypesSelectorView(
+            "Please select a file type to input:",
+            App.Current?.Resources["FileSearchIcon"] as StreamGeometry ?? throw new NullReferenceException(),
+            InputConverters.Select(converter => converter.name).ToArray(),
+            OnFileTypeClicked
+        ), false, true);
+    }
+
+    [RelayCommand]
+    private void ConvertFileNextBackButtonClicked(object? parameter)
+    {
+        if (SelectedConvertDocument is not null && int.TryParse(parameter?.ToString(), out int pageIndex))
+        {
+            var count = SelectedConvertDocument.ProgressStepValues.Count();
+
+            if (pageIndex < 0 || pageIndex > count)
+            {
+                throw new ArgumentOutOfRangeException($"Page index must be between 0 and {count}.");
+            }
+
+            SelectedConvertDocument.ProgressStepIndex = pageIndex;
+        }
+    }
+
+    #endregion
+
+    #region Misc Functions
 
     private async void LoadConverterTypes()
     {
         var converters = await ConverterTypesService.GetConverterTypesAsync();
 
-        InputConverters = new ObservableCollection<ConverterType>(converters.Where(c => c.input_converter is not null).ToArray());
-        OutputConverters = new ObservableCollection<ConverterType>(converters.Where(c => c.output_converter is not null).ToArray());
-
-        InputConverterSearchItems = InputConverters.ToList().Select(c => c.name).ToArray();
-        OutputConverterSearchItems = OutputConverters.ToList().Select(c => c.name).ToArray();
+        InputConverters = new ObservableCollection<ConverterType>(converters.Where(c => c.inputConverter is not null).ToArray());
+        OutputConverters = new ObservableCollection<ConverterType>(converters.Where(c => c.outputConverter is not null).ToArray());
     }
 
-    private async void LoadDataGenerationTypes()
+    private ConvertDocumentViewModel ExampleConverterDocument()
     {
-        DataGenerationTypes = await DataGenerationTypesService.GetDataGenerationTypesAsync();
-    }
-
-    partial void OnSelectedInputConverterChanged(ConverterType value) => GenerateAboutText();
-
-    partial void OnSelectedOutputConverterChanged(ConverterType value) => GenerateAboutText();
-
-    private void GenerateAboutText()
-    {
-        AboutTitle = $"Convert {SelectedInputConverter?.name} to {SelectedOutputConverter?.name}";
-
-        AboutText = $"This versatile application enables users to easily convert {SelectedInputConverter?.name} files " +
-                    $"to {SelectedOutputConverter?.name} through its intuitive and user-friendly interface. All processing " +
-                    "for the conversion is performed locally, ensuring your data remains secure and private without the need " +
-                    "for network connectivity.";
-
-        AboutHowToConvertText = [
-            new StringWithIndex(0,
-            $"Simply open your {SelectedInputConverter?.name} file—it boasts the file extension " +
-            $"'{string.Join(" or ", SelectedInputConverter!.extensions)}'. The data seamlessly populates the grid view " +
-            "upon opening, setting the stage for effortless management."),
-
-            new StringWithIndex(1,
-            $"Navigate through your {SelectedInputConverter?.name} dataset with ease. The 'Edit Data' " +
-            "options offer a user-friendly interface to tailor your data as needed."),
-
-            new StringWithIndex(2,
-            $"Explore both the 'Edit Data' and 'Output Options' to customize your {SelectedInputConverter?.name} " +
-            "dataset. The 'Output Options' allow you to fine-tune settings related to the output file type, " +
-            "ensuring your converted data meets your specific requirements."),
-
-            new StringWithIndex(3,
-            $"When satisfied with your edits, effortlessly transform your {SelectedInputConverter?.name} " +
-            $"data into the desired {SelectedOutputConverter?.name} file type. Witness the conversion process " +
-            "in real-time, courtesy of the intuitive progress bar."),
-
-            new StringWithIndex(4,
-            $"Upon completion, choose to either save your refined {SelectedOutputConverter?.name} file with a" +
-            "simple click of the 'Save File' button or swiftly copy the transformed data using the 'Copy' button."),
-
-            new StringWithIndex(5,
-            $"Enjoy your transformed data 😁")
-        ];
-
-        InputTextBoxWatermarkText = $"Please open or paste a {SelectedInputConverter?.name} file to begin the conversion process 😊";
-
-        OutputTextBoxWatermarkText = $"Once the {SelectedInputConverter?.name} file is converted you will be able to view the converted {SelectedOutputConverter?.name} file data here 🫠";
-    }
-
-    private static string ReduceLargeString(ref string large_string, int max_length, string message)
-    {
-        if (large_string.Length > max_length)
+        return new ConvertDocumentViewModel()
         {
-            byte[]? bytes = Encoding.UTF8.GetBytes(large_string);
-
-            if (bytes is not null)
+            Name = "Example.csv",
+            InputConverter = InputConverters.First(converter => converter.name == "CSV"),
+            InputFileText = new AvaloniaEdit.Document.TextDocument()
             {
-                string new_string = Encoding.UTF8.GetString(bytes, 0, max_length);
-
-                new_string += $"{Environment.NewLine}[...]{Environment.NewLine}{Environment.NewLine}{message}{Environment.NewLine}";
-
-                return new_string;
+                FileName = "Example.csv",
+                Text =
+                    "FIRST_NAME,LAST_NAME,GENDER,COUNTRY_CODE" + Environment.NewLine +
+                    "Luxeena,Binoy,F,GB" + Environment.NewLine +
+                    "Lisa,Allen,F,GB" + Environment.NewLine +
+                    "Richard,Wood,M,GB" + Environment.NewLine +
+                    "Luke,Murphy,M,GB" + Environment.NewLine +
+                    "Adrian,Heacock,M,GB" + Environment.NewLine +
+                    "Elvinas,Palubinskas,M,GB" + Environment.NewLine +
+                    "Sian,Turner,F,GB" + Environment.NewLine +
+                    "Potar,Potts,M,GB" + Environment.NewLine +
+                    "Janis,Chrisp,F,GB" + Environment.NewLine +
+                    "Sarah,Proffitt,F,GB" + Environment.NewLine +
+                    "Calissa,Noonan,F,GB" + Environment.NewLine +
+                    "Andrew,Connors,M,GB" + Environment.NewLine +
+                    "Siann,Tynan,F,GB" + Environment.NewLine +
+                    "Olivia,Parry,F,GB" + Environment.NewLine
             }
-        }
-
-        return large_string;
+        };
     }
 
-    #region Commands
-
-    [RelayCommand]
-    private void AddFieldButtonClicked(DataGenerationField field)
+    private async void OnFileTypeClicked(string converterName)
     {
-        if (DataGenerationFields.Last() == field)
-        {
-            DataGenerationFields.Add(new DataGenerationField());
-        }
-        else
-        {
-            DataGenerationFields.Insert(DataGenerationFields.IndexOf(field) + 1, new DataGenerationField());
-        }
-    }
+        var topLevel = TopLevel.GetTopLevel(((IClassicDesktopStyleApplicationLifetime)App.Current?.ApplicationLifetime!).MainWindow);
 
-    [RelayCommand]
-    private void RemoveFieldButtonClicked(DataGenerationField field)
-    {
-        if (DataGenerationFields.Count > 1)
+        if (topLevel is not null && SelectedConvertDocument is not null)
         {
-            DataGenerationFields.Remove(field);
+            var doc = new ConvertDocumentViewModel()
+            {
+                InputConverter = InputConverters.First(converter => converter.name == converterName),
+            };
+
+            var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+            {
+                Title = $"Open {doc.InputConverter.name} File",
+                AllowMultiple = false,
+                FileTypeFilter =
+                [
+                    new(doc.InputConverter.name)
+                    {
+                        Patterns = doc.InputConverter.extensions.Select(ext => $"*{ext}").ToArray(),
+                        MimeTypes = doc.InputConverter.mimeTypes
+                    },
+                    FilePickerFileTypes.All
+                ]
+            });
+
+            if (files.Count >= 1 && ConvertDocuments is not null)
+            {
+                ConvertDocuments.Add(doc);
+
+                var loadingDoc = ConvertDocuments.Last();
+                SelectedConvertDocument = loadingDoc;
+
+                if (loadingDoc.InputConverter is not null)
+                {
+                    loadingDoc.IsBusy = true;
+
+                    loadingDoc.Name = files[0].Name;
+                    loadingDoc.Path = files[0].Path.AbsolutePath;
+
+                    loadingDoc.InputFileText = new AvaloniaEdit.Document.TextDocument()
+                    {
+                        FileName = files[0].Name,
+                        Text = await loadingDoc.InputConverter.inputConverter!.ReadFileAsync(files[0])
+                    };
+
+                    loadingDoc.IsBusy = false;
+
+                    await SukiHost.ShowToast(new ToastModel(
+                        "File Added",
+                        $"The file '{files[0].Name}' has been added to your documents.",
+                        SukiUI.Enums.NotificationType.Success)
+                    );
+                }
+            }
         }
     }
 

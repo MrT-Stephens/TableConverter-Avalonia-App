@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TableConverter.DataModels;
-using TableConverter.Interfaces;
 
 namespace TableConverter.Services.ConverterHandlerServices
 {
@@ -32,14 +31,12 @@ namespace TableConverter.Services.ConverterHandlerServices
             var json_format_type_label = new Label()
             {
                 Content = "JSON File Format:",
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
             };
 
             var json_format_type_combo_box = new ComboBox()
             {
                 ItemsSource = JsonFormatTypes,
                 SelectedItem = SelectedJsonFormatType,
-                FontFamily = App.Current?.Resources["JetBrainsMono"] as FontFamily ?? throw new NullReferenceException(),
                 HorizontalAlignment = HorizontalAlignment.Stretch,
             };
 
