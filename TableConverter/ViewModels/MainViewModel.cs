@@ -9,6 +9,7 @@ using SukiUI.Models;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using TableConverter.DataModels;
 using TableConverter.Services;
 using TableConverter.Views;
@@ -65,18 +66,52 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void ConvertFileNextBackButtonClicked(object? parameter)
+    private async Task ConvertFileNextBackButtonClicked(object? parameter)
     {
-        if (SelectedConvertDocument is not null && int.TryParse(parameter?.ToString(), out int pageIndex))
+        var currentDoc = SelectedConvertDocument;
+
+        if (currentDoc is not null && int.TryParse(parameter?.ToString(), out int pageIndex))
         {
-            var count = SelectedConvertDocument.ProgressStepValues.Count();
+            var count = currentDoc.ProgressStepValues.Count();
 
             if (pageIndex < 0 || pageIndex > count)
             {
                 throw new ArgumentOutOfRangeException($"Page index must be between 0 and {count}.");
             }
+            else if (pageIndex == 1 && 
+                     currentDoc.ProgressStepIndex < 1 && 
+                     currentDoc.EditRows.Count == 0 && 
+                     currentDoc.EditHeaders.Count == 0 &&
+                     currentDoc.InputConverter is not null)
+            {
+                currentDoc.IsBusy = true;
 
-            SelectedConvertDocument.ProgressStepIndex = pageIndex;
+                var data = await currentDoc.InputConverter.inputConverter!.ReadTextAsync(currentDoc.InputFileText.Text);
+
+                if (data != null)
+                {
+                    currentDoc.EditHeaders = new(data.headers);
+                    currentDoc.EditRows = new(data.rows);
+
+                    currentDoc.IsBusy = false;
+
+                    await SukiHost.ShowToast(new ToastModel(
+                        "File Converted",
+                        $"The file '{currentDoc.Name}' has been converted to tabular data.",
+                        SukiUI.Enums.NotificationType.Success)
+                    );
+                }
+                else
+                {
+                    currentDoc.IsBusy = false;
+                }
+            }
+            else if (pageIndex == 2 && currentDoc.ProgressStepIndex < 2)
+            {
+
+            }
+
+            currentDoc.ProgressStepIndex = pageIndex;
         }
     }
 
@@ -117,7 +152,23 @@ public partial class MainViewModel : ViewModelBase
                     "Andrew,Connors,M,GB" + Environment.NewLine +
                     "Siann,Tynan,F,GB" + Environment.NewLine +
                     "Olivia,Parry,F,GB" + Environment.NewLine
-            }
+            },
+            EditHeaders = new()
+            {
+                "FIRST_NAME",
+                "LAST_NAME",
+                "GENDER",
+                "COUNTRY_CODE",
+            },
+            EditRows = 
+            [
+                [
+                    "Luxeena",
+                    "Binoy",
+                    "F",
+                    "GB",
+                ]
+            ]
         };
     }
 

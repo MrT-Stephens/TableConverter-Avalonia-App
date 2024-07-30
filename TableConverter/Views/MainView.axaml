@@ -153,9 +153,16 @@
                                         Padding="10">
                         <components:SpacedGrid RowDefinitions="*,Auto"
                                                RowSpacing="10">
-                          <DataGrid Grid.Row="0"
-                                    ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                                    ScrollViewer.VerticalScrollBarVisibility="Visible" />
+                          <components:DynamicDataGrid Grid.Row="0"
+                                                      SelectionMode="Single"
+                                                      AutoGenerateColumns="False"
+                                                      CanUserResizeColumns="True"
+                                                      MinHeight="200"
+                                                      MinWidth="200"
+                                                      Headers="{Binding SelectedConvertDocument.EditHeaders}"
+                                                      Rows="{Binding SelectedConvertDocument.EditRows}"
+                                                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                                      ScrollViewer.VerticalScrollBarVisibility="Visible" />
                           <!-- Footer Buttons -->
                           <components:SpacedGrid Grid.Row="1"
                                                  ColumnDefinitions="Auto,*,Auto"
