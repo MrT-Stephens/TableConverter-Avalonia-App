@@ -10,5 +10,8 @@
                    Icon="/Assets/avalonia-logo.ico"
                    Title="TableConverter"
                    BackgroundAnimationEnabled="True">
+  <sukiUi:SukiWindow.LogoContent>
+    <PathIcon Data="{StaticResource TableEdit}" />
+  </sukiUi:SukiWindow.LogoContent>
   <views:MainView />
 </sukiUi:SukiWindow>
