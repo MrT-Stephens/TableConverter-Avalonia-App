@@ -33,15 +33,17 @@
                    Text="{Binding Title}"
                    VerticalAlignment="Center" />
       </StackPanel>
-      <ItemsControl ItemsSource="{Binding Options}">
-        <ItemsControl.ItemsPanel>
-          <ItemsPanelTemplate>
-            <StackPanel Orientation="Vertical"
-                        Spacing="10">
-            </StackPanel>
-          </ItemsPanelTemplate>
-        </ItemsControl.ItemsPanel>
-      </ItemsControl>
+      <sukiUi:GlassCard Padding="10">
+        <ItemsControl ItemsSource="{Binding Options}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Orientation="Vertical"
+                          Spacing="10">
+              </StackPanel>
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+        </ItemsControl>
+      </sukiUi:GlassCard>
       <Grid ColumnDefinitions="*,*">
         <Button Grid.Column="1"
                 Command="{Binding ContinueClickedCommand}">

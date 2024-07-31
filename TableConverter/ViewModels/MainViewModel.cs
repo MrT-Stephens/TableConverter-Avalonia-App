@@ -9,7 +9,6 @@ using SukiUI.Models;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading.Tasks;
 using TableConverter.DataModels;
 using TableConverter.Services;
 using TableConverter.Views;
@@ -96,6 +95,8 @@ public partial class MainViewModel : ViewModelBase
 
                         currentDoc.IsBusy = false;
 
+                        currentDoc.ProgressStepIndex = pageIndex;
+
                         await SukiHost.ShowToast(new ToastModel(
                             "File Converted",
                             $"The file '{currentDoc.Name}' has been converted to tabular data.",
@@ -114,7 +115,7 @@ public partial class MainViewModel : ViewModelBase
                 {
                     SukiHost.ShowDialog(new ConvertFilesOptionsView(
                         $"How would you like your {currentDoc.InputConverter.name} file inputted?",
-                        App.Current?.Resources["FileSearchIcon"] as StreamGeometry ?? throw new NullReferenceException(),
+                        App.Current?.Resources["OptionsIcon"] as StreamGeometry ?? throw new NullReferenceException(),
                         currentDoc.InputConverter.inputConverter!.Controls,
                         processDoc
                     ), false, true);
@@ -153,9 +154,11 @@ public partial class MainViewModel : ViewModelBase
 
                                     currentDoc.IsBusy = false;
 
+                                    currentDoc.ProgressStepIndex = pageIndex;
+
                                     await SukiHost.ShowToast(new ToastModel(
                                         "File Converted",
-                                        $"The file '{currentDoc.Name}' has been converted to tabular data.",
+                                        $"The file '{currentDoc.Name}' has been converted to a '{currentDoc.OutputConverter.name}' file.",
                                         SukiUI.Enums.NotificationType.Success)
                                     );
                                 }
@@ -171,7 +174,7 @@ public partial class MainViewModel : ViewModelBase
                             {
                                 SukiHost.ShowDialog(new ConvertFilesOptionsView(
                                     $"How would you like your {currentDoc.OutputConverter.name} file outputted?",
-                                    App.Current?.Resources["FileSearchIcon"] as StreamGeometry ?? throw new NullReferenceException(),
+                                    App.Current?.Resources["OptionsIcon"] as StreamGeometry ?? throw new NullReferenceException(),
                                     currentDoc.OutputConverter.outputConverter!.Controls,
                                     processDoc
                                 ), false, true);
@@ -184,8 +187,10 @@ public partial class MainViewModel : ViewModelBase
                     }
                 ), false, true);
             }
-
-            currentDoc.ProgressStepIndex = pageIndex;
+            else
+            {
+                currentDoc.ProgressStepIndex = pageIndex;
+            }
         }
     }
 
