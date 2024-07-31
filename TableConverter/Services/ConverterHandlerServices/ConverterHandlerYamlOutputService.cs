@@ -12,7 +12,7 @@ namespace TableConverter.Services.ConverterHandlerServices
             Controls = null;
         }
 
-        public override Task<string> ConvertAsync(string[] headers, string[][] rows, object? progress_bar)
+        public override Task<string> ConvertAsync(string[] headers, string[][] rows)
         {
             return Task.Run(() =>
             {
@@ -28,8 +28,6 @@ namespace TableConverter.Services.ConverterHandlerServices
                         {
                             writer.Write($"\t{headers[j].Replace(' ', '_')}: {rows[i][j]}{Environment.NewLine}");
                         }
-
-                        SetProgressBarValue(progress_bar, i, 0, rows.LongLength - 1);
                     }
 
                     return writer.ToString();

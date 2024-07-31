@@ -119,7 +119,19 @@
                                                    ShowLineNumbers="True"
                                                    Document="{Binding SelectedConvertDocument.InputFileText}"
                                                    ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                                                   ScrollViewer.VerticalScrollBarVisibility="Visible" />
+                                                   ScrollViewer.VerticalScrollBarVisibility="Visible">
+                            <avaloniaEdit:TextEditor.Options>
+                              <avaloniaEdit:TextEditorOptions AllowScrollBelowDocument="False"
+                                                              HighlightCurrentLine="True"
+                                                              IndentationSize="5" 
+                                                              ShowTabs="True"
+                                                              EnableRectangularSelection="True"
+                                                              ShowBoxForControlCharacters="True" 
+                                                              ShowEndOfLine="True"
+                                                              ShowSpaces="True" 
+                                                              ShowColumnRulers="True" />
+                            </avaloniaEdit:TextEditor.Options>
+                          </avaloniaEdit:TextEditor>
                           <!-- Footer Buttons -->
                           <components:SpacedGrid Grid.Row="1"
                                                  ColumnDefinitions="*,Auto"
@@ -212,7 +224,19 @@
                                                    ShowLineNumbers="True"
                                                    Document="{Binding SelectedConvertDocument.OutputFileText}"
                                                    ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                                                   ScrollViewer.VerticalScrollBarVisibility="Visible" />
+                                                   ScrollViewer.VerticalScrollBarVisibility="Visible">
+                            <avaloniaEdit:TextEditor.Options>
+                              <avaloniaEdit:TextEditorOptions AllowScrollBelowDocument="False"
+                                                              HighlightCurrentLine="True"
+                                                              IndentationSize="5"
+                                                              ShowTabs="True"
+                                                              EnableRectangularSelection="True"
+                                                              ShowBoxForControlCharacters="True"
+                                                              ShowEndOfLine="True"
+                                                              ShowSpaces="True"
+                                                              ShowColumnRulers="True" />
+                            </avaloniaEdit:TextEditor.Options>
+                          </avaloniaEdit:TextEditor>
                           <!-- Footer Buttons -->
                           <components:SpacedGrid Grid.Row="1"
                                                  ColumnDefinitions="Auto,*,Auto"

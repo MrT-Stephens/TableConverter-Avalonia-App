@@ -25,6 +25,8 @@ namespace TableConverter.Services.ConverterHandlerServices
 
         public override void InitializeControls()
         {
+            Controls = new();
+
             var json_format_type_stack_panel = new StackPanel()
             {
                 Orientation = Orientation.Vertical
@@ -86,7 +88,7 @@ namespace TableConverter.Services.ConverterHandlerServices
             Controls?.Add(minify_json_stack_panel);
         }
 
-        public override Task<string> ConvertAsync(string[] headers, string[][] rows, object? progress_bar)
+        public override Task<string> ConvertAsync(string[] headers, string[][] rows)
         {
             return Task.Run(() =>
             {
@@ -104,8 +106,6 @@ namespace TableConverter.Services.ConverterHandlerServices
                                 {
                                     json_objects[i].Add(headers[j].Replace(' ', '_'), rows[i][j]);
                                 }
-
-                                SetProgressBarValue(progress_bar, i, 0, rows.LongLength - 1);
                             }
 
                             return JsonConvert.SerializeObject(json_objects, MinifyJson ? Formatting.None : Formatting.Indented);
@@ -119,8 +119,6 @@ namespace TableConverter.Services.ConverterHandlerServices
                             for (long i = 0; i < rows.LongLength; i++)
                             {
                                 json_array[i + 1] = rows[i];
-
-                                SetProgressBarValue(progress_bar, i, 0, rows.LongLength - 1);
                             }
 
                             return JsonConvert.SerializeObject(json_array, MinifyJson ? Formatting.None : Formatting.Indented);
@@ -135,8 +133,6 @@ namespace TableConverter.Services.ConverterHandlerServices
                                 {
                                     { headers[i].Replace(' ', '_'), rows.Select(row => row[i]).ToArray() }
                                 };
-
-                                SetProgressBarValue(progress_bar, i, 0, headers.LongLength - 1);
                             }
 
                             return JsonConvert.SerializeObject(json_objects, MinifyJson ? Formatting.None : Formatting.Indented);
@@ -156,8 +152,6 @@ namespace TableConverter.Services.ConverterHandlerServices
                                 {
                                     { i + 1, rows[i] }
                                 };
-
-                                SetProgressBarValue(progress_bar, i, 0, rows.LongLength - 1);
                             }
 
                             return JsonConvert.SerializeObject(json_objects, MinifyJson ? Formatting.None : Formatting.Indented);

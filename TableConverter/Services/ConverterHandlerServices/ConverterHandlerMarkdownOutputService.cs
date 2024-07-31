@@ -34,6 +34,8 @@ namespace TableConverter.Services.ConverterHandlerServices
 
         public override void InitializeControls()
         {
+            Controls = new();
+
             var table_type_stack_panel = new StackPanel()
             {
                 Orientation = Orientation.Vertical
@@ -155,7 +157,7 @@ namespace TableConverter.Services.ConverterHandlerServices
             Controls?.Add(bold_first_column_stack_panel);
         }
 
-        public override Task<string> ConvertAsync(string[] headers, string[][] rows, object? progress_bar)
+        public override Task<string> ConvertAsync(string[] headers, string[][] rows)
         {
             return Task.Run(() =>
             {

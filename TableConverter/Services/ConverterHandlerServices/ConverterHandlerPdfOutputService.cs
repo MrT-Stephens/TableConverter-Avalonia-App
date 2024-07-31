@@ -47,6 +47,8 @@ namespace TableConverter.Services.ConverterHandlerServices
 
         public override void InitializeControls()
         {
+            Controls = new();
+
             var ColourDataTemplate = new FuncDataTemplate<string>((item, _) =>
             {
                 var stack_panel = new StackPanel 
@@ -198,7 +200,7 @@ namespace TableConverter.Services.ConverterHandlerServices
             Controls?.Add(show_grid_lines_stack_panel);
         }
 
-        public override Task<string> ConvertAsync(string[] headers, string[][] rows, object? progress_bar)
+        public override Task<string> ConvertAsync(string[] headers, string[][] rows)
         {
             return Task.Run(() =>
             {
@@ -239,8 +241,6 @@ namespace TableConverter.Services.ConverterHandlerServices
                         });
                     });
                 });
-
-                SetProgressBarValue(progress_bar, 100, 0, 100);
 
                 return $"Please save the '.pdf' file to view the generated file 😁{Environment.NewLine}";
             });

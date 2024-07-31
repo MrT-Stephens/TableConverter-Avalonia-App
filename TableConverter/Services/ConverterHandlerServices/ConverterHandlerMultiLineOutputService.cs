@@ -13,6 +13,8 @@ namespace TableConverter.Services.ConverterHandlerServices
 
         public override void InitializeControls()
         {
+            Controls = new();
+
             var row_separator_stack_panel = new StackPanel()
             {
                 Orientation = Orientation.Vertical
@@ -42,7 +44,7 @@ namespace TableConverter.Services.ConverterHandlerServices
             Controls?.Add(row_separator_stack_panel);
         }
 
-        public override Task<string> ConvertAsync(string[] headers, string[][] rows, object? progress_bar)
+        public override Task<string> ConvertAsync(string[] headers, string[][] rows)
         {
             return Task.Run(() =>
             {
@@ -64,8 +66,6 @@ namespace TableConverter.Services.ConverterHandlerServices
                         {
                             writer.WriteLine(rows[i][j]);
                         }
-
-                        SetProgressBarValue(progress_bar, i, 0, rows.LongLength - 1);
                     }
 
                     return writer.ToString();

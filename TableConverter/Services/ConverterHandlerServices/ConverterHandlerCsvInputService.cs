@@ -19,6 +19,8 @@ namespace TableConverter.Services.ConverterHandlerServices
 
         public override void InitializeControls()
         {
+            Controls = new();
+
             var delimiter_stack_panel = new StackPanel()
             {
                 Orientation = Orientation.Vertical

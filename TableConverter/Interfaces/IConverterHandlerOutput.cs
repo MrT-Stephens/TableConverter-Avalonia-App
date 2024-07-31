@@ -12,7 +12,7 @@ namespace TableConverter.Interfaces
 
         public void InitializeControls();
 
-        public Task<string> ConvertAsync(string[] headers, string[][] rows, object? progress_bar);
+        public Task<string> ConvertAsync(string[] headers, string[][] rows);
 
         public Task SaveFileAsync(IStorageFile output, ReadOnlyMemory<byte> buffer);
     }

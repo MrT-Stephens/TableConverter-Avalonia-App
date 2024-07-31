@@ -16,6 +16,7 @@ namespace TableConverter.Services.ConverterHandlerServices
 
         public override void InitializeControls()
         {
+            Controls = new();
 
             var minify_html_stack_panel = new StackPanel()
             {
@@ -78,7 +79,7 @@ namespace TableConverter.Services.ConverterHandlerServices
             Controls?.Add(include_thead_tbody_stack_panel);
         }
 
-        public override Task<string> ConvertAsync(string[] headers, string[][] rows, object? progress_bar)
+        public override Task<string> ConvertAsync(string[] headers, string[][] rows)
         {
             return Task.Run(() =>
             {
@@ -133,8 +134,6 @@ namespace TableConverter.Services.ConverterHandlerServices
                     {
                         string_writer.Write($"{(MinifyHtml ? "" : Environment.NewLine + new string('\t', --tab_count))}</tbody>");
                     }
-
-                    SetProgressBarValue(progress_bar, i, 0, rows.LongLength - 1);
                 }
 
                 string_writer.Write($"{(MinifyHtml ? "" : Environment.NewLine)}</table>");

@@ -58,15 +58,15 @@ public partial class MainViewModel : ViewModelBase
     private void ConvertFileNewFileButtonClicked()
     {
         SukiHost.ShowDialog(new TypesSelectorView(
-            "Please select a file type to input:",
+            "Please select a file type to input",
             App.Current?.Resources["FileSearchIcon"] as StreamGeometry ?? throw new NullReferenceException(),
             InputConverters.Select(converter => converter.name).ToArray(),
-            OnFileTypeClicked
+            OnInputFileTypeClicked
         ), false, true);
     }
 
     [RelayCommand]
-    private async Task ConvertFileNextBackButtonClicked(object? parameter)
+    private void ConvertFileNextBackButtonClicked(object? parameter)
     {
         var currentDoc = SelectedConvertDocument;
 
@@ -80,35 +80,109 @@ public partial class MainViewModel : ViewModelBase
             }
             else if (pageIndex == 1 && 
                      currentDoc.ProgressStepIndex < 1 && 
-                     currentDoc.EditRows.Count == 0 && 
-                     currentDoc.EditHeaders.Count == 0 &&
                      currentDoc.InputConverter is not null)
             {
-                currentDoc.IsBusy = true;
-
-                var data = await currentDoc.InputConverter.inputConverter!.ReadTextAsync(currentDoc.InputFileText.Text);
-
-                if (data != null)
+                // Process the inputted text file to the tabular data.
+                Action processDoc = async () =>
                 {
-                    currentDoc.EditHeaders = new(data.headers);
-                    currentDoc.EditRows = new(data.rows);
+                    currentDoc.IsBusy = true;
 
-                    currentDoc.IsBusy = false;
+                    var data = await currentDoc.InputConverter.inputConverter!.ReadTextAsync(currentDoc.InputFileText.Text);
 
-                    await SukiHost.ShowToast(new ToastModel(
-                        "File Converted",
-                        $"The file '{currentDoc.Name}' has been converted to tabular data.",
-                        SukiUI.Enums.NotificationType.Success)
-                    );
+                    if (data != null)
+                    {
+                        currentDoc.EditHeaders = new(data.headers);
+                        currentDoc.EditRows = new(data.rows);
+
+                        currentDoc.IsBusy = false;
+
+                        await SukiHost.ShowToast(new ToastModel(
+                            "File Converted",
+                            $"The file '{currentDoc.Name}' has been converted to tabular data.",
+                            SukiUI.Enums.NotificationType.Success)
+                        );
+                    }
+                    else
+                    {
+                        currentDoc.IsBusy = false;
+                    }
+                };
+
+                currentDoc.InputConverter.inputConverter!.InitializeControls();
+
+                if (currentDoc.InputConverter.inputConverter!.Controls is not null)
+                {
+                    SukiHost.ShowDialog(new ConvertFilesOptionsView(
+                        $"How would you like your {currentDoc.InputConverter.name} file inputted?",
+                        App.Current?.Resources["FileSearchIcon"] as StreamGeometry ?? throw new NullReferenceException(),
+                        currentDoc.InputConverter.inputConverter!.Controls,
+                        processDoc
+                    ), false, true);
                 }
                 else
                 {
-                    currentDoc.IsBusy = false;
+                    processDoc.Invoke();
                 }
             }
             else if (pageIndex == 2 && currentDoc.ProgressStepIndex < 2)
             {
+                // Process the tabular data to the outputted file type.
+                SukiHost.ShowDialog(new TypesSelectorView(
+                    "Please select a file type to output",
+                    App.Current?.Resources["FileSearchIcon"] as StreamGeometry ?? throw new NullReferenceException(),
+                    OutputConverters.Select(converter => converter.name).ToArray(),
+                    (converterName) =>
+                    {
+                        currentDoc.OutputConverter = OutputConverters.First(converter => converter.name == converterName);
 
+                        if (currentDoc.OutputConverter is not null) 
+                        {
+                            Action processDoc = async () =>
+                            {
+                                currentDoc.IsBusy = true;
+
+                                var data = await currentDoc.OutputConverter.outputConverter!.ConvertAsync(currentDoc.EditHeaders.ToArray(), currentDoc.EditRows.ToArray());
+
+                                if (data != null)
+                                {
+                                    currentDoc.OutputFileText = new AvaloniaEdit.Document.TextDocument()
+                                    { 
+                                        FileName = currentDoc.Name,
+                                        Text = data 
+                                    };
+
+                                    currentDoc.IsBusy = false;
+
+                                    await SukiHost.ShowToast(new ToastModel(
+                                        "File Converted",
+                                        $"The file '{currentDoc.Name}' has been converted to tabular data.",
+                                        SukiUI.Enums.NotificationType.Success)
+                                    );
+                                }
+                                else
+                                {
+                                    currentDoc.IsBusy = false;
+                                }
+                            };
+
+                            currentDoc.OutputConverter.outputConverter!.InitializeControls();
+
+                            if (currentDoc.OutputConverter.outputConverter!.Controls is not null)
+                            {
+                                SukiHost.ShowDialog(new ConvertFilesOptionsView(
+                                    $"How would you like your {currentDoc.OutputConverter.name} file outputted?",
+                                    App.Current?.Resources["FileSearchIcon"] as StreamGeometry ?? throw new NullReferenceException(),
+                                    currentDoc.OutputConverter.outputConverter!.Controls,
+                                    processDoc
+                                ), false, true);
+                            }
+                            else
+                            {
+                                processDoc.Invoke();
+                            }
+                        }
+                    }
+                ), false, true);
             }
 
             currentDoc.ProgressStepIndex = pageIndex;
@@ -152,27 +226,11 @@ public partial class MainViewModel : ViewModelBase
                     "Andrew,Connors,M,GB" + Environment.NewLine +
                     "Siann,Tynan,F,GB" + Environment.NewLine +
                     "Olivia,Parry,F,GB" + Environment.NewLine
-            },
-            EditHeaders = new()
-            {
-                "FIRST_NAME",
-                "LAST_NAME",
-                "GENDER",
-                "COUNTRY_CODE",
-            },
-            EditRows = 
-            [
-                [
-                    "Luxeena",
-                    "Binoy",
-                    "F",
-                    "GB",
-                ]
-            ]
+            }
         };
     }
 
-    private async void OnFileTypeClicked(string converterName)
+    private async void OnInputFileTypeClicked(string converterName)
     {
         var topLevel = TopLevel.GetTopLevel(((IClassicDesktopStyleApplicationLifetime)App.Current?.ApplicationLifetime!).MainWindow);
 

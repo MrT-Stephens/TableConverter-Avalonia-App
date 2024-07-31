@@ -38,8 +38,7 @@ namespace TableConverter.Components
         {
             base.OnInitialized();
 
-            ItemsSource = Rows;
-
+            UpdateRows();
             UpdateColumns();
         }
 
@@ -47,17 +46,26 @@ namespace TableConverter.Components
         {
             base.OnPropertyChanged(change);
 
-            if (change.Property.Name == nameof(HeadersProperty))
+            if (change.Property.Name == nameof(Headers))
             {
                 UpdateColumns();
             }
+            else if (change.Property.Name == nameof(Rows))
+            {
+                UpdateRows();
+            }
+        }
+
+        private void UpdateRows()
+        {
+            ItemsSource = Rows;
         }
 
         private void UpdateColumns()
         {
             Columns.Clear();
 
-            for (int i = 0; i < Headers.Count; ++i)
+            for (int i = 0; Headers is not null && i < Headers.Count; ++i)
             {
                 Columns.Add(new DataGridTextColumn
                 {

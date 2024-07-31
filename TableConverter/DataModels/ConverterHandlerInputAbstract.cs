@@ -10,13 +10,6 @@ namespace TableConverter.DataModels
     {
         public Collection<Control>? Controls { get; set; }
 
-        protected ConverterHandlerInputAbstract()
-        {
-            Controls = new Collection<Control>();
-
-            InitializeControls();
-        }
-
         public virtual async Task<string> ReadFileAsync(IStorageFile storage_file)
         {
             using (var reader = new System.IO.StreamReader(await storage_file.OpenReadAsync()))

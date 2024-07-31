@@ -23,6 +23,8 @@ namespace TableConverter.Services.ConverterHandlerServices
 
         public override void InitializeControls()
         {
+            Controls = new();
+
             var json_format_type_stack_panel = new StackPanel()
             {
                 Orientation = Orientation.Vertical

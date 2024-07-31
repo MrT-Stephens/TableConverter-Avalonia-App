@@ -17,6 +17,8 @@ namespace TableConverter.Services.ConverterHandlerServices
 
         public override void InitializeControls()
         {
+            Controls = new();
+
             var delimiter_stack_panel = new StackPanel()
             {
                 Orientation = Orientation.Vertical
@@ -46,7 +48,7 @@ namespace TableConverter.Services.ConverterHandlerServices
             Controls?.Add(delimiter_stack_panel);
         }
 
-        public override Task<string> ConvertAsync(string[] headers, string[][] rows, object? progress_bar)
+        public override Task<string> ConvertAsync(string[] headers, string[][] rows)
         {
             return Task.Run(() =>
             {
@@ -70,8 +72,6 @@ namespace TableConverter.Services.ConverterHandlerServices
                         sheet.AutoSizeColumn((int)i);
                         row.CreateCell((int)j).SetCellValue(rows[i][j]);
                     }
-
-                    SetProgressBarValue(progress_bar, i, 0, rows.LongLength - 1);
                 }
 
                 return $"Please save the '.xlsx' file to view the generated file 😁{Environment.NewLine}";
