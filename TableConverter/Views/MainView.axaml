@@ -31,7 +31,144 @@
           <sukiUi:GlassCard IsAnimated="True"
                             Margin="20"
                             Padding="10">
-            
+            <sukiUi:SettingsLayout>
+              <sukiUi:SettingsLayout.Items>
+                <!-- Array of SettingsLayoutItems -->
+                <components:XamlArray x:TypeArguments="sukiUi:SettingsLayoutItem">
+                  <!-- "What is TableDConverter" Section -->
+                  <sukiUi:SettingsLayoutItem Header="What is TableConverter?">
+                    <sukiUi:SettingsLayoutItem.Content>
+                      <TextBlock Text="Hello" />
+                    </sukiUi:SettingsLayoutItem.Content>
+                  </sukiUi:SettingsLayoutItem>
+                  <!-- "Convert File Types" Section -->
+                  <sukiUi:SettingsLayoutItem Header="Convert File Types">
+                    <sukiUi:SettingsLayoutItem.Content>
+                      <StackPanel Spacing="10">
+                        <TextBlock Classes="h4"
+                                   Text="Accepted input files:" />
+                        <!-- Input Converters Items Control -->
+                        <ItemsControl ItemsSource="{Binding InputConverters}">
+                          <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                              <StackPanel Spacing="10" />
+                            </ItemsPanelTemplate>
+                          </ItemsControl.ItemsPanel>
+                          <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                              <sukiUi:GlassCard IsAnimated="True">
+                                <components:SpacedGrid RowDefinitions="Auto,*"
+                                                       RowSpacing="10"
+                                                       ColumnDefinitions="Auto,*"
+                                                       ColumnSpacing="10">
+                                  <!-- Input Converter Name -->
+                                  <TextBlock Grid.Column="0"
+                                             Grid.Row="0"
+                                             Classes="h4 Primary"
+                                             Text="{Binding name}"
+                                             FontWeight="DemiBold" />
+                                  <!-- Input Converter Extensions -->
+                                  <ItemsControl Grid.Column="1"
+                                                Grid.Row="0"
+                                                HorizontalAlignment="Right"
+                                                ItemsSource="{Binding extensions}">
+                                    <ItemsControl.ItemsPanel>
+                                      <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal"
+                                                    Spacing="5" />
+                                      </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                      <DataTemplate>
+                                        <sukiUi:GlassCard IsAnimated="True"
+                                                          IsOpaque="True"
+                                                          Padding="15">
+                                          <TextBlock Classes="h5"
+                                                     Text="{Binding}" />
+                                        </sukiUi:GlassCard>
+                                      </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                  </ItemsControl>
+                                  <!-- Input Converter Description -->
+                                  <TextBlock Grid.Column="0"
+                                             Grid.Row="1"
+                                             Grid.ColumnSpan="2"
+                                             Classes="h6"
+                                             Text="{Binding description}"
+                                             TextWrapping="Wrap" />
+                                </components:SpacedGrid>
+                              </sukiUi:GlassCard>
+                            </DataTemplate>
+                          </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock Classes="h4"
+                                   Text="Accepted output files:" />
+                        <!-- Output Converters Items Control -->
+                        <ItemsControl ItemsSource="{Binding OutputConverters}">
+                          <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                              <StackPanel Spacing="10" />
+                            </ItemsPanelTemplate>
+                          </ItemsControl.ItemsPanel>
+                          <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                              <sukiUi:GlassCard IsAnimated="True">
+                                <components:SpacedGrid RowDefinitions="Auto,*"
+                                                       RowSpacing="10"
+                                                       ColumnDefinitions="Auto,*"
+                                                       ColumnSpacing="10">
+                                  <!-- Output Converter Name -->
+                                  <TextBlock Grid.Column="0"
+                                             Grid.Row="0"
+                                             Classes="h4 Primary"
+                                             Text="{Binding name}"
+                                             FontWeight="DemiBold" />
+                                  <!-- Output Converter Extensions -->
+                                  <ItemsControl Grid.Column="1"
+                                                Grid.Row="0"
+                                                HorizontalAlignment="Right"
+                                                ItemsSource="{Binding extensions}">
+                                    <ItemsControl.ItemsPanel>
+                                      <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal"
+                                                    Spacing="5" />
+                                      </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                      <DataTemplate>
+                                        <sukiUi:GlassCard IsAnimated="True"
+                                                          IsOpaque="True"
+                                                          Padding="15">
+                                          <TextBlock Classes="h5"
+                                                     Text="{Binding}" />
+                                        </sukiUi:GlassCard>
+                                      </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                  </ItemsControl>
+                                  <!-- Output Converter Description -->
+                                  <TextBlock Grid.Column="0"
+                                             Grid.Row="1"
+                                             Grid.ColumnSpan="2"
+                                             Classes="h6"
+                                             Text="{Binding description}"
+                                             TextWrapping="Wrap" />
+                                </components:SpacedGrid>
+                              </sukiUi:GlassCard>
+                            </DataTemplate>
+                          </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                      </StackPanel>
+                    </sukiUi:SettingsLayoutItem.Content>
+                  </sukiUi:SettingsLayoutItem>
+                  <!-- "Data Generation" Section -->
+                  <sukiUi:SettingsLayoutItem Header="Data Generation">
+                    <sukiUi:SettingsLayoutItem.Content>
+                      <TextBlock Text="Hello" />
+                    </sukiUi:SettingsLayoutItem.Content>
+                  </sukiUi:SettingsLayoutItem>
+                </components:XamlArray>
+              </sukiUi:SettingsLayout.Items>
+            </sukiUi:SettingsLayout>
           </sukiUi:GlassCard>
         </sukiUi:SukiSideMenuItem.PageContent>
       </sukiUi:SukiSideMenuItem>
@@ -123,19 +260,20 @@
                             <avaloniaEdit:TextEditor.Options>
                               <avaloniaEdit:TextEditorOptions AllowScrollBelowDocument="False"
                                                               HighlightCurrentLine="True"
-                                                              IndentationSize="5" 
-                                                              ShowTabs="True"
+                                                              IndentationSize="5"
                                                               EnableRectangularSelection="True"
-                                                              ShowBoxForControlCharacters="True" 
+                                                              ShowBoxForControlCharacters="True"
                                                               ShowEndOfLine="True"
-                                                              ShowSpaces="True" 
-                                                              ShowColumnRulers="True" />
+                                                              ShowSpaces="True"
+                                                              ShowTabs="True"
+                                                              RequireControlModifierForHyperlinkClick="True" />
                             </avaloniaEdit:TextEditor.Options>
                           </avaloniaEdit:TextEditor>
                           <!-- Footer Buttons -->
                           <components:SpacedGrid Grid.Row="1"
                                                  ColumnDefinitions="*,Auto"
                                                  ColumnSpacing="10">
+                            <!-- Next Button -->
                             <Button Grid.Column="1"
                                     Command="{Binding ConvertFileNextBackButtonClickedCommand}"
                                     CommandParameter="1">
@@ -179,6 +317,7 @@
                           <components:SpacedGrid Grid.Row="1"
                                                  ColumnDefinitions="Auto,*,Auto"
                                                  ColumnSpacing="10">
+                            <!-- Back Button -->
                             <Button Grid.Column="0"
                                     Command="{Binding ConvertFileNextBackButtonClickedCommand}"
                                     CommandParameter="0">
@@ -191,6 +330,21 @@
                                            VerticalAlignment="Center" />
                               </StackPanel>
                             </Button>
+                            <!-- Rows and Columns Ammount -->
+                            <StackPanel Grid.Column="1"
+                                        Orientation="Horizontal"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center">
+                              <TextBlock Classes="h5"
+                                         Text="Rows: " />
+                              <TextBlock Classes="h5"
+                                         Text="{Binding SelectedConvertDocument.EditRows.Count}" />
+                              <TextBlock Classes="h5"
+                                         Text=", Columns: " />
+                              <TextBlock Classes="h5"
+                                         Text="{Binding SelectedConvertDocument.EditHeaders.Count}" />
+                            </StackPanel>
+                            <!-- Next Button -->
                             <Button Grid.Column="2"
                                     Command="{Binding ConvertFileNextBackButtonClickedCommand}"
                                     CommandParameter="2">
@@ -229,18 +383,19 @@
                               <avaloniaEdit:TextEditorOptions AllowScrollBelowDocument="False"
                                                               HighlightCurrentLine="True"
                                                               IndentationSize="5"
-                                                              ShowTabs="True"
                                                               EnableRectangularSelection="True"
                                                               ShowBoxForControlCharacters="True"
                                                               ShowEndOfLine="True"
                                                               ShowSpaces="True"
-                                                              ShowColumnRulers="True" />
+                                                              ShowTabs="True"
+                                                              RequireControlModifierForHyperlinkClick="True" />
                             </avaloniaEdit:TextEditor.Options>
                           </avaloniaEdit:TextEditor>
                           <!-- Footer Buttons -->
                           <components:SpacedGrid Grid.Row="1"
                                                  ColumnDefinitions="Auto,*,Auto"
                                                  ColumnSpacing="10">
+                            <!-- Back Button -->
                             <Button Grid.Column="0"
                                     Command="{Binding ConvertFileNextBackButtonClickedCommand}"
                                     CommandParameter="1">
@@ -253,6 +408,7 @@
                                            VerticalAlignment="Center" />
                               </StackPanel>
                             </Button>
+                            <!-- Copy Data Button -->
                             <StackPanel Grid.Column="2"
                                         Orientation="Horizontal"
                                         Spacing="10">
@@ -266,6 +422,7 @@
                                             Classes="Primary" />
                                 </StackPanel>
                               </Button>
+                              <!-- Save File Button -->
                               <Button>
                                 <StackPanel Spacing="10"
                                             Orientation="Horizontal">
