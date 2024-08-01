@@ -7,7 +7,9 @@
              xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
              xmlns:xamlInteractivity="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:xamlInteractions="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+             xmlns:xamlResponsive="clr-namespace:Avalonia.Xaml.Interactions.Responsive;assembly=Avalonia.Xaml.Interactions.Responsive"
              xmlns:components="clr-namespace:TableConverter.Components"
+             xmlns:converters="clr-namespace:TableConverter.Converters"
              xmlns:vm="clr-namespace:TableConverter.ViewModels"
              x:Class="TableConverter.Views.MainView"
              x:DataType="vm:MainViewModel"
@@ -32,6 +34,31 @@
                             Margin="20"
                             Padding="10">
             <sukiUi:SettingsLayout>
+              <sukiUi:SettingsLayout.Styles>
+                <!-- Adaptive Uniform Grid Styles -->
+                <Style Selector="UniformGrid">
+                  <Setter Property="(xamlInteractivity:Interaction.Behaviors)">
+                    <xamlInteractivity:BehaviorCollectionTemplate>
+                      <xamlInteractivity:BehaviorCollection>
+                        <xamlResponsive:AdaptiveBehavior SourceControl="{Binding $parent[TopLevel]}">
+                          <xamlResponsive:AdaptiveClassSetter MinWidth="0" MaxWidth="1000" ClassName="Small" />
+                          <xamlResponsive:AdaptiveClassSetter MinWidth="1000" MaxWidth="1600" ClassName="Medium" />
+                          <xamlResponsive:AdaptiveClassSetter MinWidth="1600" MaxWidth="Infinity" ClassName="Wide" />
+                        </xamlResponsive:AdaptiveBehavior>
+                      </xamlInteractivity:BehaviorCollection>
+                    </xamlInteractivity:BehaviorCollectionTemplate>
+                  </Setter>
+                </Style>
+                <Style Selector="UniformGrid.Small">
+                  <Setter Property="Columns" Value="1" />
+                </Style>
+                <Style Selector="UniformGrid.Medium">
+                  <Setter Property="Columns" Value="2" />
+                </Style>
+                <Style Selector="UniformGrid.Wide">
+                  <Setter Property="Columns" Value="3" />
+                </Style>
+              </sukiUi:SettingsLayout.Styles>
               <sukiUi:SettingsLayout.Items>
                 <!-- Array of SettingsLayoutItems -->
                 <components:XamlArray x:TypeArguments="sukiUi:SettingsLayoutItem">
@@ -51,44 +78,31 @@
                         <ItemsControl ItemsSource="{Binding InputConverters}">
                           <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                              <StackPanel Spacing="10" />
+                              <UniformGrid />
                             </ItemsPanelTemplate>
                           </ItemsControl.ItemsPanel>
                           <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                              <sukiUi:GlassCard IsAnimated="True">
+                              <sukiUi:GlassCard IsAnimated="False">
                                 <components:SpacedGrid RowDefinitions="Auto,*"
                                                        RowSpacing="10"
                                                        ColumnDefinitions="Auto,*"
-                                                       ColumnSpacing="10">
+                                                       ColumnSpacing="10"
+                                                       VerticalAlignment="Center">
                                   <!-- Input Converter Name -->
                                   <TextBlock Grid.Column="0"
                                              Grid.Row="0"
                                              Classes="h4 Primary"
                                              Text="{Binding name}"
-                                             FontWeight="DemiBold" />
+                                             FontWeight="Bold"
+                                             VerticalAlignment="Center" />
                                   <!-- Input Converter Extensions -->
-                                  <ItemsControl Grid.Column="1"
-                                                Grid.Row="0"
-                                                HorizontalAlignment="Right"
-                                                ItemsSource="{Binding extensions}">
-                                    <ItemsControl.ItemsPanel>
-                                      <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Horizontal"
-                                                    Spacing="5" />
-                                      </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                      <DataTemplate>
-                                        <sukiUi:GlassCard IsAnimated="True"
-                                                          IsOpaque="True"
-                                                          Padding="15">
-                                          <TextBlock Classes="h5"
-                                                     Text="{Binding}" />
-                                        </sukiUi:GlassCard>
-                                      </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                  </ItemsControl>
+                                  <TextBlock Grid.Column="1"
+                                             Grid.Row="0"
+                                             HorizontalAlignment="Right"
+                                             Classes="h5"
+                                             Text="{Binding extensions, Converter={x:Static converters:ArrayToStringConverter.Instance}}">
+                                  </TextBlock>
                                   <!-- Input Converter Description -->
                                   <TextBlock Grid.Column="0"
                                              Grid.Row="1"
@@ -107,22 +121,24 @@
                         <ItemsControl ItemsSource="{Binding OutputConverters}">
                           <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                              <StackPanel Spacing="10" />
+                              <UniformGrid />
                             </ItemsPanelTemplate>
                           </ItemsControl.ItemsPanel>
                           <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                              <sukiUi:GlassCard IsAnimated="True">
+                              <sukiUi:GlassCard IsAnimated="False">
                                 <components:SpacedGrid RowDefinitions="Auto,*"
                                                        RowSpacing="10"
                                                        ColumnDefinitions="Auto,*"
-                                                       ColumnSpacing="10">
+                                                       ColumnSpacing="10"
+                                                       VerticalAlignment="Center">
                                   <!-- Output Converter Name -->
                                   <TextBlock Grid.Column="0"
                                              Grid.Row="0"
                                              Classes="h4 Primary"
                                              Text="{Binding name}"
-                                             FontWeight="DemiBold" />
+                                             FontWeight="Bold"
+                                             VerticalAlignment="Center" />
                                   <!-- Output Converter Extensions -->
                                   <ItemsControl Grid.Column="1"
                                                 Grid.Row="0"
