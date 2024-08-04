@@ -15,14 +15,13 @@ namespace TableConverter.Converters
         {
             if (value is IEnumerable<object?> enumerable) 
             { 
+                var count = enumerable.Count();
+
                 if (!enumerable.Any())
                 {
                     return new BindingNotification("Array to string converter must have elements");
                 }
-
-                var count = enumerable.Count();
-
-                if (count == 1)
+                else if (count == 1)
                 {
                     return enumerable.First();
                 }

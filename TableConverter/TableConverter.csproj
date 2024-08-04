@@ -29,8 +29,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Views\TypesSelectorView.axaml.cs">
-      <DependentUpon>TypesSelectorView.axaml</DependentUpon>
+    <Compile Update="Views\MessageBoxView.axaml.cs">
+      <DependentUpon>MessageBoxView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\FileTypesSelectorView.axaml.cs">
+      <DependentUpon>FileTypesSelectorView.axaml</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>

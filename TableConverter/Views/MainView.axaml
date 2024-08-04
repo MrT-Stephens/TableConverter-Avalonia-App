@@ -21,7 +21,7 @@
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
     <vm:MainViewModel />
   </Design.DataContext>
-  
+
   <sukiUi:SukiSideMenu>
     <sukiUi:SukiSideMenu.Items>
       <!-- Welcome Section UI code -->
@@ -36,7 +36,7 @@
             <sukiUi:SettingsLayout>
               <sukiUi:SettingsLayout.Styles>
                 <!-- Adaptive Uniform Grid Styles -->
-                <Style Selector="UniformGrid">
+                <Style Selector="components|SpacedUniformGrid">
                   <Setter Property="(xamlInteractivity:Interaction.Behaviors)">
                     <xamlInteractivity:BehaviorCollectionTemplate>
                       <xamlInteractivity:BehaviorCollection>
@@ -49,13 +49,16 @@
                     </xamlInteractivity:BehaviorCollectionTemplate>
                   </Setter>
                 </Style>
-                <Style Selector="UniformGrid.Small">
+                <!-- Adaptive Uniform Grid Styles (Small Screen) -->
+                <Style Selector="components|SpacedUniformGrid.Small">
                   <Setter Property="Columns" Value="1" />
                 </Style>
-                <Style Selector="UniformGrid.Medium">
+                <!-- Adaptive Uniform Grid Styles (Medium Screen) -->
+                <Style Selector="components|SpacedUniformGrid.Medium">
                   <Setter Property="Columns" Value="2" />
                 </Style>
-                <Style Selector="UniformGrid.Wide">
+                <!-- Adaptive Uniform Grid Styles (Wide Screen) -->
+                <Style Selector="components|SpacedUniformGrid.Wide">
                   <Setter Property="Columns" Value="3" />
                 </Style>
               </sukiUi:SettingsLayout.Styles>
@@ -78,39 +81,37 @@
                         <ItemsControl ItemsSource="{Binding InputConverters}">
                           <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                              <UniformGrid />
+                              <components:SpacedUniformGrid Spacing="10" />
                             </ItemsPanelTemplate>
                           </ItemsControl.ItemsPanel>
                           <ItemsControl.ItemTemplate>
                             <DataTemplate>
                               <sukiUi:GlassCard IsAnimated="False">
-                                <components:SpacedGrid RowDefinitions="Auto,*"
-                                                       RowSpacing="10"
-                                                       ColumnDefinitions="Auto,*"
-                                                       ColumnSpacing="10"
-                                                       VerticalAlignment="Center">
-                                  <!-- Input Converter Name -->
-                                  <TextBlock Grid.Column="0"
-                                             Grid.Row="0"
-                                             Classes="h4 Primary"
-                                             Text="{Binding name}"
-                                             FontWeight="Bold"
-                                             VerticalAlignment="Center" />
-                                  <!-- Input Converter Extensions -->
-                                  <TextBlock Grid.Column="1"
-                                             Grid.Row="0"
-                                             HorizontalAlignment="Right"
-                                             Classes="h5"
-                                             Text="{Binding extensions, Converter={x:Static converters:ArrayToStringConverter.Instance}}">
-                                  </TextBlock>
+                                <sukiUi:GroupBox VerticalAlignment="Center">
+                                  <sukiUi:GroupBox.Header>
+                                    <components:SpacedGrid ColumnDefinitions="Auto,*"
+                                                           ColumnSpacing="10">
+                                      <!-- Input Converter Name -->
+                                      <TextBlock Grid.Column="0"
+                                                 Classes="h4 Primary"
+                                                 Text="{Binding name}"
+                                                 FontWeight="Bold"
+                                                 VerticalAlignment="Center" />
+                                      <!-- Input Converter Extensions -->
+                                      <TextBlock Grid.Column="1"
+                                                 HorizontalAlignment="Right"
+                                                 VerticalAlignment="Center"
+                                                 Classes="h5"
+                                                 FontWeight="DemiBold"
+                                                 Text="{Binding extensions, Converter={x:Static converters:ArrayToStringConverter.Instance}}">
+                                      </TextBlock>
+                                    </components:SpacedGrid>
+                                  </sukiUi:GroupBox.Header>
                                   <!-- Input Converter Description -->
-                                  <TextBlock Grid.Column="0"
-                                             Grid.Row="1"
-                                             Grid.ColumnSpan="2"
-                                             Classes="h6"
+                                  <TextBlock Classes="h6"
                                              Text="{Binding description}"
                                              TextWrapping="Wrap" />
-                                </components:SpacedGrid>
+                                </sukiUi:GroupBox>
                               </sukiUi:GlassCard>
                             </DataTemplate>
                           </ItemsControl.ItemTemplate>
@@ -121,54 +122,37 @@
                         <ItemsControl ItemsSource="{Binding OutputConverters}">
                           <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                              <UniformGrid />
+                              <components:SpacedUniformGrid Spacing="10" />
                             </ItemsPanelTemplate>
                           </ItemsControl.ItemsPanel>
                           <ItemsControl.ItemTemplate>
                             <DataTemplate>
                               <sukiUi:GlassCard IsAnimated="False">
-                                <components:SpacedGrid RowDefinitions="Auto,*"
-                                                       RowSpacing="10"
-                                                       ColumnDefinitions="Auto,*"
-                                                       ColumnSpacing="10"
-                                                       VerticalAlignment="Center">
-                                  <!-- Output Converter Name -->
-                                  <TextBlock Grid.Column="0"
-                                             Grid.Row="0"
-                                             Classes="h4 Primary"
-                                             Text="{Binding name}"
-                                             FontWeight="Bold"
-                                             VerticalAlignment="Center" />
-                                  <!-- Output Converter Extensions -->
-                                  <ItemsControl Grid.Column="1"
-                                                Grid.Row="0"
-                                                HorizontalAlignment="Right"
-                                                ItemsSource="{Binding extensions}">
-                                    <ItemsControl.ItemsPanel>
-                                      <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Horizontal"
-                                                    Spacing="5" />
-                                      </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                      <DataTemplate>
-                                        <sukiUi:GlassCard IsAnimated="True"
-                                                          IsOpaque="True"
-                                                          Padding="15">
-                                          <TextBlock Classes="h5"
-                                                     Text="{Binding}" />
-                                        </sukiUi:GlassCard>
-                                      </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                  </ItemsControl>
+                                <sukiUi:GroupBox VerticalAlignment="Center">
+                                  <sukiUi:GroupBox.Header>
+                                    <components:SpacedGrid ColumnDefinitions="Auto,*"
+                                                           ColumnSpacing="10">
+                                      <!-- Output Converter Name -->
+                                      <TextBlock Grid.Column="0"
+                                                 Classes="h4 Primary"
+                                                 Text="{Binding name}"
+                                                 FontWeight="Bold"
+                                                 VerticalAlignment="Center" />
+                                      <!-- Output Converter Extensions -->
+                                      <TextBlock Grid.Column="1"
+                                                 HorizontalAlignment="Right"
+                                                 VerticalAlignment="Center"
+                                                 Classes="h5"
+                                                 FontWeight="DemiBold"
+                                                 Text="{Binding extensions, Converter={x:Static converters:ArrayToStringConverter.Instance}}">
+                                      </TextBlock>
+                                    </components:SpacedGrid>
+                                  </sukiUi:GroupBox.Header>
                                   <!-- Output Converter Description -->
-                                  <TextBlock Grid.Column="0"
-                                             Grid.Row="1"
-                                             Grid.ColumnSpan="2"
-                                             Classes="h6"
+                                  <TextBlock Classes="h6"
                                              Text="{Binding description}"
                                              TextWrapping="Wrap" />
-                                </components:SpacedGrid>
+                                </sukiUi:GroupBox>
                               </sukiUi:GlassCard>
                             </DataTemplate>
                           </ItemsControl.ItemTemplate>
@@ -428,7 +412,7 @@
                             <StackPanel Grid.Column="2"
                                         Orientation="Horizontal"
                                         Spacing="10">
-                              <Button>
+                              <Button Command="{Binding CopyFileButtonClickedCommand}">
                                 <StackPanel Spacing="10"
                                             Orientation="Horizontal">
                                   <TextBlock Classes="h5"
@@ -439,7 +423,7 @@
                                 </StackPanel>
                               </Button>
                               <!-- Save File Button -->
-                              <Button>
+                              <Button Command="{Binding SaveFileButtonClickedCommand}">
                                 <StackPanel Spacing="10"
                                             Orientation="Horizontal">
                                   <TextBlock Classes="h5"

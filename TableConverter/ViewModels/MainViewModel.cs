@@ -8,7 +8,10 @@ using SukiUI.Controls;
 using SukiUI.Models;
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using TableConverter.DataModels;
 using TableConverter.Services;
 using TableConverter.Views;
@@ -56,7 +59,7 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void ConvertFileNewFileButtonClicked()
     {
-        SukiHost.ShowDialog(new TypesSelectorView(
+        SukiHost.ShowDialog(new FileTypesSelectorView(
             "Please select a file type to input",
             App.Current?.Resources["FileSearchIcon"] as StreamGeometry ?? throw new NullReferenceException(),
             InputConverters.Select(converter => converter.name).ToArray(),
@@ -128,7 +131,7 @@ public partial class MainViewModel : ViewModelBase
             else if (pageIndex == 2 && currentDoc.ProgressStepIndex < 2)
             {
                 // Process the tabular data to the outputted file type.
-                SukiHost.ShowDialog(new TypesSelectorView(
+                SukiHost.ShowDialog(new FileTypesSelectorView(
                     "Please select a file type to output",
                     App.Current?.Resources["FileSearchIcon"] as StreamGeometry ?? throw new NullReferenceException(),
                     OutputConverters.Select(converter => converter.name).ToArray(),
@@ -190,6 +193,95 @@ public partial class MainViewModel : ViewModelBase
             else
             {
                 currentDoc.ProgressStepIndex = pageIndex;
+            }
+        }
+    }
+
+    [RelayCommand]
+    private async Task CopyFileButtonClicked()
+    {
+        var currentDoc = SelectedConvertDocument;
+        var topLevel = TopLevel.GetTopLevel(((IClassicDesktopStyleApplicationLifetime)App.Current?.ApplicationLifetime!).MainWindow);
+
+        if (topLevel is not null && currentDoc is not null && !string.IsNullOrEmpty(currentDoc.OutputFileText.Text))
+        {
+            currentDoc.IsBusy = true;
+
+            await topLevel.Clipboard!.SetTextAsync(currentDoc.OutputFileText.Text);
+
+            currentDoc.IsBusy = false;
+
+            await SukiHost.ShowToast(new ToastModel(
+                "File Copied",
+                $"The file '{currentDoc.Name}' has been copied to clipboard.",
+                SukiUI.Enums.NotificationType.Success)
+            );
+        }
+    }
+
+    [RelayCommand]
+    private async Task SaveFileButtonClicked()
+    {
+        var currentDoc = SelectedConvertDocument;
+        var topLevel = TopLevel.GetTopLevel(((IClassicDesktopStyleApplicationLifetime)App.Current?.ApplicationLifetime!).MainWindow);
+
+        if (topLevel is not null &&
+            currentDoc is not null &&
+            currentDoc.InputConverter is not null &&
+            currentDoc.OutputConverter is not null && 
+            !string.IsNullOrEmpty(currentDoc.OutputFileText.Text))
+        {
+            var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+            {
+                Title = $"Save {currentDoc.OutputConverter.name} File",
+                FileTypeChoices = [
+                    new(currentDoc.OutputConverter.name)
+                    {
+                        Patterns = currentDoc.OutputConverter.extensions.Select(ext => $"*{ext}").ToArray(),
+                        MimeTypes = currentDoc.OutputConverter.mimeTypes
+                    },
+                    FilePickerFileTypes.All
+                ],
+                DefaultExtension = currentDoc.OutputConverter.extensions[0],
+                ShowOverwritePrompt = false,
+                SuggestedFileName = $"TableConverter-{currentDoc.InputConverter.name}-{currentDoc.OutputConverter.name}-{DateTime.Now.ToFileTime()}"
+            });
+
+            if (file is not null)
+            {
+                Action action = async () =>
+                {
+                    currentDoc.IsBusy = true;
+
+                    await currentDoc.OutputConverter.outputConverter!.SaveFileAsync(file, Encoding.UTF8.GetBytes(currentDoc.OutputFileText.Text));
+
+                    currentDoc.IsBusy = false;
+
+                    await SukiHost.ShowToast(new ToastModel(
+                        "File Saved",
+                        $"The file '{currentDoc.Name}' has been saved to '{file.Path.AbsolutePath}'.",
+                        SukiUI.Enums.NotificationType.Success)
+                    );
+                };
+
+                if (File.Exists(file.Path.AbsolutePath))
+                {
+                    SukiHost.ShowMessageBox(new MessageBoxModel(
+                        "File already exists",
+                        $"The file '{file.Name}' already exists at that location. Would you like to replace it?",
+                        SukiUI.Enums.NotificationType.Info,
+                        "Yes", () =>
+                        {
+                            SukiHost.CloseDialog();
+
+                            action.Invoke();
+                        }), true
+                    );
+                }
+                else
+                {
+                    action.Invoke();
+                }
             }
         }
     }

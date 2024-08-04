@@ -6,7 +6,7 @@ using System;
 
 namespace TableConverter.ViewModels;
 
-public partial class TypesSelectorViewModel : ViewModelBase
+public partial class FileTypesSelectorViewModel : ViewModelBase
 {
     #region Properties
 

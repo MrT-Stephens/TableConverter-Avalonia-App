@@ -13,6 +13,7 @@ namespace TableConverter.Components
     {
         public static readonly StyledProperty<double> RowSpacingProperty = 
             AvaloniaProperty.Register<SpacedGrid, double>(nameof(RowSpacing), 5);
+
         public static readonly StyledProperty<double> ColumnSpacingProperty = 
             AvaloniaProperty.Register<SpacedGrid, double>(nameof(ColumnSpacing), 5);
 
