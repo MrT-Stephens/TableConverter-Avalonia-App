@@ -61,7 +61,6 @@ public partial class MainViewModel : ViewModelBase
     {
         SukiHost.ShowDialog(new FileTypesSelectorView(
             "Please select a file type to input",
-            App.Current?.Resources["FileSearchIcon"] as StreamGeometry ?? throw new NullReferenceException(),
             InputConverters.Select(converter => converter.name).ToArray(),
             OnInputFileTypeClicked
         ), false, true);
@@ -118,7 +117,6 @@ public partial class MainViewModel : ViewModelBase
                 {
                     SukiHost.ShowDialog(new ConvertFilesOptionsView(
                         $"How would you like your {currentDoc.InputConverter.name} file inputted?",
-                        App.Current?.Resources["OptionsIcon"] as StreamGeometry ?? throw new NullReferenceException(),
                         currentDoc.InputConverter.inputConverter!.Controls,
                         processDoc
                     ), false, true);
@@ -133,7 +131,6 @@ public partial class MainViewModel : ViewModelBase
                 // Process the tabular data to the outputted file type.
                 SukiHost.ShowDialog(new FileTypesSelectorView(
                     "Please select a file type to output",
-                    App.Current?.Resources["FileSearchIcon"] as StreamGeometry ?? throw new NullReferenceException(),
                     OutputConverters.Select(converter => converter.name).ToArray(),
                     (converterName) =>
                     {
@@ -177,7 +174,6 @@ public partial class MainViewModel : ViewModelBase
                             {
                                 SukiHost.ShowDialog(new ConvertFilesOptionsView(
                                     $"How would you like your {currentDoc.OutputConverter.name} file outputted?",
-                                    App.Current?.Resources["OptionsIcon"] as StreamGeometry ?? throw new NullReferenceException(),
                                     currentDoc.OutputConverter.outputConverter!.Controls,
                                     processDoc
                                 ), false, true);

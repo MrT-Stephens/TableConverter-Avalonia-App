@@ -47,31 +47,34 @@
                     </Panel.Background>
                   </Panel>
                   <!-- Main Content Stack Panel -->
-                  <StackPanel>
-                    <!-- Title -->
-                    <TextBlock Margin="0,60,0,0" 
-                               Text="{TemplateBinding Title}" 
-                               FontWeight="DemiBold" 
-                               FontSize="26" 
-                               HorizontalAlignment="Center" 
-                               Foreground="{DynamicResource SukiText}" />
-                    <!-- Content -->
-                    <ContentPresenter Margin="30,20,30,30" 
-                                      Content="{TemplateBinding Content}" 
-                                      FontWeight="DemiBold" 
-                                      TextWrapping="Wrap" 
-                                      Foreground="{DynamicResource SukiLowText}" />
-                    <!-- Action Buttons -->
-                    <ItemsControl ItemsSource="{TemplateBinding ActionButtons}"
-                                  Margin="30,0,30,30"
-                                  IsVisible="{TemplateBinding ActionButtons, Converter={x:Static converters:IsArrayEmptyConverter.Instance}}">
-                      <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                          <components:SpacedUniformGrid Spacing="15" Columns="2" />
-                        </ItemsPanelTemplate>
-                      </ItemsControl.ItemsPanel>
-                    </ItemsControl>
-                  </StackPanel>
+                  <ScrollViewer Classes="Stack">
+                    <StackPanel>
+                      <!-- Title -->
+                      <TextBlock Margin="30,60,30,0" 
+                                 Text="{TemplateBinding Title}" 
+                                 FontWeight="DemiBold" 
+                                 FontSize="26" 
+                                 TextWrapping="WrapWithOverflow"
+                                 HorizontalAlignment="Center" 
+                                 Foreground="{DynamicResource SukiText}" />
+                      <!-- Content -->
+                      <ContentPresenter Margin="30,20,30,30" 
+                                        Content="{TemplateBinding Content}" 
+                                        FontWeight="DemiBold" 
+                                        TextWrapping="Wrap" 
+                                        Foreground="{DynamicResource SukiLowText}" />
+                      <!-- Action Buttons -->
+                      <ItemsControl ItemsSource="{TemplateBinding ActionButtons}"
+                                    Margin="30,0,30,30"
+                                    IsVisible="{TemplateBinding ActionButtons, Converter={x:Static converters:IsArrayEmptyConverter.Instance}}">
+                        <ItemsControl.ItemsPanel>
+                          <ItemsPanelTemplate>
+                            <components:SpacedUniformGrid Spacing="15" Columns="2" />
+                          </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                      </ItemsControl>
+                    </StackPanel>
+                  </ScrollViewer>
                 </Panel>
               </Border>
             </Border>
@@ -107,9 +110,9 @@
                     </Panel.Background>
                   </Panel>
                   <!-- Circle Icon -->
-                  <PathIcon Width="28" 
+                  <PathIcon Width="32" 
                             Margin="0,0,0,0"
-                            Height="28" 
+                            Height="32" 
                             HorizontalAlignment="Center" 
                             VerticalAlignment="Center"
                             Data="{TemplateBinding Icon}"

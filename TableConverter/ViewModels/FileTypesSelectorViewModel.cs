@@ -14,25 +14,34 @@ public partial class FileTypesSelectorViewModel : ViewModelBase
     private string _Title = string.Empty;
 
     [ObservableProperty]
-    private StreamGeometry? _Icon = null;
-
-    [ObservableProperty]
     private string[] _Values = [];
 
-    public Action<string>? OnItemClicked { get; set; } = null;
+    [ObservableProperty]
+    private string _SelectedValue = string.Empty;
+
+    public Action<string>? OnOkClicked { get; set; } = null;
 
     #endregion
 
     #region Commands
 
     [RelayCommand]
-    private void ItemClicked(object? item)
+    private void ButtonClicked(object? name)
     {
         SukiHost.CloseDialog();
 
-        if (OnItemClicked is not null && item is string strItem)
+        if (name is string buttonName)
         {
-            OnItemClicked.Invoke(strItem);
+            switch (buttonName)
+            {
+                case "Ok":
+                    OnOkClicked?.Invoke(SelectedValue);
+                    break;
+                case "Cancel":
+                    break;
+                default:
+                    throw new NotImplementedException($"Button {buttonName} is not implemented");
+            }
         }
     }
 

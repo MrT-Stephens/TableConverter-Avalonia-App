@@ -17,21 +17,30 @@
     <vm:FileTypesSelectorViewModel />
   </Design.DataContext>
 
-  <views:MessageBoxView Title="Select a file type">
+  <views:MessageBoxView Title="{Binding Title}"
+                        Icon="{StaticResource FileSearchIcon}">
     <views:MessageBoxView.Content>
-      <ListBox ItemsSource="{Binding Values}">
+      <ListBox ItemsSource="{Binding Values}"
+               SelectedItem="{Binding SelectedValue}"
+               SelectionMode="AlwaysSelected,Single">
         <ListBox.ItemsPanel>
           <ItemsPanelTemplate>
             <components:SpacedUniformGrid Spacing="10"
-                                          Columns="3" />
+                                          Columns="4" />
           </ItemsPanelTemplate>
         </ListBox.ItemsPanel>
       </ListBox>
     </views:MessageBoxView.Content>
     <views:MessageBoxView.ActionButtons>
       <components:XamlArray x:TypeArguments="Control">
-        <Button Classes="Flat" Content="Cancel" />
-        <Button Classes="Flat" Content="Ok" />
+        <Button Classes="Flat" 
+                Content="Cancel"
+                Command="{Binding ButtonClickedCommand}"
+                CommandParameter="Cancel" />
+        <Button Classes="Flat" 
+                Content="Ok"
+                Command="{Binding ButtonClickedCommand}"
+                CommandParameter="Ok" />
       </components:XamlArray>
     </views:MessageBoxView.ActionButtons>
   </views:MessageBoxView>

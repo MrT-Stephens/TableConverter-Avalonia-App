@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-using Avalonia.Media;
 using System;
 using TableConverter.ViewModels;
 
@@ -12,16 +11,15 @@ public partial class FileTypesSelectorView : UserControl
         InitializeComponent();
     }
 
-    public FileTypesSelectorView(string title, StreamGeometry icon, string[] values, Action<string> onItemClicked)
+    public FileTypesSelectorView(string title, string[] values, Action<string> onOkClicked)
     {
         InitializeComponent();
 
         if (DataContext is FileTypesSelectorViewModel viewModel)
         {
             viewModel.Title = title;
-            viewModel.Icon = icon;
             viewModel.Values = values;
-            viewModel.OnItemClicked = onItemClicked;
+            viewModel.OnOkClicked = onOkClicked;
         }
         else
         {

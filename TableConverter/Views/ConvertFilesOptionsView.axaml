@@ -17,7 +17,7 @@
     <vm:ConvertFilesOptionsViewModel />
   </Design.DataContext>
 
-  <views:MessageBoxView Title="Options"
+  <views:MessageBoxView Title="{Binding Title}"
                         Icon="{StaticResource OptionsIcon}">
     <views:MessageBoxView.Content>
       <sukiUi:GlassCard Padding="10">
@@ -34,8 +34,13 @@
     </views:MessageBoxView.Content>
     <views:MessageBoxView.ActionButtons>
       <components:XamlArray x:TypeArguments="Control">
-        <Button Classes="Flat" Content="Cancel" />
-        <Button Classes="Flat" Content="Ok" />
+        <Button Content="Cancel"
+                Command="{Binding ButtonClickedCommand}"
+                CommandParameter="Cancel" />
+        <Button Classes="Flat" 
+                Content="Ok"
+                Command="{Binding ButtonClickedCommand}"
+                CommandParameter="Ok" />
       </components:XamlArray>
     </views:MessageBoxView.ActionButtons>
   </views:MessageBoxView>

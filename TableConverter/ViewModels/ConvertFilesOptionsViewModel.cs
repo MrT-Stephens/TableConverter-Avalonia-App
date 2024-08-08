@@ -16,25 +16,31 @@ public partial class ConvertFilesOptionsViewModel : ViewModelBase
     private string _Title = string.Empty;
 
     [ObservableProperty]
-    private StreamGeometry? _Icon = null;
-
-    [ObservableProperty]
     private ObservableCollection<Control> _Options = new();
 
-    public Action? OnContinueClicked { get; set; } = null;
+    public Action? OnOkClicked { get; set; } = null;
 
     #endregion
 
     #region Commands
 
     [RelayCommand]
-    private void ContinueClicked()
+    private void ButtonClicked(object? name)
     {
         SukiHost.CloseDialog();
 
-        if (OnContinueClicked is not null)
+        if (name is string buttonName)
         {
-            OnContinueClicked.Invoke();
+            switch (buttonName)
+            {
+                case "Ok":
+                    OnOkClicked?.Invoke();
+                    break;
+                case "Cancel":
+                    break;
+                default:
+                    throw new NotImplementedException($"Button {buttonName} is not implemented");
+            }
         }
     }
 

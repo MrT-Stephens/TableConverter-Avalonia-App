@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-using Avalonia.Media;
 using System;
 using System.Collections.ObjectModel;
 using TableConverter.ViewModels;
@@ -13,16 +12,15 @@ public partial class ConvertFilesOptionsView : UserControl
         InitializeComponent();
     }
 
-    public ConvertFilesOptionsView(string title, StreamGeometry icon, Collection<Control> options, Action onContinueClicked)
+    public ConvertFilesOptionsView(string title, Collection<Control> options, Action onOkClicked)
     {
         InitializeComponent();
 
         if (DataContext is ConvertFilesOptionsViewModel viewModel)
         {
             viewModel.Title = title;
-            viewModel.Icon = icon;
             viewModel.Options = new(options);
-            viewModel.OnContinueClicked = onContinueClicked;
+            viewModel.OnOkClicked = onOkClicked;
         }
         else
         {

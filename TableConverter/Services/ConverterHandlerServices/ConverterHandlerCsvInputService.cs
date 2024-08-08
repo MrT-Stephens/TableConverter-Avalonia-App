@@ -71,7 +71,7 @@ namespace TableConverter.Services.ConverterHandlerServices
             var has_header_label = new Label()
             {
                 Content = "Has Header",
-                VerticalAlignment = VerticalAlignment.Center
+                VerticalAlignment = VerticalAlignment.Center,
             };
 
             has_header_stack_panel.Children.Add(has_header_check_box);
