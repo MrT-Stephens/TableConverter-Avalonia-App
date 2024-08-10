@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TableConverter", "TableConv
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TableConverter.Desktop", "TableConverter.Desktop\TableConverter.Desktop.csproj", "{EB3D7E19-DC31-43C0-B078-EC5B79CF987F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableConverter.DataGeneration", "TableConverter.DataGeneration\TableConverter.DataGeneration.csproj", "{8E2BC14C-1985-47E6-B972-98AD49376EB8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{EB3D7E19-DC31-43C0-B078-EC5B79CF987F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB3D7E19-DC31-43C0-B078-EC5B79CF987F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB3D7E19-DC31-43C0-B078-EC5B79CF987F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E2BC14C-1985-47E6-B972-98AD49376EB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E2BC14C-1985-47E6-B972-98AD49376EB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E2BC14C-1985-47E6-B972-98AD49376EB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E2BC14C-1985-47E6-B972-98AD49376EB8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

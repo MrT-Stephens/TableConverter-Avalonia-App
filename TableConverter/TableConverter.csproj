@@ -29,6 +29,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TableConverter.DataGeneration\TableConverter.DataGeneration.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="Views\MessageBoxView.axaml.cs">
       <DependentUpon>MessageBoxView.axaml</DependentUpon>
     </Compile>

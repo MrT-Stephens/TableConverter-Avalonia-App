@@ -8,10 +8,12 @@ using SukiUI.Controls;
 using SukiUI.Models;
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TableConverter.DataGeneration;
 using TableConverter.DataModels;
 using TableConverter.Services;
 using TableConverter.Views;
@@ -20,6 +22,12 @@ namespace TableConverter.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {
+    #region Services
+
+    private readonly DataGenerationTypes DataGenerationTypesService;
+
+    #endregion
+
     #region Properties
 
     // File converter view properties
@@ -39,8 +47,10 @@ public partial class MainViewModel : ViewModelBase
 
     #region Constructor
 
-    public MainViewModel()
+    public MainViewModel(DataGenerationTypes dataGenerationTypesService)
     {
+        DataGenerationTypesService = dataGenerationTypesService;
+
         LoadConverterTypes();
 
         if (ConvertDocuments is null)

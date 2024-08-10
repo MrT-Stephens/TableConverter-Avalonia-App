@@ -276,14 +276,14 @@
                             <!-- Next Button -->
                             <Button Grid.Column="1"
                                     Command="{Binding ConvertFileNextBackButtonClickedCommand}"
-                                    CommandParameter="1">
+                                    CommandParameter="1"
+                                    Classes="Flat">
                               <StackPanel Spacing="10"
                                           Orientation="Horizontal">
                                 <TextBlock Classes="h5"
                                            Text="Next"
                                            VerticalAlignment="Center" />
-                                <PathIcon Data="{StaticResource ArrowRightIcon}"
-                                          Classes="Primary" />
+                                <PathIcon Data="{StaticResource ArrowRightIcon}" />
                               </StackPanel>
                             </Button>
                           </components:SpacedGrid>
@@ -320,11 +320,11 @@
                             <!-- Back Button -->
                             <Button Grid.Column="0"
                                     Command="{Binding ConvertFileNextBackButtonClickedCommand}"
-                                    CommandParameter="0">
+                                    CommandParameter="0"
+                                    Classes="Flat">
                               <StackPanel Spacing="10"
                                           Orientation="Horizontal">
-                                <PathIcon Data="{StaticResource ArrowLeftIcon}"
-                                          Classes="Primary" />
+                                <PathIcon Data="{StaticResource ArrowLeftIcon}" />
                                 <TextBlock Classes="h5"
                                            Text="Back"
                                            VerticalAlignment="Center" />
@@ -347,14 +347,14 @@
                             <!-- Next Button -->
                             <Button Grid.Column="2"
                                     Command="{Binding ConvertFileNextBackButtonClickedCommand}"
-                                    CommandParameter="2">
+                                    CommandParameter="2"
+                                    Classes="Flat">
                               <StackPanel Spacing="10"
                                           Orientation="Horizontal">
                                 <TextBlock Classes="h5"
                                            Text="Next"
                                            VerticalAlignment="Center" />
-                                <PathIcon Data="{StaticResource ArrowRightIcon}"
-                                          Classes="Primary" />
+                                <PathIcon Data="{StaticResource ArrowRightIcon}" />
                               </StackPanel>
                             </Button>
                           </components:SpacedGrid>
@@ -398,11 +398,11 @@
                             <!-- Back Button -->
                             <Button Grid.Column="0"
                                     Command="{Binding ConvertFileNextBackButtonClickedCommand}"
-                                    CommandParameter="1">
+                                    CommandParameter="1"
+                                    Classes="Flat">
                               <StackPanel Spacing="10"
                                           Orientation="Horizontal">
-                                <PathIcon Data="{StaticResource ArrowLeftIcon}"
-                                          Classes="Primary" />
+                                <PathIcon Data="{StaticResource ArrowLeftIcon}" />
                                 <TextBlock Classes="h5"
                                            Text="Back"
                                            VerticalAlignment="Center" />
@@ -412,25 +412,25 @@
                             <StackPanel Grid.Column="2"
                                         Orientation="Horizontal"
                                         Spacing="10">
-                              <Button Command="{Binding CopyFileButtonClickedCommand}">
+                              <Button Command="{Binding CopyFileButtonClickedCommand}"
+                                      Classes="Flat Accent">
                                 <StackPanel Spacing="10"
                                             Orientation="Horizontal">
                                   <TextBlock Classes="h5"
                                              Text="Copy"
                                              VerticalAlignment="Center" />
-                                  <PathIcon Data="{StaticResource CopyIcon}"
-                                            Classes="Primary" />
+                                  <PathIcon Data="{StaticResource CopyIcon}" />
                                 </StackPanel>
                               </Button>
                               <!-- Save File Button -->
-                              <Button Command="{Binding SaveFileButtonClickedCommand}">
+                              <Button Command="{Binding SaveFileButtonClickedCommand}"
+                                      Classes="Flat">
                                 <StackPanel Spacing="10"
                                             Orientation="Horizontal">
                                   <TextBlock Classes="h5"
                                              Text="Save"
                                              VerticalAlignment="Center" />
-                                  <PathIcon Data="{StaticResource FileDownloadIcon}"
-                                            Classes="Primary" />
+                                  <PathIcon Data="{StaticResource FileDownloadIcon}" />
                                 </StackPanel>
                               </Button>
                             </StackPanel>
@@ -451,7 +451,149 @@
           <PathIcon Data="{StaticResource DataIcon}" />
         </sukiUi:SukiSideMenuItem.Icon>
         <sukiUi:SukiSideMenuItem.PageContent>
-          <TextBlock Text="Data" />
+          <components:SpacedGrid RowDefinitions="*,Auto"
+                                 RowSpacing="20"
+                                 Margin="20">
+            <!-- Data Generation Types Data Grid -->
+            <sukiUi:GlassCard Grid.Row="0"
+                              IsAnimated="True"
+                              Padding="10">
+              <DataGrid SelectionMode="Single"
+                        AutoGenerateColumns="True"
+                        CanUserResizeColumns="True"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                        ScrollViewer.VerticalScrollBarVisibility="Visible">
+                <DataGrid.Columns>
+                  <!-- Data Generation Field Name -->
+                  <DataGridTemplateColumn Header="Field Name"
+                                          Width="Auto"
+                                          MinWidth="200">
+                    <DataGridTemplateColumn.CellTemplate>
+                      <DataTemplate>
+                        <TextBox Text=""
+                                 Watermark="Enter Field Name"
+                                 VerticalAlignment="Stretch"
+                                 HorizontalAlignment="Stretch"
+                                 VerticalContentAlignment="Center">
+                        </TextBox>
+                      </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                  </DataGridTemplateColumn>
+                  <!-- Data Generation Field Type -->
+                  <DataGridTemplateColumn Header="Field Type"
+                                          MinWidth="200">
+                    <DataGridTemplateColumn.CellTemplate>
+                      <DataTemplate>
+                        <Button HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch">
+                          <components:SpacedGrid ColumnDefinitions="Auto,*,Auto"
+                                                 ColumnSpacing="5">
+                            <TextBlock Grid.Column="0"
+                                       Text=""
+                                       VerticalAlignment="Center" />
+                            <PathIcon Grid.Column="2"
+                                      Data="{StaticResource UpDownIcon}"
+                                      Height="24"
+                                      Width="24"
+                                      VerticalAlignment="Center" />
+                          </components:SpacedGrid>
+                        </Button>
+                      </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                  </DataGridTemplateColumn>
+                  <!-- Data Generation Field Options -->
+                  <DataGridTemplateColumn Header="Field Options"
+                                          Width="Auto">
+                    <DataGridTemplateColumn.CellTemplate>
+                      <DataTemplate>
+                        <ItemsControl>
+                          <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                              <StackPanel Orientation="Horizontal"
+                                          HorizontalAlignment="Stretch"
+                                          VerticalAlignment="Stretch">
+                              </StackPanel>
+                            </ItemsPanelTemplate>
+                          </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                      </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                  </DataGridTemplateColumn>
+                  <DataGridTemplateColumn Width="*"
+                                          MinWidth="0">
+                    <DataTemplate>
+                      <Control />
+                    </DataTemplate>
+                  </DataGridTemplateColumn>
+                  <!-- Data Generation Field Number of Blanks -->
+                  <DataGridTemplateColumn Header="Blanks Percentage">
+                    <DataGridTemplateColumn.CellTemplate>
+                      <DataTemplate>
+                        <NumericUpDown Minimum="0"
+                                       Maximum="100"
+                                       ParsingNumberStyle="Integer"
+                                       FormatString="N0"
+                                       Value="0"
+                                       VerticalAlignment="Stretch"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalContentAlignment="Center"
+                                       sukiUiTheme:NumericUpDownExtensions.Unit="%" />
+                      </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                  </DataGridTemplateColumn>
+                  <!-- Data Generation Field Remove -->
+                  <DataGridTemplateColumn Header="Remove/Add">
+                    <DataGridTemplateColumn.CellTemplate>
+                      <DataTemplate>
+                        <Grid ColumnDefinitions="*,*">
+                          <Button Grid.Column="0"
+                                  HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Stretch"
+                                  CommandParameter="{Binding .}">
+                            <PathIcon Data="{StaticResource RemoveIcon}"
+                                      Height="24"
+                                      Width="24"
+                                      HorizontalAlignment="Center" />
+                          </Button>
+                          <Button Grid.Column="1"
+                                  HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Stretch"
+                                  CommandParameter="{Binding .}">
+                            <PathIcon Data="{StaticResource AddIcon}"
+                                      Height="24"
+                                      Width="24"
+                                      HorizontalAlignment="Center" />
+                          </Button>
+                        </Grid>
+                      </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                  </DataGridTemplateColumn>
+                </DataGrid.Columns>
+              </DataGrid>
+            </sukiUi:GlassCard>
+            <!-- Data Generation Footer -->
+            <sukiUi:GlassCard Grid.Row="1"
+                              IsAnimated="True"
+                              Padding="10">
+              <components:SpacedGrid ColumnDefinitions="Auto,*"
+                                     ColumnSpacing="10">
+                <NumericUpDown Grid.Column="0"
+                               ShowButtonSpinner="True"
+                               Value="1000"
+                               Minimum="0"
+                               Maximum="10000"
+                               ParsingNumberStyle="Integer"
+                               FormatString="N0"
+                               sukiUiTheme:NumericUpDownExtensions.Unit="Rows" />
+                <Button Grid.Column="1"
+                        Classes="Flat"
+                        Content="Generate Data"
+                        HorizontalAlignment="Right" />
+              </components:SpacedGrid>
+            </sukiUi:GlassCard>
+          </components:SpacedGrid>
         </sukiUi:SukiSideMenuItem.PageContent>
       </sukiUi:SukiSideMenuItem>
     </sukiUi:SukiSideMenu.Items>
