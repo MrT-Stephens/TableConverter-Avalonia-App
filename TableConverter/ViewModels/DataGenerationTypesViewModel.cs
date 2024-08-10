@@ -1,23 +1,18 @@
-﻿using Avalonia.Controls;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SukiUI.Controls;
 using System;
-using System.Collections.ObjectModel;
 
 namespace TableConverter.ViewModels;
 
-public partial class ConvertFilesOptionsViewModel : ViewModelBase
+public partial class DataGenerationTypesViewModel : ViewModelBase
 {
     #region Properties
 
     [ObservableProperty]
-    private string _Title = string.Empty;
+    private string _SelectedType = string.Empty;
 
-    [ObservableProperty]
-    private ObservableCollection<Control> _Options = new();
-
-    public Action? OnOkClicked { get; set; } = null;
+    public Action<string>? OnOkClicked { get; set; } = null;
 
     #endregion
 
@@ -33,7 +28,7 @@ public partial class ConvertFilesOptionsViewModel : ViewModelBase
             switch (buttonName)
             {
                 case "Ok":
-                    OnOkClicked?.Invoke();
+                    OnOkClicked?.Invoke(SelectedType);
                     break;
                 case "Cancel":
                     break;

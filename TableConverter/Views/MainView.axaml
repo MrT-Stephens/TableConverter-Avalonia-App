@@ -458,13 +458,10 @@
             <sukiUi:GlassCard Grid.Row="0"
                               IsAnimated="True"
                               Padding="10">
-              <DataGrid SelectionMode="Single"
-                        AutoGenerateColumns="True"
-                        CanUserResizeColumns="True"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch"
-                        ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                        ScrollViewer.VerticalScrollBarVisibility="Visible">
+              <DataGrid ItemsSource="{Binding DataGenerationFields}"
+                        SelectionMode="Single"
+                        AutoGenerateColumns="False"
+                        CanUserResizeColumns="False">
                 <DataGrid.Columns>
                   <!-- Data Generation Field Name -->
                   <DataGridTemplateColumn Header="Field Name"
@@ -472,11 +469,8 @@
                                           MinWidth="200">
                     <DataGridTemplateColumn.CellTemplate>
                       <DataTemplate>
-                        <TextBox Text=""
-                                 Watermark="Enter Field Name"
-                                 VerticalAlignment="Stretch"
-                                 HorizontalAlignment="Stretch"
-                                 VerticalContentAlignment="Center">
+                        <TextBox Text="{Binding Name}"
+                                 Watermark="Enter Field Name">
                         </TextBox>
                       </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -486,19 +480,15 @@
                                           MinWidth="200">
                     <DataGridTemplateColumn.CellTemplate>
                       <DataTemplate>
-                        <Button HorizontalAlignment="Stretch"
-                                VerticalAlignment="Stretch">
-                          <components:SpacedGrid ColumnDefinitions="Auto,*,Auto"
-                                                 ColumnSpacing="5">
-                            <TextBlock Grid.Column="0"
-                                       Text=""
-                                       VerticalAlignment="Center" />
-                            <PathIcon Grid.Column="2"
-                                      Data="{StaticResource UpDownIcon}"
-                                      Height="24"
-                                      Width="24"
-                                      VerticalAlignment="Center" />
-                          </components:SpacedGrid>
+                        <Button Classes="Flat"
+                                Command="{Binding ((vm:MainViewModel)DataContext).ChooseTypeButtonClickedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}">
+                          <StackPanel Spacing="10"
+                                      Orientation="Horizontal">
+                            <TextBlock Text="{Binding Type}" />
+                            <PathIcon Data="{StaticResource UpDownIcon}"
+                                      Height="18"
+                                      Width="18" />
+                          </StackPanel>
                         </Button>
                       </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -544,29 +534,25 @@
                     </DataGridTemplateColumn.CellTemplate>
                   </DataGridTemplateColumn>
                   <!-- Data Generation Field Remove -->
-                  <DataGridTemplateColumn Header="Remove/Add">
+                  <DataGridTemplateColumn Header="Remove/Add"
+                                          MinWidth="140">
                     <DataGridTemplateColumn.CellTemplate>
                       <DataTemplate>
-                        <Grid ColumnDefinitions="*,*">
-                          <Button Grid.Column="0"
-                                  HorizontalAlignment="Stretch"
-                                  VerticalAlignment="Stretch"
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="10">
+                          <Button Classes="Flat"
                                   CommandParameter="{Binding .}">
                             <PathIcon Data="{StaticResource RemoveIcon}"
-                                      Height="24"
-                                      Width="24"
-                                      HorizontalAlignment="Center" />
+                                      Height="18"
+                                      Width="18" />
                           </Button>
-                          <Button Grid.Column="1"
-                                  HorizontalAlignment="Stretch"
-                                  VerticalAlignment="Stretch"
+                          <Button Classes="Flat"
                                   CommandParameter="{Binding .}">
                             <PathIcon Data="{StaticResource AddIcon}"
-                                      Height="24"
-                                      Width="24"
-                                      HorizontalAlignment="Center" />
+                                      Height="18"
+                                      Width="18" />
                           </Button>
-                        </Grid>
+                        </StackPanel>
                       </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                   </DataGridTemplateColumn>

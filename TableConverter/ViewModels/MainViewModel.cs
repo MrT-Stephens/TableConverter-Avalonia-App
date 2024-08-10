@@ -43,9 +43,30 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     private ConvertDocumentViewModel? _SelectedConvertDocument = null;
 
+    // Data generation view properties
+    [ObservableProperty]
+    private ObservableCollection<DataGenerationFieldViewModel> _DataGenerationFields = new();
+
     #endregion
 
-    #region Constructor
+    #region Constructors
+
+    public MainViewModel()
+    {
+        DataGenerationTypesService = new();
+
+        LoadConverterTypes();
+
+        if (ConvertDocuments is null)
+        {
+            ConvertDocuments = new()
+            {
+                ExampleConverterDocument()
+            };
+        }
+
+        DataGenerationFields.Add(new());
+    }
 
     public MainViewModel(DataGenerationTypes dataGenerationTypesService)
     {
@@ -60,6 +81,8 @@ public partial class MainViewModel : ViewModelBase
                 ExampleConverterDocument()
             };
         }
+
+        DataGenerationFields.Add(new());
     }
 
     #endregion
@@ -292,10 +315,18 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
+    // Data generation view commands
+    [RelayCommand]
+    private void ChooseTypeButtonClicked()
+    {
+        SukiHost.ShowDialog(new DataGenerationTypesView((str) => { }), false, true);
+    }
+
     #endregion
 
     #region Misc Functions
 
+    // File converter view misc functions
     private async void LoadConverterTypes()
     {
         var converters = await ConverterTypesService.GetConverterTypesAsync();
