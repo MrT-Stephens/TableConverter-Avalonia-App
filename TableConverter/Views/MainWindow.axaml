@@ -5,11 +5,15 @@
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
                    xmlns:views="clr-namespace:TableConverter.Views"
-                   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
                    x:Class="TableConverter.Views.MainWindow"
                    Icon="/Assets/avalonia-logo.ico"
                    Title="TableConverter"
-                   BackgroundAnimationEnabled="True">
+                   BackgroundAnimationEnabled="True"
+                   MinHeight="400"
+                   MinWidth="400"
+                   mc:Ignorable="d" 
+                   d:DesignWidth="800" 
+                   d:DesignHeight="450">
   <sukiUi:SukiWindow.LogoContent>
     <PathIcon Data="{StaticResource TableEdit}" />
   </sukiUi:SukiWindow.LogoContent>

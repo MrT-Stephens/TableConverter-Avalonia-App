@@ -16,7 +16,7 @@ public partial class MessageBoxView : UserControl
         AvaloniaProperty.Register<MessageBoxView, ObservableCollection<Control>>(nameof(ActionButtons));
 
     public static readonly StyledProperty<bool> ContentScrollEnabledProperty =
-        AvaloniaProperty.Register<MessageBoxView, bool>(nameof(ContentScrollEnabled));
+        AvaloniaProperty.Register<MessageBoxView, bool>(nameof(ContentScrollEnabled), true);
 
     public object? Icon
     {

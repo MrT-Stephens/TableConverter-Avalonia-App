@@ -21,17 +21,32 @@
                         Icon="{StaticResource OptionsIcon}"
                         ContentScrollEnabled="False">
     <views:MessageBoxView.Content>
-      <sukiUi:GlassCard IsAnimated="False">
-        <ListBox ItemsSource="{Binding CurrentTypes}"
-                 SelectedItem="{Binding SelectedType}"
-                 SelectionMode="AlwaysSelected,Single">
-          <ListBox.ItemsPanel>
-            <ItemsPanelTemplate>
-              <components:SpacedUniformGrid Spacing="10"
-                                            Columns="4" />
-            </ItemsPanelTemplate>
-          </ListBox.ItemsPanel>
-        </ListBox>
+      <sukiUi:GlassCard IsAnimated="False"
+                        Padding="0">
+        <SplitView IsPaneOpen="True"
+                   PanePlacement="Left"
+                   DisplayMode="Inline">
+          <SplitView.Pane>
+            <ListBox ItemsSource="{Binding Categories}">
+              <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <StackPanel Spacing="10"
+                              Orientation="Vertical" />
+                </ItemsPanelTemplate>
+              </ListBox.ItemsPanel>
+            </ListBox>
+          </SplitView.Pane>
+          <SplitView.Content>
+            <ListBox ItemsSource="{Binding CurrentTypes}">
+              <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <components:SpacedUniformGrid Columns="3"
+                                                Spacing="10" />
+                </ItemsPanelTemplate>
+              </ListBox.ItemsPanel>
+            </ListBox>
+          </SplitView.Content>
+        </SplitView>
       </sukiUi:GlassCard>
     </views:MessageBoxView.Content>
     <views:MessageBoxView.ActionButtons>
