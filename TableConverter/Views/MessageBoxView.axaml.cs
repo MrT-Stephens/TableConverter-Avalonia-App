@@ -15,6 +15,9 @@ public partial class MessageBoxView : UserControl
     public static readonly StyledProperty<ObservableCollection<Control>> ActionButtonsProperty =
         AvaloniaProperty.Register<MessageBoxView, ObservableCollection<Control>>(nameof(ActionButtons));
 
+    public static readonly StyledProperty<bool> ContentScrollEnabledProperty =
+        AvaloniaProperty.Register<MessageBoxView, bool>(nameof(ContentScrollEnabled));
+
     public object? Icon
     {
         get => GetValue(IconProperty);
@@ -31,6 +34,12 @@ public partial class MessageBoxView : UserControl
     {
         get => GetValue(ActionButtonsProperty);
         set => SetValue(ActionButtonsProperty, value);
+    }
+
+    public bool ContentScrollEnabled
+    {
+        get => GetValue(ContentScrollEnabledProperty);
+        set => SetValue(ContentScrollEnabledProperty, value);
     }
 
     public MessageBoxView()

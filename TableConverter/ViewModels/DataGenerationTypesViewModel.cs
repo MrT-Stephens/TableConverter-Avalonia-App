@@ -2,12 +2,25 @@
 using CommunityToolkit.Mvvm.Input;
 using SukiUI.Controls;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using TableConverter.DataGeneration.DataModels;
 
 namespace TableConverter.ViewModels;
 
 public partial class DataGenerationTypesViewModel : ViewModelBase
 {
     #region Properties
+
+    [ObservableProperty]
+    private ObservableCollection<KeyValuePair<string, string>> _GenerationTypes = new();
+
+    [ObservableProperty]
+    private ObservableCollection<string> _CurrentTypes = new();
+
+    [ObservableProperty]
+    private ObservableCollection<string> _Categories = new();
 
     [ObservableProperty]
     private string _SelectedType = string.Empty;
@@ -36,6 +49,17 @@ public partial class DataGenerationTypesViewModel : ViewModelBase
                     throw new NotImplementedException($"Button {buttonName} is not implemented");
             }
         }
+    }
+
+    #endregion
+
+    #region Misc Functions
+
+    partial void OnGenerationTypesChanged(ObservableCollection<KeyValuePair<string, string>> value)
+    {
+        CurrentTypes = new(value.Select(val => val.Key));
+
+        Categories = new(value.Select(val => val.Value).Distinct());
     }
 
     #endregion

@@ -18,10 +18,20 @@
   </Design.DataContext>
 
   <views:MessageBoxView Title="Select a data generation type"
-                        Icon="{StaticResource OptionsIcon}">
+                        Icon="{StaticResource OptionsIcon}"
+                        ContentScrollEnabled="False">
     <views:MessageBoxView.Content>
       <sukiUi:GlassCard IsAnimated="False">
-        
+        <ListBox ItemsSource="{Binding CurrentTypes}"
+                 SelectedItem="{Binding SelectedType}"
+                 SelectionMode="AlwaysSelected,Single">
+          <ListBox.ItemsPanel>
+            <ItemsPanelTemplate>
+              <components:SpacedUniformGrid Spacing="10"
+                                            Columns="4" />
+            </ItemsPanelTemplate>
+          </ListBox.ItemsPanel>
+        </ListBox>
       </sukiUi:GlassCard>
     </views:MessageBoxView.Content>
     <views:MessageBoxView.ActionButtons>

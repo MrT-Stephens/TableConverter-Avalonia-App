@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.Input;
 using SukiUI.Controls;
 using SukiUI.Models;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -319,7 +320,11 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void ChooseTypeButtonClicked()
     {
-        SukiHost.ShowDialog(new DataGenerationTypesView((str) => { }), false, true);
+        SukiHost.ShowDialog(new DataGenerationTypesView(DataGenerationTypesService.Types.Select(val => new KeyValuePair<string, string>(val.Name, val.Category)), 
+            (typeName) => { 
+
+            }
+        ), false, true);
     }
 
     #endregion

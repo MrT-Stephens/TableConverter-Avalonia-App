@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using System;
+using System.Collections.Generic;
 using TableConverter.ViewModels;
 
 namespace TableConverter.Views;
@@ -11,12 +12,13 @@ public partial class DataGenerationTypesView : UserControl
         InitializeComponent();
     }
 
-    public DataGenerationTypesView(Action<string> onOkClicked)
+    public DataGenerationTypesView(IEnumerable<KeyValuePair<string, string>> dataGenerationTypes, Action<string> onOkClicked)
     {
         InitializeComponent();
 
         if (DataContext is DataGenerationTypesViewModel viewModel)
         {
+            viewModel.GenerationTypes = new(dataGenerationTypes);
             viewModel.OnOkClicked = onOkClicked;
         }
         else

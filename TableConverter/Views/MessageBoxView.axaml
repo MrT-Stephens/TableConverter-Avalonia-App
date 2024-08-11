@@ -47,34 +47,38 @@
                     </Panel.Background>
                   </Panel>
                   <!-- Main Content Stack Panel -->
-                  <ScrollViewer Classes="Stack">
-                    <StackPanel>
-                      <!-- Title -->
-                      <TextBlock Margin="30,60,30,0" 
-                                 Text="{TemplateBinding Title}" 
-                                 FontWeight="DemiBold" 
-                                 FontSize="26" 
-                                 TextWrapping="WrapWithOverflow"
-                                 HorizontalAlignment="Center" 
-                                 Foreground="{DynamicResource SukiText}" />
-                      <!-- Content -->
-                      <ContentPresenter Margin="30,20,30,30" 
-                                        Content="{TemplateBinding Content}" 
+                  <Grid RowDefinitions="Auto,*,Auto">
+                    <!-- Title -->
+                    <TextBlock Grid.Row="0" 
+                               Margin="30,60,30,0" 
+                               Text="{TemplateBinding Title}" 
+                               FontWeight="DemiBold" 
+                               FontSize="26" 
+                               TextWrapping="WrapWithOverflow"
+                               HorizontalAlignment="Center" 
+                               Foreground="{DynamicResource SukiText}" />
+                    <!-- Content -->
+                    <ScrollViewer Grid.Row="1"
+                                  Margin="30,20,30,30"
+                                  VerticalScrollBarVisibility="{TemplateBinding ContentScrollEnabled, Converter={x:Static converters:BoolToScrollVisibilityConverter.Instance}}"
+                                  HorizontalScrollBarVisibility="{TemplateBinding ContentScrollEnabled, Converter={x:Static converters:BoolToScrollVisibilityConverter.Instance}}">
+                      <ContentPresenter Content="{TemplateBinding Content}" 
                                         FontWeight="DemiBold" 
                                         TextWrapping="Wrap" 
                                         Foreground="{DynamicResource SukiLowText}" />
-                      <!-- Action Buttons -->
-                      <ItemsControl ItemsSource="{TemplateBinding ActionButtons}"
-                                    Margin="30,0,30,30"
-                                    IsVisible="{TemplateBinding ActionButtons, Converter={x:Static converters:IsArrayEmptyConverter.Instance}}">
-                        <ItemsControl.ItemsPanel>
-                          <ItemsPanelTemplate>
-                            <components:SpacedUniformGrid Spacing="15" Columns="2" />
-                          </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                      </ItemsControl>
-                    </StackPanel>
-                  </ScrollViewer>
+                    </ScrollViewer>
+                    <!-- Action Buttons -->
+                    <ItemsControl Grid.Row="2" 
+                                  ItemsSource="{TemplateBinding ActionButtons}"
+                                  Margin="30,0,30,30"
+                                  IsVisible="{TemplateBinding ActionButtons, Converter={x:Static converters:IsArrayEmptyConverter.Instance}}">
+                      <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                          <components:SpacedUniformGrid Spacing="15" Columns="2" />
+                        </ItemsPanelTemplate>
+                      </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                  </Grid>
                 </Panel>
               </Border>
             </Border>
