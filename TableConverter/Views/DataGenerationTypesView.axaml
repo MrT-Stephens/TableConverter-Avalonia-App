@@ -7,6 +7,10 @@
              xmlns:sukiUiTheme="clr-namespace:SukiUI.Theme;assembly=SukiUI"
              xmlns:components="clr-namespace:TableConverter.Components"
              xmlns:views="clr-namespace:TableConverter.Views"
+             xmlns:converters="clr-namespace:TableConverter.Converters"
+             xmlns:xamlInteractivity="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             xmlns:xamlInteractions="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+             xmlns:xamlResponsive="clr-namespace:Avalonia.Xaml.Interactions.Responsive;assembly=Avalonia.Xaml.Interactions.Responsive"
              x:Class="TableConverter.Views.DataGenerationTypesView"
              x:DataType="vm:DataGenerationTypesViewModel"
              d:DesignHeight="450"
@@ -18,24 +22,83 @@
     <vm:DataGenerationTypesViewModel />
   </Design.DataContext>
 
+  <UserControl.Styles>
+    <!-- Adaptive Uniform Grid Styles -->
+    <Style Selector="components|SpacedUniformGrid.Adaptive">
+      <Setter Property="(xamlInteractivity:Interaction.Behaviors)">
+        <xamlInteractivity:BehaviorCollectionTemplate>
+          <xamlInteractivity:BehaviorCollection>
+            <xamlResponsive:AdaptiveBehavior SourceControl="{Binding $parent[TopLevel]}">
+              <xamlResponsive:AdaptiveClassSetter MinWidth="0" MaxWidth="1000" ClassName="Small" />
+              <xamlResponsive:AdaptiveClassSetter MinWidth="1000" MaxWidth="1600" ClassName="Medium" />
+              <xamlResponsive:AdaptiveClassSetter MinWidth="1600" MaxWidth="Infinity" ClassName="Wide" />
+            </xamlResponsive:AdaptiveBehavior>
+          </xamlInteractivity:BehaviorCollection>
+        </xamlInteractivity:BehaviorCollectionTemplate>
+      </Setter>
+    </Style>
+    <!-- Adaptive Uniform Grid Styles (Small Screen) -->
+    <Style Selector="components|SpacedUniformGrid.Small">
+      <Setter Property="Columns" Value="1" />
+    </Style>
+    <!-- Adaptive Uniform Grid Styles (Medium Screen) -->
+    <Style Selector="components|SpacedUniformGrid.Medium">
+      <Setter Property="Columns" Value="2" />
+    </Style>
+    <!-- Adaptive Uniform Grid Styles (Wide Screen) -->
+    <Style Selector="components|SpacedUniformGrid.Wide">
+      <Setter Property="Columns" Value="3" />
+    </Style>
+  </UserControl.Styles>
+
+  <!-- Message Box -->
   <views:MessageBoxView Title="Select a data generation type"
                         Icon="{StaticResource OptionsIcon}"
                         ContentScrollEnabled="False">
     <views:MessageBoxView.Content>
-      <sukiUi:GlassCard IsAnimated="False"
+      <sukiUi:GlassCard Name="PART_RootGlassCard"
+                        IsAnimated="False"
                         Padding="0">
-        <SplitView IsPaneOpen="True"
+        <SplitView Name="PART_SplitView"
                    PanePlacement="Left"
+                   IsPaneOpen="True"
                    DisplayMode="CompactInline"
                    OpenPaneLength="225"
-                   CompactPaneLength="15">
+                   CompactPaneLength="20">
+          <!-- Adaptive Split View Behaviors -->
+          <xamlInteractivity:Interaction.Behaviors>
+            <xamlInteractions:DataTriggerBehavior Binding="{Binding $parent[TopLevel].ClientSize.Width}"
+                                                  ComparisonCondition="LessThanOrEqual"
+                                                  Value="1000">
+              <xamlInteractions:ChangePropertyAction TargetObject="$self"
+                                                     PropertyName="IsPaneOpen"
+                                                     Value="False" />
+              <xamlInteractions:ChangePropertyAction TargetObject="$self"
+                                                     PropertyName="DisplayMode"
+                                                     Value="CompactOverlay" />
+              <xamlInteractions:ChangePropertyAction TargetObject="PART_SplitViewGrid"
+                                                     PropertyName="Background"
+                                                     Value="{DynamicResource SukiGlassCardBackground}" />
+            </xamlInteractions:DataTriggerBehavior>
+            <xamlInteractions:DataTriggerBehavior Binding="{Binding $parent[TopLevel].ClientSize.Width}"
+                                                  ComparisonCondition="GreaterThan"
+                                                  Value="1000">
+              <xamlInteractions:ChangePropertyAction TargetObject="$self"
+                                                     PropertyName="IsPaneOpen"
+                                                     Value="True" />
+              <xamlInteractions:ChangePropertyAction TargetObject="$self"
+                                                     PropertyName="DisplayMode"
+                                                     Value="CompactInline" />
+              <xamlInteractions:ChangePropertyAction TargetObject="PART_SplitViewGrid"
+                                                     PropertyName="Background"
+                                                     Value="Transparent" />
+            </xamlInteractions:DataTriggerBehavior>
+          </xamlInteractivity:Interaction.Behaviors>
+          <!-- Categories Left Pane -->
           <SplitView.Pane>
-            <Grid ColumnDefinitions="*,15">
-              <Grid.Styles>
-                <Style Selector="Button">
-                  <Setter Property="CornerRadius" Value="0" />
-                </Style>
-              </Grid.Styles>
+            <Grid Name="PART_SplitViewGrid"
+                  ColumnDefinitions="*,20">
+              <!-- Categories List Box -->
               <ListBox Grid.Column="0"
                        SelectionMode="AlwaysSelected,Single"
                        ItemsSource="{Binding Categories}"
@@ -48,27 +111,69 @@
                 <ListBox.ItemsPanel>
                   <ItemsPanelTemplate>
                     <StackPanel Spacing="10"
-                                Orientation="Vertical" />
+                                Orientation="Vertical"
+                                Margin="10" />
                   </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
               </ListBox>
+              <!-- Hide Categories Pane Button -->
               <Button Grid.Column="1"
-                      Classes="Flat"
+                      Classes="Void"
                       HorizontalAlignment="Stretch"
                       VerticalAlignment="Stretch"
+                      VerticalContentAlignment="Center"
+                      HorizontalContentAlignment="Center"
                       Background="{DynamicResource SukiStrongBackground}">
-                
+                <PathIcon Data="{StaticResource ArrowBack}"
+                          Classes="Primary"
+                          Width="15"
+                          Height="15">
+                  <!-- Rotate Icon Behaviors -->
+                  <xamlInteractivity:Interaction.Behaviors>
+                    <xamlInteractions:DataTriggerBehavior Binding="{Binding IsPaneOpen, ElementName=PART_SplitView}"
+                                            ComparisonCondition="Equal"
+                                            Value="True">
+                      <xamlInteractions:ChangePropertyAction TargetObject="$self"
+                                                             PropertyName="RenderTransform">
+                        <xamlInteractions:ChangePropertyAction.Value>
+                          <RotateTransform Angle="0" />
+                        </xamlInteractions:ChangePropertyAction.Value>
+                      </xamlInteractions:ChangePropertyAction>
+                    </xamlInteractions:DataTriggerBehavior>
+                    <xamlInteractions:DataTriggerBehavior Binding="{Binding IsPaneOpen, ElementName=PART_SplitView}"
+                                                          ComparisonCondition="Equal"
+                                                          Value="False">
+                      <xamlInteractions:ChangePropertyAction TargetObject="$self"
+                                                             PropertyName="RenderTransform">
+                        <xamlInteractions:ChangePropertyAction.Value>
+                          <RotateTransform Angle="180" />
+                        </xamlInteractions:ChangePropertyAction.Value>
+                      </xamlInteractions:ChangePropertyAction>
+                    </xamlInteractions:DataTriggerBehavior>
+                  </xamlInteractivity:Interaction.Behaviors>
+                </PathIcon>
+                <!-- Button Click Event Behaviors -->
+                <xamlInteractivity:Interaction.Behaviors>
+                  <xamlInteractions:EventTriggerBehavior EventName="Click"
+                                                         SourceObject="$self">
+                    <xamlInteractions:ChangePropertyAction TargetObject="PART_SplitView"
+                                                           PropertyName="IsPaneOpen"
+                                                           Value="{Binding !IsPaneOpen, ElementName=PART_SplitView}" />
+                  </xamlInteractions:EventTriggerBehavior>
+                </xamlInteractivity:Interaction.Behaviors>
               </Button>
             </Grid>
           </SplitView.Pane>
+          <!-- Data Generation Types Right Pane -->
           <SplitView.Content>
+            <!-- Data Generation Types List Box -->
             <ListBox SelectionMode="AlwaysSelected,Single"
                      ItemsSource="{Binding CurrentTypes}"
                      SelectedItem="{Binding SelectedType}">
               <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
-                  <components:SpacedUniformGrid Columns="2"
-                                                Spacing="10" />
+                  <components:SpacedUniformGrid Spacing="10"
+                                                Classes="Adaptive" />
                 </ItemsPanelTemplate>
               </ListBox.ItemsPanel>
               <ListBox.ItemTemplate>
@@ -92,6 +197,7 @@
         </SplitView>
       </sukiUi:GlassCard>
     </views:MessageBoxView.Content>
+    <!-- Message Box Action Buttons -->
     <views:MessageBoxView.ActionButtons>
       <components:XamlArray x:TypeArguments="Control">
         <Button Content="Cancel"
