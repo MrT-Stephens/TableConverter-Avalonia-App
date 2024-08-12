@@ -318,8 +318,8 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void ChooseTypeButtonClicked()
     {
-        SukiHost.ShowDialog(new DataGenerationTypesView(DataGenerationTypesService.Types.Select(val => new KeyValuePair<string, string>(val.Name, val.Category)), 
-            (typeName) => { 
+        SukiHost.ShowDialog(new DataGenerationTypesView(DataGenerationTypesService.Types, 
+            (type) => { 
 
             }
         ), false, true);

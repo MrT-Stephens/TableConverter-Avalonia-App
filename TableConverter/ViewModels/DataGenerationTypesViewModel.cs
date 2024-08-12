@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using TableConverter.DataGeneration.DataModels;
 
 namespace TableConverter.ViewModels;
 
@@ -13,18 +14,21 @@ public partial class DataGenerationTypesViewModel : ViewModelBase
     #region Properties
 
     [ObservableProperty]
-    private ObservableCollection<KeyValuePair<string, string>> _GenerationTypes = new();
+    private ObservableCollection<DataGenerationType> _GenerationTypes = new();
 
     [ObservableProperty]
-    private ObservableCollection<string> _CurrentTypes = new();
+    private ObservableCollection<DataGenerationType> _CurrentTypes = new();
 
     [ObservableProperty]
     private ObservableCollection<string> _Categories = new();
 
     [ObservableProperty]
-    private string _SelectedType = string.Empty;
+    private DataGenerationType? _SelectedType = null;
 
-    public Action<string>? OnOkClicked { get; set; } = null;
+    [ObservableProperty]
+    private string _SelectedCategory = "All";
+
+    public Action<DataGenerationType>? OnOkClicked { get; set; } = null;
 
     #endregion
 
@@ -40,7 +44,7 @@ public partial class DataGenerationTypesViewModel : ViewModelBase
             switch (buttonName)
             {
                 case "Ok":
-                    OnOkClicked?.Invoke(SelectedType);
+                    OnOkClicked?.Invoke(SelectedType!);
                     break;
                 case "Cancel":
                     break;
@@ -54,11 +58,20 @@ public partial class DataGenerationTypesViewModel : ViewModelBase
 
     #region Misc Functions
 
-    partial void OnGenerationTypesChanged(ObservableCollection<KeyValuePair<string, string>> value)
+    partial void OnGenerationTypesChanged(ObservableCollection<DataGenerationType> value)
     {
-        CurrentTypes = new(value.Select(val => val.Key));
+        CurrentTypes = value;
 
-        Categories = new(value.Select(val => val.Value).Distinct());
+        Categories = new(value.Select(val => val.Category).Distinct().Order());
+
+        Categories.Insert(0, "All");
+
+        SelectedCategory = Categories[0];
+    }
+
+    partial void OnSelectedCategoryChanged(string value)
+    {
+        CurrentTypes = value == "All" ? GenerationTypes : new(GenerationTypes.Where(type => type.Category == value));
     }
 
     #endregion

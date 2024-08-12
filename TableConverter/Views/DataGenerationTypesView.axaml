@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:TableConverter.ViewModels"
              xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+             xmlns:sukiUiTheme="clr-namespace:SukiUI.Theme;assembly=SukiUI"
              xmlns:components="clr-namespace:TableConverter.Components"
              xmlns:views="clr-namespace:TableConverter.Views"
              x:Class="TableConverter.Views.DataGenerationTypesView"
@@ -25,25 +26,67 @@
                         Padding="0">
         <SplitView IsPaneOpen="True"
                    PanePlacement="Left"
-                   DisplayMode="Inline">
+                   DisplayMode="CompactInline"
+                   OpenPaneLength="225"
+                   CompactPaneLength="15">
           <SplitView.Pane>
-            <ListBox ItemsSource="{Binding Categories}">
-              <ListBox.ItemsPanel>
-                <ItemsPanelTemplate>
-                  <StackPanel Spacing="10"
-                              Orientation="Vertical" />
-                </ItemsPanelTemplate>
-              </ListBox.ItemsPanel>
-            </ListBox>
+            <Grid ColumnDefinitions="*,15">
+              <Grid.Styles>
+                <Style Selector="Button">
+                  <Setter Property="CornerRadius" Value="0" />
+                </Style>
+              </Grid.Styles>
+              <ListBox Grid.Column="0"
+                       SelectionMode="AlwaysSelected,Single"
+                       ItemsSource="{Binding Categories}"
+                       SelectedItem="{Binding SelectedCategory}">
+                <ListBox.Styles>
+                  <Style Selector="TextBlock">
+                    <Setter Property="FontSize" Value="18" />
+                  </Style>
+                </ListBox.Styles>
+                <ListBox.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <StackPanel Spacing="10"
+                                Orientation="Vertical" />
+                  </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+              </ListBox>
+              <Button Grid.Column="1"
+                      Classes="Flat"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch"
+                      Background="{DynamicResource SukiStrongBackground}">
+                
+              </Button>
+            </Grid>
           </SplitView.Pane>
           <SplitView.Content>
-            <ListBox ItemsSource="{Binding CurrentTypes}">
+            <ListBox SelectionMode="AlwaysSelected,Single"
+                     ItemsSource="{Binding CurrentTypes}"
+                     SelectedItem="{Binding SelectedType}">
               <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
-                  <components:SpacedUniformGrid Columns="3"
+                  <components:SpacedUniformGrid Columns="2"
                                                 Spacing="10" />
                 </ItemsPanelTemplate>
               </ListBox.ItemsPanel>
+              <ListBox.ItemTemplate>
+                <DataTemplate>
+                  <sukiUi:GroupBox Margin="5"
+                                   VerticalAlignment="Center">
+                    <sukiUi:GroupBox.Header>
+                      <TextBlock Text="{Binding Name}"
+                                 Classes="h5 Primary" />
+                    </sukiUi:GroupBox.Header>
+                    <sukiUi:GroupBox.Content>
+                      <TextBlock Text="{Binding Description}"
+                                 Classes="h6"
+                                 TextWrapping="WrapWithOverflow" />
+                    </sukiUi:GroupBox.Content>
+                  </sukiUi:GroupBox>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
             </ListBox>
           </SplitView.Content>
         </SplitView>
