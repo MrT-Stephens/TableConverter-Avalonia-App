@@ -1,10 +1,8 @@
-﻿using TableConverter.DataGeneration.DataGenerationOptions;
-
-namespace TableConverter.DataGeneration.Interfaces
+﻿namespace TableConverter.DataGeneration.Interfaces
 {
-    public interface IDataGenerationTypeHandler<T> where T : class
+    public interface IDataGenerationTypeHandler 
     {
-        public T? Options { get; init; }
+        public dynamic? Options { get; set; }
 
         public string[] GenerateData(int rows, ushort blanks_percentage);
 

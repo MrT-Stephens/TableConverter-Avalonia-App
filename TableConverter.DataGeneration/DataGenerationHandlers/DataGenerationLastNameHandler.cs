@@ -6,12 +6,15 @@ namespace TableConverter.DataGeneration.DataGenerationHandlers
 {
     public class DataGenerationLastNameHandler : DataGenerationTypeHandlerAbstract<DataGenerationFirstLastNameOptions>
     {
-        protected override string[] GenerateDataOverride(int rows, DataGenerationFirstLastNameOptions? options, ushort blanks_percentage)
+        protected override string[] GenerateDataOverride(int rows, ushort blanks_percentage)
         {
             string[] data = new string[rows];
 
             using (var reader = DbConnection.ExecuteCommand(
-                $"SELECT C.COUNTRY_CODE, N.LAST_NAME FROM FIRST_LAST_NAMES_TABLE N INNER JOIN COUNTRY_CODES_TABLE C ON C.COUNTRY_CODE = '{options!.CountryCode ?? "GB"}' WHERE N.ID IN (SELECT ID FROM FIRST_LAST_NAMES_TABLE ORDER BY RANDOM() LIMIT {rows});"
+                @$"SELECT C.COUNTRY_CODE, N.LAST_NAME FROM FIRST_LAST_NAMES_TABLE N 
+                   INNER JOIN COUNTRY_CODES_TABLE C ON C.COUNTRY_CODE = '{Options!.CountryCode ?? "GB"}' 
+                   WHERE N.ID IN (SELECT ID FROM FIRST_LAST_NAMES_TABLE 
+                   ORDER BY RANDOM() LIMIT {rows});"
             ))
             {
                 if (!reader.HasRows)

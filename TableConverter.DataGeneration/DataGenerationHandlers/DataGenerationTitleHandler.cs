@@ -10,7 +10,7 @@ namespace TableConverter.DataGeneration.DataGenerationHandlers
             "Mr", "Ms", "Mrs", "Miss", "Master", "Madam", "Uncle", "Aunt", "Dr", "Prof", "Doc", "Sir", "Lady", "Lord", "Dame"
         ];
 
-        protected override string[] GenerateDataOverride(int rows, DataGenerationBaseOptions? options, ushort blanks_percentage)
+        protected override string[] GenerateDataOverride(int rows, ushort blanks_percentage)
         {
             string[] data = new string[rows];
 

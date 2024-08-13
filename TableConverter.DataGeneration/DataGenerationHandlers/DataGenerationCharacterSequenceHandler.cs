@@ -5,13 +5,13 @@ namespace TableConverter.DataGeneration.DataGenerationHandlers
 {
     public class DataGenerationCharacterSequenceHandler : DataGenerationTypeHandlerAbstract<DataGenerationCharacterSequenceOptions>
     {
-        protected override string[] GenerateDataOverride(int rows, DataGenerationCharacterSequenceOptions? options, ushort blanks_percentage)
+        protected override string[] GenerateDataOverride(int rows, ushort blanks_percentage)
         {
             string[] data = new string[rows];
 
             for (int i = 0; i < rows; i++)
             {
-                data[i] = CheckBlank(() => GenerateSequence(options!.CharacterSequence), blanks_percentage);
+                data[i] = CheckBlank(() => GenerateSequence(Options!.CharacterSequence), blanks_percentage);
             }
 
             return data;

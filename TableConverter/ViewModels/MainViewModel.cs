@@ -332,8 +332,12 @@ public partial class MainViewModel : ViewModelBase
     {
         SukiHost.ShowDialog(new DataGenerationTypesView(DataGenerationTypesService.Types, 
             (type) => 
-            { 
-                field.Name = type.Name;
+            {
+                field.Type = type.Name;
+
+                field.DataGenerationTypeHandler = DataGenerationTypesService.GetHandlerByName(type.Name);
+
+
             }
         ), false, true);
     }

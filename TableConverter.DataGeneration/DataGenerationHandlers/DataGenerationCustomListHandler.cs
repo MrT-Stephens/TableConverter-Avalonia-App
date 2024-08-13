@@ -5,7 +5,7 @@ namespace TableConverter.DataGeneration.DataGenerationHandlers
 {
     public class DataGenerationCustomListHandler : DataGenerationTypeHandlerAbstract<DataGenerationCustomListOptions>
     {
-        protected override string[] GenerateDataOverride(int rows, DataGenerationCustomListOptions? options, ushort blanks_percentage)
+        protected override string[] GenerateDataOverride(int rows, ushort blanks_percentage)
         {
             List<string> data = new List<string>();
 
@@ -13,7 +13,7 @@ namespace TableConverter.DataGeneration.DataGenerationHandlers
             {
                 data.Add(CheckBlank(() =>
                 {
-                    string[] items = options!.ItemsList.Split(',');
+                    string[] items = Options!.ItemsList.Split(',');
                     return items[new Random().Next(0, items.Length)];
                 }
                 , blanks_percentage));

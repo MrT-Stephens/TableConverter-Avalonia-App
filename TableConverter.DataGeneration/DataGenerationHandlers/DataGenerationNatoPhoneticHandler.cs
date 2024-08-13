@@ -12,7 +12,7 @@ namespace TableConverter.DataGeneration.DataGenerationHandlers
             "X-ray", "Yankee", "Zulu"
         ];
 
-        protected override string[] GenerateDataOverride(int rows, DataGenerationBaseOptions? options, ushort blanks_percentage)
+        protected override string[] GenerateDataOverride(int rows, ushort blanks_percentage)
         {
             string[] data = new string[rows];
 

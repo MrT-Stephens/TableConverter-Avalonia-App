@@ -6,12 +6,17 @@ namespace TableConverter.DataGeneration.DataGenerationHandlers
 {
     public class DataGenerationCompanyNameHandler : DataGenerationTypeHandlerAbstract<DataGenerationCompanyNameOptions>
     {
-        protected override string[] GenerateDataOverride(int rows, DataGenerationCompanyNameOptions? options, ushort blanks_percentage)
+        protected override string[] GenerateDataOverride(int rows, ushort blanks_percentage)
         {
             string[] data = new string[rows];
 
             using (var reader = DbConnection.ExecuteCommand(
-                $"SELECT CC.COUNTRY_CODE, CP.NAME FROM COMPANIES_TABLE CP INNER JOIN COUNTRY_CODES_TABLE CC ON CC.COUNTRY_CODE = '{options!.CountryCode ?? "GB"}' WHERE CP.ID IN (SELECT ID FROM COMPANIES_TABLE ORDER BY RANDOM() LIMIT {rows});"
+                @$"SELECT CC.COUNTRY_CODE, CP.NAME FROM COMPANIES_TABLE CP 
+                   INNER JOIN COUNTRY_CODES_TABLE CC ON CC.COUNTRY_CODE = '{Options!.CountryCode ?? "GB"}' 
+                   WHERE CP.ID IN (
+                      SELECT ID FROM COMPANIES_TABLE 
+                      ORDER BY RANDOM() LIMIT {rows}
+                   );"
             ))
             {
                 if (!reader.HasRows)

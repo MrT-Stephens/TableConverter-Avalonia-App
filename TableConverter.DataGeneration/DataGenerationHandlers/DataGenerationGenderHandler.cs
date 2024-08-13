@@ -5,7 +5,7 @@ namespace TableConverter.DataGeneration.DataGenerationHandlers
 {
     public class DataGenerationGenderHandler : DataGenerationTypeHandlerAbstract<DataGenerationGenderOptions>
     {
-        protected override string[] GenerateDataOverride(int rows, DataGenerationGenderOptions? options, ushort blanks_percentage)
+        protected override string[] GenerateDataOverride(int rows, ushort blanks_percentage)
         {
             string[] data = new string[rows];
 
@@ -13,7 +13,7 @@ namespace TableConverter.DataGeneration.DataGenerationHandlers
             {
                 data[i] = CheckBlank(() =>
                 {
-                    return options!.GenderFormat switch
+                    return Options!.GenderFormat switch
                     {
                         "M" => Random.Next(0, 1) == 1 ? "M" : "F",
                         "m" => Random.Next(0, 1) == 1 ? "m" : "f",

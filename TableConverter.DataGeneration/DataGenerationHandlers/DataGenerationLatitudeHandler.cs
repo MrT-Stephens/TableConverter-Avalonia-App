@@ -5,7 +5,7 @@ namespace TableConverter.DataGeneration.DataGenerationHandlers
 {
     public class DataGenerationLatitudeHandler : DataGenerationTypeHandlerAbstract<DataGenerationBaseOptions>
     {
-        protected override string[] GenerateDataOverride(int rows, DataGenerationBaseOptions? options, ushort blanks_percentage)
+        protected override string[] GenerateDataOverride(int rows, ushort blanks_percentage)
         {
             List<string> data = new List<string>();
 

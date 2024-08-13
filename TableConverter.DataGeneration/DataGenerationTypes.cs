@@ -1,7 +1,4 @@
-﻿using System.Linq;
-using System.Xml.Linq;
-using TableConverter.DataGeneration.DataGenerationHandlers;
-using TableConverter.DataGeneration.DataGenerationOptions;
+﻿using TableConverter.DataGeneration.DataGenerationHandlers;
 using TableConverter.DataGeneration.DataModels;
 using TableConverter.DataGeneration.Interfaces;
 
@@ -147,9 +144,9 @@ namespace TableConverter.DataGeneration
         /// <param name="name"> The name of the generator. </param>
         /// <returns> The newly created instance of the generation handler. </returns>
         /// <exception cref="Exception"> Thrown if the function doesnt manage to create an instance of the handler. </exception>
-        public IDataGenerationTypeHandler<T> GetHandlerByName<T>(string name) where T : DataGenerationBaseOptions
+        public IDataGenerationTypeHandler GetHandlerByName(string name)
         {
-            IDataGenerationTypeHandler<T>? handler = (IDataGenerationTypeHandler<T>?)Activator.CreateInstance(GetByName(name).GeneratorType);
+            IDataGenerationTypeHandler? handler = (IDataGenerationTypeHandler?)Activator.CreateInstance(GetByName(name).GeneratorType);
 
             if (handler is null)
             {
@@ -179,7 +176,7 @@ namespace TableConverter.DataGeneration
             {
                 headers.Add((!string.IsNullOrEmpty(dataGenerationFields[i].Name)) ? dataGenerationFields[i].Name : dataGenerationFields[i].Type);
 
-                string[] column = dataGenerationFields[i].TypeHandler.GenerateData(numberOfRows, dataGenerationFields[i].Options, dataGenerationFields[i].BlankPercentage);
+                string[] column = dataGenerationFields[i].TypeHandler.GenerateData(numberOfRows, dataGenerationFields[i].BlankPercentage);
 
                 for (int j = 0; j < column.LongLength; j++)
                 {
@@ -213,7 +210,7 @@ namespace TableConverter.DataGeneration
 
             var tasks = dataGenerationFields.Select(async (field, index) =>
             {
-                string[] column = await field.TypeHandler.GenerateDataAsync(numberOfRows, field.Options, field.BlankPercentage);
+                string[] column = await field.TypeHandler.GenerateDataAsync(numberOfRows, field.BlankPercentage);
 
                 for (int j = 0; j < column.LongLength; j++)
                 {

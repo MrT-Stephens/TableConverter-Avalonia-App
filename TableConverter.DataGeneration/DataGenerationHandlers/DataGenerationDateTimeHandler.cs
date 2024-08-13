@@ -5,17 +5,17 @@ namespace TableConverter.DataGeneration.DataGenerationHandlers
 {
     public class DataGenerationDateTimeHandler : DataGenerationTypeHandlerAbstract<DataGenerationDateTimeOptions>
     {
-        protected override string[] GenerateDataOverride(int rows, DataGenerationDateTimeOptions? options, ushort blanks_percentage)
+        protected override string[] GenerateDataOverride(int rows, ushort blanks_percentage)
         {
             string[] data = new string[rows];
 
             for (int i = 0; i < rows; i++)
             {
                 data[i] = CheckBlank(() => GenerateRandomDateTime(
-                        options!.FromDateTime, 
-                        options!.ToDateTime
+                        Options!.FromDateTime, 
+                        Options!.ToDateTime
                     ).ToString(
-                        options!.DateTimeFormats[options!.SelectedDateTimeFormat]
+                        Options!.DateTimeFormats[Options!.SelectedDateTimeFormat]
                     ), blanks_percentage);
             }
 

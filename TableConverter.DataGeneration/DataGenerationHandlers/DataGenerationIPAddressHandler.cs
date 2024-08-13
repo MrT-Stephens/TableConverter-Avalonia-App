@@ -5,7 +5,7 @@ namespace TableConverter.DataGeneration.DataGenerationHandlers
 {
     public class DataGenerationIPAddressHandler : DataGenerationTypeHandlerAbstract<DataGenerationIPAddressOptions>
     {
-        protected override string[] GenerateDataOverride(int rows, DataGenerationIPAddressOptions? options, ushort blanks_percentage)
+        protected override string[] GenerateDataOverride(int rows, ushort blanks_percentage)
         {
             string[] data = new string[rows];
 
@@ -13,7 +13,7 @@ namespace TableConverter.DataGeneration.DataGenerationHandlers
             {
                 data[i] = CheckBlank(() =>
                 {
-                    switch (options!.SelectedIpType)
+                    switch (Options!.SelectedIpType)
                     {
                         default:
                         case "IPv4":

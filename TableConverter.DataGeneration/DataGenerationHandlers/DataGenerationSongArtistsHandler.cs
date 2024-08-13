@@ -6,12 +6,15 @@ namespace TableConverter.DataGeneration.DataGenerationHandlers
 {
     public class DataGenerationSongArtistsHandler : DataGenerationTypeHandlerAbstract<DataGenerationBaseOptions>
     {
-        protected override string[] GenerateDataOverride(int rows, DataGenerationBaseOptions? options, ushort blanks_percentage)
+        protected override string[] GenerateDataOverride(int rows, ushort blanks_percentage)
         {
             string[] data = new string[rows];
 
             using (var reader = DbConnection.ExecuteCommand(
-                $"SELECT ARTIST FROM SONGS_TABLE WHERE ID IN (SELECT ID FROM SONGS_TABLE ORDER BY RANDOM() LIMIT {rows});"
+                @$"SELECT ARTIST FROM SONGS_TABLE 
+                   WHERE ID IN (
+                      SELECT ID FROM SONGS_TABLE ORDER BY RANDOM() LIMIT {rows}
+                   );"
             ))
             {
                 if (!reader.HasRows)

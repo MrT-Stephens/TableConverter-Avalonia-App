@@ -6,12 +6,14 @@ namespace TableConverter.DataGeneration.DataGenerationHandlers
 {
     public class DataGenerationBookIsbnHandler : DataGenerationTypeHandlerAbstract<DataGenerationBaseOptions>
     {
-        protected override string[] GenerateDataOverride(int rows, DataGenerationBaseOptions? options, ushort blanks_percentage)
+        protected override string[] GenerateDataOverride(int rows, ushort blanks_percentage)
         {
             string[] data = new string[rows];
 
             using (var reader = DbConnection.ExecuteCommand(
-                $"SELECT ISBN FROM BOOKS_TABLE WHERE ID IN (SELECT ID FROM BOOKS_TABLE ORDER BY RANDOM() LIMIT {rows});"
+                @$"SELECT ISBN FROM BOOKS_TABLE WHERE ID IN (
+                      SELECT ID FROM BOOKS_TABLE ORDER BY RANDOM() LIMIT {rows}
+                   );"
             ))
             {
                 if (!reader.HasRows)

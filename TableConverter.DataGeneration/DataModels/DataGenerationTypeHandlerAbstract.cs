@@ -4,12 +4,18 @@ using TableConverter.DataGeneration.Services;
 
 namespace TableConverter.DataGeneration.DataModels
 {
-    public abstract class DataGenerationTypeHandlerAbstract<T> : IDataGenerationTypeHandler<T> where T : DataGenerationBaseOptions, new()
+    public abstract class DataGenerationTypeHandlerAbstract<T> : IDataGenerationTypeHandler where T : DataGenerationBaseOptions, new()
     {
         /// <summary>
         /// The options for the generator. Used internally by <seealso cref="DataGenerationTypeHandlerAbstract{T}"/>, but can be used externally.
         /// </summary>
-        public T? Options { get; init; }
+        dynamic? IDataGenerationTypeHandler.Options
+        {
+            get => this.Options;
+            set => this.Options = value;
+        }
+
+        public T? Options { get; set; }
 
         /// <summary>
         /// A random data object for every instance of this class. Each instance has its own object.
@@ -23,7 +29,7 @@ namespace TableConverter.DataGeneration.DataModels
 
         public DataGenerationTypeHandlerAbstract()
         {
-            Options = (typeof(T) == typeof(DataGenerationBaseOptions)) ? (T?)null : new T();
+            Options = (typeof(T) == typeof(DataGenerationBaseOptions)) ? null : new T();
 
             Random = new Random((int)DateTime.Now.ToBinary());
         }

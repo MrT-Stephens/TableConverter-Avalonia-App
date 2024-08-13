@@ -6,12 +6,15 @@ namespace TableConverter.DataGeneration.DataGenerationHandlers
 {
     public class DataGenerationWebsiteUrlHandler : DataGenerationTypeHandlerAbstract<DataGenerationBaseOptions>
     {
-        protected override string[] GenerateDataOverride(int rows, DataGenerationBaseOptions? options, ushort blanks_percentage)
+        protected override string[] GenerateDataOverride(int rows, ushort blanks_percentage)
         {
             string[] data = new string[rows];
 
             using (var reader = DbConnection.ExecuteCommand(
-                $"SELECT URL FROM WEBSITE_URLS_TABLE WHERE ID IN (SELECT ID FROM WEBSITE_URLS_TABLE ORDER BY RANDOM() LIMIT {rows});"
+                @$"SELECT URL FROM WEBSITE_URLS_TABLE 
+                   WHERE ID IN (
+                      SELECT ID FROM WEBSITE_URLS_TABLE ORDER BY RANDOM() LIMIT {rows}
+                   );"
             ))
             {
                 if (!reader.HasRows)

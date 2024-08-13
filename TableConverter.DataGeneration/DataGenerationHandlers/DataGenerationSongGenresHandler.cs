@@ -6,12 +6,13 @@ namespace TableConverter.DataGeneration.DataGenerationHandlers
 {
     public class DataGenerationSongGenresHandler : DataGenerationTypeHandlerAbstract<DataGenerationBaseOptions>
     {
-        protected override string[] GenerateDataOverride(int rows, DataGenerationBaseOptions? options, ushort blanks_percentage)
+        protected override string[] GenerateDataOverride(int rows, ushort blanks_percentage)
         {
             string[] data = new string[rows];
 
             using (var reader = DbConnection.ExecuteCommand(
-                $"SELECT * FROM SONGS_GENRES_TABLE ORDER BY RANDOM() LIMIT {rows};"
+                @$"SELECT * FROM SONGS_GENRES_TABLE 
+                   ORDER BY RANDOM() LIMIT {rows};"
             ))
             {
                 if (!reader.HasRows)
