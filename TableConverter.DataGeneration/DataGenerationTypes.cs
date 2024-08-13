@@ -1,5 +1,7 @@
 ﻿using System.Linq;
+using System.Xml.Linq;
 using TableConverter.DataGeneration.DataGenerationHandlers;
+using TableConverter.DataGeneration.DataGenerationOptions;
 using TableConverter.DataGeneration.DataModels;
 using TableConverter.DataGeneration.Interfaces;
 
@@ -145,11 +147,11 @@ namespace TableConverter.DataGeneration
         /// <param name="name"> The name of the generator. </param>
         /// <returns> The newly created instance of the generation handler. </returns>
         /// <exception cref="Exception"> Thrown if the function doesnt manage to create an instance of the handler. </exception>
-        public IDataGenerationTypeHandler GetHandlerByName(string name)
+        public IDataGenerationTypeHandler<T> GetHandlerByName<T>(string name) where T : DataGenerationBaseOptions
         {
-            IDataGenerationTypeHandler? handler = (IDataGenerationTypeHandler?)Activator.CreateInstance(GetByName(name).GeneratorType);
+            IDataGenerationTypeHandler<T>? handler = (IDataGenerationTypeHandler<T>?)Activator.CreateInstance(GetByName(name).GeneratorType);
 
-            if (handler == null)
+            if (handler is null)
             {
                 throw new Exception($"Handler for {name} not found.");
             }

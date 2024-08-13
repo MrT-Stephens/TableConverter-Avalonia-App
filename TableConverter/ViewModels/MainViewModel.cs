@@ -6,7 +6,6 @@ using CommunityToolkit.Mvvm.Input;
 using SukiUI.Controls;
 using SukiUI.Models;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -29,7 +28,10 @@ public partial class MainViewModel : ViewModelBase
 
     #region Properties
 
-    // File converter view properties
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ////                            Convert File Properties
+    ///////////////////////////////////////////////////////////////////////////////////////
+    
     [ObservableProperty]
     private ObservableCollection<ConverterType> _InputConverters = [];
 
@@ -42,7 +44,10 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     private ConvertDocumentViewModel? _SelectedConvertDocument = null;
 
-    // Data generation view properties
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ////                            Data Generation Properties
+    ///////////////////////////////////////////////////////////////////////////////////////
+    
     [ObservableProperty]
     private ObservableCollection<DataGenerationFieldViewModel> _DataGenerationFields = new();
 
@@ -87,6 +92,10 @@ public partial class MainViewModel : ViewModelBase
     #endregion
 
     #region Commands 
+
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ////                            Convert File Commands
+    ///////////////////////////////////////////////////////////////////////////////////////
 
     [RelayCommand]
     private void ConvertFileNewFileButtonClicked()
@@ -314,22 +323,51 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    // Data generation view commands
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ////                            Data Generation Commands
+    ///////////////////////////////////////////////////////////////////////////////////////
+    
     [RelayCommand]
-    private void ChooseTypeButtonClicked()
+    private void ChooseTypeButtonClicked(DataGenerationFieldViewModel field)
     {
         SukiHost.ShowDialog(new DataGenerationTypesView(DataGenerationTypesService.Types, 
-            (type) => { 
-
+            (type) => 
+            { 
+                field.Name = type.Name;
             }
         ), false, true);
+    }
+
+    [RelayCommand]
+    private void AddFieldButtonClicked(DataGenerationFieldViewModel field)
+    {
+        if (DataGenerationFields.Last() == field)
+        {
+            DataGenerationFields.Add(new DataGenerationFieldViewModel());
+        }
+        else
+        {
+            DataGenerationFields.Insert(DataGenerationFields.IndexOf(field) + 1, new DataGenerationFieldViewModel());
+        }
+    }
+
+    [RelayCommand]
+    private void RemoveFieldButtonClicked(DataGenerationFieldViewModel field)
+    {
+        if (DataGenerationFields.Count > 1)
+        {
+            DataGenerationFields.Remove(field);
+        }
     }
 
     #endregion
 
     #region Misc Functions
 
-    // File converter view misc functions
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ////                            Convert File Misc Functions
+    ///////////////////////////////////////////////////////////////////////////////////////
+    
     private async void LoadConverterTypes()
     {
         var converters = await ConverterTypesService.GetConverterTypesAsync();

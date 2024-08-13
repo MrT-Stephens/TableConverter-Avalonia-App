@@ -481,7 +481,8 @@
                     <DataGridTemplateColumn.CellTemplate>
                       <DataTemplate>
                         <Button Classes="Flat"
-                                Command="{Binding ((vm:MainViewModel)DataContext).ChooseTypeButtonClickedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}">
+                                Command="{Binding ((vm:MainViewModel)DataContext).ChooseTypeButtonClickedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                CommandParameter="{Binding .}">
                           <StackPanel Spacing="10"
                                       Orientation="Horizontal">
                             <TextBlock Text="{Binding Type}" />
@@ -498,7 +499,7 @@
                                           Width="Auto">
                     <DataGridTemplateColumn.CellTemplate>
                       <DataTemplate>
-                        <ItemsControl>
+                        <ItemsControl ItemsSource="{Binding OptionsControls}">
                           <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                               <StackPanel Orientation="Horizontal"
@@ -541,12 +542,14 @@
                         <StackPanel Orientation="Horizontal"
                                     Spacing="10">
                           <Button Classes="Flat"
+                                  Command="{Binding ((vm:MainViewModel)DataContext).RemoveFieldButtonClickedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                   CommandParameter="{Binding .}">
                             <PathIcon Data="{StaticResource RemoveIcon}"
                                       Height="18"
                                       Width="18" />
                           </Button>
                           <Button Classes="Flat"
+                                  Command="{Binding ((vm:MainViewModel)DataContext).AddFieldButtonClickedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                   CommandParameter="{Binding .}">
                             <PathIcon Data="{StaticResource AddIcon}"
                                       Height="18"

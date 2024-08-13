@@ -2,12 +2,12 @@
 
 namespace TableConverter.DataGeneration.Interfaces
 {
-    public interface IDataGenerationTypeHandler
+    public interface IDataGenerationTypeHandler<T> where T : class
     {
-        public Type OptionsType { get; init; }
+        public T? Options { get; init; }
 
-        public string[] GenerateData(int rows, DataGenerationBaseOptions? options, ushort blanks_percentage);
+        public string[] GenerateData(int rows, ushort blanks_percentage);
 
-        public Task<string[]> GenerateDataAsync(int rows, DataGenerationBaseOptions? options, ushort blanks_percentage);
+        public Task<string[]> GenerateDataAsync(int rows, ushort blanks_percentage);
     }
 }
