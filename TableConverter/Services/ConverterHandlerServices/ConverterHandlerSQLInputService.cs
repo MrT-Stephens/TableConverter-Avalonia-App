@@ -33,9 +33,9 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Orientation = Orientation.Vertical
             };
 
-            var quote_type_label = new Label()
+            var quote_type_label = new TextBlock()
             {
-                Content = "Quote Type:",
+                Text = "Quote Type:",
             };
 
             var quote_type_combo_box = new ComboBox()
@@ -64,22 +64,22 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Spacing = 10
             };
 
-            var has_column_names_check_box = new CheckBox()
+            var has_column_names_check_box = new ToggleSwitch()
             {
                 IsChecked = HasColumnNames
             };
 
             has_column_names_check_box.IsCheckedChanged += (sender, e) =>
             {
-                if (sender is CheckBox check_box)
+                if (sender is ToggleSwitch check_box)
                 {
                     HasColumnNames = check_box.IsChecked ?? false;
                 }
             };
 
-            var has_column_names_label = new Label()
+            var has_column_names_label = new TextBlock()
             {
-                Content = "Has Column Names",
+                Text = "Has Column Names",
                 VerticalAlignment = VerticalAlignment.Center
             };
 

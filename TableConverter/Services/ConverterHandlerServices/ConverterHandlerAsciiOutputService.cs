@@ -103,9 +103,9 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Orientation = Orientation.Vertical
             };
 
-            var table_type_label = new Label()
+            var table_type_label = new TextBlock()
             {
-                Content = "Table Type:",
+                Text = "Table Type:",
             };
 
             var table_type_combo_box = new ComboBox()
@@ -133,9 +133,9 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Orientation = Orientation.Vertical
             };
 
-            var text_alignment_label = new Label()
+            var text_alignment_label = new TextBlock()
             {
-                Content = "Text Alignment:",
+                Text = "Text Alignment:",
             };
 
             var text_alignment_combo_box = new ComboBox()
@@ -163,9 +163,9 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Orientation = Orientation.Vertical
             };
 
-            var comment_type_label = new Label()
+            var comment_type_label = new TextBlock()
             {
-                Content = "Comment Type:",
+                Text = "Comment Type:",
             };
 
             var comment_type_combo_box = new ComboBox()
@@ -206,9 +206,9 @@ namespace TableConverter.Services.ConverterHandlerServices
                 }
             };
 
-            var force_row_separators_label = new Label()
+            var force_row_separators_label = new TextBlock()
             {
-                Content = "Force Row Separators",
+                Text = "Force Row Separators",
                 VerticalAlignment = VerticalAlignment.Center
             };
 

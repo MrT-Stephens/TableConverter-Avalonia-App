@@ -24,9 +24,9 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Orientation = Orientation.Vertical
             };
 
-            var delimiter_label = new Label()
+            var delimiter_label = new TextBlock()
             {
-                Content = "Excel Workbook Sheet Name:",
+                Text = "Excel Workbook Sheet Name:",
             };
 
             var delimiter_text_box = new TextBox()

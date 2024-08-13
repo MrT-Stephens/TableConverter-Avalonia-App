@@ -1,6 +1,5 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Layout;
-using Avalonia.Media;
 using CsvHelper.Configuration;
 using System;
 using System.Collections.Generic;
@@ -14,8 +13,9 @@ namespace TableConverter.Services.ConverterHandlerServices
 {
     internal class ConverterHandlerCsvInputService : ConverterHandlerInputAbstract
     {
-        private string Delimiter = ",";
-        private bool HasHeader = true;
+        private string Delimiter { get; set; } = ",";
+
+        private bool HasHeader { get; set; } = true;
 
         public override void InitializeControls()
         {
@@ -26,9 +26,9 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Orientation = Orientation.Vertical
             };
 
-            var delimiter_label = new Label()
+            var delimiter_label = new TextBlock()
             {
-                Content = "Delimiter:",
+                Text = "Delimiter:",
             };
 
             var delimiter_text_box = new TextBox()
@@ -55,22 +55,22 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Spacing = 10
             };
 
-            var has_header_check_box = new CheckBox()
+            var has_header_check_box = new ToggleSwitch()
             {
                 IsChecked = HasHeader
             };
 
             has_header_check_box.IsCheckedChanged += (sender, e) =>
             {
-                if (sender is CheckBox check_box)
+                if (sender is ToggleSwitch check_box)
                 {
                     HasHeader = check_box.IsChecked ?? false;
                 }
             };
 
-            var has_header_label = new Label()
+            var has_header_label = new TextBlock()
             {
-                Content = "Has Header",
+                Text = "Has Header",
                 VerticalAlignment = VerticalAlignment.Center,
             };
 

@@ -24,22 +24,22 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Spacing = 10
             };
 
-            var minify_html_check_box = new CheckBox()
+            var minify_html_check_box = new ToggleSwitch()
             {
                 IsChecked = MinifyHtml
             };
 
             minify_html_check_box.IsCheckedChanged += (sender, e) =>
             {
-                if (sender is CheckBox check_box)
+                if (sender is ToggleSwitch check_box)
                 {
                     MinifyHtml = check_box.IsChecked ?? false;
                 }
             };
 
-            var minify_html_label = new Label()
+            var minify_html_label = new TextBlock()
             {
-                Content = "Minify HTML",
+                Text = "Minify HTML",
                 VerticalAlignment = VerticalAlignment.Center
             };
 
@@ -54,22 +54,22 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Spacing = 10
             };
 
-            var include_thead_tbody_check_box = new CheckBox()
+            var include_thead_tbody_check_box = new ToggleSwitch()
             {
                 IsChecked = IncludeTheadTbody
             };
 
             include_thead_tbody_check_box.IsCheckedChanged += (sender, e) =>
             {
-                if (sender is CheckBox check_box)
+                if (sender is ToggleSwitch check_box)
                 {
                     IncludeTheadTbody = check_box.IsChecked ?? false;
                 }
             };
 
-            var include_thead_tbody_label = new Label()
+            var include_thead_tbody_label = new TextBlock()
             {
-                Content = "Include thead/tbody",
+                Text = "Include thead/tbody",
                 VerticalAlignment = VerticalAlignment.Center
             };
 

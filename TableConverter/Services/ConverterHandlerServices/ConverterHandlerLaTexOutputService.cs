@@ -58,9 +58,9 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Orientation = Orientation.Vertical
             };
 
-            var table_type_label = new Label()
+            var table_type_label = new TextBlock()
             {
-                Content = "LaTex Table Type:",
+                Text = "LaTex Table Type:",
             };
 
             var table_type_combo_box = new ComboBox()
@@ -88,9 +88,9 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Orientation = Orientation.Vertical
             };
 
-            var text_alignment_label = new Label()
+            var text_alignment_label = new TextBlock()
             {
-                Content = "Text Alignment:",
+                Text = "Text Alignment:",
             };
 
             var text_alignment_combo_box = new ComboBox()
@@ -118,9 +118,9 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Orientation = Orientation.Vertical
             };
 
-            var table_alignment_label = new Label()
+            var table_alignment_label = new TextBlock()
             {
-                Content = "Table Alignment:",
+                Text = "Table Alignment:",
             };
 
             var table_alignment_combo_box = new ComboBox()
@@ -148,9 +148,9 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Orientation = Orientation.Vertical
             };
 
-            var caption_alignment_label = new Label()
+            var caption_alignment_label = new TextBlock()
             {
-                Content = "Caption Alignment:",
+                Text = "Caption Alignment:",
             };
 
             var caption_alignment_combo_box = new ComboBox()
@@ -178,9 +178,9 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Orientation = Orientation.Vertical
             };
 
-            var caption_name_label = new Label()
+            var caption_name_label = new TextBlock()
             {
-                Content = "Caption Name:",
+                Text = "Caption Name:",
             };
 
             var caption_name_text_box = new TextBox()
@@ -207,9 +207,9 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Orientation = Orientation.Vertical
             };
 
-            var label_name_label = new Label()
+            var label_name_label = new TextBlock()
             {
-                Content = "Label Name:",
+                Text = "Label Name:",
             };
 
             var label_name_text_box = new TextBox()
@@ -237,22 +237,22 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Spacing = 10
             };
 
-            var minimal_working_example_check_box = new CheckBox()
+            var minimal_working_example_check_box = new ToggleSwitch()
             {
                 IsChecked = MinimalWorkingExample
             };
 
             minimal_working_example_check_box.IsCheckedChanged += (sender, e) =>
             {
-                if (sender is CheckBox check_box)
+                if (sender is ToggleSwitch check_box)
                 {
                     MinimalWorkingExample = check_box.IsChecked ?? false;
                 }
             };
 
-            var minimal_working_example_label = new Label()
+            var minimal_working_example_label = new TextBlock()
             {
-                Content = "Minimal Working Example",
+                Text = "Minimal Working Example",
                 VerticalAlignment = VerticalAlignment.Center
             };
 
@@ -267,22 +267,22 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Spacing = 10
             };
 
-            var bold_header_check_box = new CheckBox()
+            var bold_header_check_box = new ToggleSwitch()
             {
                 IsChecked = BoldHeader
             };
 
             bold_header_check_box.IsCheckedChanged += (sender, e) =>
             {
-                if (sender is CheckBox check_box)
+                if (sender is ToggleSwitch check_box)
                 {
                     BoldHeader = check_box.IsChecked ?? false;
                 }
             };
 
-            var bold_header_label = new Label()
+            var bold_header_label = new TextBlock()
             {
-                Content = "Bold Header",
+                Text = "Bold Header",
                 VerticalAlignment = VerticalAlignment.Center
             };
 
@@ -297,22 +297,22 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Spacing = 10
             };
 
-            var bold_first_column_check_box = new CheckBox()
+            var bold_first_column_check_box = new ToggleSwitch()
             {
                 IsChecked = BoldFirstColumn
             };
 
             bold_first_column_check_box.IsCheckedChanged += (sender, e) =>
             {
-                if (sender is CheckBox check_box)
+                if (sender is ToggleSwitch check_box)
                 {
                     BoldFirstColumn = check_box.IsChecked ?? false;
                 }
             };
 
-            var bold_first_column_label = new Label()
+            var bold_first_column_label = new TextBlock()
             {
-                Content = "Bold First Column",
+                Text = "Bold First Column",
                 VerticalAlignment = VerticalAlignment.Center
             };
 

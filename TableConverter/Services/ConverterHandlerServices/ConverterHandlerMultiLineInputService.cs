@@ -21,9 +21,9 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Orientation = Orientation.Vertical
             };
 
-            var row_separator_label = new Label()
+            var row_separator_label = new TextBlock()
             {
-                Content = "Row Separator:",
+                Text = "Row Separator:",
             };
 
             var row_separator_text_box = new TextBox()

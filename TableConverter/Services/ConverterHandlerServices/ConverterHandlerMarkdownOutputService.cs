@@ -41,9 +41,9 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Orientation = Orientation.Vertical
             };
 
-            var table_type_label = new Label()
+            var table_type_label = new TextBlock()
             {
-                Content = "Table Type:",
+                Text = "Table Type:",
             };
 
             var table_type_combo_box = new ComboBox()
@@ -71,9 +71,9 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Orientation = Orientation.Vertical
             };
 
-            var text_alignment_label = new Label()
+            var text_alignment_label = new TextBlock()
             {
-                Content = "Text Alignment:",
+                Text = "Text Alignment:",
             };
 
             var text_alignment_combo_box = new ComboBox()
@@ -102,22 +102,22 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Spacing = 10
             };
 
-            var bold_column_names_check_box = new CheckBox()
+            var bold_column_names_check_box = new ToggleSwitch()
             {
                 IsChecked = BoldColumnNames
             };
 
             bold_column_names_check_box.IsCheckedChanged += (sender, e) =>
             {
-                if (sender is CheckBox check_box)
+                if (sender is ToggleSwitch check_box)
                 {
                     BoldColumnNames = check_box.IsChecked ?? false;
                 }
             };
 
-            var bold_column_names_label = new Label()
+            var bold_column_names_label = new TextBlock()
             {
-                Content = "Bold Column Names",
+                Text = "Bold Column Names",
                 VerticalAlignment = VerticalAlignment.Center
             };
 
@@ -132,22 +132,22 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Spacing = 10
             };
 
-            var bold_first_column_check_box = new CheckBox()
+            var bold_first_column_check_box = new ToggleSwitch()
             {
                 IsChecked = BoldFirstColumn
             };
 
             bold_first_column_check_box.IsCheckedChanged += (sender, e) =>
             {
-                if (sender is CheckBox check_box)
+                if (sender is ToggleSwitch check_box)
                 {
                     BoldFirstColumn = check_box.IsChecked ?? false;
                 }
             };
 
-            var bold_first_column_label = new Label()
+            var bold_first_column_label = new TextBlock()
             {
-                Content = "Bold First Column",
+                Text = "Bold First Column",
                 VerticalAlignment = VerticalAlignment.Center
             };
 

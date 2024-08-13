@@ -30,9 +30,9 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Orientation = Orientation.Vertical
             };
 
-            var json_format_type_label = new Label()
+            var json_format_type_label = new TextBlock()
             {
-                Content = "JSON File Format:",
+                Text = "JSON File Format:",
             };
 
             var json_format_type_combo_box = new ComboBox()

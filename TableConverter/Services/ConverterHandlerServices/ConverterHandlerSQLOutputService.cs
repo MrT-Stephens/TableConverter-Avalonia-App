@@ -35,9 +35,9 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Orientation = Orientation.Vertical
             };
 
-            var table_name_label = new Label()
+            var table_name_label = new TextBlock()
             {
-                Content = "Table Name:",
+                Text = "Table Name:",
             };
 
             var table_name_text_box = new TextBox()
@@ -63,9 +63,9 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Orientation = Orientation.Vertical
             };
 
-            var quote_type_label = new Label()
+            var quote_type_label = new TextBlock()
             {
-                Content = "Quote Type:",
+                Text = "Quote Type:",
             };
 
             var quote_type_combo_box = new ComboBox()
@@ -94,22 +94,22 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Spacing = 10
             };
 
-            var insert_multi_rows_at_once_check_box = new CheckBox()
+            var insert_multi_rows_at_once_check_box = new ToggleSwitch()
             {
                 IsChecked = InsertMultiRowsAtOnce
             };
 
             insert_multi_rows_at_once_check_box.IsCheckedChanged += (sender, e) =>
             {
-                if (sender is CheckBox check_box)
+                if (sender is ToggleSwitch check_box)
                 {
                     InsertMultiRowsAtOnce = check_box.IsChecked ?? false;
                 }
             };
 
-            var insert_multi_rows_at_once_label = new Label()
+            var insert_multi_rows_at_once_label = new TextBlock()
             {
-                Content = "Insert Multiple Rows at Once",
+                Text = "Insert Multiple Rows at Once",
                 VerticalAlignment = VerticalAlignment.Center
             };
 

@@ -80,9 +80,9 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Orientation = Orientation.Vertical
             };
 
-            var background_colour_label = new Label()
+            var background_colour_label = new TextBlock()
             {
-                Content = "Background Colour:",
+                Text = "Background Colour:",
             };
 
             var background_colour_combo_box = new ComboBox()
@@ -112,9 +112,9 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Orientation = Orientation.Vertical
             };
 
-            var foreground_colour_label = new Label()
+            var foreground_colour_label = new TextBlock()
             {
-                Content = "Text Colour:",
+                Text = "Text Colour:",
             };
 
             var foreground_colour_combo_box = new ComboBox()
@@ -145,22 +145,22 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Spacing = 10
             };
 
-            var bold_header_check_box = new CheckBox()
+            var bold_header_check_box = new ToggleSwitch()
             {
                 IsChecked = BoldHeader
             };
 
             bold_header_check_box.IsCheckedChanged += (sender, e) =>
             {
-                if (sender is CheckBox check_box)
+                if (sender is ToggleSwitch check_box)
                 {
                     BoldHeader = check_box.IsChecked ?? false;
                 }
             };
 
-            var bold_header_label = new Label()
+            var bold_header_label = new TextBlock()
             {
-                Content = "Bold Header",
+                Text = "Bold Header",
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center
             };
 
@@ -175,22 +175,22 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Spacing = 10
             };
 
-            var show_grid_lines_check_box = new CheckBox()
+            var show_grid_lines_check_box = new ToggleSwitch()
             {
                 IsChecked = ShowGridLines
             };
 
             show_grid_lines_check_box.IsCheckedChanged += (sender, e) =>
             {
-                if (sender is CheckBox check_box)
+                if (sender is ToggleSwitch check_box)
                 {
                     ShowGridLines = check_box.IsChecked ?? false;
                 }
             };
 
-            var show_grid_lines_label = new Label()
+            var show_grid_lines_label = new TextBlock()
             {
-                Content = "Show Grid Lines",
+                Text = "Show Grid Lines",
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center
             };
 

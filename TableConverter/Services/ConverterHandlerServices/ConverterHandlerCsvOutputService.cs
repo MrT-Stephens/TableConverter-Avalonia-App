@@ -27,9 +27,9 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Orientation = Orientation.Vertical
             };
 
-            var delimiter_label = new Label()
+            var delimiter_label = new TextBlock()
             {
-                Content = "Delimiter:",
+                Text = "Delimiter:",
             };
 
             var delimiter_text_box = new TextBox()
@@ -56,22 +56,22 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Spacing = 10
             };
 
-            var has_header_check_box = new CheckBox()
+            var has_header_check_box = new ToggleSwitch()
             {
                 IsChecked = HasHeader
             };
 
             has_header_check_box.IsCheckedChanged += (sender, e) =>
             {
-                if (sender is CheckBox check_box)
+                if (sender is ToggleSwitch check_box)
                 {
                     HasHeader = check_box.IsChecked ?? false;
                 }
             };
 
-            var has_header_label = new Label()
+            var has_header_label = new TextBlock()
             {
-                Content = "Print Header",
+                Text = "Print Header",
                 VerticalAlignment = VerticalAlignment.Center
             };
 

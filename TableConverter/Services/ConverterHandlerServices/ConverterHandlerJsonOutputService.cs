@@ -32,9 +32,9 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Orientation = Orientation.Vertical
             };
 
-            var json_format_type_label = new Label()
+            var json_format_type_label = new TextBlock()
             {
-                Content = "JSON File Format:",
+                Text = "JSON File Format:",
             };
 
             var json_format_type_combo_box = new ComboBox()
@@ -63,22 +63,22 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Spacing = 10
             };
 
-            var minify_json_check_box = new CheckBox()
+            var minify_json_check_box = new ToggleSwitch()
             {
                 IsChecked = MinifyJson
             };
 
             minify_json_check_box.IsCheckedChanged += (sender, e) =>
             {
-                if (sender is CheckBox check_box)
+                if (sender is ToggleSwitch check_box)
                 {
                     MinifyJson = check_box.IsChecked ?? false;
                 }
             };
 
-            var minify_json_label = new Label()
+            var minify_json_label = new TextBlock()
             {
-                Content = "Minify JSON",
+                Text = "Minify JSON",
                 VerticalAlignment = VerticalAlignment.Center
             };
 

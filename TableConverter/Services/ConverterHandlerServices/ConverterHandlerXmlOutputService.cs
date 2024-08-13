@@ -26,9 +26,9 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Orientation = Orientation.Vertical
             };
 
-            var xml_root_node_name_label = new Label()
+            var xml_root_node_name_label = new TextBlock()
             {
-                Content = "XML Root Node Name:",
+                Text = "XML Root Node Name:",
             };
 
             var xml_root_node_name_text_box = new TextBox()
@@ -54,9 +54,9 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Orientation = Orientation.Vertical
             };
 
-            var xml_element_node_name_label = new Label()
+            var xml_element_node_name_label = new TextBlock()
             {
-                Content = "XML Element Node Name:",
+                Text = "XML Element Node Name:",
             };
 
             var xml_element_node_name_text_box = new TextBox()
@@ -83,22 +83,22 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Spacing = 10
             };
 
-            var minify_xml_check_box = new CheckBox()
+            var minify_xml_check_box = new ToggleSwitch()
             {
                 IsChecked = MinifyXml
             };
 
             minify_xml_check_box.IsCheckedChanged += (sender, e) =>
             {
-                if (sender is CheckBox check_box)
+                if (sender is ToggleSwitch check_box)
                 {
                     MinifyXml = check_box.IsChecked ?? false;
                 }
             };
 
-            var minify_xml_label = new Label()
+            var minify_xml_label = new TextBlock()
             {
-                Content = "Minify XML",
+                Text = "Minify XML",
                 VerticalAlignment = VerticalAlignment.Center
             };
 

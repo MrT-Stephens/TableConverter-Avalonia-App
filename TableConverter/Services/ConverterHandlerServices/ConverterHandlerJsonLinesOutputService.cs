@@ -27,9 +27,9 @@ namespace TableConverter.Services.ConverterHandlerServices
                 Orientation = Orientation.Vertical
             };
 
-            var json_lines_format_type_label = new Label()
+            var json_lines_format_type_label = new TextBlock()
             {
-                Content = "JSONLines File Format:",
+                Text = "JSONLines File Format:",
             };
 
             var json_lines_format_type_combo_box = new ComboBox()
