@@ -11,8 +11,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TableConverter.DataGeneration;
 using TableConverter.DataModels;
+using TableConverter.Interfaces;
 using TableConverter.Services;
 using TableConverter.Views;
 
@@ -22,7 +22,7 @@ public partial class MainViewModel : ViewModelBase
 {
     #region Services
 
-    private readonly DataGenerationTypes DataGenerationTypesService;
+    private readonly DataGenerationTypesService DataGenerationTypesService;
 
     #endregion
 
@@ -72,7 +72,7 @@ public partial class MainViewModel : ViewModelBase
         DataGenerationFields.Add(new());
     }
 
-    public MainViewModel(DataGenerationTypes dataGenerationTypesService)
+    public MainViewModel(DataGenerationTypesService dataGenerationTypesService)
     {
         DataGenerationTypesService = dataGenerationTypesService;
 
@@ -337,7 +337,12 @@ public partial class MainViewModel : ViewModelBase
 
                 field.DataGenerationTypeHandler = DataGenerationTypesService.GetHandlerByName(type.Name);
 
+                if (field.DataGenerationTypeHandler.Options is not null && field.DataGenerationTypeHandler is IInitializeControls controls)
+                {
+                    controls.InitializeControls();
 
+                    field.OptionsControls = new(controls.OptionsControls);
+                }
             }
         ), false, true);
     }

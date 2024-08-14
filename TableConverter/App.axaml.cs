@@ -2,7 +2,7 @@
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
-using TableConverter.DataGeneration;
+using TableConverter.Services;
 using TableConverter.ViewModels;
 using TableConverter.Views;
 
@@ -21,7 +21,7 @@ public partial class App : Application
         // Without this line you will get duplicate validations from both Avalonia and CT
         BindingPlugins.DataValidators.RemoveAt(0);
 
-        DataGenerationTypes dataGenerationTypesService = new();
+        DataGenerationTypesService dataGenerationTypesService = new();
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {

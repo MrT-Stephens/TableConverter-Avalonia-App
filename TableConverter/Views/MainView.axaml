@@ -504,7 +504,7 @@
                             <ItemsPanelTemplate>
                               <StackPanel Orientation="Horizontal"
                                           HorizontalAlignment="Stretch"
-                                          VerticalAlignment="Stretch">
+                                          Spacing="5">
                               </StackPanel>
                             </ItemsPanelTemplate>
                           </ItemsControl.ItemsPanel>

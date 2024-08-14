@@ -5,7 +5,7 @@ using TableConverter.Services.ConverterHandlerServices;
 
 namespace TableConverter.Services
 {
-    internal static class ConverterTypesService
+    public static class ConverterTypesService
     {
         public static Task<List<ConverterType>> GetConverterTypesAsync()
         {
