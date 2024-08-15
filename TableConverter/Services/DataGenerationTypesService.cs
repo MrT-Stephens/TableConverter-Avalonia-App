@@ -5,10 +5,11 @@ using TableConverter.DataGeneration.DataModels;
 using TableConverter.DataGeneration.Interfaces;
 using System.Linq;
 using TableConverter.Services.DataGenerationHandlersWithControls;
+using TableConverter.DataGeneration;
 
 namespace TableConverter.Services
 {
-    public class DataGenerationTypesService : DataGenerationGenderHandler
+    public class DataGenerationTypesService : DataGenerationGenHandler
     {
         public readonly IEnumerable<DataGenerationType> Types = new List<DataGenerationType>
         {

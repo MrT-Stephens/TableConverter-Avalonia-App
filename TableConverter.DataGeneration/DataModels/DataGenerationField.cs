@@ -7,7 +7,6 @@ namespace TableConverter.DataGeneration.DataModels
         string Name,
         string Type,
         ushort BlankPercentage,
-        DataGenerationBaseOptions Options,
         IDataGenerationTypeHandler TypeHandler
     );
 }

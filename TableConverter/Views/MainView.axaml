@@ -571,7 +571,7 @@
                                      ColumnSpacing="10">
                 <NumericUpDown Grid.Column="0"
                                ShowButtonSpinner="True"
-                               Value="1000"
+                               Value="{Binding NumberOfRows}"
                                Minimum="0"
                                Maximum="10000"
                                ParsingNumberStyle="Integer"
@@ -580,7 +580,8 @@
                 <Button Grid.Column="1"
                         Classes="Flat"
                         Content="Generate Data"
-                        HorizontalAlignment="Right" />
+                        HorizontalAlignment="Right"
+                        Command="{Binding GenerateDataButtonClickedCommand}" />
               </components:SpacedGrid>
             </sukiUi:GlassCard>
           </components:SpacedGrid>

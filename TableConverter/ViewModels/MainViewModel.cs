@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TableConverter.DataGeneration.DataModels;
 using TableConverter.DataModels;
 using TableConverter.Interfaces;
 using TableConverter.Services;
@@ -50,6 +51,9 @@ public partial class MainViewModel : ViewModelBase
     
     [ObservableProperty]
     private ObservableCollection<DataGenerationFieldViewModel> _DataGenerationFields = new();
+
+    [ObservableProperty]
+    private int _NumberOfRows = 0;
 
     #endregion
 
@@ -366,6 +370,31 @@ public partial class MainViewModel : ViewModelBase
         if (DataGenerationFields.Count > 1)
         {
             DataGenerationFields.Remove(field);
+        }
+    }
+
+    [RelayCommand]
+    private async Task GenerateDataButtonClicked()
+    {
+        DataGeneration.DataModels.TableData tableData = await DataGenerationTypesService.GenerateDataAsync(
+            DataGenerationFields.Select(val => new DataGenerationField(
+                val.Name,
+                val.Type,
+                val.BlankPercentage,
+                val.DataGenerationTypeHandler!
+            )).ToArray(), NumberOfRows
+        );
+
+        if (tableData.headers.Count > 0 && tableData.rows.Count > 0) 
+        {
+            ConvertDocuments?.Append(
+                new ConvertDocumentViewModel()
+                {
+                    Name = "GeneratedDocument",
+                    EditHeaders = new(tableData.headers),
+                    EditRows = new(tableData.rows),
+                }
+            );
         }
     }
 

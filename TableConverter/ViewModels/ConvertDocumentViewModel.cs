@@ -26,6 +26,9 @@ public partial class ConvertDocumentViewModel : ViewModelBase
     [ObservableProperty]
     private string _Path = string.Empty;
 
+    [ObservableProperty]
+    private bool _IsGenerated = false;
+
     // Input Items
     [ObservableProperty]
     private ConverterType? _InputConverter = null;
