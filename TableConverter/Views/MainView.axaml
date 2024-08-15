@@ -482,7 +482,8 @@
                       <DataTemplate>
                         <Button Classes="Flat"
                                 Command="{Binding ((vm:MainViewModel)DataContext).ChooseTypeButtonClickedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                CommandParameter="{Binding .}">
+                                CommandParameter="{Binding .}"
+                                HorizontalAlignment="Left">
                           <StackPanel Spacing="10"
                                       Orientation="Horizontal">
                             <TextBlock Text="{Binding Type}" />
