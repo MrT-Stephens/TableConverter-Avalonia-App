@@ -25,7 +25,7 @@ namespace TableConverter.DataGeneration.DataModels
         /// <summary>
         /// Connection to the internal database for random data.
         /// </summary>
-        public static DatabaseService DbConnection { get; } = new DatabaseService("");
+        public static DatabaseService DbConnection { get; } = new DatabaseService($"Data Source={AppContext.BaseDirectory}\\TableConverter-Data-Generation.db");
 
         public DataGenerationTypeHandlerAbstract()
         {
