@@ -25,6 +25,8 @@ public partial class MainViewModel : ViewModelBase
 
     private readonly DataGenerationTypesService DataGenerationTypesService;
 
+    private readonly ConverterTypesService ConverterTypesService;
+
     #endregion
 
     #region Properties
@@ -53,7 +55,10 @@ public partial class MainViewModel : ViewModelBase
     private ObservableCollection<DataGenerationFieldViewModel> _DataGenerationFields = new();
 
     [ObservableProperty]
-    private int _NumberOfRows = 0;
+    private int _NumberOfRows = 1000;
+
+    [ObservableProperty]
+    private string _GeneratedDocumentName = string.Empty;
 
     #endregion
 
@@ -62,6 +67,7 @@ public partial class MainViewModel : ViewModelBase
     public MainViewModel()
     {
         DataGenerationTypesService = new();
+        ConverterTypesService = new();
 
         LoadConverterTypes();
 
@@ -76,9 +82,10 @@ public partial class MainViewModel : ViewModelBase
         DataGenerationFields.Add(new());
     }
 
-    public MainViewModel(DataGenerationTypesService dataGenerationTypesService)
+    public MainViewModel(DataGenerationTypesService dataGenerationTypesService, ConverterTypesService converterTypesService)
     {
         DataGenerationTypesService = dataGenerationTypesService;
+        ConverterTypesService = converterTypesService;
 
         LoadConverterTypes();
 
@@ -387,13 +394,24 @@ public partial class MainViewModel : ViewModelBase
 
         if (tableData.headers.Count > 0 && tableData.rows.Count > 0) 
         {
-            ConvertDocuments?.Append(
-                new ConvertDocumentViewModel()
-                {
-                    Name = "GeneratedDocument",
-                    EditHeaders = new(tableData.headers),
-                    EditRows = new(tableData.rows),
-                }
+
+            var newDoc = new ConvertDocumentViewModel()
+            {
+                Name = string.IsNullOrEmpty(GeneratedDocumentName) ? 
+                           $"TableConverter-Generated-{DateTime.Now.ToFileTime()}" : 
+                           GeneratedDocumentName,
+                EditHeaders = new(tableData.headers),
+                EditRows = new(tableData.rows),
+                IsGenerated = true,
+                ProgressStepIndex = 1,
+            };
+
+            ConvertDocuments?.Add(newDoc);
+
+            await SukiHost.ShowToast(new ToastModel(
+                "Data Generated",
+                $"The file '{newDoc.Name}' has been added to your documents.",
+                SukiUI.Enums.NotificationType.Success)
             );
         }
     }
@@ -406,12 +424,10 @@ public partial class MainViewModel : ViewModelBase
     ////                            Convert File Misc Functions
     ///////////////////////////////////////////////////////////////////////////////////////
     
-    private async void LoadConverterTypes()
+    private void LoadConverterTypes()
     {
-        var converters = await ConverterTypesService.GetConverterTypesAsync();
-
-        InputConverters = new ObservableCollection<ConverterType>(converters.Where(c => c.inputConverter is not null).ToArray());
-        OutputConverters = new ObservableCollection<ConverterType>(converters.Where(c => c.outputConverter is not null).ToArray());
+        InputConverters = new ObservableCollection<ConverterType>(ConverterTypesService.Types.Where(c => c.inputConverter is not null));
+        OutputConverters = new ObservableCollection<ConverterType>(ConverterTypesService.Types.Where(c => c.outputConverter is not null));
     }
 
     private ConvertDocumentViewModel ExampleConverterDocument()

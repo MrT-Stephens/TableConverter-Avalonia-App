@@ -218,10 +218,15 @@
                     <DataTemplate>
                       <TextBlock Classes="h5"
                                  FontWeight="Bold"
-                                 Text="{Binding Name}">
+                                 Text="{Binding Name}"
+                                 TextWrapping="NoWrap"
+                                 TextTrimming="CharacterEllipsis"
+                                 MinWidth="100"
+                                 MaxWidth="150">
                         <TextBlock.ContextMenu>
                           <ContextMenu>
-                            <MenuItem Header="Remove File" />
+                            <MenuItem Header="Remove File"
+                                      Icon="{StaticResource RemoveIcon}" />
                           </ContextMenu>
                         </TextBlock.ContextMenu>
                       </TextBlock>
@@ -321,7 +326,8 @@
                             <Button Grid.Column="0"
                                     Command="{Binding ConvertFileNextBackButtonClickedCommand}"
                                     CommandParameter="0"
-                                    Classes="Flat">
+                                    Classes="Flat"
+                                    IsVisible="{Binding !SelectedConvertDocument.IsGenerated}">
                               <StackPanel Spacing="10"
                                           Orientation="Horizontal">
                                 <PathIcon Data="{StaticResource ArrowLeftIcon}" />
@@ -567,17 +573,21 @@
             <sukiUi:GlassCard Grid.Row="1"
                               IsAnimated="True"
                               Padding="10">
-              <components:SpacedGrid ColumnDefinitions="Auto,*"
+              <components:SpacedGrid ColumnDefinitions="Auto,Auto,*"
                                      ColumnSpacing="10">
-                <NumericUpDown Grid.Column="0"
+                <TextBox Grid.Column="0"
+                         Watermark="Document Name" 
+                         Text="{Binding GeneratedDocumentName}"
+                         MaxWidth="175" />
+                <NumericUpDown Grid.Column="1"
                                ShowButtonSpinner="True"
                                Value="{Binding NumberOfRows}"
-                               Minimum="0"
+                               Minimum="1"
                                Maximum="10000"
                                ParsingNumberStyle="Integer"
                                FormatString="N0"
                                sukiUiTheme:NumericUpDownExtensions.Unit="Rows" />
-                <Button Grid.Column="1"
+                <Button Grid.Column="2"
                         Classes="Flat"
                         Content="Generate Data"
                         HorizontalAlignment="Right"

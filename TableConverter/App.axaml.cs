@@ -22,19 +22,20 @@ public partial class App : Application
         BindingPlugins.DataValidators.RemoveAt(0);
 
         DataGenerationTypesService dataGenerationTypesService = new DataGenerationTypesService();
+        ConverterTypesService converterTypesService = new ConverterTypesService();
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainViewModel(dataGenerationTypesService)
+                DataContext = new MainViewModel(dataGenerationTypesService, converterTypesService)
             };
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
         {
             singleViewPlatform.MainView = new MainView
             {
-                DataContext = new MainViewModel(dataGenerationTypesService)
+                DataContext = new MainViewModel(dataGenerationTypesService, converterTypesService)
             };
         }
 
