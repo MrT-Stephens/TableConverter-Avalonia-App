@@ -354,6 +354,16 @@ public partial class MainViewModel : ViewModelBase
 
                     field.OptionsControls = new(controls.OptionsControls);
                 }
+                else
+                {
+                    field.OptionsControls = new()
+                    {
+                        new TextBlock()
+                        {
+                            Text = "No Options Available"
+                        }
+                    };
+                }
             }
         ), false, true);
     }

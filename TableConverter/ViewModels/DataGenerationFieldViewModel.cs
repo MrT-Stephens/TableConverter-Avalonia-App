@@ -16,7 +16,13 @@ public partial class DataGenerationFieldViewModel : ViewModelBase
     private string _Type = "Choose a Type";
 
     [ObservableProperty]
-    private ObservableCollection<Control> _OptionsControls = new();
+    private ObservableCollection<Control> _OptionsControls = new()
+    {
+        new TextBlock()
+        {
+            Text = "No Options Available"
+        }
+    };
 
     [ObservableProperty]
     private ushort _BlankPercentage = 0;
