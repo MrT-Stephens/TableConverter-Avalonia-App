@@ -334,6 +334,15 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
+    [RelayCommand]
+    private void RemoveFileButtonClicked(string name)
+    {
+        if (ConvertDocuments!.Any(val => val.Name == name))
+        {
+            ConvertDocuments!.Remove(ConvertDocuments.First(val => val.Name == name));
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////////////////
     ////                            Data Generation Commands
     ///////////////////////////////////////////////////////////////////////////////////////

@@ -208,13 +208,13 @@
                          SelectedItem="{Binding SelectedConvertDocument}"
                          SelectionMode="AlwaysSelected,Single"
                          ScrollViewer.HorizontalScrollBarVisibility="Auto">
-                  <ItemsControl.ItemsPanel>
+                  <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                       <StackPanel Spacing="5"
                                   Orientation="Horizontal" />
                     </ItemsPanelTemplate>
-                  </ItemsControl.ItemsPanel>
-                  <ItemsControl.ItemTemplate>
+                  </ListBox.ItemsPanel>
+                  <ListBox.ItemTemplate>
                     <DataTemplate>
                       <TextBlock Classes="h5"
                                  FontWeight="Bold"
@@ -223,15 +223,9 @@
                                  TextTrimming="CharacterEllipsis"
                                  MinWidth="100"
                                  MaxWidth="150">
-                        <TextBlock.ContextMenu>
-                          <ContextMenu>
-                            <MenuItem Header="Remove File"
-                                      Icon="{StaticResource RemoveIcon}" />
-                          </ContextMenu>
-                        </TextBlock.ContextMenu>
                       </TextBlock>
                     </DataTemplate>
-                  </ItemsControl.ItemTemplate>
+                  </ListBox.ItemTemplate>
                 </ListBox>
                 <!-- Converstion Progress Stepper Bar -->
                 <sukiUi:Stepper Grid.Column="2"
@@ -419,7 +413,7 @@
                                         Orientation="Horizontal"
                                         Spacing="10">
                               <Button Command="{Binding CopyFileButtonClickedCommand}"
-                                      Classes="Flat Accent">
+                                      Classes="Flat">
                                 <StackPanel Spacing="10"
                                             Orientation="Horizontal">
                                   <TextBlock Classes="h5"
