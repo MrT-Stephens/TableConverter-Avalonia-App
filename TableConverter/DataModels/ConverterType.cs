@@ -1,14 +1,15 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using TableConverter.Interfaces;
 
 namespace TableConverter.DataModels
 {
     public record ConverterType(
-        string name,
-        Collection<string> extensions,
-        Collection<string> mimeTypes,
-        string description,
-        IConverterHanderInput? inputConverter,
-        IConverterHandlerOutput? outputConverter
+        string Name,
+        Collection<string> Extensions,
+        Collection<string> MimeTypes,
+        string Description,
+        Type? InputConverterType,
+        Type? OutputConverterType
     );
 }
