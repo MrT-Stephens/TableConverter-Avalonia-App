@@ -10,7 +10,7 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
 {
     public class DataGenerationDateTimeHandlerWithControls : DataGenerationDateTimeHandler, IInitializeControls
     {
-        public Collection<Control> OptionsControls { get; set; } = new();
+        public Collection<Control> Controls { get; set; } = new();
 
         public void InitializeControls()
         {
@@ -141,10 +141,10 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
                 }
             };
 
-            OptionsControls.Add(from_uniform_grid);
-            OptionsControls.Add(to_label);
-            OptionsControls.Add(to_uniform_grid);
-            OptionsControls.Add(format_combo_box);
+            Controls.Add(from_uniform_grid);
+            Controls.Add(to_label);
+            Controls.Add(to_uniform_grid);
+            Controls.Add(format_combo_box);
         }
     }
 }

@@ -2,7 +2,6 @@
 using SukiUI.Controls;
 using System;
 using System.Collections.ObjectModel;
-using TableConverter.Components;
 using TableConverter.DataGeneration.DataGenerationHandlers;
 using TableConverter.Interfaces;
 using TableConverter.Views;
@@ -11,7 +10,7 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
 {
     public class DataGenerationCharacterSequenceHandlerWithControls : DataGenerationCharacterSequenceHandler, IInitializeControls
     {
-        public Collection<Control> OptionsControls { get; set; } = new();
+        public Collection<Control> Controls { get; set; } = new();
 
         public void InitializeControls()
         {
@@ -76,8 +75,8 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
                 }, false, true);
             };
 
-            OptionsControls.Add(sequence_text_box);
-            OptionsControls.Add(flyout_button);
+            Controls.Add(sequence_text_box);
+            Controls.Add(flyout_button);
         }
     }
 }

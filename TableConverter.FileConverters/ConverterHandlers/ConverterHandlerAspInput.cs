@@ -1,4 +1,4 @@
-﻿using TableConverter.FileConverters.ConverterHandlerOptions;
+﻿using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
 
 namespace TableConverter.FileConverters.ConverterHandlers

@@ -8,7 +8,7 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
 {
     public class DataGenerationShirtSizesHandlerWithControls : DataGenerationShirtSizesHandler, IInitializeControls
     {
-        public Collection<Control> OptionsControls { get; set; } = new();
+        public Collection<Control> Controls { get; set; } = new();
 
         public void InitializeControls()
         {
@@ -34,8 +34,8 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
                 }
             };
 
-            OptionsControls.Add(shirt_size_group_label);
-            OptionsControls.Add(shirt_size_group_combo_box);
+            Controls.Add(shirt_size_group_label);
+            Controls.Add(shirt_size_group_combo_box);
         }
     }
 }

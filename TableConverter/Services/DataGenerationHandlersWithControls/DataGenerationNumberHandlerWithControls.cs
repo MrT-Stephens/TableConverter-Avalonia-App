@@ -9,7 +9,7 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
 {
     public class DataGenerationNumberHandlerWithControls : DataGenerationNumberHandler, IInitializeControls
     {
-        public Collection<Control> OptionsControls { get; set; } = new();
+        public Collection<Control> Controls { get; set; } = new();
 
         public void InitializeControls()
         {
@@ -36,8 +36,8 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
                 }
             };
 
-            OptionsControls.Add(min_label);
-            OptionsControls.Add(min_numeric_up_down);
+            Controls.Add(min_label);
+            Controls.Add(min_numeric_up_down);
 
             var max_label = new TextBlock()
             {
@@ -62,8 +62,8 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
                 }
             };
 
-            OptionsControls.Add(max_label);
-            OptionsControls.Add(max_numeric_up_down);
+            Controls.Add(max_label);
+            Controls.Add(max_numeric_up_down);
 
             var decimal_label = new TextBlock()
             {
@@ -88,8 +88,8 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
                 }
             };
 
-            OptionsControls.Add(decimal_label);
-            OptionsControls.Add(decimal_numeric_up_down);
+            Controls.Add(decimal_label);
+            Controls.Add(decimal_numeric_up_down);
         }
     }
 }

@@ -7,7 +7,7 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
 {
     public class DataGenerationCustomListHandlerWithControls : DataGenerationCustomListHandler, IInitializeControls
     {
-        public Collection<Control> OptionsControls { get; set; } = new();
+        public Collection<Control> Controls { get; set; } = new();
 
         public void InitializeControls()
         {
@@ -25,7 +25,7 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
                 }
             };
 
-            OptionsControls.Add(sequence_text_box);
+            Controls.Add(sequence_text_box);
         }
     }
 }

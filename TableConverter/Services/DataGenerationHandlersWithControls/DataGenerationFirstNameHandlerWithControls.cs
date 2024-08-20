@@ -10,7 +10,7 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
 {
     public class DataGenerationFirstNameHandlerWithControls : DataGenerationFirstNameHandler, IInitializeControls
     {
-        public Collection<Control> OptionsControls { get; set; } = new();
+        public Collection<Control> Controls { get; set; } = new();
 
         public void InitializeControls()
         {
@@ -56,8 +56,8 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
                 }
             };
 
-            OptionsControls.Add(country_code_label);
-            OptionsControls.Add(country_code_combo_box);
+            Controls.Add(country_code_label);
+            Controls.Add(country_code_combo_box);
         }
     }
 }

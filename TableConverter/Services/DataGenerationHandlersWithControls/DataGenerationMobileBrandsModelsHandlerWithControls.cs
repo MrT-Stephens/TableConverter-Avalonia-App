@@ -12,7 +12,7 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
 {
     public class DataGenerationMobileBrandsModelsHandlerWithControls : DataGenerationMobileBrandsModelsHandler, IInitializeControls
     {
-        public Collection<Control> OptionsControls { get; set; } = new();
+        public Collection<Control> Controls { get; set; } = new();
 
         public void InitializeControls()
         {
@@ -58,8 +58,8 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
                 }
             };
 
-            OptionsControls.Add(mobile_brands_label);
-            OptionsControls.Add(mobile_brands_combo_box);
+            Controls.Add(mobile_brands_label);
+            Controls.Add(mobile_brands_combo_box);
         }
     }
 }

@@ -5,7 +5,7 @@ namespace TableConverter.Interfaces
 {
     public interface IInitializeControls
     {
-        public Collection<Control> OptionsControls { get; set; }
+        public Collection<Control> Controls { get; set; }
 
         public void InitializeControls();
     }

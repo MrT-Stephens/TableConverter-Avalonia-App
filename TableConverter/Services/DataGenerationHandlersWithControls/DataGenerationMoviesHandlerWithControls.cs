@@ -10,7 +10,7 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
 {
     public class DataGenerationMoviesHandlerWithControls : DataGenerationMoviesHandler, IInitializeControls
     {
-        public Collection<Control> OptionsControls { get; set; } = new();
+        public Collection<Control> Controls { get; set; } = new();
 
         public void InitializeControls()
         {
@@ -56,8 +56,8 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
                 }
             };
 
-            OptionsControls.Add(movie_genre_label);
-            OptionsControls.Add(movie_genres_combo_box);
+            Controls.Add(movie_genre_label);
+            Controls.Add(movie_genres_combo_box);
         }
     }
 }

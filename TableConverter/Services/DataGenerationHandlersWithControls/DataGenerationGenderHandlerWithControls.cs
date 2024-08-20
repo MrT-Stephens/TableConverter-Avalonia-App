@@ -8,7 +8,7 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
 {
     public class DataGenerationGenderHandlerWithControls : DataGenerationGenderHandler, IInitializeControls
     {
-        public Collection<Control> OptionsControls { get; set; } = new();
+        public Collection<Control> Controls { get; set; } = new();
 
         public void InitializeControls()
         {
@@ -34,8 +34,8 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
                 }
             };
 
-            OptionsControls.Add(format_label);
-            OptionsControls.Add(gender_format_combo_box);
+            Controls.Add(format_label);
+            Controls.Add(gender_format_combo_box);
         }
     }
 }

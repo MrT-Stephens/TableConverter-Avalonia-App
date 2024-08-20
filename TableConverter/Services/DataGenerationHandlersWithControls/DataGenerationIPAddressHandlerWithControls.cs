@@ -7,7 +7,7 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
 {
     public class DataGenerationIPAddressHandlerWithControls : DataGenerationIPAddressHandler, IInitializeControls
     {
-        public Collection<Control> OptionsControls { get; set; } = new();
+        public Collection<Control> Controls { get; set; } = new();
 
         public void InitializeControls()
         {
@@ -27,7 +27,7 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
                 }
             };
 
-            OptionsControls.Add(ip_type_combo_box);
+            Controls.Add(ip_type_combo_box);
         }
     }
 }
