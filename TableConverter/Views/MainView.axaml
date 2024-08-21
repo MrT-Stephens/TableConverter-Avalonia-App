@@ -94,7 +94,7 @@
                                       <!-- Input Converter Name -->
                                       <TextBlock Grid.Column="0"
                                                  Classes="h4 Primary"
-                                                 Text="{Binding name}"
+                                                 Text="{Binding Name}"
                                                  FontWeight="Bold"
                                                  VerticalAlignment="Center" />
                                       <!-- Input Converter Extensions -->
@@ -103,13 +103,13 @@
                                                  VerticalAlignment="Center"
                                                  Classes="h5"
                                                  FontWeight="DemiBold"
-                                                 Text="{Binding extensions, Converter={x:Static converters:ArrayToStringConverter.Instance}}">
+                                                 Text="{Binding Extensions, Converter={x:Static converters:ArrayToStringConverter.Instance}}">
                                       </TextBlock>
                                     </components:SpacedGrid>
                                   </sukiUi:GroupBox.Header>
                                   <!-- Input Converter Description -->
                                   <TextBlock Classes="h6"
-                                             Text="{Binding description}"
+                                             Text="{Binding Description}"
                                              TextWrapping="Wrap" />
                                 </sukiUi:GroupBox>
                               </sukiUi:GlassCard>
@@ -135,7 +135,7 @@
                                       <!-- Output Converter Name -->
                                       <TextBlock Grid.Column="0"
                                                  Classes="h4 Primary"
-                                                 Text="{Binding name}"
+                                                 Text="{Binding Name}"
                                                  FontWeight="Bold"
                                                  VerticalAlignment="Center" />
                                       <!-- Output Converter Extensions -->
@@ -144,13 +144,13 @@
                                                  VerticalAlignment="Center"
                                                  Classes="h5"
                                                  FontWeight="DemiBold"
-                                                 Text="{Binding extensions, Converter={x:Static converters:ArrayToStringConverter.Instance}}">
+                                                 Text="{Binding Extensions, Converter={x:Static converters:ArrayToStringConverter.Instance}}">
                                       </TextBlock>
                                     </components:SpacedGrid>
                                   </sukiUi:GroupBox.Header>
                                   <!-- Output Converter Description -->
                                   <TextBlock Classes="h6"
-                                             Text="{Binding description}"
+                                             Text="{Binding Description}"
                                              TextWrapping="Wrap" />
                                 </sukiUi:GroupBox>
                               </sukiUi:GlassCard>

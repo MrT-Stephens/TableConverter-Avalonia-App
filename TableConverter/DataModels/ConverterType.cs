@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using TableConverter.Interfaces;
+﻿using System.Collections.ObjectModel;
+using TableConverter.FileConverters.Interfaces;
 
 namespace TableConverter.DataModels
 {
@@ -9,7 +8,7 @@ namespace TableConverter.DataModels
         Collection<string> Extensions,
         Collection<string> MimeTypes,
         string Description,
-        Type? InputConverterType,
-        Type? OutputConverterType
+        IConverterHanderInput? InputConverterHandler,
+        IConverterHandlerOutput? OutputConverterHandler
     );
 }

@@ -3,6 +3,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Org.BouncyCastle.Asn1.Crmf;
 using SukiUI.Controls;
 using SukiUI.Models;
 using System;
@@ -113,7 +114,7 @@ public partial class MainViewModel : ViewModelBase
     {
         SukiHost.ShowDialog(new FileTypesSelectorView(
             "Please select a file type to input",
-            InputConverters.Select(converter => converter.name).ToArray(),
+            InputConverters.Select(converter => converter.Name).ToArray(),
             OnInputFileTypeClicked
         ), false, true);
     }
@@ -140,7 +141,7 @@ public partial class MainViewModel : ViewModelBase
                 {
                     currentDoc.IsBusy = true;
 
-                    var data = await currentDoc.InputConverter.inputConverter!.ReadTextAsync(currentDoc.InputFileText.Text);
+                    var data = await currentDoc.InputConverter.InputConverterHandler!.ReadTextAsync(currentDoc.InputFileText.Text);
 
                     if (data != null)
                     {
@@ -163,13 +164,13 @@ public partial class MainViewModel : ViewModelBase
                     }
                 };
 
-                currentDoc.InputConverter.inputConverter!.InitializeControls();
-
-                if (currentDoc.InputConverter.inputConverter!.Controls is not null)
+                if (currentDoc.InputConverter.InputConverterHandler!.Options is not null && currentDoc.InputConverter.InputConverterHandler is IInitializeControls controls)
                 {
+                    controls.InitializeControls();
+
                     SukiHost.ShowDialog(new ConvertFilesOptionsView(
-                        $"How would you like your {currentDoc.InputConverter.name} file inputted?",
-                        currentDoc.InputConverter.inputConverter!.Controls,
+                        $"How would you like your {currentDoc.InputConverter.Name} file inputted?",
+                        controls.Controls,
                         processDoc
                     ), false, true);
                 }
@@ -183,10 +184,10 @@ public partial class MainViewModel : ViewModelBase
                 // Process the tabular data to the outputted file type.
                 SukiHost.ShowDialog(new FileTypesSelectorView(
                     "Please select a file type to output",
-                    OutputConverters.Select(converter => converter.name).ToArray(),
+                    OutputConverters.Select(converter => converter.Name).ToArray(),
                     (converterName) =>
                     {
-                        currentDoc.OutputConverter = OutputConverters.First(converter => converter.name == converterName);
+                        currentDoc.OutputConverter = OutputConverters.First(converter => converter.Name == converterName);
 
                         if (currentDoc.OutputConverter is not null) 
                         {
@@ -194,7 +195,7 @@ public partial class MainViewModel : ViewModelBase
                             {
                                 currentDoc.IsBusy = true;
 
-                                var data = await currentDoc.OutputConverter.outputConverter!.ConvertAsync(currentDoc.EditHeaders.ToArray(), currentDoc.EditRows.ToArray());
+                                var data = await currentDoc.OutputConverter.OutputConverterHandler!.ConvertAsync(currentDoc.EditHeaders.ToArray(), currentDoc.EditRows.ToArray());
 
                                 if (data != null)
                                 {
@@ -210,7 +211,7 @@ public partial class MainViewModel : ViewModelBase
 
                                     await SukiHost.ShowToast(new ToastModel(
                                         "File Converted",
-                                        $"The file '{currentDoc.Name}' has been converted to a '{currentDoc.OutputConverter.name}' file.",
+                                        $"The file '{currentDoc.Name}' has been converted to a '{currentDoc.OutputConverter.Name}' file.",
                                         SukiUI.Enums.NotificationType.Success)
                                     );
                                 }
@@ -220,13 +221,13 @@ public partial class MainViewModel : ViewModelBase
                                 }
                             };
 
-                            currentDoc.OutputConverter.outputConverter!.InitializeControls();
-
-                            if (currentDoc.OutputConverter.outputConverter!.Controls is not null)
+                            if (currentDoc.OutputConverter.OutputConverterHandler!.Options is not null && currentDoc.OutputConverter.OutputConverterHandler is IInitializeControls controls)
                             {
+                                controls.InitializeControls();
+
                                 SukiHost.ShowDialog(new ConvertFilesOptionsView(
-                                    $"How would you like your {currentDoc.OutputConverter.name} file outputted?",
-                                    currentDoc.OutputConverter.outputConverter!.Controls,
+                                    $"How would you like your {currentDoc.OutputConverter.Name} file outputted?",
+                                    controls.Controls,
                                     processDoc
                                 ), false, true);
                             }
@@ -281,18 +282,18 @@ public partial class MainViewModel : ViewModelBase
         {
             var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
             {
-                Title = $"Save {currentDoc.OutputConverter.name} File",
+                Title = $"Save {currentDoc.OutputConverter.Name} File",
                 FileTypeChoices = [
-                    new(currentDoc.OutputConverter.name)
+                    new(currentDoc.OutputConverter.Name)
                     {
-                        Patterns = currentDoc.OutputConverter.extensions.Select(ext => $"*{ext}").ToArray(),
-                        MimeTypes = currentDoc.OutputConverter.mimeTypes
+                        Patterns = currentDoc.OutputConverter.Extensions.Select(ext => $"*{ext}").ToArray(),
+                        MimeTypes = currentDoc.OutputConverter.MimeTypes
                     },
                     FilePickerFileTypes.All
                 ],
-                DefaultExtension = currentDoc.OutputConverter.extensions[0],
+                DefaultExtension = currentDoc.OutputConverter.Extensions[0],
                 ShowOverwritePrompt = false,
-                SuggestedFileName = $"TableConverter-{currentDoc.InputConverter.name}-{currentDoc.OutputConverter.name}-{DateTime.Now.ToFileTime()}"
+                SuggestedFileName = $"TableConverter-{currentDoc.InputConverter.Name}-{currentDoc.OutputConverter.Name}-{DateTime.Now.ToFileTime()}"
             });
 
             if (file is not null)
@@ -301,7 +302,10 @@ public partial class MainViewModel : ViewModelBase
                 {
                     currentDoc.IsBusy = true;
 
-                    await currentDoc.OutputConverter.outputConverter!.SaveFileAsync(file, Encoding.UTF8.GetBytes(currentDoc.OutputFileText.Text));
+                    using (var stream = await file.OpenWriteAsync())
+                    {
+                        await currentDoc.OutputConverter.OutputConverterHandler!.SaveFileAsync(stream, Encoding.UTF8.GetBytes(currentDoc.OutputFileText.Text));
+                    }
 
                     currentDoc.IsBusy = false;
 
@@ -361,7 +365,7 @@ public partial class MainViewModel : ViewModelBase
                 {
                     controls.InitializeControls();
 
-                    field.OptionsControls = new(controls.OptionsControls);
+                    field.OptionsControls = new(controls.Controls);
                 }
                 else
                 {
@@ -445,8 +449,8 @@ public partial class MainViewModel : ViewModelBase
     
     private void LoadConverterTypes()
     {
-        InputConverters = new ObservableCollection<ConverterType>(ConverterTypesService.Types.Where(c => c.inputConverter is not null));
-        OutputConverters = new ObservableCollection<ConverterType>(ConverterTypesService.Types.Where(c => c.outputConverter is not null));
+        InputConverters = new ObservableCollection<ConverterType>(ConverterTypesService.Types.Where(c => c.InputConverterHandler is not null));
+        OutputConverters = new ObservableCollection<ConverterType>(ConverterTypesService.Types.Where(c => c.OutputConverterHandler is not null));
     }
 
     private ConvertDocumentViewModel ExampleConverterDocument()
@@ -454,7 +458,7 @@ public partial class MainViewModel : ViewModelBase
         return new ConvertDocumentViewModel()
         {
             Name = "Example.csv",
-            InputConverter = InputConverters.First(converter => converter.name == "CSV"),
+            InputConverter = InputConverters.First(converter => converter.Name == "CSV"),
             InputFileText = new AvaloniaEdit.Document.TextDocument()
             {
                 FileName = "Example.csv",
@@ -486,19 +490,19 @@ public partial class MainViewModel : ViewModelBase
         {
             var doc = new ConvertDocumentViewModel()
             {
-                InputConverter = InputConverters.First(converter => converter.name == converterName),
+                InputConverter = InputConverters.First(converter => converter.Name == converterName),
             };
 
             var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
             {
-                Title = $"Open {doc.InputConverter.name} File",
+                Title = $"Open {doc.InputConverter.Name} File",
                 AllowMultiple = false,
                 FileTypeFilter =
                 [
-                    new(doc.InputConverter.name)
+                    new(doc.InputConverter.Name)
                     {
-                        Patterns = doc.InputConverter.extensions.Select(ext => $"*{ext}").ToArray(),
-                        MimeTypes = doc.InputConverter.mimeTypes
+                        Patterns = doc.InputConverter.Extensions.Select(ext => $"*{ext}").ToArray(),
+                        MimeTypes = doc.InputConverter.MimeTypes
                     },
                     FilePickerFileTypes.All
                 ]
@@ -518,11 +522,14 @@ public partial class MainViewModel : ViewModelBase
                     loadingDoc.Name = files[0].Name;
                     loadingDoc.Path = files[0].Path.AbsolutePath;
 
-                    loadingDoc.InputFileText = new AvaloniaEdit.Document.TextDocument()
+                    using (var stream = await files[0].OpenReadAsync())
                     {
-                        FileName = files[0].Name,
-                        Text = await loadingDoc.InputConverter.inputConverter!.ReadFileAsync(files[0])
-                    };
+                        loadingDoc.InputFileText = new AvaloniaEdit.Document.TextDocument()
+                        {
+                            FileName = files[0].Name,
+                            Text = await loadingDoc.InputConverter.InputConverterHandler!.ReadFileAsync(stream)
+                        };
+                    }
 
                     loadingDoc.IsBusy = false;
 
