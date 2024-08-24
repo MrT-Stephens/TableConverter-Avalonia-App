@@ -37,4 +37,8 @@
       <DependentUpon>FileTypesSelectorView.axaml</DependentUpon>
     </Compile>
   </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Views\DataGenerationPageView.axaml" />
+  </ItemGroup>
 </Project>

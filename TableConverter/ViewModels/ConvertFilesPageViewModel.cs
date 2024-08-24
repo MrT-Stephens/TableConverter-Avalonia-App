@@ -1,8 +1,10 @@
-﻿namespace TableConverter.ViewModels;
+﻿using Avalonia;
+
+namespace TableConverter.ViewModels;
 
 public partial class ConvertFilesPageViewModel : BasePageViewModel
 {
-    public ConvertFilesPageViewModel() : base("Convert Files", App.Current?.Resources["ConvertIcon"])
+    public ConvertFilesPageViewModel() : base("Convert Files", Application.Current?.Resources["ConvertIcon"])
     {
     }
 }
