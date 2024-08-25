@@ -6,7 +6,7 @@ namespace TableConverter.ViewModels;
 public abstract partial class BasePageViewModel : ObservableValidator
 {
     [ObservableProperty]
-    private string _Name;
+    private string _DisplayName;
 
     [ObservableProperty]
     private object _Icon;
@@ -14,11 +14,11 @@ public abstract partial class BasePageViewModel : ObservableValidator
     [ObservableProperty]
     private int _Index;
 
-    public BasePageViewModel(string name, object? icon, int index = 0)
+    public BasePageViewModel(string displayName, object? icon, int index = 0)
     {
         ArgumentNullException.ThrowIfNull(icon, nameof(icon));
 
-        Name = name;
+        DisplayName = displayName;
         Icon = icon;
         Index = index;
     }

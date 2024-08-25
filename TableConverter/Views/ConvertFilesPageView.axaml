@@ -2,6 +2,286 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="TableConverter.Views.ConvertFilesPageView">
+             xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+             xmlns:xamlInteractivity="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             xmlns:xamlInteractions="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+             xmlns:components="clr-namespace:TableConverter.Components"
+             xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+             x:Class="TableConverter.Views.ConvertFilesPageView"
+             xmlns:vm="clr-namespace:TableConverter.ViewModels"
+             x:DataType="vm:ConvertFilesPageViewModel"
+             mc:Ignorable="d"
+             d:DesignWidth="800"
+             d:DesignHeight="450">
+  <Design.DataContext>
+    <!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+    <vm:ConvertFilesPageViewModel />
+  </Design.DataContext>
+  
+  <components:SpacedGrid RowDefinitions="Auto,*"
+                         RowSpacing="20"
+                         Margin="20">
+    <!-- Convert Files View Header -->
+    <sukiUi:GlassCard Grid.Row="0"
+                      IsAnimated="True"
+                      Padding="10">
+      <components:SpacedGrid ColumnDefinitions="Auto,*,Auto"
+                             ColumnSpacing="10">
+        <StackPanel Grid.Column="0"
+                    Orientation="Horizontal"
+                    Spacing="5">
+          <!-- New File Button -->
+          <Button Command="{Binding ConvertFileNewFileButtonClickedCommand}">
+            <StackPanel Orientation="Horizontal"
+                        Spacing="10">
+              <TextBlock Classes="h5"
+                         Text="New"
+                         VerticalAlignment="Center" />
+              <PathIcon Data="{StaticResource FileUploadIcon}"
+                        Classes="Primary" />
+            </StackPanel>
+          </Button>
+        </StackPanel>
+        <!-- Current Files List Box -->
+        <ListBox Grid.Column="1"
+                 ItemsSource="{Binding ConvertDocuments}"
+                 SelectedItem="{Binding SelectedConvertDocument}"
+                 SelectionMode="AlwaysSelected,Single"
+                 ScrollViewer.HorizontalScrollBarVisibility="Auto">
+          <ListBox.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Spacing="5"
+                          Orientation="Horizontal" />
+            </ItemsPanelTemplate>
+          </ListBox.ItemsPanel>
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <TextBlock Classes="h5"
+                         FontWeight="Bold"
+                         Text="{Binding Name}"
+                         TextWrapping="NoWrap"
+                         TextTrimming="CharacterEllipsis"
+                         MinWidth="100"
+                         MaxWidth="150">
+              </TextBlock>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+        <!-- Converstion Progress Stepper Bar -->
+        <sukiUi:Stepper Grid.Column="2"
+                        Index="{Binding SelectedConvertDocument.ProgressStepIndex}"
+                        Steps="{Binding SelectedConvertDocument.ProgressStepValues}">
+        </sukiUi:Stepper>
+      </components:SpacedGrid>
+    </sukiUi:GlassCard>
+    <!-- Convert Files Progress Stepper Views -->
+    <sukiUi:BusyArea Name="ConvertFilesBusyArea"
+                     Grid.Row="1"
+                     IsBusy="{Binding SelectedConvertDocument.IsBusy}"
+                     BusyText="Loading...">
+      <xamlInteractivity:Interaction.Behaviors>
+        <!-- Input Progress Stepper View -->
+        <xamlInteractions:DataTriggerBehavior Binding="{Binding SelectedConvertDocument.ProgressStepIndex}"
+                                              ComparisonCondition="Equal"
+                                              Value="0">
+          <xamlInteractions:ChangePropertyAction TargetObject="ConvertFilesBusyArea"
+                                                 PropertyName="Content">
+            <xamlInteractions:ChangePropertyAction.Value>
+              <sukiUi:GlassCard IsAnimated="True"
+                                Padding="10">
+                <components:SpacedGrid RowDefinitions="*,Auto"
+                                       RowSpacing="10">
+                  <avaloniaEdit:TextEditor Grid.Row="0"
+                                           ShowLineNumbers="True"
+                                           Document="{Binding SelectedConvertDocument.InputFileText}"
+                                           ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                           ScrollViewer.VerticalScrollBarVisibility="Visible">
+                    <avaloniaEdit:TextEditor.Options>
+                      <avaloniaEdit:TextEditorOptions AllowScrollBelowDocument="False"
+                                                      HighlightCurrentLine="True"
+                                                      IndentationSize="5"
+                                                      EnableRectangularSelection="True"
+                                                      ShowBoxForControlCharacters="True"
+                                                      ShowEndOfLine="True"
+                                                      ShowSpaces="True"
+                                                      ShowTabs="True"
+                                                      RequireControlModifierForHyperlinkClick="True" />
+                    </avaloniaEdit:TextEditor.Options>
+                  </avaloniaEdit:TextEditor>
+                  <!-- Footer Buttons -->
+                  <components:SpacedGrid Grid.Row="1"
+                                         ColumnDefinitions="*,Auto"
+                                         ColumnSpacing="10">
+                    <!-- Next Button -->
+                    <Button Grid.Column="1"
+                            Command="{Binding ConvertFileNextBackButtonClickedCommand}"
+                            CommandParameter="1"
+                            Classes="Flat">
+                      <StackPanel Spacing="10"
+                                  Orientation="Horizontal">
+                        <TextBlock Classes="h5"
+                                   Text="Next"
+                                   VerticalAlignment="Center" />
+                        <PathIcon Data="{StaticResource ArrowRightIcon}" />
+                      </StackPanel>
+                    </Button>
+                  </components:SpacedGrid>
+                </components:SpacedGrid>
+              </sukiUi:GlassCard>
+            </xamlInteractions:ChangePropertyAction.Value>
+          </xamlInteractions:ChangePropertyAction>
+        </xamlInteractions:DataTriggerBehavior>
+        <!-- Edit Progress Stepper View -->
+        <xamlInteractions:DataTriggerBehavior Binding="{Binding SelectedConvertDocument.ProgressStepIndex}"
+                                              ComparisonCondition="Equal"
+                                              Value="1">
+          <xamlInteractions:ChangePropertyAction TargetObject="ConvertFilesBusyArea"
+                                                 PropertyName="Content">
+            <xamlInteractions:ChangePropertyAction.Value>
+              <sukiUi:GlassCard IsAnimated="True"
+                                Padding="10">
+                <components:SpacedGrid RowDefinitions="*,Auto"
+                                       RowSpacing="10">
+                  <components:DynamicDataGrid Grid.Row="0"
+                                              SelectionMode="Single"
+                                              AutoGenerateColumns="False"
+                                              CanUserResizeColumns="True"
+                                              MinHeight="200"
+                                              MinWidth="200"
+                                              Headers="{Binding SelectedConvertDocument.EditHeaders}"
+                                              Rows="{Binding SelectedConvertDocument.EditRows}"
+                                              ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                              ScrollViewer.VerticalScrollBarVisibility="Visible" />
+                  <!-- Footer Buttons -->
+                  <components:SpacedGrid Grid.Row="1"
+                                         ColumnDefinitions="Auto,*,Auto"
+                                         ColumnSpacing="10">
+                    <!-- Back Button -->
+                    <Button Grid.Column="0"
+                            Command="{Binding ConvertFileNextBackButtonClickedCommand}"
+                            CommandParameter="0"
+                            Classes="Flat"
+                            IsVisible="{Binding !SelectedConvertDocument.IsGenerated}">
+                      <StackPanel Spacing="10"
+                                  Orientation="Horizontal">
+                        <PathIcon Data="{StaticResource ArrowLeftIcon}" />
+                        <TextBlock Classes="h5"
+                                   Text="Back"
+                                   VerticalAlignment="Center" />
+                      </StackPanel>
+                    </Button>
+                    <!-- Rows and Columns Ammount -->
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                      <TextBlock Classes="h5"
+                                 Text="Rows: " />
+                      <TextBlock Classes="h5"
+                                 Text="{Binding SelectedConvertDocument.EditRows.Count}" />
+                      <TextBlock Classes="h5"
+                                 Text=", Columns: " />
+                      <TextBlock Classes="h5"
+                                 Text="{Binding SelectedConvertDocument.EditHeaders.Count}" />
+                    </StackPanel>
+                    <!-- Next Button -->
+                    <Button Grid.Column="2"
+                            Command="{Binding ConvertFileNextBackButtonClickedCommand}"
+                            CommandParameter="2"
+                            Classes="Flat">
+                      <StackPanel Spacing="10"
+                                  Orientation="Horizontal">
+                        <TextBlock Classes="h5"
+                                   Text="Next"
+                                   VerticalAlignment="Center" />
+                        <PathIcon Data="{StaticResource ArrowRightIcon}" />
+                      </StackPanel>
+                    </Button>
+                  </components:SpacedGrid>
+                </components:SpacedGrid>
+              </sukiUi:GlassCard>
+            </xamlInteractions:ChangePropertyAction.Value>
+          </xamlInteractions:ChangePropertyAction>
+        </xamlInteractions:DataTriggerBehavior>
+        <!-- Output Progress Stepper View -->
+        <xamlInteractions:DataTriggerBehavior Binding="{Binding SelectedConvertDocument.ProgressStepIndex}"
+                                              ComparisonCondition="Equal"
+                                              Value="2">
+          <xamlInteractions:ChangePropertyAction TargetObject="ConvertFilesBusyArea"
+                                                 PropertyName="Content">
+            <xamlInteractions:ChangePropertyAction.Value>
+              <sukiUi:GlassCard IsAnimated="True"
+                                Padding="10">
+                <components:SpacedGrid RowDefinitions="*,Auto"
+                                       RowSpacing="10">
+                  <avaloniaEdit:TextEditor Grid.Row="0"
+                                           ShowLineNumbers="True"
+                                           Document="{Binding SelectedConvertDocument.OutputFileText}"
+                                           ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                           ScrollViewer.VerticalScrollBarVisibility="Visible">
+                    <avaloniaEdit:TextEditor.Options>
+                      <avaloniaEdit:TextEditorOptions AllowScrollBelowDocument="False"
+                                                      HighlightCurrentLine="True"
+                                                      IndentationSize="5"
+                                                      EnableRectangularSelection="True"
+                                                      ShowBoxForControlCharacters="True"
+                                                      ShowEndOfLine="True"
+                                                      ShowSpaces="True"
+                                                      ShowTabs="True"
+                                                      RequireControlModifierForHyperlinkClick="True" />
+                    </avaloniaEdit:TextEditor.Options>
+                  </avaloniaEdit:TextEditor>
+                  <!-- Footer Buttons -->
+                  <components:SpacedGrid Grid.Row="1"
+                                         ColumnDefinitions="Auto,*,Auto"
+                                         ColumnSpacing="10">
+                    <!-- Back Button -->
+                    <Button Grid.Column="0"
+                            Command="{Binding ConvertFileNextBackButtonClickedCommand}"
+                            CommandParameter="1"
+                            Classes="Flat">
+                      <StackPanel Spacing="10"
+                                  Orientation="Horizontal">
+                        <PathIcon Data="{StaticResource ArrowLeftIcon}" />
+                        <TextBlock Classes="h5"
+                                   Text="Back"
+                                   VerticalAlignment="Center" />
+                      </StackPanel>
+                    </Button>
+                    <!-- Copy Data Button -->
+                    <StackPanel Grid.Column="2"
+                                Orientation="Horizontal"
+                                Spacing="10">
+                      <Button Command="{Binding CopyFileButtonClickedCommand}"
+                              Classes="Flat">
+                        <StackPanel Spacing="10"
+                                    Orientation="Horizontal">
+                          <TextBlock Classes="h5"
+                                     Text="Copy"
+                                     VerticalAlignment="Center" />
+                          <PathIcon Data="{StaticResource CopyIcon}" />
+                        </StackPanel>
+                      </Button>
+                      <!-- Save File Button -->
+                      <Button Command="{Binding SaveFileButtonClickedCommand}"
+                              Classes="Flat">
+                        <StackPanel Spacing="10"
+                                    Orientation="Horizontal">
+                          <TextBlock Classes="h5"
+                                     Text="Save"
+                                     VerticalAlignment="Center" />
+                          <PathIcon Data="{StaticResource FileDownloadIcon}" />
+                        </StackPanel>
+                      </Button>
+                    </StackPanel>
+                  </components:SpacedGrid>
+                </components:SpacedGrid>
+              </sukiUi:GlassCard>
+            </xamlInteractions:ChangePropertyAction.Value>
+          </xamlInteractions:ChangePropertyAction>
+        </xamlInteractions:DataTriggerBehavior>
+      </xamlInteractivity:Interaction.Behaviors>
+    </sukiUi:BusyArea>
+  </components:SpacedGrid>
 </UserControl>

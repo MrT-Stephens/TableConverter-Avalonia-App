@@ -2,6 +2,10 @@
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
+using Microsoft.Extensions.DependencyInjection;
+using SukiUI.Dialogs;
+using SukiUI.Toasts;
+using System;
 using TableConverter.Services;
 using TableConverter.ViewModels;
 using TableConverter.Views;
@@ -10,9 +14,13 @@ namespace TableConverter;
 
 public partial class App : Application
 {
+    public IServiceProvider? ServiceProvider { get; private set; }
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+
+        ServiceProvider = ConfigureServices();
     }
 
     public override void OnFrameworkInitializationCompleted()
@@ -40,5 +48,20 @@ public partial class App : Application
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    private static ServiceProvider ConfigureServices()
+    {
+        ServiceCollection services = new();
+
+        // Custom Services
+        services.AddSingleton<ConverterTypesService>();
+        services.AddSingleton<DataGenerationTypesService>();
+
+        // SukiUI Services
+        services.AddSingleton<ISukiToastManager, SukiToastManager>();
+        services.AddSingleton<ISukiDialogManager, SukiDialogManager>();
+
+        return services.BuildServiceProvider();
     }
 }

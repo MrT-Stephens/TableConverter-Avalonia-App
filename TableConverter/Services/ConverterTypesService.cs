@@ -8,7 +8,7 @@ namespace TableConverter.Services
 {
     public class ConverterTypesService
     {
-        public static readonly IEnumerable<ConverterType> Types = new List<ConverterType>()
+        public static readonly IEnumerable<ConverterType> Types = new ConverterType[]
         {
             new ConverterType("CSV", [ ".csv", ".txt" ], [ "text/csv" ],
                     "CSV stands for Comma-Separated Values. CSV file format is a text file that has a specific format which allows data to be saved in a table structured format.",

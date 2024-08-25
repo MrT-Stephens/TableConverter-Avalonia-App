@@ -11,7 +11,7 @@ namespace TableConverter.Services
 {
     public class DataGenerationTypesService : DataGenerationGenHandler
     {
-        public readonly IEnumerable<DataGenerationType> Types = new List<DataGenerationType>
+        public readonly IEnumerable<DataGenerationType> Types = new DataGenerationType[]
         {
             new("Row Number", "Basic",
                 "Generates a row number. For example 1, 2, 3.",
@@ -121,7 +121,7 @@ namespace TableConverter.Services
             new("Book ISBN", "Entertainment",
                 "Generates a random book ISBN.",
                 typeof(DataGenerationBookIsbnHandler)),
-        }.OrderBy(val => val.Name).ToList();
+        }.OrderBy(val => val.Name).ToArray();
 
         /// <summary>
         /// Gets the generation type by the name of the generator.
