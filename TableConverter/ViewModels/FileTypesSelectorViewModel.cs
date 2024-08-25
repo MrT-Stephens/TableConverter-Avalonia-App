@@ -5,7 +5,7 @@ using System;
 
 namespace TableConverter.ViewModels;
 
-public partial class FileTypesSelectorViewModel : ViewModelBase
+public partial class FileTypesSelectorViewModel : ObservableObject
 {
     #region Properties
 

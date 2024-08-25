@@ -5,7 +5,7 @@ using TableConverter.DataGeneration.Interfaces;
 
 namespace TableConverter.ViewModels;
 
-public partial class DataGenerationFieldViewModel : ViewModelBase
+public partial class DataGenerationFieldViewModel : ObservableObject
 {
     #region Properties
 

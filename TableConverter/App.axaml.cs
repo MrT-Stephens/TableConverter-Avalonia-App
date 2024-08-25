@@ -8,7 +8,6 @@ using SukiUI.Toasts;
 using System;
 using TableConverter.Services;
 using TableConverter.ViewModels;
-using TableConverter.Views;
 
 namespace TableConverter;
 
@@ -29,22 +28,9 @@ public partial class App : Application
         // Without this line you will get duplicate validations from both Avalonia and CT
         BindingPlugins.DataValidators.RemoveAt(0);
 
-        DataGenerationTypesService dataGenerationTypesService = new DataGenerationTypesService();
-        ConverterTypesService converterTypesService = new ConverterTypesService();
-
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow
-            {
-                DataContext = new MainViewModel(dataGenerationTypesService, converterTypesService)
-            };
-        }
-        else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
-        {
-            singleViewPlatform.MainView = new MainView
-            {
-                DataContext = new MainViewModel(dataGenerationTypesService, converterTypesService)
-            };
+            
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -61,6 +47,12 @@ public partial class App : Application
         // SukiUI Services
         services.AddSingleton<ISukiToastManager, SukiToastManager>();
         services.AddSingleton<ISukiDialogManager, SukiDialogManager>();
+
+        // ViewModels
+        services.AddSingleton<MainWindowViewModel>();
+        services.AddSingleton<BasePageViewModel, WelcomePageViewModel>();
+        services.AddSingleton<BasePageViewModel, ConvertFilesPageViewModel>();
+        services.AddSingleton<BasePageViewModel, DataGenerationPageViewModel>();
 
         return services.BuildServiceProvider();
     }

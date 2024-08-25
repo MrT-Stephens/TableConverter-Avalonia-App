@@ -31,6 +31,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Views\MainWindowView.axaml.cs">
+      <DependentUpon>MainWindowView.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\MessageBoxView.axaml.cs">
       <DependentUpon>MessageBoxView.axaml</DependentUpon>
     </Compile>

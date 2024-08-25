@@ -1,0 +1,44 @@
+<sukiUi:SukiWindow xmlns="https://github.com/avaloniaui"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                   xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+                   xmlns:vm="clr-namespace:TableConverter.ViewModels"
+                   x:Class="TableConverter.Views.MainWindowView"
+                   Icon="/Assets/avalonia-logo.ico"
+                   Title="TableConverter"
+                   BackgroundAnimationEnabled="True"
+                   BackgroundTransitionsEnabled="True"
+                   MinHeight="400"
+                   MinWidth="400"
+                   x:DataType="vm:MainWindowViewModel"
+                   mc:Ignorable="d" 
+                   d:DesignWidth="800" 
+                   d:DesignHeight="450">
+  <Design.DataContext>
+    <!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+    <vm:MainWindowViewModel />
+  </Design.DataContext>
+
+  <sukiUi:SukiWindow.Hosts>
+    <sukiUi:SukiToastHost Manager="{Binding ToastManager}" />
+    <sukiUi:SukiDialogHost Manager="{Binding DialogManager}" />
+  </sukiUi:SukiWindow.Hosts>
+  <sukiUi:SukiWindow.LogoContent>
+    <PathIcon Data="{StaticResource TableEdit}" />
+  </sukiUi:SukiWindow.LogoContent>
+  <sukiUi:SukiSideMenu ItemsSource="{Binding Pages}"
+                       SelectedItem="{Binding SelectedPage}">
+    <sukiUi:SukiSideMenu.ItemTemplate>
+      <DataTemplate>
+        <sukiUi:SukiSideMenuItem Classes="Compact" 
+                                 Header="{Binding DisplayName}">
+          <sukiUi:SukiSideMenuItem.Icon>
+            <PathIcon Data="{Binding Icon}" />
+          </sukiUi:SukiSideMenuItem.Icon>
+        </sukiUi:SukiSideMenuItem>
+      </DataTemplate>
+    </sukiUi:SukiSideMenu.ItemTemplate>
+  </sukiUi:SukiSideMenu>
+</sukiUi:SukiWindow>

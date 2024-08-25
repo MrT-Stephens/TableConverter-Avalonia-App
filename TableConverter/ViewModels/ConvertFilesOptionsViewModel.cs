@@ -7,7 +7,7 @@ using System.Collections.ObjectModel;
 
 namespace TableConverter.ViewModels;
 
-public partial class ConvertFilesOptionsViewModel : ViewModelBase
+public partial class ConvertFilesOptionsViewModel : ObservableObject
 {
     #region Properties
 

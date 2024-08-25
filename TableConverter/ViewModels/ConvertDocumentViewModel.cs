@@ -6,7 +6,7 @@ using TableConverter.DataModels;
 
 namespace TableConverter.ViewModels;
 
-public partial class ConvertDocumentViewModel : ViewModelBase
+public partial class ConvertDocumentViewModel : ObservableObject
 {
     // General Items
     public IEnumerable<string> ProgressStepValues { get; } = 

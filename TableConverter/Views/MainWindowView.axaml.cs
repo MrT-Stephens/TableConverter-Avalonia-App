@@ -2,9 +2,9 @@
 
 namespace TableConverter.Views;
 
-public partial class MainWindow : SukiWindow
+public partial class MainWindowView : SukiWindow
 {
-    public MainWindow()
+    public MainWindowView()
     {
         InitializeComponent();
     }

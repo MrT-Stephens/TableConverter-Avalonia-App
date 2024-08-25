@@ -63,9 +63,9 @@ namespace TableConverter.Services
                     new ConverterHandlerYamlInput(), new ConverterHandlerYamlOutput()),
         };
 
-        public static readonly IEnumerable<ConverterType> InputTypes = Types.Where(val => val.InputConverterHandler is not null);
+        public readonly IReadOnlyList<ConverterType> InputTypes = Types.Where(val => val.InputConverterHandler is not null).ToList();
 
-        public static readonly IEnumerable<ConverterType> OutputTypes = Types.Where(val => val.OutputConverterHandler is not null);
+        public readonly IReadOnlyList<ConverterType> OutputTypes = Types.Where(val => val.OutputConverterHandler is not null).ToList();
 
         public ConverterType GetByName(string name) => Types.First(val => val.Name == name);
 

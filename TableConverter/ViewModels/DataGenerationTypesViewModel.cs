@@ -8,7 +8,7 @@ using TableConverter.DataGeneration.DataModels;
 
 namespace TableConverter.ViewModels;
 
-public partial class DataGenerationTypesViewModel : ViewModelBase
+public partial class DataGenerationTypesViewModel : ObservableObject
 {
     #region Properties
 
