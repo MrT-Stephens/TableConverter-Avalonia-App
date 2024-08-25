@@ -36,8 +36,6 @@ public partial class DataGenerationTypesViewModel : ObservableObject
     [RelayCommand]
     private void ButtonClicked(object? name)
     {
-        SukiHost.CloseDialog();
-
         if (name is string buttonName)
         {
             switch (buttonName)

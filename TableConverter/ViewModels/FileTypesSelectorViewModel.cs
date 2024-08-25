@@ -27,8 +27,6 @@ public partial class FileTypesSelectorViewModel : ObservableObject
     [RelayCommand]
     private void ButtonClicked(object? name)
     {
-        SukiHost.CloseDialog();
-
         if (name is string buttonName)
         {
             switch (buttonName)

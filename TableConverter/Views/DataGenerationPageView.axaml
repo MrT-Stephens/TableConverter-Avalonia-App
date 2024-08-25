@@ -47,7 +47,7 @@
             <DataGridTemplateColumn.CellTemplate>
               <DataTemplate>
                 <Button Classes="Flat"
-                        Command="{Binding ((vm:MainViewModel)DataContext).ChooseTypeButtonClickedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                        Command="{Binding ((vm:DataGenerationPageViewModel)DataContext).ChooseTypeButtonClickedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                         CommandParameter="{Binding .}"
                         HorizontalAlignment="Left">
                   <StackPanel Spacing="10"
@@ -109,14 +109,14 @@
                 <StackPanel Orientation="Horizontal"
                             Spacing="10">
                   <Button Classes="Flat"
-                          Command="{Binding ((vm:MainViewModel)DataContext).RemoveFieldButtonClickedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                          Command="{Binding ((vm:DataGenerationPageViewModel)DataContext).RemoveFieldButtonClickedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                           CommandParameter="{Binding .}">
                     <PathIcon Data="{StaticResource RemoveIcon}"
                               Height="18"
                               Width="18" />
                   </Button>
                   <Button Classes="Flat"
-                          Command="{Binding ((vm:MainViewModel)DataContext).AddFieldButtonClickedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                          Command="{Binding ((vm:DataGenerationPageViewModel)DataContext).AddFieldButtonClickedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                           CommandParameter="{Binding .}">
                     <PathIcon Data="{StaticResource AddIcon}"
                               Height="18"

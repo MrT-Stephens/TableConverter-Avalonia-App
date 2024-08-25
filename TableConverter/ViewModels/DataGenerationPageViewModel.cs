@@ -54,31 +54,34 @@ public partial class DataGenerationPageViewModel : BasePageViewModel
     [RelayCommand]
     private void ChooseTypeButtonClicked(DataGenerationFieldViewModel field)
     {
-        SukiHost.ShowDialog(new DataGenerationTypesView(DataGenerationTypes.Types,
-            (type) =>
-            {
-                field.Type = type.Name;
-
-                field.DataGenerationTypeHandler = DataGenerationTypes.GetHandlerByName(type.Name);
-
-                if (field.DataGenerationTypeHandler.Options is not null && field.DataGenerationTypeHandler is IInitializeControls controls)
+        DialogManager.CreateDialog()
+            .WithContent(
+            new DataGenerationTypesView(DataGenerationTypes.Types,
+                (type) =>
                 {
-                    controls.InitializeControls();
+                    field.Type = type.Name;
 
-                    field.OptionsControls = new(controls.Controls);
-                }
-                else
-                {
-                    field.OptionsControls = new()
+                    field.DataGenerationTypeHandler = DataGenerationTypes.GetHandlerByName(type.Name);
+
+                    if (field.DataGenerationTypeHandler.Options is not null && field.DataGenerationTypeHandler is IInitializeControls controls)
                     {
-                        new TextBlock()
+                        controls.InitializeControls();
+
+                        field.OptionsControls = new(controls.Controls);
+                    }
+                    else
+                    {
+                        field.OptionsControls = new()
                         {
-                            Text = "No Options Available"
-                        }
-                    };
+                            new TextBlock()
+                            {
+                                Text = "No Options Available"
+                            }
+                        };
+                    }
                 }
-            }
-        ), false, true);
+            ))
+            .TryShow();
     }
 
     [RelayCommand]

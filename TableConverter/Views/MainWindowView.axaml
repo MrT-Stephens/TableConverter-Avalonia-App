@@ -32,8 +32,7 @@
                        SelectedItem="{Binding SelectedPage}">
     <sukiUi:SukiSideMenu.ItemTemplate>
       <DataTemplate>
-        <sukiUi:SukiSideMenuItem Classes="Compact" 
-                                 Header="{Binding DisplayName}">
+        <sukiUi:SukiSideMenuItem Header="{Binding DisplayName}">
           <sukiUi:SukiSideMenuItem.Icon>
             <PathIcon Data="{Binding Icon}" />
           </sukiUi:SukiSideMenuItem.Icon>

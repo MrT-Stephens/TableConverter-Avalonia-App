@@ -6,8 +6,11 @@ using Microsoft.Extensions.DependencyInjection;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using System;
+using System.Linq;
+using TableConverter.Common;
 using TableConverter.Services;
 using TableConverter.ViewModels;
+using TableConverter.Views;
 
 namespace TableConverter;
 
@@ -28,9 +31,13 @@ public partial class App : Application
         // Without this line you will get duplicate validations from both Avalonia and CT
         BindingPlugins.DataValidators.RemoveAt(0);
 
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && ServiceProvider is not null)
         {
-            
+            var viewModel = ServiceProvider.GetRequiredService<MainWindowViewModel>();
+            var view = ServiceProvider.GetRequiredService<MainWindowView>();
+
+            view.DataContext = viewModel;
+            desktop.MainWindow = view;
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -39,6 +46,17 @@ public partial class App : Application
     private static ServiceProvider ConfigureServices()
     {
         ServiceCollection services = new();
+
+        // ViewLocator
+        var viewLocator = Current?.DataTemplates.First(val => val is ViewLocator);
+
+        if (viewLocator is not null)
+        {
+            services.AddSingleton(viewLocator);
+        }
+
+        // Views
+        services.AddSingleton<MainWindowView>();
 
         // Custom Services
         services.AddSingleton<ConverterTypesService>();

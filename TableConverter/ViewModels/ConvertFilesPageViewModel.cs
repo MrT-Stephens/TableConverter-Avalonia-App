@@ -118,11 +118,13 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                 {
                     controls.InitializeControls();
 
-                    SukiHost.ShowDialog(new ConvertFilesOptionsView(
-                        $"How would you like your {currentDoc.InputConverter.Name} file inputted?",
-                        controls.Controls,
-                        processDoc
-                    ), false, true);
+                    DialogManager.CreateDialog()
+                        .WithContent(new ConvertFilesOptionsView(
+                            $"How would you like your {currentDoc.InputConverter.Name} file inputted?",
+                            controls.Controls,
+                            processDoc
+                        ))
+                        .TryShow();
                 }
                 else
                 {
@@ -132,64 +134,66 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
             else if (pageIndex == 2 && currentDoc.ProgressStepIndex < 2)
             {
                 // Process the tabular data to the outputted file type.
-                SukiHost.ShowDialog(new FileTypesSelectorView(
-                    "Please select a file type to output",
-                    OutputConverters.Select(converter => converter.Name).ToArray(),
-                    (converterName) =>
-                    {
-                        currentDoc.OutputConverter = ConverterTypes.OutputTypes.First(converter => converter.Name == converterName);
-
-                        if (currentDoc.OutputConverter is not null)
+                DialogManager.CreateDialog()
+                    .WithContent(new FileTypesSelectorView(
+                        "Please select a file type to output",
+                        ConverterTypes.OutputTypes.Select(converter => converter.Name).ToArray(),
+                        (converterName) =>
                         {
-                            Action processDoc = async () =>
+                            currentDoc.OutputConverter = ConverterTypes.OutputTypes.First(converter => converter.Name == converterName);
+
+                            if (currentDoc.OutputConverter is not null)
                             {
-                                currentDoc.IsBusy = true;
-
-                                var data = await currentDoc.OutputConverter.OutputConverterHandler!.ConvertAsync(currentDoc.EditHeaders.ToArray(), currentDoc.EditRows.ToArray());
-
-                                if (data != null)
+                                Action processDoc = async () =>
                                 {
-                                    currentDoc.OutputFileText = new AvaloniaEdit.Document.TextDocument()
+                                    currentDoc.IsBusy = true;
+
+                                    var data = await currentDoc.OutputConverter.OutputConverterHandler!.ConvertAsync(currentDoc.EditHeaders.ToArray(), currentDoc.EditRows.ToArray());
+
+                                    if (data != null)
                                     {
-                                        FileName = currentDoc.Name,
-                                        Text = data
-                                    };
+                                        currentDoc.OutputFileText = new AvaloniaEdit.Document.TextDocument()
+                                        {
+                                            FileName = currentDoc.Name,
+                                            Text = data
+                                        };
 
-                                    currentDoc.IsBusy = false;
+                                        currentDoc.IsBusy = false;
 
-                                    currentDoc.ProgressStepIndex = pageIndex;
+                                        currentDoc.ProgressStepIndex = pageIndex;
 
-                                    ToastManager.CreateToast()
-                                        .WithTitle("File Converted")
-                                        .WithContent($"The file '{currentDoc.Name}' has been converted to a '{currentDoc.OutputConverter.Name}' file.")
-                                        .OfType(NotificationType.Success)
-                                        .Queue();
+                                        ToastManager.CreateToast()
+                                            .WithTitle("File Converted")
+                                            .WithContent($"The file '{currentDoc.Name}' has been converted to a '{currentDoc.OutputConverter.Name}' file.")
+                                            .OfType(NotificationType.Success)
+                                            .Queue();
+                                    }
+                                    else
+                                    {
+                                        currentDoc.IsBusy = false;
+                                    }
+                                };
+
+                                if (currentDoc.OutputConverter.OutputConverterHandler!.Options is not null && currentDoc.OutputConverter.OutputConverterHandler is IInitializeControls controls)
+                                {
+                                    controls.InitializeControls();
+
+                                    DialogManager.CreateDialog()
+                                        .WithContent(new ConvertFilesOptionsView(
+                                            $"How would you like your {currentDoc.OutputConverter.Name} file outputted?",
+                                            controls.Controls,
+                                            processDoc
+                                        ))
+                                        .TryShow();
                                 }
                                 else
                                 {
-                                    currentDoc.IsBusy = false;
+                                    processDoc.Invoke();
                                 }
-                            };
-
-                            if (currentDoc.OutputConverter.OutputConverterHandler!.Options is not null && currentDoc.OutputConverter.OutputConverterHandler is IInitializeControls controls)
-                            {
-                                controls.InitializeControls();
-
-                                DialogManager.CreateDialog()
-                                    .WithContent(new ConvertFilesOptionsView(
-                                        $"How would you like your {currentDoc.OutputConverter.Name} file outputted?",
-                                        controls.Controls,
-                                        processDoc
-                                    ))
-                                    .TryShow();
-                            }
-                            else
-                            {
-                                processDoc.Invoke();
                             }
                         }
-                    }
-                ), false, true);
+                    ))
+                    .TryShow();
             }
             else
             {

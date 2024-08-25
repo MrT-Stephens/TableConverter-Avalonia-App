@@ -26,8 +26,6 @@ public partial class ConvertFilesOptionsViewModel : ObservableObject
     [RelayCommand]
     private void ButtonClicked(object? name)
     {
-        SukiHost.CloseDialog();
-
         if (name is string buttonName)
         {
             switch (buttonName)
