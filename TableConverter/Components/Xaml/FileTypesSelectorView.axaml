@@ -12,7 +12,8 @@
              d:DesignWidth="800"
              mc:Ignorable="d">
   <xamlComponents:MessageBox Title="{Binding Title}"
-                        Icon="{StaticResource FileSearchIcon}">
+                             Icon="{StaticResource FileSearchIcon}"
+                             ShowCard="True">
     <xamlComponents:MessageBox.Content>
       <ListBox ItemsSource="{Binding Values}"
                SelectedItem="{Binding SelectedValue}"

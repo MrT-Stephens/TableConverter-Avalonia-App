@@ -18,6 +18,9 @@ public partial class MessageBox : UserControl
     public static readonly StyledProperty<bool> ContentScrollEnabledProperty =
         AvaloniaProperty.Register<MessageBox, bool>(nameof(ContentScrollEnabled), true);
 
+    public static readonly StyledProperty<bool> ShowCardProperty =
+        AvaloniaProperty.Register<MessageBox, bool>(nameof(ShowCard), true);
+
     public object? Icon
     {
         get => GetValue(IconProperty);
@@ -40,6 +43,12 @@ public partial class MessageBox : UserControl
     {
         get => GetValue(ContentScrollEnabledProperty);
         set => SetValue(ContentScrollEnabledProperty, value);
+    }
+
+    public bool ShowCard
+    {
+        get => GetValue(ShowCardProperty);
+        set => SetValue(ShowCardProperty, value);
     }
 
     public MessageBox()
