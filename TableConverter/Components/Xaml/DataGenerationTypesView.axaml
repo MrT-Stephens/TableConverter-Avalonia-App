@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vm="clr-namespace:TableConverter.ViewModels"
+             xmlns:xamlComponents="clr-namespace:TableConverter.Components.Xaml"
              xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
              xmlns:sukiUiTheme="clr-namespace:SukiUI.Theme;assembly=SukiUI"
              xmlns:components="clr-namespace:TableConverter.Components"
@@ -11,17 +11,11 @@
              xmlns:xamlInteractivity="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:xamlInteractions="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
              xmlns:xamlResponsive="clr-namespace:Avalonia.Xaml.Interactions.Responsive;assembly=Avalonia.Xaml.Interactions.Responsive"
-             x:Class="TableConverter.Views.DataGenerationTypesView"
-             x:DataType="vm:DataGenerationTypesViewModel"
+             x:Class="TableConverter.Components.Xaml.DataGenerationTypesView"
+             x:DataType="xamlComponents:DataGenerationTypesViewModel"
              d:DesignHeight="450"
              d:DesignWidth="800"
              mc:Ignorable="d">
-  <Design.DataContext>
-    <!-- This only sets the DataContext for the previewer in an IDE,
-         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-    <vm:DataGenerationTypesViewModel />
-  </Design.DataContext>
-
   <UserControl.Styles>
     <!-- Adaptive Uniform Grid Styles -->
     <Style Selector="components|SpacedUniformGrid.Adaptive">
@@ -52,10 +46,10 @@
   </UserControl.Styles>
 
   <!-- Message Box -->
-  <views:MessageBoxView Title="Select a data generation type"
-                        Icon="{StaticResource OptionsIcon}"
-                        ContentScrollEnabled="False">
-    <views:MessageBoxView.Content>
+  <xamlComponents:MessageBox Title="Select a data generation type"
+                                 Icon="{StaticResource OptionsIcon}"
+                                 ContentScrollEnabled="False">
+    <xamlComponents:MessageBox.Content>
       <sukiUi:GlassCard Name="PART_RootGlassCard"
                         IsAnimated="False"
                         Padding="0">
@@ -196,9 +190,9 @@
           </SplitView.Content>
         </SplitView>
       </sukiUi:GlassCard>
-    </views:MessageBoxView.Content>
+    </xamlComponents:MessageBox.Content>
     <!-- Message Box Action Buttons -->
-    <views:MessageBoxView.ActionButtons>
+    <xamlComponents:MessageBox.ActionButtons>
       <components:XamlArray x:TypeArguments="Control">
         <Button Content="Cancel"
                 Command="{Binding ButtonClickedCommand}"
@@ -208,6 +202,6 @@
                 Command="{Binding ButtonClickedCommand}"
                 CommandParameter="Ok" />
       </components:XamlArray>
-    </views:MessageBoxView.ActionButtons>
-  </views:MessageBoxView>
+    </xamlComponents:MessageBox.ActionButtons>
+  </xamlComponents:MessageBox>
 </UserControl>

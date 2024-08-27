@@ -1,14 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using SukiUI.Controls;
+using SukiUI.Dialogs;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using TableConverter.DataGeneration.DataModels;
 
-namespace TableConverter.ViewModels;
+namespace TableConverter.Components.Xaml;
 
-public partial class DataGenerationTypesViewModel : ObservableObject
+public partial class DataGenerationTypesViewModel(ISukiDialog dialog) : BaseDialogViewModel(dialog)
 {
     #region Properties
 
@@ -41,9 +41,11 @@ public partial class DataGenerationTypesViewModel : ObservableObject
             switch (buttonName)
             {
                 case "Ok":
+                    Close();
                     OnOkClicked?.Invoke(SelectedType!);
                     break;
                 case "Cancel":
+                    Close();
                     break;
                 default:
                     throw new NotImplementedException($"Button {buttonName} is not implemented");

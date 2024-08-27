@@ -70,7 +70,7 @@
   <Application.Styles>
     <!-- Application Styles -->
     <FluentTheme></FluentTheme>
-    <sukiUi:SukiTheme ThemeColor="Orange">
+    <sukiUi:SukiTheme ThemeColor="Green">
     </sukiUi:SukiTheme>
 
     <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />

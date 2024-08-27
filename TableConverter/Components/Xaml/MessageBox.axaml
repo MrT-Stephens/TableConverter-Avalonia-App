@@ -4,13 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:components="clr-namespace:TableConverter.Components"
              xmlns:converters="clr-namespace:TableConverter.Converters"
-             xmlns:views="clr-namespace:TableConverter.Views"
-             x:Class="TableConverter.Views.MessageBoxView"
+             xmlns:xamlComponents="clr-namespace:TableConverter.Components.Xaml"
+             x:Class="TableConverter.Components.Xaml.MessageBox"
              d:DesignHeight="450"
              d:DesignWidth="800"
              mc:Ignorable="d">
   <UserControl.Styles>
-    <Style Selector="views|MessageBoxView">
+    <Style Selector="xamlComponents|MessageBox">
       <Setter Property="Template">
         <ControlTemplate>
           <Panel>

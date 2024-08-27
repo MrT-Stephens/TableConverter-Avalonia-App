@@ -1,11 +1,13 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Avalonia.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using SukiUI.Controls;
+using SukiUI.Dialogs;
 using System;
+using System.Collections.ObjectModel;
 
-namespace TableConverter.ViewModels;
+namespace TableConverter.Components.Xaml;
 
-public partial class FileTypesSelectorViewModel : ObservableObject
+public partial class ConvertFilesOptionsViewModel(ISukiDialog dialog) : BaseDialogViewModel(dialog)
 {
     #region Properties
 
@@ -13,12 +15,9 @@ public partial class FileTypesSelectorViewModel : ObservableObject
     private string _Title = string.Empty;
 
     [ObservableProperty]
-    private string[] _Values = [];
+    private ObservableCollection<Control> _Options = new();
 
-    [ObservableProperty]
-    private string _SelectedValue = string.Empty;
-
-    public Action<string>? OnOkClicked { get; set; } = null;
+    public Action? OnOkClicked { get; set; } = null;
 
     #endregion
 
@@ -32,9 +31,11 @@ public partial class FileTypesSelectorViewModel : ObservableObject
             switch (buttonName)
             {
                 case "Ok":
-                    OnOkClicked?.Invoke(SelectedValue);
+                    Close();
+                    OnOkClicked?.Invoke();
                     break;
                 case "Cancel":
+                    Close();
                     break;
                 default:
                     throw new NotImplementedException($"Button {buttonName} is not implemented");

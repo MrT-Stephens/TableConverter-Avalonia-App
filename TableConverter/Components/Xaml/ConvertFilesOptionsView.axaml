@@ -2,24 +2,17 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vm="clr-namespace:TableConverter.ViewModels"
              xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
              xmlns:components="clr-namespace:TableConverter.Components"
-             xmlns:views="clr-namespace:TableConverter.Views"
-             x:Class="TableConverter.Views.ConvertFilesOptionsView"
-             x:DataType="vm:ConvertFilesOptionsViewModel"
+             xmlns:xamlComponents="clr-namespace:TableConverter.Components.Xaml"
+             x:Class="TableConverter.Components.Xaml.ConvertFilesOptionsView"
+             x:DataType="xamlComponents:ConvertFilesOptionsViewModel"
              d:DesignHeight="450"
              d:DesignWidth="800"
              mc:Ignorable="d">
-  <Design.DataContext>
-    <!-- This only sets the DataContext for the previewer in an IDE,
-         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-    <vm:ConvertFilesOptionsViewModel />
-  </Design.DataContext>
-
-  <views:MessageBoxView Title="{Binding Title}"
-                        Icon="{StaticResource OptionsIcon}">
-    <views:MessageBoxView.Content>
+  <xamlComponents:MessageBox Title="{Binding Title}"
+                             Icon="{StaticResource OptionsIcon}">
+    <xamlComponents:MessageBox.Content>
       <sukiUi:GlassCard Padding="10">
         <ItemsControl ItemsSource="{Binding Options}">
           <ItemsControl.ItemsPanel>
@@ -31,17 +24,17 @@
           </ItemsControl.ItemsPanel>
         </ItemsControl>
       </sukiUi:GlassCard>
-    </views:MessageBoxView.Content>
-    <views:MessageBoxView.ActionButtons>
+    </xamlComponents:MessageBox.Content>
+    <xamlComponents:MessageBox.ActionButtons>
       <components:XamlArray x:TypeArguments="Control">
         <Button Content="Cancel"
                 Command="{Binding ButtonClickedCommand}"
                 CommandParameter="Cancel" />
-        <Button Classes="Flat" 
+        <Button Classes="Flat"
                 Content="Ok"
                 Command="{Binding ButtonClickedCommand}"
                 CommandParameter="Ok" />
       </components:XamlArray>
-    </views:MessageBoxView.ActionButtons>
-  </views:MessageBoxView>
+    </xamlComponents:MessageBox.ActionButtons>
+  </xamlComponents:MessageBox>
 </UserControl>

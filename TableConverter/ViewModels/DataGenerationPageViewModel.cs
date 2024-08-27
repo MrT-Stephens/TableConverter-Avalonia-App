@@ -40,7 +40,7 @@ public partial class DataGenerationPageViewModel : BasePageViewModel
     #region Constructors
 
     public DataGenerationPageViewModel(DataGenerationTypesService dataGenerationTypes, ISukiDialogManager dialogManager, ISukiToastManager toastManager) 
-        : base(dialogManager, toastManager, "Data Generation", Application.Current?.Resources["DataIcon"])
+        : base(dialogManager, toastManager, "Data Generation", Application.Current?.Resources["DataIcon"], 2)
     {
         DataGenerationTypes = dataGenerationTypes;
 
@@ -54,34 +54,34 @@ public partial class DataGenerationPageViewModel : BasePageViewModel
     [RelayCommand]
     private void ChooseTypeButtonClicked(DataGenerationFieldViewModel field)
     {
-        DialogManager.CreateDialog()
-            .WithContent(
-            new DataGenerationTypesView(DataGenerationTypes.Types,
-                (type) =>
-                {
-                    field.Type = type.Name;
+        //DialogManager.CreateDialog()
+        //    .WithContent(
+        //    new DataGenerationTypesView(DataGenerationTypes.Types,
+        //        (type) =>
+        //        {
+        //            field.Type = type.Name;
 
-                    field.DataGenerationTypeHandler = DataGenerationTypes.GetHandlerByName(type.Name);
+        //            field.DataGenerationTypeHandler = DataGenerationTypes.GetHandlerByName(type.Name);
 
-                    if (field.DataGenerationTypeHandler.Options is not null && field.DataGenerationTypeHandler is IInitializeControls controls)
-                    {
-                        controls.InitializeControls();
+        //            if (field.DataGenerationTypeHandler.Options is not null && field.DataGenerationTypeHandler is IInitializeControls controls)
+        //            {
+        //                controls.InitializeControls();
 
-                        field.OptionsControls = new(controls.Controls);
-                    }
-                    else
-                    {
-                        field.OptionsControls = new()
-                        {
-                            new TextBlock()
-                            {
-                                Text = "No Options Available"
-                            }
-                        };
-                    }
-                }
-            ))
-            .TryShow();
+        //                field.OptionsControls = new(controls.Controls);
+        //            }
+        //            else
+        //            {
+        //                field.OptionsControls = new()
+        //                {
+        //                    new TextBlock()
+        //                    {
+        //                        Text = "No Options Available"
+        //                    }
+        //                };
+        //            }
+        //        }
+        //    ))
+        //    .TryShow();
     }
 
     [RelayCommand]

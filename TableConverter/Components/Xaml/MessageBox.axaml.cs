@@ -2,21 +2,21 @@ using Avalonia;
 using Avalonia.Controls;
 using System.Collections.ObjectModel;
 
-namespace TableConverter.Views;
+namespace TableConverter.Components.Xaml;
 
-public partial class MessageBoxView : UserControl
+public partial class MessageBox : UserControl
 {
     public static readonly StyledProperty<object?> IconProperty =
-        AvaloniaProperty.Register<MessageBoxView, object?>(nameof(Icon));
+        AvaloniaProperty.Register<MessageBox, object?>(nameof(Icon));
 
     public static readonly StyledProperty<string> TitleProperty =
-        AvaloniaProperty.Register<MessageBoxView, string>(nameof(Title));
+        AvaloniaProperty.Register<MessageBox, string>(nameof(Title));
 
     public static readonly StyledProperty<ObservableCollection<Control>> ActionButtonsProperty =
-        AvaloniaProperty.Register<MessageBoxView, ObservableCollection<Control>>(nameof(ActionButtons));
+        AvaloniaProperty.Register<MessageBox, ObservableCollection<Control>>(nameof(ActionButtons));
 
     public static readonly StyledProperty<bool> ContentScrollEnabledProperty =
-        AvaloniaProperty.Register<MessageBoxView, bool>(nameof(ContentScrollEnabled), true);
+        AvaloniaProperty.Register<MessageBox, bool>(nameof(ContentScrollEnabled), true);
 
     public object? Icon
     {
@@ -42,7 +42,7 @@ public partial class MessageBoxView : UserControl
         set => SetValue(ContentScrollEnabledProperty, value);
     }
 
-    public MessageBoxView()
+    public MessageBox()
     {
         InitializeComponent();
     }

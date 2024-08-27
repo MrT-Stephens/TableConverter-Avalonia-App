@@ -2,24 +2,18 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vm="clr-namespace:TableConverter.ViewModels"
+             xmlns:xamlComponents="clr-namespace:TableConverter.Components.Xaml"
              xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
              xmlns:views="clr-namespace:TableConverter.Views"
              xmlns:components="clr-namespace:TableConverter.Components"
-             x:Class="TableConverter.Views.FileTypesSelectorView"
-             x:DataType="vm:FileTypesSelectorViewModel"
+             x:Class="TableConverter.Components.Xaml.FileTypesSelectorView"
+             x:DataType="xamlComponents:FileTypesSelectorViewModel"
              d:DesignHeight="450"
              d:DesignWidth="800"
              mc:Ignorable="d">
-  <Design.DataContext>
-    <!-- This only sets the DataContext for the previewer in an IDE,
-         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-    <vm:FileTypesSelectorViewModel />
-  </Design.DataContext>
-
-  <views:MessageBoxView Title="{Binding Title}"
+  <xamlComponents:MessageBox Title="{Binding Title}"
                         Icon="{StaticResource FileSearchIcon}">
-    <views:MessageBoxView.Content>
+    <xamlComponents:MessageBox.Content>
       <ListBox ItemsSource="{Binding Values}"
                SelectedItem="{Binding SelectedValue}"
                SelectionMode="AlwaysSelected,Single">
@@ -30,18 +24,18 @@
           </ItemsPanelTemplate>
         </ListBox.ItemsPanel>
       </ListBox>
-    </views:MessageBoxView.Content>
-    <views:MessageBoxView.ActionButtons>
+    </xamlComponents:MessageBox.Content>
+    <xamlComponents:MessageBox.ActionButtons>
       <components:XamlArray x:TypeArguments="Control">
-        <Button Classes="Flat" 
+        <Button Classes="Flat"
                 Content="Cancel"
                 Command="{Binding ButtonClickedCommand}"
                 CommandParameter="Cancel" />
-        <Button Classes="Flat" 
+        <Button Classes="Flat"
                 Content="Ok"
                 Command="{Binding ButtonClickedCommand}"
                 CommandParameter="Ok" />
       </components:XamlArray>
-    </views:MessageBoxView.ActionButtons>
-  </views:MessageBoxView>
+    </xamlComponents:MessageBox.ActionButtons>
+  </xamlComponents:MessageBox>
 </UserControl>
