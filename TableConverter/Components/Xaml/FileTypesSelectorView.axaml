@@ -13,7 +13,7 @@
              mc:Ignorable="d">
   <xamlComponents:MessageBox Title="{Binding Title}"
                              Icon="{StaticResource FileSearchIcon}"
-                             ShowCard="True">
+                             ShowCard="False">
     <xamlComponents:MessageBox.Content>
       <ListBox ItemsSource="{Binding Values}"
                SelectedItem="{Binding SelectedValue}"
