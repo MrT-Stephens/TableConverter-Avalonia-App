@@ -146,7 +146,48 @@
           <!-- "Data Generation" Section -->
           <sukiUi:SettingsLayoutItem Header="Data Generation">
             <sukiUi:SettingsLayoutItem.Content>
-              <TextBlock Text="Hello" />
+              <!-- Data Generation Categories Items Control -->
+              <ItemsControl ItemsSource="{Binding DataGenerationTypes}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <StackPanel Spacing="10" />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <StackPanel Spacing="10">
+                      <TextBlock Classes="h4"
+                                 Text="{Binding Key}" />
+                      <!-- Data Generation Types By Categorie Items Control -->
+                      <ItemsControl ItemsSource="{Binding Value}">
+                        <ItemsControl.ItemsPanel>
+                          <ItemsPanelTemplate>
+                            <components:SpacedUniformGrid Spacing="10" />
+                          </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate>
+                            <sukiUi:GlassCard IsAnimated="False">
+                              <sukiUi:GroupBox VerticalAlignment="Center">
+                                <sukiUi:GroupBox.Header>
+                                  <!-- Data Generation Type Name -->
+                                  <TextBlock Classes="h4 Primary"
+                                             Text="{Binding Name}"
+                                             FontWeight="Bold" />
+                                </sukiUi:GroupBox.Header>
+                                <!-- Data Generation Type Description -->
+                                <TextBlock Classes="h6"
+                                           Text="{Binding Description}"
+                                           TextWrapping="Wrap" />
+                              </sukiUi:GroupBox>
+                            </sukiUi:GlassCard>
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                    </StackPanel>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
             </sukiUi:SettingsLayoutItem.Content>
           </sukiUi:SettingsLayoutItem>
         </components:XamlArray>
