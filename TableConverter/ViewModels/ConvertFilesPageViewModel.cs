@@ -24,7 +24,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
 {
     #region Services
 
-    private readonly ConverterTypesService ConverterTypes;
+    public readonly ConverterTypesService ConverterTypes;
 
     #endregion
 

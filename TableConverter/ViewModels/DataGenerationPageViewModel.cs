@@ -20,7 +20,7 @@ public partial class DataGenerationPageViewModel : BasePageViewModel
 {
     #region Services
 
-    private readonly DataGenerationTypesService DataGenerationTypes;
+    public readonly DataGenerationTypesService DataGenerationTypes;
 
     #endregion
 

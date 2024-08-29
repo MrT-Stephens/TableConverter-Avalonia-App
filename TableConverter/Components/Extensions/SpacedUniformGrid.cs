@@ -2,7 +2,7 @@
 using Avalonia.Controls;
 using System;
 
-namespace TableConverter.Components
+namespace TableConverter.Components.Extensions
 {
     public class SpacedUniformGrid : Panel
     {
@@ -48,9 +48,9 @@ namespace TableConverter.Components
 
         static SpacedUniformGrid()
         {
-            AffectsMeasure<SpacedUniformGrid>([ 
-                RowsProperty, 
-                ColumnsProperty, 
+            AffectsMeasure<SpacedUniformGrid>([
+                RowsProperty,
+                ColumnsProperty,
                 FirstColumnProperty,
                 SpacingProperty
             ]);
@@ -97,13 +97,13 @@ namespace TableConverter.Components
             double cellHeight = (finalSize.Height - (_rows - 1) * Spacing) / _rows;
 
             if (cellWidth < 0)
-            { 
-                cellWidth = 0; 
+            {
+                cellWidth = 0;
             }
 
             if (cellHeight < 0)
-            { 
-                cellHeight = 0; 
+            {
+                cellHeight = 0;
             }
 
             for (int i = 0; i < Children.Count; i++)
@@ -114,9 +114,9 @@ namespace TableConverter.Components
                 }
 
                 Children[i].Arrange(new(
-                    (i % Columns) * (cellWidth + Spacing),
-                    (i / Columns) * (cellHeight + Spacing), 
-                    cellWidth, 
+                    i % Columns * (cellWidth + Spacing),
+                    i / Columns * (cellHeight + Spacing),
+                    cellWidth,
                     cellHeight
                 ));
             }
@@ -149,7 +149,7 @@ namespace TableConverter.Components
             {
                 if (_columns == 0)
                 {
-                    _rows = (_columns = (int)Math.Ceiling(Math.Sqrt(num)));
+                    _rows = _columns = (int)Math.Ceiling(Math.Sqrt(num));
                     return;
                 }
 

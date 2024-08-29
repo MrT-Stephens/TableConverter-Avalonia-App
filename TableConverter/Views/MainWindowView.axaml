@@ -3,12 +3,14 @@
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+                   xmlns:sukiModels="clr-namespace:SukiUI.Models;assembly=SukiUI"
                    xmlns:vm="clr-namespace:TableConverter.ViewModels"
                    x:Class="TableConverter.Views.MainWindowView"
                    Icon="/Assets/avalonia-logo.ico"
                    Title="TableConverter"
                    BackgroundAnimationEnabled="True"
                    BackgroundTransitionsEnabled="True"
+                   BackgroundStyle="Bubble"
                    MinHeight="400"
                    MinWidth="400"
                    x:DataType="vm:MainWindowViewModel"
@@ -22,6 +24,63 @@
   <sukiUi:SukiWindow.LogoContent>
     <PathIcon Data="{StaticResource TableEdit}" />
   </sukiUi:SukiWindow.LogoContent>
+  <sukiUi:SukiWindow.RightWindowTitleBarControls>
+    <Button Classes="Basic Rounded WindowControlsButton">
+      <PathIcon Data="{StaticResource CogIcon}"
+                Foreground="{DynamicResource SukiText}" />
+      <Button.Flyout>
+        <Flyout Placement="RightEdgeAlignedTop">
+          <Panel FlowDirection="LeftToRight">
+            <Border CornerRadius="20" 
+                    Margin="20" 
+                    BoxShadow="{DynamicResource SukiPopupShadow}" />
+            <Border Margin="20" 
+                    CornerRadius="15"
+                    ClipToBounds="True" 
+                    MinWidth="350"
+                    Background="{DynamicResource SukiCardBackground}"
+                    BorderBrush="{DynamicResource SukiLightBorderBrush}"
+                    BorderThickness="1">
+              <Border Background="{DynamicResource PopupGradientBrush}"
+                      Padding="15">
+                <StackPanel Orientation="Vertical"
+                            Spacing="20">
+                  <StackPanel Orientation="Vertical">
+                    <TextBlock Classes="h5"
+                                Text="Theme Colour:" />
+                    <ComboBox ItemsSource="{Binding Theme.ColorThemes}"
+                              SelectedItem="{Binding SelectedColorTheme}">
+                      <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                          <TextBlock Foreground="{Binding PrimaryBrush}" 
+                                     Text="{Binding DisplayName}"
+                                     FontWeight="Bold" />
+                        </DataTemplate>
+                      </ComboBox.ItemTemplate>
+                    </ComboBox>
+                  </StackPanel>
+                  <Button Classes="Flat"
+                          Command="{Binding ToggleBaseThemeCommand}">
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="5">
+                      <PathIcon Data="{StaticResource LightbulbIcon}" 
+                                Foreground="{DynamicResource SukiText}" />
+                      <TextBlock Classes="h5"
+                                 Text="{Binding SelectedBaseTheme}"
+                                 Foreground="{DynamicResource SukiText}" />
+                      <TextBlock Classes="h5"
+                                 Text="Mode"
+                                 Foreground="{DynamicResource SukiText}" />
+                    </StackPanel>
+                  </Button>
+                </StackPanel>
+              </Border>
+            </Border>
+          </Panel>
+        </Flyout>
+      </Button.Flyout>
+    </Button>
+  </sukiUi:SukiWindow.RightWindowTitleBarControls>
   <sukiUi:SukiSideMenu ItemsSource="{Binding Pages}"
                        SelectedItem="{Binding SelectedPage}">
     <sukiUi:SukiSideMenu.ItemTemplate>

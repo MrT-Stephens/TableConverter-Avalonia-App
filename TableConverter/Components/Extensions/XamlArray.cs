@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 
-namespace TableConverter.Components
+namespace TableConverter.Components.Extensions
 {
     public class XamlArray<T> : ObservableCollection<T>
     {

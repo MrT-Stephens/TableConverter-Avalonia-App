@@ -4,7 +4,7 @@ using Avalonia.Data;
 using System;
 using System.Collections.ObjectModel;
 
-namespace TableConverter.Components
+namespace TableConverter.Components.Extensions
 {
     public class DynamicDataGrid : DataGrid
     {

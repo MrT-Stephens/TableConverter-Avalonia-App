@@ -28,14 +28,14 @@ public partial class ConvertFilesOptionsViewModel(ISukiDialog dialog) : BaseDial
     {
         if (name is string buttonName)
         {
+            Close();
+
             switch (buttonName)
             {
                 case "Ok":
-                    Close();
                     OnOkClicked?.Invoke();
                     break;
                 case "Cancel":
-                    Close();
                     break;
                 default:
                     throw new NotImplementedException($"Button {buttonName} is not implemented");

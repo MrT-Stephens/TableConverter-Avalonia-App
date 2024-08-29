@@ -1,4 +1,4 @@
-﻿namespace TableConverter.Components.Interfaces
+﻿namespace TableConverter.Components.Extensions.Interfaces
 {
     public interface ISpacing
     {

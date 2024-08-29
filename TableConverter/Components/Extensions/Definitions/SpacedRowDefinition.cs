@@ -1,7 +1,7 @@
 ﻿using Avalonia.Controls;
-using TableConverter.Components.Interfaces;
+using TableConverter.Components.Extensions.Interfaces;
 
-namespace TableConverter.Components.Definitions
+namespace TableConverter.Components.Extensions.Definitions
 {
     public class SpacedRowDefinition : RowDefinition, ISpacing
     {
@@ -12,7 +12,7 @@ namespace TableConverter.Components.Definitions
         }
 
         public SpacedRowDefinition(double height) : base(height, GridUnitType.Pixel)
-        { 
+        {
         }
     }
 }

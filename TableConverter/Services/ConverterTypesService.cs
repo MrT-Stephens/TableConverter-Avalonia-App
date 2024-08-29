@@ -8,8 +8,8 @@ namespace TableConverter.Services
 {
     public class ConverterTypesService
     {
-        public static readonly IEnumerable<ConverterType> Types = new ConverterType[]
-        {
+        public static readonly IEnumerable<ConverterType> Types =
+        [
             new ConverterType("CSV", [ ".csv", ".txt" ], [ "text/csv" ],
                     "CSV stands for Comma-Separated Values. CSV file format is a text file that has a specific format which allows data to be saved in a table structured format.",
                     new ConverterHandlerCsvInputWithControls(), new ConverterHandlerCsvOutputWithControls()),
@@ -61,11 +61,11 @@ namespace TableConverter.Services
             new ConverterType("YAML", [ ".yaml" ], [ "application/x-yaml" ],
                     "YAML stands for YAML Ain't Markup Language. YAML is a human-readable data serialization language. It is commonly used for configuration files and in applications where data is being stored or transmitted.",
                     new ConverterHandlerYamlInput(), new ConverterHandlerYamlOutput()),
-        };
+        ];
 
-        public readonly IReadOnlyList<ConverterType> InputTypes = Types.Where(val => val.InputConverterHandler is not null).ToList();
+        public IReadOnlyList<ConverterType> InputTypes { get; } = Types.Where(val => val.InputConverterHandler is not null).ToList();
 
-        public readonly IReadOnlyList<ConverterType> OutputTypes = Types.Where(val => val.OutputConverterHandler is not null).ToList();
+        public IReadOnlyList<ConverterType> OutputTypes { get; } = Types.Where(val => val.OutputConverterHandler is not null).ToList();
 
         public ConverterType GetByName(string name) => Types.First(val => val.Name == name);
 

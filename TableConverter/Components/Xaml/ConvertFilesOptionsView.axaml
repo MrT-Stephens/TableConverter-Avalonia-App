@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
-             xmlns:components="clr-namespace:TableConverter.Components"
+             xmlns:components="clr-namespace:TableConverter.Components.Extensions"
              xmlns:xamlComponents="clr-namespace:TableConverter.Components.Xaml"
              x:Class="TableConverter.Components.Xaml.ConvertFilesOptionsView"
              x:DataType="xamlComponents:ConvertFilesOptionsViewModel"
@@ -11,7 +11,8 @@
              d:DesignWidth="800"
              mc:Ignorable="d">
   <xamlComponents:MessageBox Title="{Binding Title}"
-                             Icon="{StaticResource OptionsIcon}">
+                             Icon="{StaticResource OptionsIcon}"
+                             ShowCard="False">
     <xamlComponents:MessageBox.Content>
       <sukiUi:GlassCard Padding="10">
         <ItemsControl ItemsSource="{Binding Options}">

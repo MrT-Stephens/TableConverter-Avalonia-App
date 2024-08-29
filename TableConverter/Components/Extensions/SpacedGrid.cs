@@ -4,17 +4,17 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using TableConverter.Components.Definitions;
-using TableConverter.Components.Interfaces;
+using TableConverter.Components.Extensions.Definitions;
+using TableConverter.Components.Extensions.Interfaces;
 
-namespace TableConverter.Components
+namespace TableConverter.Components.Extensions
 {
     public class SpacedGrid : Grid
     {
-        public static readonly StyledProperty<double> RowSpacingProperty = 
+        public static readonly StyledProperty<double> RowSpacingProperty =
             AvaloniaProperty.Register<SpacedGrid, double>(nameof(RowSpacing), 5);
 
-        public static readonly StyledProperty<double> ColumnSpacingProperty = 
+        public static readonly StyledProperty<double> ColumnSpacingProperty =
             AvaloniaProperty.Register<SpacedGrid, double>(nameof(ColumnSpacing), 5);
 
         public double RowSpacing
@@ -84,10 +84,10 @@ namespace TableConverter.Components
                 item.Initialized -= ItemInitialized!;
 
                 SetRow(item, GetRow(item) * 2); // 1 -> 2 or 2 -> 4
-                SetRowSpan(item, (GetRowSpan(item) * 2) - 1); // 2 -> 3 or 3 -> 5
+                SetRowSpan(item, GetRowSpan(item) * 2 - 1); // 2 -> 3 or 3 -> 5
 
                 SetColumn(item, GetColumn(item) * 2); // 1 -> 2 or 2 -> 4
-                SetColumnSpan(item, (GetColumnSpan(item) * 2) - 1); // 2 -> 3 or 3 -> 5
+                SetColumnSpan(item, GetColumnSpan(item) * 2 - 1); // 2 -> 3 or 3 -> 5
             }
         }
 
@@ -148,7 +148,7 @@ namespace TableConverter.Components
         private void RecalculateRowSpacing() =>
             RowDefinitions.OfType<ISpacing>().Select(spacingRow => spacingRow.Spacing = RowSpacing);
 
-        private void RecalculateColumnSpacing() => 
+        private void RecalculateColumnSpacing() =>
             ColumnDefinitions.OfType<ISpacing>().Select(spacingColumn => spacingColumn.Spacing = ColumnSpacing);
     }
 }

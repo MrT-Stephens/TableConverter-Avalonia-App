@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
              xmlns:sukiUiTheme="clr-namespace:SukiUI.Theme;assembly=SukiUI"
-             xmlns:components="clr-namespace:TableConverter.Components"
+             xmlns:components="clr-namespace:TableConverter.Components.Extensions"
              xmlns:vm="clr-namespace:TableConverter.ViewModels"
              x:Class="TableConverter.Views.DataGenerationPageView"
              x:DataType="vm:DataGenerationPageViewModel"

@@ -11,7 +11,7 @@ namespace TableConverter.Services
 {
     public class DataGenerationTypesService : DataGenerationGenHandler
     {
-        public readonly IEnumerable<DataGenerationType> Types = new DataGenerationType[]
+        public IReadOnlyList<DataGenerationType> Types { get; } = new DataGenerationType[]
         {
             new("Row Number", "Basic",
                 "Generates a row number. For example 1, 2, 3.",

@@ -5,7 +5,7 @@
              xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
              xmlns:xamlInteractivity="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:xamlResponsive="clr-namespace:Avalonia.Xaml.Interactions.Responsive;assembly=Avalonia.Xaml.Interactions.Responsive"
-             xmlns:components="clr-namespace:TableConverter.Components"
+             xmlns:components="clr-namespace:TableConverter.Components.Extensions"
              xmlns:converters="clr-namespace:TableConverter.Converters"
              x:Class="TableConverter.Views.WelcomePageView"
              xmlns:vm="clr-namespace:TableConverter.ViewModels"
@@ -13,12 +13,6 @@
              mc:Ignorable="d"
              d:DesignWidth="800"
              d:DesignHeight="450">
-  <Design.DataContext>
-    <!-- This only sets the DataContext for the previewer in an IDE,
-         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-    <vm:WelcomePageViewModel />
-  </Design.DataContext>
-  
   <sukiUi:GlassCard IsAnimated="True"
                     Margin="20"
                     Padding="10">
@@ -67,7 +61,7 @@
                 <TextBlock Classes="h4"
                            Text="Accepted input files:" />
                 <!-- Input Converters Items Control -->
-                <ItemsControl ItemsSource="{Binding InputConverters}">
+                <ItemsControl ItemsSource="{Binding ConverterTypes.InputTypes}">
                   <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                       <components:SpacedUniformGrid Spacing="10" />
@@ -108,7 +102,7 @@
                 <TextBlock Classes="h4"
                            Text="Accepted output files:" />
                 <!-- Output Converters Items Control -->
-                <ItemsControl ItemsSource="{Binding OutputConverters}">
+                <ItemsControl ItemsSource="{Binding ConverterTypes.OutputTypes}">
                   <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                       <components:SpacedUniformGrid Spacing="10" />

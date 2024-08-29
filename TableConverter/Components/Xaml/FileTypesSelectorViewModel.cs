@@ -29,14 +29,14 @@ public partial class FileTypesSelectorViewModel(ISukiDialog dialog) : BaseDialog
     {
         if (name is string buttonName)
         {
+            Close();
+
             switch (buttonName)
             {
                 case "Ok":
-                    Close();
                     OnOkClicked?.Invoke(SelectedValue);
                     break;
                 case "Cancel":
-                    Close();
                     break;
                 default:
                     throw new NotImplementedException($"Button {buttonName} is not implemented");

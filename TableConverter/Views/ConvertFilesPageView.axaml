@@ -5,7 +5,7 @@
              xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
              xmlns:xamlInteractivity="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:xamlInteractions="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
-             xmlns:components="clr-namespace:TableConverter.Components"
+             xmlns:components="clr-namespace:TableConverter.Components.Extensions"
              xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
              x:Class="TableConverter.Views.ConvertFilesPageView"
              xmlns:vm="clr-namespace:TableConverter.ViewModels"

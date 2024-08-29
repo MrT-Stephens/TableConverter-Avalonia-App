@@ -5,7 +5,7 @@
              xmlns:xamlComponents="clr-namespace:TableConverter.Components.Xaml"
              xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
              xmlns:views="clr-namespace:TableConverter.Views"
-             xmlns:components="clr-namespace:TableConverter.Components"
+             xmlns:components="clr-namespace:TableConverter.Components.Extensions"
              x:Class="TableConverter.Components.Xaml.FileTypesSelectorView"
              x:DataType="xamlComponents:FileTypesSelectorViewModel"
              d:DesignHeight="450"

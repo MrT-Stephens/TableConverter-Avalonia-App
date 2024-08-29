@@ -1,7 +1,7 @@
 ﻿using Avalonia.Controls;
-using TableConverter.Components.Interfaces;
+using TableConverter.Components.Extensions.Interfaces;
 
-namespace TableConverter.Components.Definitions
+namespace TableConverter.Components.Extensions.Definitions
 {
     public class SpacedColumnDefinition : ColumnDefinition, ISpacing
     {

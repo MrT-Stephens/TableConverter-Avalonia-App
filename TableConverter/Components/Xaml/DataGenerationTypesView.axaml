@@ -5,7 +5,7 @@
              xmlns:xamlComponents="clr-namespace:TableConverter.Components.Xaml"
              xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
              xmlns:sukiUiTheme="clr-namespace:SukiUI.Theme;assembly=SukiUI"
-             xmlns:components="clr-namespace:TableConverter.Components"
+             xmlns:components="clr-namespace:TableConverter.Components.Extensions"
              xmlns:views="clr-namespace:TableConverter.Views"
              xmlns:converters="clr-namespace:TableConverter.Converters"
              xmlns:xamlInteractivity="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
@@ -47,8 +47,9 @@
 
   <!-- Message Box -->
   <xamlComponents:MessageBox Title="Select a data generation type"
-                                 Icon="{StaticResource OptionsIcon}"
-                                 ContentScrollEnabled="False">
+                             Icon="{StaticResource OptionsIcon}"
+                             ContentScrollEnabled="False"
+                             ShowCard="False">
     <xamlComponents:MessageBox.Content>
       <sukiUi:GlassCard Name="PART_RootGlassCard"
                         IsAnimated="False"

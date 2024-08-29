@@ -38,14 +38,14 @@ public partial class DataGenerationTypesViewModel(ISukiDialog dialog) : BaseDial
     {
         if (name is string buttonName)
         {
+            Close();
+
             switch (buttonName)
             {
                 case "Ok":
-                    Close();
                     OnOkClicked?.Invoke(SelectedType!);
                     break;
                 case "Cancel":
-                    Close();
                     break;
                 default:
                     throw new NotImplementedException($"Button {buttonName} is not implemented");
