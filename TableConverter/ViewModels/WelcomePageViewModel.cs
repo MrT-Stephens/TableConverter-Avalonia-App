@@ -26,7 +26,7 @@ public partial class WelcomePageViewModel : BasePageViewModel
     #region Constructors
 
     public WelcomePageViewModel(ConverterTypesService converterTypes, DataGenerationTypesService dataGenerationTypes, ISukiDialogManager dialogManager, ISukiToastManager toastManager) 
-        : base(dialogManager, toastManager, "Welcome", Application.Current?.Resources["HandWaveIcon"])
+        : base(dialogManager, toastManager, "Welcome", Application.Current?.Resources["HandWaveIcon"], 0)
     {
         ConverterTypes = converterTypes;
 
@@ -41,7 +41,7 @@ public partial class WelcomePageViewModel : BasePageViewModel
             ))
             .DistinctBy(kv => kv.Key)
             .OrderBy(kv => kv.Key)
-            .ToDictionary(val => val.Key, val => val.Value);
+            .ToDictionary(val => $"{val.Key} ({val.Value.Count})", val => val.Value);
     }
 
     #endregion

@@ -1,6 +1,5 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Data;
 using Avalonia.VisualTree;
 using System;
 
@@ -18,8 +17,8 @@ public partial class DataGenerationTypesView : UserControl
             {
                 parent.GetObservable(TopLevel.ClientSizeProperty).Subscribe(size =>
                 {
-                    Width = size.Width - 40;
-                    Height = size.Height - 75;
+                    Width = size.Width - 80;
+                    Height = size.Height - 150;
                 });
             }
         };

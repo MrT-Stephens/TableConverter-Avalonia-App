@@ -56,6 +56,7 @@ public partial class MainWindowViewModel : ObservableObject
                 .OfType(NotificationType.Information)
                 .WithTitle("Color Changed")
                 .WithContent($"Color has changed to {variant.DisplayName}.")
+                .Dismiss().ByClicking()
                 .Dismiss().After(new(0, 0, 3 ))
                 .Queue();
         };
@@ -68,6 +69,7 @@ public partial class MainWindowViewModel : ObservableObject
                 .OfType(NotificationType.Information)
                 .WithTitle("Theme Changed")
                 .WithContent($"Theme has changed to {variant}.")
+                .Dismiss().ByClicking()
                 .Dismiss().After(new(0, 0, 3))
                 .Queue();
         };

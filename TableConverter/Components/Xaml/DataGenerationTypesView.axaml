@@ -73,7 +73,7 @@
                                                      Value="CompactOverlay" />
               <xamlInteractions:ChangePropertyAction TargetObject="PART_SplitViewGrid"
                                                      PropertyName="Background"
-                                                     Value="{DynamicResource SukiGlassCardBackground}" />
+                                                     Value="{DynamicResource ControlSukiGlassCardBackground}" />
             </xamlInteractions:DataTriggerBehavior>
             <xamlInteractions:DataTriggerBehavior Binding="{Binding $parent[TopLevel].ClientSize.Width}"
                                                   ComparisonCondition="GreaterThan"

@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using SukiUI.Dialogs;
 using System;
+using System.Collections.ObjectModel;
 
 namespace TableConverter.Components.Xaml;
 
@@ -13,7 +14,7 @@ public partial class FileTypesSelectorViewModel(ISukiDialog dialog) : BaseDialog
     private string _Title = string.Empty;
 
     [ObservableProperty]
-    private string[] _Values = [];
+    private ObservableCollection<string> _Values = [];
 
     [ObservableProperty]
     private string _SelectedValue = string.Empty;
