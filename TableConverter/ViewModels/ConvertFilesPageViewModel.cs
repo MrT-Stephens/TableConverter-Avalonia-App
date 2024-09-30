@@ -258,7 +258,8 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                     new(currentDoc.OutputConverter.Name)
                     {
                         Patterns = currentDoc.OutputConverter.Extensions.Select(ext => $"*{ext}").ToArray(),
-                        MimeTypes = currentDoc.OutputConverter.MimeTypes
+                        MimeTypes = currentDoc.OutputConverter.MimeTypes,
+                        AppleUniformTypeIdentifiers = currentDoc.OutputConverter.AppleUTIs
                     },
                     FilePickerFileTypes.All
                 ],
@@ -369,10 +370,11 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                     new(doc.InputConverter.Name)
                     {
                         Patterns = doc.InputConverter.Extensions.Select(ext => $"*{ext}").ToArray(),
-                        MimeTypes = doc.InputConverter.MimeTypes
+                        MimeTypes = doc.InputConverter.MimeTypes,
+                        AppleUniformTypeIdentifiers = doc.InputConverter.AppleUTIs
                     },
-                    FilePickerFileTypes.All
-                ]
+                    FilePickerFileTypes.All,
+                ],
             });
 
             if (files.Count >= 1 && ConvertDocuments is not null)

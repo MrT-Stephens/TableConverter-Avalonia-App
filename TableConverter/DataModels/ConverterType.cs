@@ -7,6 +7,7 @@ namespace TableConverter.DataModels
         string Name,
         Collection<string> Extensions,
         Collection<string> MimeTypes,
+        Collection<string> AppleUTIs,
         string Description,
         IConverterHanderInput? InputConverterHandler,
         IConverterHandlerOutput? OutputConverterHandler
