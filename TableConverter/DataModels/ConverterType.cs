@@ -1,13 +1,13 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
 using TableConverter.FileConverters.Interfaces;
 
 namespace TableConverter.DataModels
 {
     public record ConverterType(
         string Name,
-        Collection<string> Extensions,
-        Collection<string> MimeTypes,
-        Collection<string> AppleUTIs,
+        IReadOnlyList<string> Extensions,
+        IReadOnlyList<string> MimeTypes,
+        IReadOnlyList<string> AppleUTIs,
         string Description,
         IConverterHanderInput? InputConverterHandler,
         IConverterHandlerOutput? OutputConverterHandler

@@ -22,10 +22,10 @@ class Program
             .WithInterFont()
             .LogToTrace();
 
-        if (OperatingSystem.IsWindows() || OperatingSystem.IsMacOS() || OperatingSystem.IsLinux())
+        /* if (OperatingSystem.IsWindows() || OperatingSystem.IsMacOS() || OperatingSystem.IsLinux())
         {
             app.UseManagedSystemDialogs();
-        }
+        } */
 
         return app;
     }

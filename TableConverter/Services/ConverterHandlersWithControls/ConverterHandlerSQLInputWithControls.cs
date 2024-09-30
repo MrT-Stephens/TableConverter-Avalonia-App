@@ -12,6 +12,8 @@ namespace TableConverter.Services.ConverterHandlersWithControls
 
         public void InitializeControls()
         {
+            Controls.Clear();
+
             var quote_type_stack_panel = new StackPanel()
             {
                 Orientation = Orientation.Vertical

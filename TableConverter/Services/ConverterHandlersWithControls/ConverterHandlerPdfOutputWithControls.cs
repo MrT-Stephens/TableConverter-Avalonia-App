@@ -14,6 +14,8 @@ namespace TableConverter.Services.ConverterHandlersWithControls
 
         public void InitializeControls()
         {
+            Controls.Clear();
+
             var ColourDataTemplate = new FuncDataTemplate<string>((item, _) =>
             {
                 var stack_panel = new StackPanel

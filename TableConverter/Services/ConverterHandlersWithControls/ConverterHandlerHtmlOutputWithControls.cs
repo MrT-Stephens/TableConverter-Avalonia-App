@@ -12,6 +12,8 @@ namespace TableConverter.Services.ConverterHandlersWithControls
 
         public void InitializeControls()
         {
+            Controls.Clear();
+
             var minify_html_stack_panel = new StackPanel()
             {
                 Orientation = Orientation.Horizontal,
