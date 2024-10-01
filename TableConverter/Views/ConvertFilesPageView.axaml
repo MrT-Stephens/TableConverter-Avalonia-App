@@ -152,7 +152,7 @@
                                               Headers="{Binding SelectedConvertDocument.EditHeaders}"
                                               Rows="{Binding SelectedConvertDocument.EditRows}"
                                               ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                                              ScrollViewer.VerticalScrollBarVisibility="Visible" />
+                                              ScrollViewer.VerticalScrollBarVisibility="Auto" />
                   <!-- Footer Buttons -->
                   <components:SpacedGrid Grid.Row="1"
                                          ColumnDefinitions="Auto,*,Auto"

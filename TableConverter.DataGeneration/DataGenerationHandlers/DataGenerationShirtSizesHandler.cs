@@ -9,13 +9,13 @@ namespace TableConverter.DataGeneration.DataGenerationHandlers
         {
             string[] data = new string[rows];
 
-            string[] sizes = (Options!.ShirtSizeGroup == "All") ? 
+            string[] sizes = (Options!.ShirtSizeGroup == "All") ?
                 Options!.ShirtSizeGroups.Values.SelectMany(x => x).ToArray() :
                 Options!.ShirtSizeGroups[Options!.ShirtSizeGroup];
 
             for (int i = 0; i < rows; i++)
             {
-                data[i] = (CheckBlank(() => sizes[Random.Next(0, sizes.Length - 1)], blanks_percentage));
+                data[i] = CheckBlank(() => sizes[Random.Next(0, sizes.Length - 1)], blanks_percentage);
             }
 
             return data;
