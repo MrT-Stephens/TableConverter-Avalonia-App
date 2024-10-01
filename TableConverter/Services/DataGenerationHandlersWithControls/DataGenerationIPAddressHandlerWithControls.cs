@@ -11,6 +11,8 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
 
         public void InitializeControls()
         {
+            Controls.Clear();
+            
             var ip_type_combo_box = new ComboBox()
             {
                 ItemsSource = Options!.IpTypes,

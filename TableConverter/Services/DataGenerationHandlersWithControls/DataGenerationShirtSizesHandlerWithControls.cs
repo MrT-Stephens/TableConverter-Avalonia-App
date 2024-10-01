@@ -12,6 +12,8 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
 
         public void InitializeControls()
         {
+            Controls.Clear();
+            
             var shirt_size_group_label = new TextBlock()
             {
                 Text = "Shirt Size Type:",

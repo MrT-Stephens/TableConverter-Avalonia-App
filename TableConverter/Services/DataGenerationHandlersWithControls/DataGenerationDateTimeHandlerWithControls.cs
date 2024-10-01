@@ -14,6 +14,8 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
 
         public void InitializeControls()
         {
+            Controls.Clear();
+            
             var from_uniform_grid = new UniformGrid()
             {
                 Rows = 2,

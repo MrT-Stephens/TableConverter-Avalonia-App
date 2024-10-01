@@ -11,6 +11,8 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
 
         public void InitializeControls()
         {
+            Controls.Clear();
+            
             var sequence_text_box = new TextBox()
             {
                 Watermark = "Example: item 1,item 2,item 3",

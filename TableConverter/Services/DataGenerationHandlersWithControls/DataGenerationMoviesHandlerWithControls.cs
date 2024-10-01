@@ -14,6 +14,8 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
 
         public void InitializeControls()
         {
+            Controls.Clear();
+            
             var movie_genre_label = new TextBlock()
             {
                 Text = "Genre:",

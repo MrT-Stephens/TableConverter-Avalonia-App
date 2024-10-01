@@ -12,6 +12,8 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
 
         public void InitializeControls()
         {
+            Controls.Clear();
+            
             var format_label = new TextBlock()
             {
                 Text = "Format:",

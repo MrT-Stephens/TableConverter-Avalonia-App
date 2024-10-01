@@ -13,6 +13,8 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
 
         public void InitializeControls()
         {
+            Controls.Clear();
+            
             var min_label = new TextBlock()
             {
                 Text = "Min:",

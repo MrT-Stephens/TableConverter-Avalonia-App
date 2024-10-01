@@ -16,6 +16,8 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
 
         public void InitializeControls()
         {
+            Controls.Clear();
+            
             var mobile_brands_label = new TextBlock()
             {
                 Text = "Mobile Brand:",
