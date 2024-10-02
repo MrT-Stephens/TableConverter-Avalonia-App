@@ -59,6 +59,8 @@ public partial class App : Application
         services.AddSingleton<MainWindowView>();
 
         // Custom Services
+        services.AddSingleton<PageNavigationService>();
+        services.AddSingleton<ConvertFilesManager>();
         services.AddSingleton<ConverterTypesService>();
         services.AddSingleton<DataGenerationTypesService>();
 

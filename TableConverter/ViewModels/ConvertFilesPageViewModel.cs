@@ -6,11 +6,9 @@ using CommunityToolkit.Mvvm.Input;
 using System.Threading.Tasks;
 using System;
 using TableConverter.Interfaces;
-using TableConverter.Views;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using CommunityToolkit.Mvvm.ComponentModel;
-using System.Collections.ObjectModel;
 using TableConverter.Services;
 using System.Linq;
 using Avalonia.Controls.Notifications;
@@ -25,13 +23,11 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
     #region Services
 
     public readonly ConverterTypesService ConverterTypes;
+    public ConvertFilesManager FilesManager { get; }
 
     #endregion
 
     #region Properties
-
-    [ObservableProperty]
-    private ObservableCollection<ConvertDocumentViewModel>? _ConvertDocuments = null;
 
     [ObservableProperty]
     private ConvertDocumentViewModel? _SelectedConvertDocument = null;
@@ -40,14 +36,16 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
 
     #region Constructors
 
-    public ConvertFilesPageViewModel(ConverterTypesService converterTypes, ISukiDialogManager dialogManager, ISukiToastManager toastManager) 
+    public ConvertFilesPageViewModel(ConverterTypesService converterTypes, ConvertFilesManager filesManager, ISukiDialogManager dialogManager, ISukiToastManager toastManager)
         : base(dialogManager, toastManager, "Convert Files", Application.Current?.Resources["ConvertIcon"], 1)
     {
         ConverterTypes = converterTypes;
 
-        if (ConvertDocuments is null)
+        FilesManager = filesManager;
+
+        if (FilesManager.Files.Count <= 0)
         {
-            ConvertDocuments = new()
+            FilesManager.Files = new()
             {
                 ExampleConverterDocument()
             };
@@ -311,9 +309,9 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
     [RelayCommand]
     private void RemoveFileButtonClicked(string name)
     {
-        if (ConvertDocuments!.Any(val => val.Name == name))
+        if (FilesManager.Files!.Any(val => val.Name == name))
         {
-            ConvertDocuments!.Remove(ConvertDocuments.First(val => val.Name == name));
+            FilesManager.Files!.Remove(FilesManager.Files.First(val => val.Name == name));
         }
     }
 
@@ -377,11 +375,11 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                 ],
             });
 
-            if (files.Count >= 1 && ConvertDocuments is not null)
+            if (files.Count >= 1)
             {
-                ConvertDocuments.Add(doc);
+                FilesManager.Files.Add(doc);
 
-                var loadingDoc = ConvertDocuments.Last();
+                var loadingDoc = FilesManager.Files.Last();
                 SelectedConvertDocument = loadingDoc;
 
                 if (loadingDoc.InputConverter is not null)

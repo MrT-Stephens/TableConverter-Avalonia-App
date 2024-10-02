@@ -18,7 +18,7 @@ public class ViewLocator : IDataTemplate
         {
             return new TextBlock()
             { 
-                Text = "ViewLocator data is null or has no name." 
+                Text = "ViewLocator data is null or has no name."
             };
         }
         

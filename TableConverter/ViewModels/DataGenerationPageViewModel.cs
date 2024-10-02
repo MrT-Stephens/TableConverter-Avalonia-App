@@ -22,6 +22,8 @@ public partial class DataGenerationPageViewModel : BasePageViewModel
     #region Services
 
     public readonly DataGenerationTypesService DataGenerationTypes;
+    private readonly PageNavigationService PageNavigation;
+    private readonly ConvertFilesManager FilesManager;
 
     #endregion
 
@@ -40,10 +42,14 @@ public partial class DataGenerationPageViewModel : BasePageViewModel
 
     #region Constructors
 
-    public DataGenerationPageViewModel(DataGenerationTypesService dataGenerationTypes, ISukiDialogManager dialogManager, ISukiToastManager toastManager) 
+    public DataGenerationPageViewModel(DataGenerationTypesService dataGenerationTypes, ConvertFilesManager filesManager, PageNavigationService pageNavigation, ISukiDialogManager dialogManager, ISukiToastManager toastManager)
         : base(dialogManager, toastManager, "Data Generation", Application.Current?.Resources["DataIcon"], 2)
     {
         DataGenerationTypes = dataGenerationTypes;
+
+        PageNavigation = pageNavigation;
+
+        FilesManager = filesManager;
 
         DataGenerationFields.Add(new DataGenerationFieldViewModel());
     }
@@ -134,12 +140,21 @@ public partial class DataGenerationPageViewModel : BasePageViewModel
                 ProgressStepIndex = 1,
             };
 
-            //ConvertDocuments?.Add(newDoc);
+            FilesManager.Files.Add(newDoc);
+
+            PageNavigation.RequestNavigation<ConvertFilesPageViewModel>((viewModel) => {
+                if (viewModel is ConvertFilesPageViewModel convertFilesPageViewModel)
+                {
+                    convertFilesPageViewModel.SelectedConvertDocument = FilesManager.Files.Last();
+                }
+            });
 
             ToastManager.CreateToast()
                 .WithTitle("Data Generated")
                 .WithContent($"The file '{newDoc.Name}' has been added to your documents.")
                 .OfType(NotificationType.Success)
+                .Dismiss().ByClicking()
+                .Dismiss().After(new(0, 0, 3))
                 .Queue();
         }
     }

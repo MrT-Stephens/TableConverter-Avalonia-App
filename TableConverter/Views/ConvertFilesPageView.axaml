@@ -24,7 +24,7 @@
                          Margin="20">
     <!-- Convert Files View Header -->
     <sukiUi:GlassCard Grid.Row="0"
-                      IsAnimated="True"
+                      IsAnimated="False"
                       Padding="10">
       <components:SpacedGrid ColumnDefinitions="Auto,*,Auto"
                              ColumnSpacing="10">
@@ -45,7 +45,7 @@
         </StackPanel>
         <!-- Current Files List Box -->
         <ListBox Grid.Column="1"
-                 ItemsSource="{Binding ConvertDocuments}"
+                 ItemsSource="{Binding FilesManager.Files}"
                  SelectedItem="{Binding SelectedConvertDocument}"
                  SelectionMode="AlwaysSelected,Single"
                  ScrollViewer.HorizontalScrollBarVisibility="Auto">
@@ -88,7 +88,7 @@
           <xamlInteractions:ChangePropertyAction TargetObject="ConvertFilesBusyArea"
                                                  PropertyName="Content">
             <xamlInteractions:ChangePropertyAction.Value>
-              <sukiUi:GlassCard IsAnimated="True"
+              <sukiUi:GlassCard IsAnimated="False"
                                 Padding="10">
                 <components:SpacedGrid RowDefinitions="*,Auto"
                                        RowSpacing="10">
@@ -139,7 +139,7 @@
           <xamlInteractions:ChangePropertyAction TargetObject="ConvertFilesBusyArea"
                                                  PropertyName="Content">
             <xamlInteractions:ChangePropertyAction.Value>
-              <sukiUi:GlassCard IsAnimated="True"
+              <sukiUi:GlassCard IsAnimated="False"
                                 Padding="10">
                 <components:SpacedGrid RowDefinitions="*,Auto"
                                        RowSpacing="10">
@@ -211,7 +211,7 @@
           <xamlInteractions:ChangePropertyAction TargetObject="ConvertFilesBusyArea"
                                                  PropertyName="Content">
             <xamlInteractions:ChangePropertyAction.Value>
-              <sukiUi:GlassCard IsAnimated="True"
+              <sukiUi:GlassCard IsAnimated="False"
                                 Padding="10">
                 <components:SpacedGrid RowDefinitions="*,Auto"
                                        RowSpacing="10">

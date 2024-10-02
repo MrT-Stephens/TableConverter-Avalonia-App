@@ -81,7 +81,8 @@
       </Button.Flyout>
     </Button>
   </sukiUi:SukiWindow.RightWindowTitleBarControls>
-  <sukiUi:SukiSideMenu ItemsSource="{Binding Pages}"
+  <sukiUi:SukiSideMenu IsSearchEnabled="True"
+                       ItemsSource="{Binding Pages}"
                        SelectedItem="{Binding SelectedPage}">
     <sukiUi:SukiSideMenu.ItemTemplate>
       <DataTemplate>
