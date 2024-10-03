@@ -20,11 +20,11 @@ public partial class DataGenerationFieldViewModel : ObservableObject
     private string _Type = "Choose a Type";
 
     [ObservableProperty]
-    private ObservableCollection<Control> _OptionsControls = new() 
+    private ObservableCollection<Control> _OptionsControls = new()
     {
         new TextBlock()
         {
-            Text = "No options available for this type.",
+            Text = "No Options Available"
         }
     };
 
