@@ -49,7 +49,7 @@
         <!-- Array of SettingsLayoutItems -->
         <components:XamlArray x:TypeArguments="sukiUi:SettingsLayoutItem">
           <!-- "What is TableDConverter" Section -->
-          <sukiUi:SettingsLayoutItem Header="What is TableConverter?">
+          <sukiUi:SettingsLayoutItem Header="TableConverter">
             <sukiUi:SettingsLayoutItem.Content>
               <TextBlock Text="Hello" />
             </sukiUi:SettingsLayoutItem.Content>

@@ -142,13 +142,6 @@ public partial class DataGenerationPageViewModel : BasePageViewModel
 
             FilesManager.Files.Add(newDoc);
 
-            PageNavigation.RequestNavigation<ConvertFilesPageViewModel>((viewModel) => {
-                if (viewModel is ConvertFilesPageViewModel convertFilesPageViewModel)
-                {
-                    convertFilesPageViewModel.SelectedConvertDocument = FilesManager.Files.Last();
-                }
-            });
-
             ToastManager.CreateToast()
                 .WithTitle("Data Generated")
                 .WithContent($"The file '{newDoc.Name}' has been added to your documents.")
@@ -156,6 +149,13 @@ public partial class DataGenerationPageViewModel : BasePageViewModel
                 .Dismiss().ByClicking()
                 .Dismiss().After(new(0, 0, 3))
                 .Queue();
+
+            PageNavigation.RequestNavigation<ConvertFilesPageViewModel>((viewModel) => {
+                if (viewModel is ConvertFilesPageViewModel convertFilesPageViewModel)
+                {
+                    convertFilesPageViewModel.SelectedConvertDocument = FilesManager.Files.Last();
+                }
+            });
         }
     }
 

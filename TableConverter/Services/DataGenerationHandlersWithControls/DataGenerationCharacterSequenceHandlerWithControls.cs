@@ -1,10 +1,9 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Controls.Primitives.PopupPositioning;
 using SukiUI.Controls;
-using System;
 using System.Collections.ObjectModel;
 using TableConverter.DataGeneration.DataGenerationHandlers;
 using TableConverter.Interfaces;
-using TableConverter.Views;
 
 namespace TableConverter.Services.DataGenerationHandlersWithControls
 {
@@ -15,7 +14,7 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
         public void InitializeControls()
         {
             Controls.Clear();
-            
+
             var sequence_text_box = new TextBox()
             {
                 Watermark = "Example: ^^-@@-##",
@@ -38,43 +37,29 @@ namespace TableConverter.Services.DataGenerationHandlersWithControls
 
             flyout_button.Classes.Add("Flat");
 
-            flyout_button.Click += (sender, e) =>
+            flyout_button.Flyout = new Flyout()
             {
-                //var dialog_button = new Button()
-                //{
-                //    Content = "Ok",
-                //};
-
-                //dialog_button.Classes.Add("Flat");
-
-                //dialog_button.Click += (sender, e) =>
-                //{
-                //    SukiHost.CloseDialog();
-                //};
-
-                //SukiHost.ShowDialog(new MessageBoxView()
-                //{
-                //    Title = "Help",
-                //    Icon = App.Current?.Resources["InfoIcon"] ?? throw new NullReferenceException(),
-                //    Content = new TextBlock()
-                //    {
-                //        Text = "Use the following characters to generate a sequence:\n\n" +
-                //               "\t• # - Random number.\n" +
-                //               "\t• @ - Random uppercase letter.\n" +
-                //               "\t• ^ - Random lowercase letter.\n" +
-                //               "\t• ? - Random special character.\n" +
-                //               "\t• * - Random number or letter.\n" +
-                //               "\t• $ - Random number or uppercase letter.\n" +
-                //               "\t• % - Random number or lowercase letter.\n" +
-                //               "\t• Any other character will be displayed as is.\n\n" +
-                //               "For example:\n\n" +
-                //               "\t• ##-@@-^^ - Gives you 24-UF-lk\n" +
-                //               "\t• #@#@#@#@ - Gives you 2K6L5J9P",
-                //    },
-                //    ActionButtons = [
-                //        dialog_button
-                //    ]
-                //}, false, true);
+                PlacementAnchor = PopupAnchor.BottomRight,
+                ShowMode = FlyoutShowMode.TransientWithDismissOnPointerMoveAway,
+                Content = new GlassCard()
+                {
+                    IsOpaque = true,
+                    Content = new TextBlock()
+                    {
+                        Text = "Use the following characters to generate a sequence:\n\n" +
+                                "\t• # - Random number.\n" +
+                                "\t• @ - Random uppercase letter.\n" +
+                                "\t• ^ - Random lowercase letter.\n" +
+                                "\t• ? - Random special character.\n" +
+                                "\t• * - Random number or letter.\n" +
+                                "\t• $ - Random number or uppercase letter.\n" +
+                                "\t• % - Random number or lowercase letter.\n" +
+                                "\t• Any other character will be displayed as is.\n\n" +
+                                "For example:\n\n" +
+                                "\t• ##-@@-^^ - Gives you 24-UF-lk\n" +
+                                "\t• #@#@#@#@ - Gives you 2K6L5J9P",
+                    }
+                }
             };
 
             Controls.Add(sequence_text_box);
