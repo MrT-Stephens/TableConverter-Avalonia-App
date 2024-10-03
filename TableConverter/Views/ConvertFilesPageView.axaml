@@ -32,14 +32,14 @@
                     Orientation="Horizontal"
                     Spacing="5">
           <!-- New File Button -->
-          <Button Command="{Binding ConvertFileNewFileButtonClickedCommand}">
+          <Button Command="{Binding ConvertFileNewFileButtonClickedCommand}"
+                  Classes="Flat">
             <StackPanel Orientation="Horizontal"
                         Spacing="10">
               <TextBlock Classes="h5"
                          Text="New"
                          VerticalAlignment="Center" />
-              <PathIcon Data="{StaticResource FileUploadIcon}"
-                        Classes="Primary" />
+              <PathIcon Data="{StaticResource FileUploadIcon}" />
             </StackPanel>
           </Button>
         </StackPanel>
