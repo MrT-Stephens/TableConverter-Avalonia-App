@@ -34,6 +34,13 @@ namespace TableConverter.DataGeneration.DataModels
             Random = new Random((int)DateTime.Now.ToBinary());
         }
 
+        public DataGenerationTypeHandlerAbstract(int seed)
+        {
+            Options = (typeof(T) == typeof(DataGenerationBaseOptions)) ? null : new T();
+
+            Random = new Random(seed);
+        }
+
         /// <summary>
         /// The generate data function that can be called by anyone.
         /// Will generate data based on the number of rows, options, and blanks percentage.
