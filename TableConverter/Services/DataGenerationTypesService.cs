@@ -138,7 +138,7 @@ namespace TableConverter.Services
         /// <exception cref="Exception"> Thrown if the function doesnt manage to create an instance of the handler. </exception>
         public IDataGenerationTypeHandler GetHandlerByName(string name)
         {
-            IDataGenerationTypeHandler? handler = (IDataGenerationTypeHandler?)Activator.CreateInstance(GetByName(name).GeneratorType);
+            IDataGenerationTypeHandler? handler=(IDataGenerationTypeHandler?)Activator.CreateInstance(GetByName(name).GeneratorType);
 
             if (handler is null)
             {
