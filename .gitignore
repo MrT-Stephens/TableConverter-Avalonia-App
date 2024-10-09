@@ -365,4 +365,4 @@ FodyWeavers.xsd
 # TableConverter Items
 *.db
 
-.vscode/
+.vscode
