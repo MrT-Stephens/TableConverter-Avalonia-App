@@ -19,8 +19,8 @@
   </Design.DataContext>
   
   <components:SpacedGrid RowDefinitions="*,Auto"
-                         RowSpacing="20"
-                         Margin="20">
+                         RowSpacing="10"
+                         Margin="10">
     <!-- Data Generation Types Data Grid -->
     <sukiUi:GlassCard Grid.Row="0"
                       IsAnimated="False"

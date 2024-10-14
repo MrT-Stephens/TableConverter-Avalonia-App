@@ -20,8 +20,8 @@
   </Design.DataContext>
   
   <components:SpacedGrid RowDefinitions="Auto,*"
-                         RowSpacing="20"
-                         Margin="20">
+                         RowSpacing="10"
+                         Margin="10">
     <!-- Convert Files View Header -->
     <sukiUi:GlassCard Grid.Row="0"
                       IsAnimated="False"

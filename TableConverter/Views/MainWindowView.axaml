@@ -6,7 +6,6 @@
                    xmlns:sukiModels="clr-namespace:SukiUI.Models;assembly=SukiUI"
                    xmlns:vm="clr-namespace:TableConverter.ViewModels"
                    x:Class="TableConverter.Views.MainWindowView"
-                   Icon="/Assets/avalonia-logo.ico"
                    Title="TableConverter"
                    BackgroundAnimationEnabled="True"
                    BackgroundTransitionsEnabled="True"
@@ -81,7 +80,7 @@
       </Button.Flyout>
     </Button>
   </sukiUi:SukiWindow.RightWindowTitleBarControls>
-  <sukiUi:SukiSideMenu IsSearchEnabled="True"
+  <sukiUi:SukiSideMenu IsSearchEnabled="False"
                        ItemsSource="{Binding Pages}"
                        SelectedItem="{Binding SelectedPage}">
     <sukiUi:SukiSideMenu.ItemTemplate>
