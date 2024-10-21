@@ -80,6 +80,27 @@
                      Grid.Row="1"
                      IsBusy="{Binding SelectedConvertDocument.IsBusy}"
                      BusyText="Loading...">
+      <!-- Convert File Context Menu -->
+      <sukiUi:BusyArea.ContextMenu>
+        <ContextMenu>
+          <!-- Delete File Menu Button -->
+          <MenuItem Header="Delete File"
+                    Command="{Binding RemoveFileButtonClickedCommand}"
+                    CommandParameter="{Binding SelectedConvertDocument.Name}">
+            <MenuItem.Icon>
+              <PathIcon Data="{StaticResource RemoveIcon}" />
+            </MenuItem.Icon>
+          </MenuItem>
+          <!-- Duplicate File Menu Button -->
+          <MenuItem Header="Duplicate File"
+                    Command="{Binding DuplicateFileButtonClickedCommand}"
+                    CommandParameter="{Binding SelectedConvertDocument.Name}">
+            <MenuItem.Icon>
+              <PathIcon Data="{StaticResource DuplicateIcon}" />
+            </MenuItem.Icon>
+          </MenuItem>
+        </ContextMenu>
+      </sukiUi:BusyArea.ContextMenu>
       <xamlInteractivity:Interaction.Behaviors>
         <!-- Input Progress Stepper View -->
         <xamlInteractions:DataTriggerBehavior Binding="{Binding SelectedConvertDocument.ProgressStepIndex}"

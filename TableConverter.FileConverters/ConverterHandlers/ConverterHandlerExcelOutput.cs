@@ -13,7 +13,7 @@ namespace TableConverter.FileConverters.ConverterHandlers
         {
             ExcelWorkbook = new XSSFWorkbook();
 
-            ISheet sheet = ExcelWorkbook.CreateSheet(Options!.SheetName);
+            ISheet sheet = ExcelWorkbook.CreateSheet(string.IsNullOrEmpty(Options!.SheetName) ? "Sheet1" : Options!.SheetName);
 
             IRow header_row = sheet.CreateRow(0);
 

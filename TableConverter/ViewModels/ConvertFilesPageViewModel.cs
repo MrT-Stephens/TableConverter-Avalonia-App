@@ -311,7 +311,80 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
     {
         if (FilesManager.Files!.Any(val => val.Name == name))
         {
-            FilesManager.Files!.Remove(FilesManager.Files.First(val => val.Name == name));
+            var file = FilesManager.Files.First(val => val.Name == name);
+
+            DialogManager.CreateDialog()
+                .WithTitle("Are you sure?")
+                .WithContent($"Are you sure you want to remove the file '{name}'?")
+                .OfType(NotificationType.Warning)
+                .WithActionButton("No", (dialog) => { }, true)
+                .WithActionButton("Yes", (dialog) => {
+                    if (FilesManager.Files!.Count == 1)
+                    {
+                        FilesManager.Files.Add(ExampleConverterDocument());
+                    }
+
+                    FilesManager.Files.Remove(file);
+
+                    ToastManager.CreateToast()
+                        .WithTitle("File Removed")
+                        .WithContent($"The file '{name}' has been removed from your documents.")
+                        .OfType(NotificationType.Success)
+                        .Dismiss().ByClicking()
+                        .Dismiss().After(new(0, 0, 3))
+                        .Queue();
+                }, true)
+                .TryShow();
+        }
+        else 
+        {
+            ToastManager.CreateToast()
+                .WithTitle("File Not Found")
+                .WithContent($"The file '{name}' could not be found.")
+                .OfType(NotificationType.Error)
+                .Dismiss().ByClicking()
+                .Dismiss().After(new(0, 0, 3))
+                .Queue();
+        }
+    }
+
+    [RelayCommand]
+    private void DuplicateFileButtonClicked(string name)
+    {
+        if (FilesManager.Files!.Any(val => val.Name == name))
+        {
+            var file = FilesManager.Files.First(val => val.Name == name);
+
+            var newDoc = new ConvertDocumentViewModel()
+            {
+                Name = $"Copy-{file.Name}",
+                InputConverter = file.InputConverter,
+                OutputConverter = file.OutputConverter,
+                InputFileText = new AvaloniaEdit.Document.TextDocument()
+                {
+                    FileName = file.InputFileText.FileName,
+                    Text = file.InputFileText.Text
+                },
+                EditHeaders = new(file.EditHeaders),
+                EditRows = new(file.EditRows),
+                OutputFileText = new AvaloniaEdit.Document.TextDocument()
+                {
+                    FileName = file.OutputFileText.FileName,
+                    Text = file.OutputFileText.Text
+                }
+            };
+
+            FilesManager.Files.Add(newDoc);
+        }
+        else 
+        {
+            ToastManager.CreateToast()
+                .WithTitle("File Not Found")
+                .WithContent($"The file '{name}' could not be found.")
+                .OfType(NotificationType.Error)
+                .Dismiss().ByClicking()
+                .Dismiss().After(new(0, 0, 3))
+                .Queue();
         }
     }
 
@@ -321,13 +394,15 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
 
     private ConvertDocumentViewModel ExampleConverterDocument()
     {
+        var name = $"Example-{DateTime.Now.ToFileTime()}.csv";
+
         return new ConvertDocumentViewModel()
         {
-            Name = "Example.csv",
+            Name = name,
             InputConverter = ConverterTypes.InputTypes.First(converter => converter.Name == "CSV"),
             InputFileText = new AvaloniaEdit.Document.TextDocument()
             {
-                FileName = "Example.csv",
+                FileName = name,
                 Text =
                     "FIRST_NAME,LAST_NAME,GENDER,COUNTRY_CODE" + Environment.NewLine +
                     "Luxeena,Binoy,F,GB" + Environment.NewLine +
