@@ -114,10 +114,12 @@
                 <components:SpacedGrid RowDefinitions="*,Auto"
                                        RowSpacing="10">
                   <avaloniaEdit:TextEditor Grid.Row="0"
+                                           Name="InputFileTextEditor"
                                            ShowLineNumbers="True"
                                            Document="{Binding SelectedConvertDocument.InputFileText}"
                                            ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                                           ScrollViewer.VerticalScrollBarVisibility="Visible">
+                                           ScrollViewer.VerticalScrollBarVisibility="Visible"
+                                           FontFamily="{StaticResource DefaultFontFamily}">
                     <avaloniaEdit:TextEditor.Options>
                       <avaloniaEdit:TextEditorOptions AllowScrollBelowDocument="False"
                                                       HighlightCurrentLine="True"
@@ -127,7 +129,8 @@
                                                       ShowEndOfLine="True"
                                                       ShowSpaces="True"
                                                       ShowTabs="True"
-                                                      RequireControlModifierForHyperlinkClick="True" />
+                                                      RequireControlModifierForHyperlinkClick="True"
+                                                      EnableEmailHyperlinks="False" />
                     </avaloniaEdit:TextEditor.Options>
                   </avaloniaEdit:TextEditor>
                   <!-- Footer Buttons -->
@@ -237,10 +240,12 @@
                 <components:SpacedGrid RowDefinitions="*,Auto"
                                        RowSpacing="10">
                   <avaloniaEdit:TextEditor Grid.Row="0"
+                                           Name="OutputFileTextEditor"
                                            ShowLineNumbers="True"
                                            Document="{Binding SelectedConvertDocument.OutputFileText}"
                                            ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                                           ScrollViewer.VerticalScrollBarVisibility="Visible">
+                                           ScrollViewer.VerticalScrollBarVisibility="Visible"
+                                           FontFamily="{StaticResource DefaultFontFamily}">
                     <avaloniaEdit:TextEditor.Options>
                       <avaloniaEdit:TextEditorOptions AllowScrollBelowDocument="False"
                                                       HighlightCurrentLine="True"
@@ -250,7 +255,8 @@
                                                       ShowEndOfLine="True"
                                                       ShowSpaces="True"
                                                       ShowTabs="True"
-                                                      RequireControlModifierForHyperlinkClick="True" />
+                                                      RequireControlModifierForHyperlinkClick="True"
+                                                      EnableEmailHyperlinks="False" />
                     </avaloniaEdit:TextEditor.Options>
                   </avaloniaEdit:TextEditor>
                   <!-- Footer Buttons -->
