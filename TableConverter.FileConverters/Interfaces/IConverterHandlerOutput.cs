@@ -1,15 +1,17 @@
-﻿namespace TableConverter.FileConverters.Interfaces
+﻿using TableConverter.FileConverters.DataModels;
+
+namespace TableConverter.FileConverters.Interfaces
 {
     public interface IConverterHandlerOutput
     {
         public dynamic? Options { get; set; }
 
-        public string Convert(string[] headers, string[][] rows);
+        public Result<string> Convert(string[] headers, string[][] rows);
 
-        public Task<string> ConvertAsync(string[] headers, string[][] rows);
+        public Task<Result<string>> ConvertAsync(string[] headers, string[][] rows);
 
-        public void SaveFile(Stream? stream, ReadOnlyMemory<byte> buffer);
+        public Result SaveFile(Stream? stream, ReadOnlyMemory<byte> buffer);
 
-        public Task SaveFileAsync(Stream? stream, ReadOnlyMemory<byte> buffer);
+        public Task<Result> SaveFileAsync(Stream? stream, ReadOnlyMemory<byte> buffer);
     }
 }

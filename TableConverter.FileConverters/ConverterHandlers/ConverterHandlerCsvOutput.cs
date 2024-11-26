@@ -9,34 +9,42 @@ namespace TableConverter.FileConverters.ConverterHandlers
 {
     public class ConverterHandlerCsvOutput : ConverterHandlerOutputAbstract<ConverterHandlerCsvOptions>
     {
-        public override string Convert(string[] headers, string[][] rows)
+        public override Result<string> Convert(string[] headers, string[][] rows)
         { 
             using var writer = new StringWriter();
-            using var csv = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture)
-            {
-                Delimiter = Options!.Delimiter,
-                NewLine = Environment.NewLine,
-                HasHeaderRecord = Options!.Header
-            });
-            {
-                List<object> records = [];
 
-                for (long i = 0; i < rows.LongLength; i++)
+            try
+            {
+                using var csv = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture)
                 {
-                    dynamic record = new ExpandoObject();
+                    Delimiter = Options!.Delimiter,
+                    NewLine = Environment.NewLine,
+                    HasHeaderRecord = Options!.Header
+                });
+                {
+                    List<object> records = [];
 
-                    for (long j = 0; j < headers.LongLength; j++)
+                    for (long i = 0; i < rows.LongLength; i++)
                     {
-                        ((IDictionary<string, object>)record)[headers[j]] = rows[i][j];
+                        dynamic record = new ExpandoObject();
+
+                        for (long j = 0; j < headers.LongLength; j++)
+                        {
+                            ((IDictionary<string, object>)record)[headers[j]] = rows[i][j];
+                        }
+
+                        records.Add(record);
                     }
 
-                    records.Add(record);
+                    csv.WriteRecords(records);
                 }
-
-                csv.WriteRecords(records);
-
-                return writer.ToString();
             }
+            catch (Exception ex)
+            {
+                return Result<string>.Failure(ex.Message);
+            }
+            
+            return Result<string>.Success(writer.ToString());
         }
     }
 }

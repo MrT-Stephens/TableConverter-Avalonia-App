@@ -7,19 +7,22 @@ namespace TableConverter.FileConverters.ConverterHandlers
 {
     public class ConverterHandlerCsvInput : ConverterHandlerInputAbstract<ConverterHandlerCsvOptions>
     {
-        public override TableData ReadText(string text)
+        public override Result<TableData> ReadText(string text)
         {
             var headers = new List<string>();
             var rows = new List<string[]>();
 
-            using (var csv_reader = new CsvHelper.CsvReader(new StringReader(text), new CsvConfiguration(CultureInfo.InvariantCulture)
+            try
             {
-                Delimiter = Options!.Delimiter,
-                NewLine = Environment.NewLine,
-                BadDataFound = null,
-            }))
-            {
-                foreach (var row in csv_reader.GetRecords<dynamic>())
+                using var csvReader = new CsvHelper.CsvReader(new StringReader(text),
+                    new CsvConfiguration(CultureInfo.InvariantCulture)
+                    {
+                        Delimiter = Options!.Delimiter,
+                        NewLine = Environment.NewLine,
+                        BadDataFound = null,
+                    });
+                
+                foreach (var row in csvReader.GetRecords<dynamic>())
                 {
                     if (Options!.Header && headers.Count == 0)
                     {
@@ -27,17 +30,22 @@ namespace TableConverter.FileConverters.ConverterHandlers
                     }
                     else if (!Options!.Header && headers.Count == 0)
                     {
-                        for (long i = 0; i < ((IDictionary<string, object>)row).Keys.LongCount(); i++)
+                        for (long i = 0; i < ((IDictionary<string, object>)row).Keys.Count; i++)
                         {
                             headers.Add($"Column {i}");
                         }
                     }
 
-                    rows.Add(((IDictionary<string, object>)row).Select(x => x.Value?.ToString() ?? string.Empty).ToArray());
+                    rows.Add(((IDictionary<string, object>)row).Select(x => x.Value?.ToString() ?? string.Empty)
+                        .ToArray());
                 }
             }
+            catch (Exception ex)
+            {
+                return Result<TableData>.Failure(ex.Message);
+            }
 
-            return new TableData(headers, rows);
+            return Result<TableData>.Success(new TableData(headers, rows));
         }
     }
 }

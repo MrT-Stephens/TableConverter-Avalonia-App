@@ -36,7 +36,7 @@ public partial class WelcomePageViewModel : BasePageViewModel
                 new List<DataGenerationType>(
                     dataGenerationTypes.Types
                         .Where(types => types.Category == val.Category)
-                        .OrderBy(val => val.Name)
+                        .OrderBy(dataGenerationType => dataGenerationType.Name)
                 )
             ))
             .DistinctBy(kv => kv.Key)

@@ -3,55 +3,48 @@ using TableConverter.FileConverters.Interfaces;
 
 namespace TableConverter.FileConverters.DataModels
 {
-    public abstract class ConverterHandlerInputAbstract<T> : IConverterHanderInput where T : ConverterHandlerBaseOptions, new()
+    public abstract class ConverterHandlerInputAbstract<T> : IConverterHandlerInput where T : ConverterHandlerBaseOptions, new()
     {
-        dynamic? IConverterHanderInput.Options
+        dynamic? IConverterHandlerInput.Options
         {
             get => Options;
             set => Options = value;
         }
 
-        public T? Options { get; set; }
+        public T? Options { get; set; } = typeof(T) == typeof(ConverterHandlerBaseOptions) ? null : new T();
 
-        public ConverterHandlerInputAbstract()
-        {
-            Options = (typeof(T) == typeof(ConverterHandlerBaseOptions)) ? null : new T();
-        }
-
-        public virtual string ReadFile(Stream? stream)
+        public virtual Result<string> ReadFile(Stream? stream)
         {
             ArgumentNullException.ThrowIfNull(stream, nameof(stream));
 
             const int maxRetries = 3;
-            int attempts = 0;
-
-            using (var reader = new StreamReader(stream))
+            var attempts = 0;
+            using var reader = new StreamReader(stream);
+            
+            while (attempts < maxRetries)
             {
-                while (attempts < maxRetries)
+                try
                 {
-                    try
-                    {
-                        return reader.ReadToEnd();
-                    }
-                    catch (IOException ex) when (ex.Message.Contains("timed out"))
-                    {
-                        attempts++;
-                        Thread.Sleep(2000); // Wait before retrying
-                    }
-                    catch (Exception)
-                    {
-                        break;
-                    }
+                    return Result<string>.Success(reader.ReadToEnd());
+                }
+                catch (IOException exception) when (exception.Message.Contains("timed out"))
+                {
+                    attempts++;
+                    Thread.Sleep(2000); // Wait before retrying
+                }
+                catch (Exception exception)
+                {
+                    return Result<string>.Failure(exception.Message);
                 }
             }
 
-            return string.Empty;
+            return Result<string>.Failure("Failed to read file");
         }
 
-        public async Task<string> ReadFileAsync(Stream? stream) => await Task.Run(() => ReadFile(stream));
+        public async Task<Result<string>> ReadFileAsync(Stream? stream) => await Task.Run(() => ReadFile(stream));
 
-        public abstract TableData ReadText(string text);
+        public abstract Result<TableData> ReadText(string text);
 
-        public async Task<TableData> ReadTextAsync(string text) => await Task.Run(() => ReadText(text));
+        public async Task<Result<TableData>> ReadTextAsync(string text) => await Task.Run(() => ReadText(text));
     }
 }

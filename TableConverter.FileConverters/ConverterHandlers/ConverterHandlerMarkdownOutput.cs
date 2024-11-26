@@ -7,41 +7,39 @@ namespace TableConverter.FileConverters.ConverterHandlers
 {
     public class ConverterHandlerMarkdownOutput : ConverterHandlerOutputAbstract<ConverterHandlerMarkdownOutputOptions>
     {
-        public override string Convert(string[] headers, string[][] rows)
+        public override Result<string> Convert(string[] headers, string[][] rows)
         {
-            var ascii_output = new StringBuilder();
+            var asciiOutput = new StringBuilder();
 
             // Calculates the max text character widths of every column.
-            long[] max_column_widths = new long[headers.LongLength];
+            var maxColumnWidths = new long[headers.Length];
 
-            for (long i = 0; i < headers.LongLength; i++)
+            for (var i = 0; i < headers.Length; i++)
             {
                 if ((i == 0 && Options!.BoldFirstColumn) || Options!.BoldColumnNames)
                 {
-                    max_column_widths[i] = headers[i].LongCount() + 6;
+                    maxColumnWidths[i] = headers[i].Length + 6;
                 }
                 else
                 {
-                    max_column_widths[i] = headers[i].LongCount() + 2;
+                    maxColumnWidths[i] = headers[i].Length + 2;
                 }
             }
 
-            foreach (string[] row in rows)
+            foreach (var row in rows)
             {
-                for (long i = 0; i < headers.LongLength; i++)
+                for (var i = 0; i < headers.Length; i++)
                 {
                     if (i == 0 && Options!.BoldFirstColumn)
                     {
-                        max_column_widths[i] = Math.Max(max_column_widths[i], row[i].ToString().LongCount() + 6);
+                        maxColumnWidths[i] = Math.Max(maxColumnWidths[i], row[i].Length + 6);
                     }
                     else
                     {
-                        max_column_widths[i] = Math.Max(max_column_widths[i], row[i].ToString().LongCount() + 2);
+                        maxColumnWidths[i] = Math.Max(maxColumnWidths[i], row[i].Length + 2);
                     }
                 }
             }
-
-            string line = string.Empty;
 
             // Bold the data if the user has selected to bold the first column.
             if (Options!.BoldFirstColumn || Options!.BoldColumnNames)
@@ -70,59 +68,59 @@ namespace TableConverter.FileConverters.ConverterHandlers
             {
                 case "Markdown Table (Normal)":
                     {
-                        ascii_output.AppendLine("|" + DrawDataRow(headers, max_column_widths, Options!.TextAlignment[Options!.SelectedTextAlignment], '|') + "|");
-                        ascii_output.AppendLine("|" + DrawSeparator(max_column_widths, '|', '-') + "|");
+                        asciiOutput.AppendLine("|" + DrawDataRow(headers, maxColumnWidths, Options!.TextAlignment[Options!.SelectedTextAlignment], '|') + "|");
+                        asciiOutput.AppendLine("|" + DrawSeparator(maxColumnWidths, '|', '-') + "|");
 
                         foreach (var row in rows)
                         {
-                            ascii_output.AppendLine("|" + DrawDataRow(row, max_column_widths, Options!.TextAlignment[Options!.SelectedTextAlignment], '|') + "|");
+                            asciiOutput.AppendLine("|" + DrawDataRow(row, maxColumnWidths, Options!.TextAlignment[Options!.SelectedTextAlignment], '|') + "|");
                         }
 
                         break;
                     }
                 case "Markdown Table (Simple)":
                     {
-                        ascii_output.AppendLine(DrawDataRow(headers, max_column_widths, Options!.TextAlignment[Options!.SelectedTextAlignment], '|'));
-                        ascii_output.AppendLine(DrawSeparator(max_column_widths, '|', '-'));
+                        asciiOutput.AppendLine(DrawDataRow(headers, maxColumnWidths, Options!.TextAlignment[Options!.SelectedTextAlignment], '|'));
+                        asciiOutput.AppendLine(DrawSeparator(maxColumnWidths, '|', '-'));
 
                         foreach (var row in rows)
                         {
-                            ascii_output.AppendLine(DrawDataRow(row, max_column_widths, Options!.TextAlignment[Options!.SelectedTextAlignment], '|'));
+                            asciiOutput.AppendLine(DrawDataRow(row, maxColumnWidths, Options!.TextAlignment[Options!.SelectedTextAlignment], '|'));
                         }
 
                         break;
                     }
             }
 
-            return ascii_output.ToString();
+            return Result<string>.Success(asciiOutput.ToString());
         }
 
-        private static string DrawSeparator(long[] column_widths, char intersection_char, char fill_char)
+        private static string DrawSeparator(long[] columnWidths, char intersectionChar, char fillChar)
         {
             var separator = new StringBuilder();
 
-            for (long i = 0; i < column_widths.LongLength; i++)
+            for (long i = 0; i < columnWidths.LongLength; i++)
             {
-                separator.Append(new string(fill_char, (int)column_widths[i]));
+                separator.Append(new string(fillChar, (int)columnWidths[i]));
 
-                separator.Append(i == column_widths.LongLength - 1 ? "" : intersection_char);
+                separator.Append(i == columnWidths.LongLength - 1 ? "" : intersectionChar);
             }
 
             return separator.ToString();
         }
 
-        private static string DrawDataRow(string[] row, long[] column_widths, TextAlignment text_alignment, char intersection_char)
+        private static string DrawDataRow(string[] row, long[] columnWidths, TextAlignment textAlignment, char intersectionChar)
         {
-            var data_row = new StringBuilder();
+            var dataRow = new StringBuilder();
 
             for (long i = 0; i < row.LongLength; i++)
             {
-                data_row.Append(ConverterHandlerUtilities.AlignText(row[i], text_alignment, (int)column_widths[i], ' '));
+                dataRow.Append(ConverterHandlerUtilities.AlignText(row[i], textAlignment, (int)columnWidths[i], ' '));
 
-                data_row.Append(i == row.LongLength - 1 ? "" : intersection_char);
+                dataRow.Append(i == row.LongLength - 1 ? "" : intersectionChar);
             }
 
-            return data_row.ToString();
+            return dataRow.ToString();
         }
     }
 }

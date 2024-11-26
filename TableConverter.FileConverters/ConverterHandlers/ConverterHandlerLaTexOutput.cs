@@ -5,19 +5,19 @@ namespace TableConverter.FileConverters.ConverterHandlers
 {
     public class ConverterHandlerLaTexOutput : ConverterHandlerOutputAbstract<ConverterHandlerLaTexOutputOptions>
     {
-        public override string Convert(string[] headers, string[][] rows)
+        public override Result<string> Convert(string[] headers, string[][] rows)
         {
-            StringWriter string_writer = new StringWriter();
+            var stringWriter = new StringWriter();
 
             if (Options!.MinimalWorkingExample)
             {
-                string_writer.Write("\\documentclass{article}" + Environment.NewLine);
-                string_writer.Write("\\begin{document}" + Environment.NewLine + Environment.NewLine);
+                stringWriter.Write("\\documentclass{article}" + Environment.NewLine);
+                stringWriter.Write("\\begin{document}" + Environment.NewLine + Environment.NewLine);
             }
 
-            string_writer.Write("\\begin{table}" + Environment.NewLine);
+            stringWriter.Write("\\begin{table}" + Environment.NewLine);
 
-            var TableAlignGenerator = () =>
+            string TableAlignGenerator()
             {
                 return Options!.SelectedTableAlignment switch
                 {
@@ -26,11 +26,11 @@ namespace TableConverter.FileConverters.ConverterHandlers
                     "Right" => "\t\\raggedright",
                     _ => "\t\\raggedleft"
                 } + Environment.NewLine;
-            };
+            }
 
-            var BeginTableGenerator = () =>
+            string BeginTableGenerator()
             {
-                string text_alignement_char = Options!.SelectedTextAlignment switch
+                var textAlignementChar = Options!.SelectedTextAlignment switch
                 {
                     "Left" => "l",
                     "Center" => "c",
@@ -40,117 +40,115 @@ namespace TableConverter.FileConverters.ConverterHandlers
 
                 return "\t\\begin{tabular}{" + Options!.SelectedTableType switch
                 {
-                    "All" or "MySQL" or "Markdown" => "|" + string.Join("", Enumerable.Repeat($"{text_alignement_char}|", headers.Length)),
-                    "Excel" => $"|{text_alignement_char}|" + string.Join("", Enumerable.Repeat($"{text_alignement_char}", headers.Length - 1)) + "|",
-                    "Horizontal" or "None" or _ => string.Join("", Enumerable.Repeat($"{text_alignement_char}", headers.Length)),
+                    "All" or "MySQL" or "Markdown" => "|" + string.Join("", Enumerable.Repeat($"{textAlignementChar}|", headers.Length)),
+                    "Excel" => $"|{textAlignementChar}|" + string.Join("", Enumerable.Repeat($"{textAlignementChar}", headers.Length - 1)) + "|",
+                    "Horizontal" or "None" or _ => string.Join("", Enumerable.Repeat($"{textAlignementChar}", headers.Length)),
                 } + "}" + Environment.NewLine;
-            };
+            }
 
-            var AfterBeginTableGenerator = () =>
+            string AfterBeginTableGenerator()
             {
                 return Options!.SelectedTableType switch
                 {
                     "All" or "MySQL" or "Excel" or "Horizontal" => "\t\\hline" + Environment.NewLine,
                     "Markdown" or "None" or _ => string.Empty
                 };
-            };
+            }
 
-            var TableHeaderGenerator = () =>
+            string TableHeaderGenerator()
             {
-                return GenerateTableRow(headers, Options!.BoldHeader, Options!.BoldFirstColumn) +
-                Options!.SelectedTableType switch
+                return GenerateTableRow(headers, Options!.BoldHeader, Options!.BoldFirstColumn) + Options!.SelectedTableType switch
                 {
                     "All" or "MySQL" or "Excel" or "Horizontal" or "Markdown" => " \\hline",
                     "None" or _ => string.Empty
                 } + Environment.NewLine;
-            };
+            }
 
-            var TableRowsGenerator = () =>
+            string TableRowsGenerator()
             {
-                StringWriter rows_string_writer = new StringWriter();
+                var rowsStringWriter = new StringWriter();
 
-                for (long i = 0; i < rows.LongLength; i++)
+                for (var i = 0; i < rows.Length; i++)
                 {
-                    rows_string_writer.Write(GenerateTableRow(rows[i], false, Options!.BoldFirstColumn));
+                    rowsStringWriter.Write(GenerateTableRow(rows[i], false, Options!.BoldFirstColumn));
 
                     if (Options!.SelectedTableType == "None")
                     {
-                        rows_string_writer.Write(Environment.NewLine);
-                        continue;
+                        rowsStringWriter.Write(Environment.NewLine);
                     }
                     else if (Options!.SelectedTableType == "All" || i == rows.LongLength - 1)
                     {
-                        rows_string_writer.Write(" \\hline" + Environment.NewLine);
+                        rowsStringWriter.Write(" \\hline" + Environment.NewLine);
                     }
                     else
                     {
-                        rows_string_writer.Write(Environment.NewLine);
+                        rowsStringWriter.Write(Environment.NewLine);
                     }
                 }
 
-                return rows_string_writer.ToString();
-            };
+                return rowsStringWriter.ToString();
+            }
 
-            string_writer.Write(TableAlignGenerator());
+            stringWriter.Write(TableAlignGenerator());
 
             if (Options!.CaptionName != string.Empty && Options!.SelectedCaptionAlignment == "Top")
             {
-                string_writer.Write("\t\\caption{" + Options!.CaptionName + "}" + Environment.NewLine);
+                stringWriter.Write("\t\\caption{" + Options!.CaptionName + "}" + Environment.NewLine);
             }
 
-            string_writer.Write(BeginTableGenerator());
-            string_writer.Write(AfterBeginTableGenerator());
-            string_writer.Write(TableHeaderGenerator());
-            string_writer.Write(TableRowsGenerator());
+            stringWriter.Write(BeginTableGenerator());
+            stringWriter.Write(AfterBeginTableGenerator());
+            stringWriter.Write(TableHeaderGenerator());
+            stringWriter.Write(TableRowsGenerator());
 
-            string_writer.Write("\t\\end{tabular}" + Environment.NewLine);
+            stringWriter.Write("\t\\end{tabular}" + Environment.NewLine);
 
             if (Options!.CaptionName != string.Empty && Options!.SelectedCaptionAlignment == "Bottom")
             {
-                string_writer.Write("\t\\caption{" + Options!.CaptionName + "}" + Environment.NewLine);
+                stringWriter.Write("\t\\caption{" + Options!.CaptionName + "}" + Environment.NewLine);
             }
 
             if (Options!.LabelName != string.Empty)
             {
-                string_writer.Write("\t\\label{" + Options!.LabelName + "}" + Environment.NewLine);
+                stringWriter.Write("\t\\label{" + Options!.LabelName + "}" + Environment.NewLine);
             }
 
-            string_writer.Write("\\end{table}" + Environment.NewLine);
+            stringWriter.Write("\\end{table}" + Environment.NewLine);
 
             if (Options!.MinimalWorkingExample)
             {
-                string_writer.Write(Environment.NewLine + "\\end{document}" + Environment.NewLine);
+                stringWriter.Write(Environment.NewLine + "\\end{document}" + Environment.NewLine);
             }
 
-            return string_writer.ToString();
+            return Result<string>.Success(stringWriter.ToString());
         }
 
-        private static string GenerateTableRow(string[] items, bool bold_header, bool bold_column)
+        private static string GenerateTableRow(string[] items, bool boldHeader, bool boldColumn)
         {
-            StringWriter string_writer = new StringWriter();
+            var stringWriter = new StringWriter();
 
-            string_writer.Write("\t\t");
+            stringWriter.Write("\t\t");
 
             for (long i = 0; i < items.LongLength; i++)
             {
-                if ((i == 0 && bold_column) || bold_header)
+                if ((i == 0 && boldColumn) || boldHeader)
                 {
-                    string_writer.Write("\\textbf{" + items[i] + "}");
+                    stringWriter.Write("\\textbf{" + items[i] + "}");
                 }
                 else
                 {
-                    string_writer.Write(items[i] + "");
+                    stringWriter.Write(items[i] + "");
                 }
 
                 if (i != items.Length - 1)
                 {
-                    string_writer.Write(" & ");
+                    stringWriter.Write(" & ");
                 }
             }
 
-            string_writer.Write(" \\\\");
+            stringWriter.Write(" \\\\");
 
-            return string_writer.ToString();
+            return stringWriter.ToString();
         }
     }
 }

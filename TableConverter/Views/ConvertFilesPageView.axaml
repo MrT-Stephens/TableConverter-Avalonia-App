@@ -34,13 +34,7 @@
           <!-- New File Button -->
           <Button Command="{Binding ConvertFileNewFileButtonClickedCommand}"
                   Classes="Flat">
-            <StackPanel Orientation="Horizontal"
-                        Spacing="10">
-              <TextBlock Classes="h5"
-                         Text="New"
-                         VerticalAlignment="Center" />
-              <PathIcon Data="{StaticResource FileUploadIcon}" />
-            </StackPanel>
+            New
           </Button>
         </StackPanel>
         <!-- Current Files List Box -->
@@ -119,7 +113,7 @@
                                            Document="{Binding SelectedConvertDocument.InputFileText}"
                                            ScrollViewer.HorizontalScrollBarVisibility="Auto"
                                            ScrollViewer.VerticalScrollBarVisibility="Visible"
-                                           FontFamily="{StaticResource DefaultFontFamily}">
+                                           FontFamily="{StaticResource SecondaryFontFamily}">
                     <avaloniaEdit:TextEditor.Options>
                       <avaloniaEdit:TextEditorOptions AllowScrollBelowDocument="False"
                                                       HighlightCurrentLine="True"
@@ -135,20 +129,26 @@
                   </avaloniaEdit:TextEditor>
                   <!-- Footer Buttons -->
                   <components:SpacedGrid Grid.Row="1"
-                                         ColumnDefinitions="*,Auto"
+                                         ColumnDefinitions="Auto,*,Auto"
                                          ColumnSpacing="10">
+                    <!-- Load File Button -->
+                    <Button Grid.Column="0"
+                            IsEnabled="False"
+                            Classes="Flat">
+                      Back
+                    </Button>
+                    <!-- Input File Name -->
+                    <TextBlock Grid.Column="1" 
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Classes="h5"
+                               Text="{Binding SelectedConvertDocument.InputFileText.FileName}" />
                     <!-- Next Button -->
-                    <Button Grid.Column="1"
+                    <Button Grid.Column="2"
                             Command="{Binding ConvertFileNextBackButtonClickedCommand}"
                             CommandParameter="1"
                             Classes="Flat">
-                      <StackPanel Spacing="10"
-                                  Orientation="Horizontal">
-                        <TextBlock Classes="h5"
-                                   Text="Next"
-                                   VerticalAlignment="Center" />
-                        <PathIcon Data="{StaticResource ArrowRightIcon}" />
-                      </StackPanel>
+                      Next
                     </Button>
                   </components:SpacedGrid>
                 </components:SpacedGrid>
@@ -187,13 +187,7 @@
                             CommandParameter="0"
                             Classes="Flat"
                             IsVisible="{Binding !SelectedConvertDocument.IsGenerated}">
-                      <StackPanel Spacing="10"
-                                  Orientation="Horizontal">
-                        <PathIcon Data="{StaticResource ArrowLeftIcon}" />
-                        <TextBlock Classes="h5"
-                                   Text="Back"
-                                   VerticalAlignment="Center" />
-                      </StackPanel>
+                      Back
                     </Button>
                     <!-- Rows and Columns Ammount -->
                     <StackPanel Grid.Column="1"
@@ -214,13 +208,7 @@
                             Command="{Binding ConvertFileNextBackButtonClickedCommand}"
                             CommandParameter="2"
                             Classes="Flat">
-                      <StackPanel Spacing="10"
-                                  Orientation="Horizontal">
-                        <TextBlock Classes="h5"
-                                   Text="Next"
-                                   VerticalAlignment="Center" />
-                        <PathIcon Data="{StaticResource ArrowRightIcon}" />
-                      </StackPanel>
+                      Next
                     </Button>
                   </components:SpacedGrid>
                 </components:SpacedGrid>
@@ -245,7 +233,7 @@
                                            Document="{Binding SelectedConvertDocument.OutputFileText}"
                                            ScrollViewer.HorizontalScrollBarVisibility="Auto"
                                            ScrollViewer.VerticalScrollBarVisibility="Visible"
-                                           FontFamily="{StaticResource DefaultFontFamily}">
+                                           FontFamily="{StaticResource SecondaryFontFamily}">
                     <avaloniaEdit:TextEditor.Options>
                       <avaloniaEdit:TextEditorOptions AllowScrollBelowDocument="False"
                                                       HighlightCurrentLine="True"
@@ -268,38 +256,26 @@
                             Command="{Binding ConvertFileNextBackButtonClickedCommand}"
                             CommandParameter="1"
                             Classes="Flat">
-                      <StackPanel Spacing="10"
-                                  Orientation="Horizontal">
-                        <PathIcon Data="{StaticResource ArrowLeftIcon}" />
-                        <TextBlock Classes="h5"
-                                   Text="Back"
-                                   VerticalAlignment="Center" />
-                      </StackPanel>
+                      Back
                     </Button>
+                    <!-- Output File Name -->
+                    <TextBlock Grid.Column="1" 
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Classes="h5"
+                               Text="{Binding SelectedConvertDocument.OutputFileText.FileName}" />
                     <!-- Copy Data Button -->
                     <StackPanel Grid.Column="2"
                                 Orientation="Horizontal"
                                 Spacing="10">
                       <Button Command="{Binding CopyFileButtonClickedCommand}"
                               Classes="Flat">
-                        <StackPanel Spacing="10"
-                                    Orientation="Horizontal">
-                          <TextBlock Classes="h5"
-                                     Text="Copy"
-                                     VerticalAlignment="Center" />
-                          <PathIcon Data="{StaticResource CopyIcon}" />
-                        </StackPanel>
+                        Copy
                       </Button>
                       <!-- Save File Button -->
                       <Button Command="{Binding SaveFileButtonClickedCommand}"
                               Classes="Flat">
-                        <StackPanel Spacing="10"
-                                    Orientation="Horizontal">
-                          <TextBlock Classes="h5"
-                                     Text="Save"
-                                     VerticalAlignment="Center" />
-                          <PathIcon Data="{StaticResource FileDownloadIcon}" />
-                        </StackPanel>
+                        Save
                       </Button>
                     </StackPanel>
                   </components:SpacedGrid>

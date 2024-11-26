@@ -7,9 +7,9 @@ namespace TableConverter.FileConverters.ConverterHandlers
 {
     public class ConverterHandlerExcelInput : ConverterHandlerInputAbstract<ConverterHandlerBaseOptions>
     {
-        private IWorkbook? ExcelWorkbook { get; set; } = null;
+        private XSSFWorkbook? ExcelWorkbook { get; set; }
 
-        public override TableData ReadText(string text)
+        public override Result<TableData> ReadText(string text)
         {
             var headers = new List<string>();
             var rows = new List<string[]>();
@@ -18,25 +18,22 @@ namespace TableConverter.FileConverters.ConverterHandlers
             {
                 if (ExcelWorkbook == null)
                 {
-                    throw new Exception("Excel Workbook is not initialized.");
+                    throw new Exception("Excel Workbook is not initialized");
                 }
 
-                ISheet sheet = ExcelWorkbook.GetSheetAt(0);
+                var sheet = ExcelWorkbook.GetSheetAt(0);
 
                 foreach (IRow row in sheet)
                 {
                     if (row.RowNum == 0)
                     {
-                        foreach (var cell in row.Cells)
-                        {
-                            headers.Add(cell.ToString() ?? "");
-                        }
+                        headers.AddRange(row.Cells.Select(cell => cell.ToString() ?? ""));
                     }
                     else
                     {
-                        List<string> values = new List<string>();
+                        var values = new List<string>();
 
-                        for (int i = 0; i < headers.Count; i++)
+                        for (var i = 0; i < headers.Count; i++)
                         {
                             var cell = row.GetCell(i);
 
@@ -59,19 +56,26 @@ namespace TableConverter.FileConverters.ConverterHandlers
             }
             catch (Exception ex)
             {
-                throw new Exception("Error while reading the Excel file.", ex);
+                return Result<TableData>.Failure(ex.Message);
             }
 
-            return new TableData(headers, rows);
+            return Result<TableData>.Success(new TableData(headers, rows));
         }
 
-        public override string ReadFile(Stream? stream)
+        public override Result<string> ReadFile(Stream? stream)
         {
             ArgumentNullException.ThrowIfNull(stream, nameof(stream));
 
-            ExcelWorkbook = new XSSFWorkbook(stream);
+            try
+            {
+                ExcelWorkbook = new XSSFWorkbook(stream);
+            }
+            catch (Exception ex)
+            {
+                return Result<string>.Failure(ex.Message);
+            }
 
-            return $"Excel files are not visible within this text box 😭{Environment.NewLine}";
+            return Result<string>.Success($"Excel files are not visible within this text box 😭{Environment.NewLine}");
         }
     }
 }

@@ -7,8 +7,8 @@
                    xmlns:vm="clr-namespace:TableConverter.ViewModels"
                    x:Class="TableConverter.Views.MainWindowView"
                    Title="TableConverter"
-                   BackgroundAnimationEnabled="True"
-                   BackgroundTransitionsEnabled="True"
+                   BackgroundAnimationEnabled="False"
+                   BackgroundTransitionsEnabled="False"
                    BackgroundStyle="Bubble"
                    MinHeight="400"
                    MinWidth="400"
@@ -21,7 +21,7 @@
     <sukiUi:SukiDialogHost Manager="{Binding DialogManager}" />
   </sukiUi:SukiWindow.Hosts>
   <sukiUi:SukiWindow.LogoContent>
-    <PathIcon Data="{StaticResource TableEdit}" />
+    <PathIcon Data="{StaticResource TableEdit}" Classes="Primary" />
   </sukiUi:SukiWindow.LogoContent>
   <sukiUi:SukiWindow.RightWindowTitleBarControls>
     <Button Classes="Basic Rounded WindowControlsButton">

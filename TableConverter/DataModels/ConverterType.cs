@@ -9,7 +9,7 @@ namespace TableConverter.DataModels
         IReadOnlyList<string> MimeTypes,
         IReadOnlyList<string> AppleUTIs,
         string Description,
-        IConverterHanderInput? InputConverterHandler,
+        IConverterHandlerInput? InputConverterHandler,
         IConverterHandlerOutput? OutputConverterHandler
     );
 }

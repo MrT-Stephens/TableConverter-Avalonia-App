@@ -5,63 +5,69 @@ namespace TableConverter.FileConverters.ConverterHandlers
 {
     public class ConverterHandlerAspInput : ConverterHandlerInputAbstract<ConverterHandlerBaseOptions>
     {
-        public override TableData ReadText(string text)
+        public override Result<TableData> ReadText(string text)
         {
             var headers = new List<string>();
             var rows = new List<string[]>();
 
-            using (var reader = new StringReader(text))
+            try
             {
-                bool first_line = true;
-                long columns_count = 0, rows_count = 0;
+                using var reader = new StringReader(text);
+                var firstLine = true;
+                long columnsCount = 0, rowsCount = 0;
 
-                for (string? line = reader?.ReadLine()?.Trim();
-                        !string.IsNullOrEmpty(line);
-                        line = reader?.ReadLine()?.Trim())
+                for (var line = reader?.ReadLine()?.Trim();
+                     !string.IsNullOrEmpty(line);
+                     line = reader?.ReadLine()?.Trim())
                 {
-                    if (first_line)
+                    if (firstLine)
                     {
                         line = line.Replace("Dim arr(", "").Replace(")", "");
 
-                        string[] values = line.Split(",");
+                        var values = line.Split(",");
 
-                        columns_count = long.Parse(values[0]);
-                        rows_count = long.Parse(values[1]);
+                        columnsCount = long.Parse(values[0]);
+                        rowsCount = long.Parse(values[1]);
 
-                        for (long i = 0; i < columns_count; i++)
+                        for (long i = 0; i < columnsCount; i++)
                         {
                             headers.Add(string.Empty);
                         }
 
-                        for (long i = 0; i < rows_count - 1; i++)
+                        for (long i = 0; i < rowsCount - 1; i++)
                         {
-                            rows.Add(new string[columns_count]);
+                            rows.Add(new string[columnsCount]);
                         }
 
-                        first_line = false;
+                        firstLine = false;
                     }
                     else
                     {
                         line = line.Replace("arr(", "").Replace(")", "");
 
-                        string[] indexes = line.Substring(0, line.IndexOf("=")).Trim().Split(',');
+                        var indexes = line.Substring(0, line.IndexOf('=')).Trim().Split(',');
 
-                        if (long.Parse(indexes[0]) < columns_count && long.Parse(indexes[1]) < rows_count)
+                        if (long.Parse(indexes[0]) < columnsCount && long.Parse(indexes[1]) < rowsCount)
                         {
                             if (int.Parse(indexes[1]) == 0)
                             {
-                                headers[int.Parse(indexes[0])] = line.Substring(line.IndexOf("=") + 1).Trim();
+                                headers[int.Parse(indexes[0])] = line.Substring(line.IndexOf('=') + 1).Trim();
                             }
                             else
                             {
-                                rows[int.Parse(indexes[1]) - 1][int.Parse(indexes[0])] = line.Substring(line.IndexOf("=") + 1).Trim();
+                                rows[int.Parse(indexes[1]) - 1][int.Parse(indexes[0])] =
+                                    line.Substring(line.IndexOf('=') + 1).Trim();
                             }
                         }
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                return Result<TableData>.Failure(ex.Message);
+            }
 
-            return new TableData(headers, rows);
+            return Result<TableData>.Success(new TableData(headers, rows));
         }
     }
 }

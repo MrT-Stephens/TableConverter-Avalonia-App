@@ -6,30 +6,24 @@ namespace TableConverter.FileConverters.ConverterHandlers
 {
     public class ConverterHandlerXmlInput : ConverterHandlerInputAbstract<ConverterHandlerBaseOptions>
     {
-        public override TableData ReadText(string text)
+        public override Result<TableData> ReadText(string text)
         {
             var headers = new List<string>();
             var rows = new List<string[]>();
 
             using (var reader = new StringReader(text))
-            using (var data_set = new DataSet())
+            using (var dataSet = new DataSet())
             {
-                data_set.ReadXml(reader);
+                dataSet.ReadXml(reader);
 
-                var table = data_set.Tables[0];
+                var table = dataSet.Tables[0];
 
-                foreach (DataColumn column in table.Columns)
-                {
-                    headers.Add(column.ColumnName);
-                }
+                headers.AddRange(from DataColumn column in table.Columns select column.ColumnName);
 
-                foreach (DataRow row in table.Rows)
-                {
-                    rows.Add(row.ItemArray.Select(x => x?.ToString() ?? "").ToArray());
-                }
+                rows.AddRange(from DataRow row in table.Rows select row.ItemArray.Select(x => x?.ToString() ?? "").ToArray());
             }
 
-            return new TableData(headers, rows);
+            return Result<TableData>.Success(new TableData(headers, rows));
         }
     }
 }

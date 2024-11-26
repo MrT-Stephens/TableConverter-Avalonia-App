@@ -51,7 +51,7 @@ public partial class MainWindowViewModel : ObservableObject
 
         Theme = SukiTheme.GetInstance();
 
-        pageNavigation.NavigationRequested += (pageType, action) => 
+        pageNavigation.NavigationRequested += (pageType, action) =>
         {
             var page = Pages.FirstOrDefault(x => x.GetType() == pageType);
 
@@ -63,30 +63,6 @@ public partial class MainWindowViewModel : ObservableObject
             SelectedPage = page;
 
             action?.Invoke(page);
-        };
-
-        Theme.OnColorThemeChanged += variant =>
-        {
-            ToastManager.CreateToast()
-                .OfType(NotificationType.Information)
-                .WithTitle("Color Changed")
-                .WithContent($"Color has changed to {variant.DisplayName}.")
-                .Dismiss().ByClicking()
-                .Dismiss().After(new(0, 0, 3 ))
-                .Queue();
-        };
-
-        Theme.OnBaseThemeChanged += variant =>
-        {
-            SelectedBaseTheme = variant;
-
-            ToastManager.CreateToast()
-                .OfType(NotificationType.Information)
-                .WithTitle("Theme Changed")
-                .WithContent($"Theme has changed to {variant}.")
-                .Dismiss().ByClicking()
-                .Dismiss().After(new(0, 0, 3))
-                .Queue();
         };
 
         SelectedColorTheme = Theme.ActiveColorTheme;

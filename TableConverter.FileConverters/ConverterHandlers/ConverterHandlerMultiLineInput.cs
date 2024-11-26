@@ -5,26 +5,29 @@ namespace TableConverter.FileConverters.ConverterHandlers
 {
     public class ConverterHandlerMultiLineInput : ConverterHandlerInputAbstract<ConverterHandlerMultiLineOptions>
     {
-        public override TableData ReadText(string text)
+        public override Result<TableData> ReadText(string text)
         {
             var headers = new List<string>();
             var rows = new List<string[]>();
 
             using (var reader = new StringReader(text))
             {
-                bool first_line = true;
+                var firstLine = true;
 
-                List<string> row = new List<string>();
+                var row = new List<string>();
 
-                for (string? line = reader?.ReadLine()?.Trim();
-                        !string.IsNullOrEmpty(line);
-                        line = reader?.ReadLine()?.Trim())
+                for (var line = reader?.ReadLine()?.Trim(); !string.IsNullOrEmpty(line); line = reader?.ReadLine()?.Trim())
                 {
+                    if (line is null)
+                    {
+                        continue;
+                    }
+                    
                     if (line == Options!.RowSeparator)
                     {
-                        if (first_line)
+                        if (firstLine)
                         {
-                            first_line = false;
+                            firstLine = false;
                         }
                         else
                         {
@@ -32,7 +35,7 @@ namespace TableConverter.FileConverters.ConverterHandlers
                             row.Clear();
                         }
                     }
-                    else if (first_line)
+                    else if (firstLine)
                     {
                         headers.Add(line);
                     }
@@ -48,7 +51,7 @@ namespace TableConverter.FileConverters.ConverterHandlers
                 }
             }
 
-            return new TableData(headers, rows);
+            return Result<TableData>.Success(new TableData(headers, rows));
         }
     }
 }

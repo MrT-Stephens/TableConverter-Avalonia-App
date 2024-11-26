@@ -4,67 +4,84 @@ using TableConverter.FileConverters.DataModels;
 
 namespace TableConverter.FileConverters.ConverterHandlers
 {
-    public class ConverterHandlerHtmlInput : ConverterHandlerInputAbstract<ConverterHandlerBaseOptions>
+    public partial class ConverterHandlerHtmlInput : ConverterHandlerInputAbstract<ConverterHandlerBaseOptions>
     {
-        public override TableData ReadText(string text)
+        public override Result<TableData> ReadText(string text)
         {
             var headers = new List<string>();
             var rows = new List<string[]>();
 
-            // Extract content within the <table> tags
-            string table_pattern = @"<table[^>]*>[\s\S]*?</table>";
-            MatchCollection table_matches = Regex.Matches(text, table_pattern, RegexOptions.IgnoreCase);
-
-            if (table_matches.Count > 0)
+            try
             {
-                // Assume the first table in the HTML as the target table
-                string table_html = table_matches[0].Value;
+                // Extract content within the <table> tags
+                var tableMatches = TableRegex().Matches(text);
 
-                // Extract data rows
-                string row_pattern = @"<tr[^>]*>[\s\S]*?</tr>";
-                MatchCollection row_matches = Regex.Matches(table_html, row_pattern, RegexOptions.IgnoreCase);
-
-                foreach (Match row_match in row_matches.Cast<Match>())
+                if (tableMatches.Count > 0)
                 {
-                    if (row_match.Value.Contains("<th>") && row_match.Value.Contains("</th>"))
+                    // Assume the first table in the HTML as the target table
+                    var tableHtml = tableMatches[0].Value;
+
+                    // Extract data rows
+                    var rowMatches = RowRegex().Matches(tableHtml);
+
+                    foreach (var rowMatch in rowMatches.Cast<Match>())
                     {
-                        // Extract headers from the first row
-                        string header_pattern = @"<th[^>]*>[\s\S]*?</th>";
-                        MatchCollection header_matches = Regex.Matches(table_html, header_pattern, RegexOptions.IgnoreCase);
-
-                        foreach (Match header_match in header_matches.Cast<Match>())
+                        if (rowMatch.Value.Contains("<th>") && rowMatch.Value.Contains("</th>"))
                         {
-                            string header_text = Regex.Replace(header_match.Value, "<.*?>", string.Empty);
-                            headers.Add(header_text.Trim());
+                            // Extract headers from the first row
+                            var headerMatches = HeadersRegex().Matches(tableHtml);
+
+                            headers.AddRange(headerMatches
+                                .Select(headerMatch => HeaderTagsRegex().Replace(headerMatch.Value, string.Empty))
+                                .Select(headerText => headerText.Trim()));
                         }
-                    }
-                    else
-                    {
-                        List<string> data_row = [];
-
-                        // Extract cells from each row
-                        string cell_pattern = @"<t[dh][^>]*>[\s\S]*?</t[dh]>";
-                        MatchCollection cell_matches = Regex.Matches(row_match.Value, cell_pattern, RegexOptions.IgnoreCase);
-
-                        foreach (Match cell_match in cell_matches.Cast<Match>())
+                        else
                         {
-                            string cell_text = Regex.Replace(cell_match.Value, "<.*?>", string.Empty);
-                            data_row.Add(cell_text.Trim());
-                        }
+                            List<string> dataRow = [];
 
-                        foreach (var item in data_row)
-                        {
-                            if (item != "")
+                            // Extract cells from each row
+                            var cellMatches = CellRegex().Matches(rowMatch.Value);
+
+                            dataRow.AddRange(cellMatches
+                                .Select(cellMatch => CellTagsRegex().Replace(cellMatch.Value, string.Empty))
+                                .Select(cellText => cellText.Trim()));
+
+                            foreach (var item in dataRow)
                             {
-                                rows.Add(data_row.ToArray());
-                                break;
+                                if (item != "")
+                                {
+                                    rows.Add(dataRow.ToArray());
+                                    break;
+                                }
                             }
                         }
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                return Result<TableData>.Failure(ex.Message);
+            }
 
-            return new TableData(headers, rows);
+            return Result<TableData>.Success(new TableData(headers, rows));
         }
+
+        [GeneratedRegex(@"<tr[^>]*>[\s\S]*?</tr>", RegexOptions.IgnoreCase, "en-GB")]
+        private static partial Regex RowRegex();
+        
+        [GeneratedRegex(@"<table[^>]*>[\s\S]*?</table>", RegexOptions.IgnoreCase, "en-GB")]
+        private static partial Regex TableRegex();
+        
+        [GeneratedRegex(@"<th[^>]*>[\s\S]*?</th>", RegexOptions.IgnoreCase, "en-GB")]
+        private static partial Regex HeadersRegex();
+        
+        [GeneratedRegex("<.*?>")]
+        private static partial Regex HeaderTagsRegex();
+        
+        [GeneratedRegex(@"<t[dh][^>]*>[\s\S]*?</t[dh]>", RegexOptions.IgnoreCase, "en-GB")]
+        private static partial Regex CellRegex();
+        
+        [GeneratedRegex("<.*?>")]
+        private static partial Regex CellTagsRegex();
     }
 }

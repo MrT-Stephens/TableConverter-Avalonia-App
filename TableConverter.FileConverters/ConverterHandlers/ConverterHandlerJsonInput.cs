@@ -6,7 +6,7 @@ namespace TableConverter.FileConverters.ConverterHandlers
 {
     public class ConverterHandlerJsonInput : ConverterHandlerInputAbstract<ConverterHandlerJsonInputOptions>
     {
-        public override TableData ReadText(string text)
+        public override Result<TableData> ReadText(string text)
         {
             var headers = new List<string>();
             var rows = new List<string[]>();
@@ -17,23 +17,18 @@ namespace TableConverter.FileConverters.ConverterHandlers
                 {
                     case "Array of Objects":
                         {
-                            List<Dictionary<string, object>>? json_objects = new();
+                            var jsonObjects = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(text);
 
-                            json_objects = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(text);
-
-                            if (json_objects is not null)
+                            if (jsonObjects is not null)
                             {
-                                foreach (var json_object in json_objects)
+                                foreach (var jsonObject in jsonObjects)
                                 {
-                                    foreach (var key in json_object.Keys)
+                                    foreach (var key in jsonObject.Keys.Where(key => !headers.Contains(key)))
                                     {
-                                        if (!headers.Contains(key))
-                                        {
-                                            headers.Add(key);
-                                        }
+                                        headers.Add(key);
                                     }
 
-                                    rows.Add(headers.ConvertAll(header => json_object.ContainsKey(header) ? json_object[header]?.ToString() ?? "" : string.Empty).ToArray());
+                                    rows.Add(headers.ConvertAll(header => jsonObject.TryGetValue(header, out var value) ? value.ToString() ?? "" : string.Empty).ToArray());
                                 }
                             }
 
@@ -41,17 +36,15 @@ namespace TableConverter.FileConverters.ConverterHandlers
                         }
                     case "2D Arrays":
                         {
-                            List<List<object>>? json_arrays = new();
+                            var jsonArrays = JsonConvert.DeserializeObject<List<List<object>>>(text);
 
-                            json_arrays = JsonConvert.DeserializeObject<List<List<object>>>(text);
-
-                            if (json_arrays is not null)
+                            if (jsonArrays is not null)
                             {
-                                headers.AddRange(json_arrays[0].ConvertAll(value => value?.ToString() ?? ""));
+                                headers.AddRange(jsonArrays[0].ConvertAll(value => value?.ToString() ?? ""));
 
-                                for (long i = 1; i < json_arrays.LongCount(); i++)
+                                for (int i = 1; i < jsonArrays.Count; i++)
                                 {
-                                    rows.Add(json_arrays[(int)i].ConvertAll(value => value?.ToString() ?? "").ToArray());
+                                    rows.Add(jsonArrays[i].ConvertAll(value => value?.ToString() ?? "").ToArray());
                                 }
                             }
 
@@ -59,24 +52,22 @@ namespace TableConverter.FileConverters.ConverterHandlers
                         }
                     case "Column Arrays":
                         {
-                            List<Dictionary<string, string[]>>? json_objects = new();
+                            var jsonObjects = JsonConvert.DeserializeObject<List<Dictionary<string, string[]>>>(text);
 
-                            json_objects = JsonConvert.DeserializeObject<List<Dictionary<string, string[]>>>(text);
-
-                            if (json_objects is not null)
+                            if (jsonObjects is not null)
                             {
-                                for (long i = 0; i < json_objects.LongCount(); i++)
+                                for (var i = 0; i < jsonObjects.Count; i++)
                                 {
-                                    headers.Add(json_objects[(int)i].Keys.First());
+                                    headers.Add(jsonObjects[i].Keys.First());
 
-                                    for (long j = 0; j < json_objects[(int)i].Values.First().LongCount(); j++)
+                                    for (var j = 0; j < jsonObjects[i].Values.First().Length; j++)
                                     {
                                         if (i == 0)
                                         {
-                                            rows.Add(new string[json_objects.LongCount()]);
+                                            rows.Add(new string[jsonObjects.Count]);
                                         }
 
-                                        rows[(int)j][i] = json_objects[(int)i].Values.First()[(int)j];
+                                        rows[j][i] = jsonObjects[i].Values.First()[j];
                                     }
                                 }
                             }
@@ -85,17 +76,15 @@ namespace TableConverter.FileConverters.ConverterHandlers
                         }
                     case "Keyed Arrays":
                         {
-                            List<Dictionary<string, string[]>>? json_objects = new();
+                            var jsonObjects = JsonConvert.DeserializeObject<List<Dictionary<string, string[]>>>(text);
 
-                            json_objects = JsonConvert.DeserializeObject<List<Dictionary<string, string[]>>>(text);
-
-                            if (json_objects is not null)
+                            if (jsonObjects is not null)
                             {
-                                headers.AddRange(json_objects[0].Values.First().Select(value => value?.ToString() ?? ""));
+                                headers.AddRange(jsonObjects[0].Values.First().Select(value => value?.ToString() ?? ""));
 
-                                for (long i = 1; i < json_objects.LongCount(); i++)
+                                for (var i = 1; i < jsonObjects.Count; i++)
                                 {
-                                    rows.Add(json_objects[(int)i].Values.First().ToArray());
+                                    rows.Add(jsonObjects[i].Values.First().ToArray());
                                 }
                             }
 
@@ -105,10 +94,10 @@ namespace TableConverter.FileConverters.ConverterHandlers
             }
             catch (Exception ex)
             {
-                throw new Exception("Invalid JSON format. Please check the JSON format and try again.", ex);
+                return Result<TableData>.Failure(ex.Message);
             }
 
-            return new TableData(headers, rows);
+            return Result<TableData>.Success(new TableData(headers, rows));
         }
     }
 }

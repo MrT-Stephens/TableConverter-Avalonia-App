@@ -6,45 +6,45 @@ namespace TableConverter.FileConverters.ConverterHandlers
 {
     public class ConverterHandlerXmlOutput : ConverterHandlerOutputAbstract<ConverterHandlerXmlOutputOptions>
     {
-        public override string Convert(string[] headers, string[][] rows)
+        public override Result<string> Convert(string[] headers, string[][] rows)
         {
-            XmlDocument xml_document = new XmlDocument();
+            var xmlDocument = new XmlDocument();
 
             // Create XML declaration
-            XmlDeclaration xml_declaration = xml_document.CreateXmlDeclaration("1.0", "UTF-8", null);
-            xml_document.AppendChild(xml_declaration);
+            var xmlDeclaration = xmlDocument.CreateXmlDeclaration("1.0", "UTF-8", null);
+            xmlDocument.AppendChild(xmlDeclaration);
 
             // Create root element
-            XmlElement root_element = xml_document.CreateElement(Options!.XmlRootNodeName.Replace(' ', '_'));
-            xml_document.AppendChild(root_element);
+            var rootElement = xmlDocument.CreateElement(Options!.XmlRootNodeName.Replace(' ', '_'));
+            xmlDocument.AppendChild(rootElement);
 
             // Iterate over DataTable rows
-            for (long i = 0; i < rows.LongLength; i++)
+            for (var i = 0; i < rows.Length; i++)
             {
                 // Create record element
-                XmlElement record_element = xml_document.CreateElement(Options!.XmlElementNodeName.Replace(' ', '_'));
+                var recordElement = xmlDocument.CreateElement(Options!.XmlElementNodeName.Replace(' ', '_'));
 
                 // Iterate over DataTable columns
-                for (long j = 0; j < headers.LongLength; j++)
+                for (var j = 0; j < headers.Length; j++)
                 {
                     // Create element for each column and set its value
-                    XmlElement columnElement = xml_document.CreateElement(headers[j].Replace(' ', '_'));
+                    var columnElement = xmlDocument.CreateElement(headers[j].Replace(' ', '_'));
                     columnElement.InnerText = rows[i][j];
-                    record_element.AppendChild(columnElement);
+                    recordElement.AppendChild(columnElement);
                 }
 
                 // Append record element to the root
-                root_element.AppendChild(record_element);
+                rootElement.AppendChild(recordElement);
             }
 
-            StringWriter text_writer = new StringWriter();
-            XmlTextWriter xml_writer = new XmlTextWriter(text_writer);
+            var textWriter = new StringWriter();
+            var xmlWriter = new XmlTextWriter(textWriter);
 
-            xml_writer.Formatting = (Options!.MinifyXml) ? Formatting.None : Formatting.Indented;
+            xmlWriter.Formatting = (Options!.MinifyXml) ? Formatting.None : Formatting.Indented;
 
-            xml_document.WriteTo(xml_writer);
+            xmlDocument.WriteTo(xmlWriter);
 
-            return text_writer.ToString();
+            return Result<string>.Success(textWriter.ToString());
         }
     }
 }

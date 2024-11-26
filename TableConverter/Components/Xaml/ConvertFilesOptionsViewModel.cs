@@ -4,6 +4,8 @@ using CommunityToolkit.Mvvm.Input;
 using SukiUI.Dialogs;
 using System;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
+using TableConverter.DataModels;
 
 namespace TableConverter.Components.Xaml;
 
@@ -17,14 +19,14 @@ public partial class ConvertFilesOptionsViewModel(ISukiDialog dialog) : BaseDial
     [ObservableProperty]
     private ObservableCollection<Control> _Options = new();
 
-    public Action? OnOkClicked { get; set; } = null;
+    public AsyncAction? OnOkClicked { get; set; }
 
     #endregion
 
     #region Commands
 
     [RelayCommand]
-    private void ButtonClicked(object? name)
+    private async Task ButtonClicked(object? name)
     {
         if (name is string buttonName)
         {
@@ -33,7 +35,10 @@ public partial class ConvertFilesOptionsViewModel(ISukiDialog dialog) : BaseDial
             switch (buttonName)
             {
                 case "Ok":
-                    OnOkClicked?.Invoke();
+                    if (OnOkClicked is not null)
+                    {
+                        await OnOkClicked();
+                    }
                     break;
                 case "Cancel":
                     break;

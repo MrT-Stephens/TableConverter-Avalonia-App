@@ -4,63 +4,67 @@ using TableConverter.FileConverters.DataModels;
 
 namespace TableConverter.FileConverters.ConverterHandlers
 {
-    public class ConverterHandlerSQLInput : ConverterHandlerInputAbstract<ConverterHandlerSQLInputOptions>
+    public partial class ConverterHandlerSQLInput : ConverterHandlerInputAbstract<ConverterHandlerSQLInputOptions>
     {
-        public override TableData ReadText(string text)
+        public override Result<TableData> ReadText(string text)
         {
             var headers = new List<string>();
             var rows = new List<string[]>();
 
-            string sql_regex_w_column_names = @"INSERT\sINTO\s([`""\[]?\w+[`""\]]?)\s*\((.*?)\)\s*VALUES\s*\((.*?)\);";
-            string sql_regex_wo_column_names = @"INSERT\sINTO\s([`""\[]?\w+[`""\]]?)\s*VALUES\s*\((.*?)\);";
-
-            if (Options!.HasColumnNames)
+            try
             {
-                MatchCollection matches = Regex.Matches(text, sql_regex_w_column_names, RegexOptions.Singleline);
-
-                bool first_loop = true;
-
-                foreach (Match match in matches.Cast<Match>())
+                if (Options!.HasColumnNames)
                 {
-                    string[] columns = match.Groups[2].Value.Split(',');
-                    string[] values = match.Groups[3].Value.Split(',');
+                    var matches = SqlWithColumnNamesRegex().Matches(text);
 
-                    if (first_loop)
+                    var firstLoop = true;
+
+                    foreach (var match in matches.Cast<Match>())
                     {
-                        first_loop = false;
+                        var columns = match.Groups[2].Value.Split(',');
+                        var values = match.Groups[3].Value.Split(',');
 
-                        for (long i = 0; i < columns.Length; i++)
+                        if (firstLoop)
                         {
-                            if (columns[i].StartsWith(Options!.SelectedQuoteType) && columns[i].EndsWith(Options!.SelectedQuoteType == "[" ? "]" : Options!.SelectedQuoteType))
+                            firstLoop = false;
+
+                            for (long i = 0; i < columns.Length; i++)
                             {
-                                columns[i] = columns[i].Substring(1, columns[i].Length - 2);
-                                headers.Add(columns[i].Trim());
-                            }
-                            else
-                            {
+                                if (columns[i].StartsWith(Options!.SelectedQuoteType) && columns[i]
+                                        .EndsWith(Options!.SelectedQuoteType == "[" ? "]" : Options!.SelectedQuoteType))
+                                {
+                                    columns[i] = columns[i].Substring(1, columns[i].Length - 2);
+                                }
+
                                 headers.Add(columns[i].Trim());
                             }
                         }
+
+                        rows.Add(values.Select(value => value.Trim().Trim('\'')).ToArray());
                     }
-
-                    rows.Add(values.Select(value => value.Trim().Trim('\'')).ToArray());
                 }
-            }
-            else
-            {
-                MatchCollection matches = Regex.Matches(text, sql_regex_wo_column_names, RegexOptions.Singleline);
-
-                foreach (Match match in matches.Cast<Match>())
+                else
                 {
-                    string[] values = match.Groups[2].Value.Split(',');
+                    var matches = SqlRegex().Matches(text);
 
-                    rows.Add(values.Select(value => value.Trim().Trim('\'')).ToArray());
+                    rows.AddRange(matches.Select(match => match.Groups[2].Value.Split(','))
+                        .Select(values => values.Select(value => value.Trim().Trim('\'')).ToArray()));
+
+                    headers.AddRange(Enumerable.Range(1, rows[0].Length).Select(i => $"Column {i}"));
                 }
-
-                headers.AddRange(Enumerable.Range(1, rows[0].Length).Select(i => $"Column {i}"));
+            }
+            catch (Exception ex)
+            {
+                return Result<TableData>.Failure(ex.Message);
             }
 
-            return new TableData(headers, rows);
+            return Result<TableData>.Success(new TableData(headers, rows));
         }
+
+        [GeneratedRegex("""INSERT\sINTO\s([`"\[]?\w+[`"\]]?)\s*\((.*?)\)\s*VALUES\s*\((.*?)\);""", RegexOptions.Singleline)]
+        private static partial Regex SqlWithColumnNamesRegex();
+        
+        [GeneratedRegex("""INSERT\sINTO\s([`"\[]?\w+[`"\]]?)\s*VALUES\s*\((.*?)\);""", RegexOptions.Singleline)]
+        private static partial Regex SqlRegex();
     }
 }

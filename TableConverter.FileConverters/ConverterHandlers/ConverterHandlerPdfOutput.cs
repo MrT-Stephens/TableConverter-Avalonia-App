@@ -7,9 +7,9 @@ namespace TableConverter.FileConverters.ConverterHandlers
 {
     public class ConverterHandlerPdfOutput : ConverterHandlerOutputAbstract<ConverterHandlerPdfOutputOptions>
     {
-        private Document? PdfDocument { get; set; } = null;
+        private Document? PdfDocument { get; set; }
 
-        public ConverterHandlerPdfOutput() : base()
+        protected ConverterHandlerPdfOutput()
         {
             QuestPDF.Settings.License = LicenseType.Community;
             QuestPDF.Settings.CheckIfAllTextGlyphsAreAvailable = false;
@@ -17,47 +17,47 @@ namespace TableConverter.FileConverters.ConverterHandlers
             QuestPDF.Settings.EnableDebugging = false;
         }
 
-        public override string Convert(string[] headers, string[][] rows)
+        public override Result<string> Convert(string[] headers, string[][] rows)
         {
-            PdfDocument = Document.Create(contrainer =>
+            PdfDocument = Document.Create(container =>
             {
-                contrainer.Page(page =>
+                container.Page(page =>
                 {
                     page.Content().Table(table =>
                     {
                         table.ExtendLastCellsToTableBottom();
-                        table.ColumnsDefinition(column_definitions =>
+                        table.ColumnsDefinition(columnDefinitions =>
                         {
-                            for (long i = 0; i < headers.LongLength; i++)
+                            for (var i = 0; i < headers.Length; i++)
                             {
-                                column_definitions.RelativeColumn();
+                                columnDefinitions.RelativeColumn();
                             }
                         });
 
-                        for (long i = 0; i < headers.LongLength; i++)
+                        for (uint i = 0; i < headers.Length; i++)
                         {
                             if (Options!.BoldHeader)
                             {
-                                table.Cell().Row(1).Column((uint)i + 1).Element(Block).Text(headers[(int)i]).ExtraBold().FontColor(Options!.SelectedForegroundColor);
+                                table.Cell().Row(1).Column(i + 1).Element(Block).Text(headers[i]).ExtraBold().FontColor(Options!.SelectedForegroundColor);
                             }
                             else
                             {
-                                table.Cell().Row(1).Column((uint)i + 1).Element(Block).Text(headers[(int)i]).FontColor(Options!.SelectedForegroundColor);
+                                table.Cell().Row(1).Column(i + 1).Element(Block).Text(headers[i]).FontColor(Options!.SelectedForegroundColor);
                             }
                         }
 
-                        for (long i = 0; i < rows.LongLength; i++)
+                        for (uint i = 0; i < rows.Length; i++)
                         {
-                            for (long j = 0; j < headers.LongLength; j++)
+                            for (uint j = 0; j < headers.Length; j++)
                             {
-                                table.Cell().Row((uint)i + 2).Column((uint)j + 1).Element(Block).Text(rows[i][j]).FontColor(Options!.SelectedForegroundColor);
+                                table.Cell().Row(i + 2).Column(j + 1).Element(Block).Text(rows[i][j]).FontColor(Options!.SelectedForegroundColor);
                             }
                         }
                     });
                 });
             });
 
-            return $"Please save the '.pdf' file to view the generated file 😁{Environment.NewLine}";
+            return Result<string>.Success($"Please save the '.pdf' file to view the generated file 😁{Environment.NewLine}");
         }
 
         private IContainer Block(IContainer container)
@@ -70,13 +70,22 @@ namespace TableConverter.FileConverters.ConverterHandlers
                 .AlignMiddle();
         }
 
-        public override void SaveFile(Stream? stream, ReadOnlyMemory<byte> buffer)
+        public override Result SaveFile(Stream? stream, ReadOnlyMemory<byte> buffer)
         {
             ArgumentNullException.ThrowIfNull(stream, nameof(stream));
 
-            stream.Write(PdfDocument?.GeneratePdf());
-                        
-            stream.Close();
+            try
+            {
+                stream.Write(PdfDocument?.GeneratePdf());
+
+                stream.Close();
+            }
+            catch (Exception ex)
+            {
+                return Result.Failure(ex.Message);
+            }
+            
+            return Result.Success();
         }
     }
 }

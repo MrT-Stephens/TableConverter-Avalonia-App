@@ -3,6 +3,8 @@ using CommunityToolkit.Mvvm.Input;
 using SukiUI.Dialogs;
 using System;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
+using TableConverter.DataModels;
 
 namespace TableConverter.Components.Xaml;
 
@@ -19,14 +21,14 @@ public partial class FileTypesSelectorViewModel(ISukiDialog dialog) : BaseDialog
     [ObservableProperty]
     private string _SelectedValue = string.Empty;
 
-    public Action<string>? OnOkClicked { get; set; } = null;
+    public AsyncAction<string>? OnOkClicked { get; set; } = null;
 
     #endregion
 
     #region Commands
 
     [RelayCommand]
-    private void ButtonClicked(object? name)
+    private async Task ButtonClicked(object? name)
     {
         if (name is string buttonName)
         {
@@ -35,7 +37,10 @@ public partial class FileTypesSelectorViewModel(ISukiDialog dialog) : BaseDialog
             switch (buttonName)
             {
                 case "Ok":
-                    OnOkClicked?.Invoke(SelectedValue);
+                    if (OnOkClicked is not null)
+                    {
+                        await OnOkClicked(SelectedValue);
+                    }
                     break;
                 case "Cancel":
                     break;

@@ -5,6 +5,7 @@ using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.Input;
 using System.Threading.Tasks;
 using System;
+using System.Collections.ObjectModel;
 using TableConverter.Interfaces;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
@@ -15,6 +16,7 @@ using Avalonia.Controls.Notifications;
 using System.IO;
 using System.Text;
 using TableConverter.Components.Xaml;
+using TableConverter.DataModels;
 
 namespace TableConverter.ViewModels;
 
@@ -22,7 +24,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
 {
     #region Services
 
-    public readonly ConverterTypesService ConverterTypes;
+    private readonly ConverterTypesService ConverterTypes;
     public ConvertFilesManager FilesManager { get; }
 
     #endregion
@@ -30,7 +32,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
     #region Properties
 
     [ObservableProperty]
-    private ConvertDocumentViewModel? _SelectedConvertDocument = null;
+    private ConvertDocumentViewModel? _SelectedConvertDocument;
 
     #endregion
 
@@ -42,13 +44,11 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
         ConverterTypes = converterTypes;
 
         FilesManager = filesManager;
-
+        
+        // If there are no files, add an example file.
         if (FilesManager.Files.Count <= 0)
         {
-            FilesManager.Files = new()
-            {
-                ExampleConverterDocument()
-            };
+            FilesManager.Files = [ExampleConverterDocument()];
         }
     }
 
@@ -59,11 +59,14 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
     [RelayCommand]
     private void ConvertFileNewFileButtonClicked()
     {
+        // Show a dialog to select the input file type.
         var dialog = DialogManager.CreateDialog()
-            .WithViewModel((dialog) => new FileTypesSelectorViewModel(dialog)
+            .WithViewModel(dialog => new FileTypesSelectorViewModel(dialog)
             {
                 Title = "Please select a file type to input",
-                Values = new(ConverterTypes.InputTypes.Select(converter => converter.Name)),
+                Values = new ObservableCollection<string>(
+                    ConverterTypes.InputTypes.Select(converter => converter.Name)
+                ),
                 OnOkClicked = OnInputFileTypeClicked
             })
             .Dismiss().ByClickingBackground()
@@ -71,144 +74,71 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
     }
 
     [RelayCommand]
-    private void ConvertFileNextBackButtonClicked(object? parameter)
+    private async Task ConvertFileNextBackButtonClicked(object? parameter)
     {
         var currentDoc = SelectedConvertDocument;
-
-        if (currentDoc is not null && int.TryParse(parameter?.ToString(), out int pageIndex))
+        
+        if (currentDoc is not null && int.TryParse(parameter?.ToString(), out var pageIndex))
         {
             var count = currentDoc.ProgressStepValues.Count();
-
+            
             if (pageIndex < 0 || pageIndex > count)
             {
                 throw new ArgumentOutOfRangeException($"Page index must be between 0 and {count}.");
             }
-            else if (pageIndex == 1 &&
-                     currentDoc.ProgressStepIndex < 1 &&
-                     currentDoc.InputConverter is not null)
+            
+            switch (pageIndex)
             {
-                // Process the inputted text file to the tabular data.
-                Action processDoc = async () =>
+                // If the page index is 1 and the current document index is less than 1.
+                case 1 when currentDoc is { ProgressStepIndex: < 1, InputConverter: not null }:
                 {
-                    currentDoc.IsBusy = true;
-
-                    var data = await currentDoc.InputConverter.InputConverterHandler!.ReadTextAsync(currentDoc.InputFileText.Text);
-
-                    if (data != null)
+                    // Process the inputted text file to the tabular data.
+                
+                    // If the input converter has options, show a dialog to get the options.
+                    if (currentDoc.InputConverter.InputConverterHandler!.Options is not null && currentDoc.InputConverter.InputConverterHandler is IInitializeControls controls)
                     {
-                        currentDoc.EditHeaders = new(data.headers);
-                        currentDoc.EditRows = new(data.rows);
+                        controls.InitializeControls();
 
-                        currentDoc.IsBusy = false;
-
-                        currentDoc.ProgressStepIndex = pageIndex;
-
-                        ToastManager.CreateToast()
-                            .WithTitle("File Converted")
-                            .WithContent($"The file '{currentDoc.Name}' has been converted to tabular data.")
-                            .OfType(NotificationType.Success)
-                            .Dismiss().ByClicking()
-                            .Dismiss().After(new(0, 0, 3))
-                            .Queue();
+                        DialogManager.CreateDialog()
+                            .WithViewModel(dialog => new ConvertFilesOptionsViewModel(dialog)
+                            {
+                                Title = $"How would you like your {currentDoc.InputConverter.Name} file inputted?",
+                                Options = new ObservableCollection<Control>(controls.Controls),
+                                OnOkClicked = async () => await ProcessInputtedFileToTableData(currentDoc, pageIndex)
+                            })
+                            .Dismiss().ByClickingBackground()
+                            .TryShow();
                     }
+                    // Otherwise, process the inputted file to tabular data.
                     else
                     {
-                        currentDoc.IsBusy = false;
+                        await ProcessInputtedFileToTableData(currentDoc, pageIndex);
                     }
-                };
 
-                if (currentDoc.InputConverter.InputConverterHandler!.Options is not null && currentDoc.InputConverter.InputConverterHandler is IInitializeControls controls)
+                    break;
+                }
+                // If the page index is 2 and the current document index is less than 2.
+                case 2 when currentDoc.ProgressStepIndex < 2:
                 {
-                    controls.InitializeControls();
-
+                    // Process the tabular data to the outputted file type.
                     DialogManager.CreateDialog()
-                        .WithViewModel((dialog) => new ConvertFilesOptionsViewModel(dialog)
+                        .WithViewModel(dialog => new FileTypesSelectorViewModel(dialog)
                         {
-                            Title = $"How would you like your {currentDoc.InputConverter.Name} file inputted?",
-                            Options = new(controls.Controls),
-                            OnOkClicked = processDoc
+                            Title = "Please select a file type to output",
+                            Values = new ObservableCollection<string>(
+                                ConverterTypes.OutputTypes.Select(converter => converter.Name)
+                            ),
+                            OnOkClicked = fileType => OnOutputFileTypeClicked(fileType, currentDoc, pageIndex)
                         })
                         .Dismiss().ByClickingBackground()
                         .TryShow();
+                    break;
                 }
-                else
+                default:
                 {
-                    processDoc.Invoke();
+                    currentDoc.ProgressStepIndex = pageIndex;
+                    break;
                 }
-            }
-            else if (pageIndex == 2 && currentDoc.ProgressStepIndex < 2)
-            {
-                // Process the tabular data to the outputted file type.
-                DialogManager.CreateDialog()
-                    .WithViewModel((dialog) => new FileTypesSelectorViewModel(dialog)
-                    {
-                        Title = "Please select a file type to output",
-                        Values = new(ConverterTypes.OutputTypes.Select(converter => converter.Name)),
-                        OnOkClicked = (converterName) =>
-                        {
-                            currentDoc.OutputConverter = ConverterTypes.OutputTypes.First(converter => converter.Name == converterName);
-
-                            if (currentDoc.OutputConverter is not null)
-                            {
-                                Action processDoc = async () =>
-                                {
-                                    currentDoc.IsBusy = true;
-
-                                    var data = await currentDoc.OutputConverter.OutputConverterHandler!.ConvertAsync(currentDoc.EditHeaders.ToArray(), currentDoc.EditRows.ToArray());
-
-                                    if (data != null)
-                                    {
-                                        currentDoc.OutputFileText = new AvaloniaEdit.Document.TextDocument()
-                                        {
-                                            FileName = currentDoc.Name,
-                                            Text = data
-                                        };
-
-                                        currentDoc.IsBusy = false;
-
-                                        currentDoc.ProgressStepIndex = pageIndex;
-
-                                        ToastManager.CreateToast()
-                                            .WithTitle("File Converted")
-                                            .WithContent($"The file '{currentDoc.Name}' has been converted to a '{currentDoc.OutputConverter.Name}' file.")
-                                            .OfType(NotificationType.Success)
-                                            .Dismiss().ByClicking()
-                                            .Dismiss().After(new(0, 0, 3))
-                                            .Queue();
-                                    }
-                                    else
-                                    {
-                                        currentDoc.IsBusy = false;
-                                    }
-                                };
-
-                                if (currentDoc.OutputConverter.OutputConverterHandler!.Options is not null && currentDoc.OutputConverter.OutputConverterHandler is IInitializeControls controls)
-                                {
-                                    controls.InitializeControls();
-
-                                    DialogManager.CreateDialog()
-                                        .WithViewModel((dialog) => new ConvertFilesOptionsViewModel(dialog)
-                                        {
-                                            Title = $"How would you like your {currentDoc.OutputConverter.Name} file outputted?",
-                                            Options = new(controls.Controls),
-                                            OnOkClicked = processDoc
-                                        })
-                                        .Dismiss().ByClickingBackground()
-                                        .TryShow();
-                                }
-                                else
-                                {
-                                    processDoc.Invoke();
-                                }
-                            }
-                        }
-                    })
-                    .Dismiss().ByClickingBackground()
-                    .TryShow();
-            }
-            else
-            {
-                currentDoc.ProgressStepIndex = pageIndex;
             }
         }
     }
@@ -217,22 +147,24 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
     private async Task CopyFileButtonClicked()
     {
         var currentDoc = SelectedConvertDocument;
-        var topLevel = TopLevel.GetTopLevel(((IClassicDesktopStyleApplicationLifetime)App.Current?.ApplicationLifetime!).MainWindow);
-
+        var topLevel = TopLevel.GetTopLevel(((IClassicDesktopStyleApplicationLifetime)Application.Current?.ApplicationLifetime!).MainWindow);
+        
         if (topLevel is not null && currentDoc is not null && !string.IsNullOrEmpty(currentDoc.OutputFileText.Text))
         {
             currentDoc.IsBusy = true;
 
+            // Copy the file data to the clipboard.
             await topLevel.Clipboard!.SetTextAsync(currentDoc.OutputFileText.Text);
 
             currentDoc.IsBusy = false;
-
+            
+            // Show a success toast.
             ToastManager.CreateToast()
                 .WithTitle("File Copied")
                 .WithContent($"The file '{currentDoc.Name}' has been copied to clipboard.")
                 .OfType(NotificationType.Success)
                 .Dismiss().ByClicking()
-                .Dismiss().After(new(0, 0, 3))
+                .Dismiss().After(new TimeSpan(0, 0, 3))
                 .Queue();
         }
     }
@@ -241,19 +173,18 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
     private async Task SaveFileButtonClicked()
     {
         var currentDoc = SelectedConvertDocument;
-        var topLevel = TopLevel.GetTopLevel(((IClassicDesktopStyleApplicationLifetime)App.Current?.ApplicationLifetime!).MainWindow);
+        var topLevel = TopLevel.GetTopLevel(((IClassicDesktopStyleApplicationLifetime)Application.Current?.ApplicationLifetime!).MainWindow);
 
         if (topLevel is not null &&
-            currentDoc is not null &&
-            currentDoc.InputConverter is not null &&
-            currentDoc.OutputConverter is not null &&
+            currentDoc is { InputConverter: not null, OutputConverter: not null } &&
             !string.IsNullOrEmpty(currentDoc.OutputFileText.Text))
         {
+            // Show a dialog to save the file.
             var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
             {
                 Title = $"Save {currentDoc.OutputConverter.Name} File",
                 FileTypeChoices = [
-                    new(currentDoc.OutputConverter.Name)
+                    new FilePickerFileType(currentDoc.OutputConverter.Name)
                     {
                         Patterns = currentDoc.OutputConverter.Extensions.Select(ext => $"*{ext}").ToArray(),
                         MimeTypes = currentDoc.OutputConverter.MimeTypes,
@@ -268,11 +199,11 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
 
             if (file is not null)
             {
-                Action action = async () =>
+                AsyncAction action = async () =>
                 {
                     currentDoc.IsBusy = true;
-
-                    using (var stream = await file.OpenWriteAsync())
+                    
+                    await using (var stream = await file.OpenWriteAsync())
                     {
                         await currentDoc.OutputConverter.OutputConverterHandler!.SaveFileAsync(stream, Encoding.UTF8.GetBytes(currentDoc.OutputFileText.Text));
                     }
@@ -284,7 +215,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                         .WithContent($"The file '{currentDoc.Name}' has been saved to '{file.Path.AbsolutePath}'.")
                         .OfType(NotificationType.Success)
                         .Dismiss().ByClicking()
-                        .Dismiss().After(new(0, 0, 3))
+                        .Dismiss().After(new TimeSpan(0, 0, 3))
                         .Queue();
                 };
 
@@ -294,13 +225,13 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                         .WithTitle("File already exists")
                         .WithContent($"The file '{file.Name}' already exists at that location. Would you like to replace it?")
                         .OfType(NotificationType.Warning)
-                        .WithActionButton("No", (dialog) => { }, true)
-                        .WithActionButton("Yes", (dialog) => action.Invoke(), true)
+                        .WithActionButton("No", _ => { }, true)
+                        .WithActionButton("Yes", _ => action.Invoke(), true)
                         .TryShow();
                 }
                 else
                 {
-                    action.Invoke();
+                    await action.Invoke();
                 }
             }
         }
@@ -309,7 +240,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
     [RelayCommand]
     private void RemoveFileButtonClicked(string name)
     {
-        if (FilesManager.Files!.Any(val => val.Name == name))
+        if (FilesManager.Files.Any(val => val.Name == name))
         {
             var file = FilesManager.Files.First(val => val.Name == name);
 
@@ -317,9 +248,9 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                 .WithTitle("Are you sure?")
                 .WithContent($"Are you sure you want to remove the file '{name}'?")
                 .OfType(NotificationType.Warning)
-                .WithActionButton("No", (dialog) => { }, true)
-                .WithActionButton("Yes", (dialog) => {
-                    if (FilesManager.Files!.Count == 1)
+                .WithActionButton("No", _ => { }, true)
+                .WithActionButton("Yes", _ => {
+                    if (FilesManager.Files.Count == 1)
                     {
                         FilesManager.Files.Add(ExampleConverterDocument());
                     }
@@ -331,7 +262,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                         .WithContent($"The file '{name}' has been removed from your documents.")
                         .OfType(NotificationType.Success)
                         .Dismiss().ByClicking()
-                        .Dismiss().After(new(0, 0, 3))
+                        .Dismiss().After(new TimeSpan(0, 0, 3))
                         .Queue();
                 }, true)
                 .TryShow();
@@ -343,7 +274,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                 .WithContent($"The file '{name}' could not be found.")
                 .OfType(NotificationType.Error)
                 .Dismiss().ByClicking()
-                .Dismiss().After(new(0, 0, 3))
+                .Dismiss().After(new TimeSpan(0, 0, 3))
                 .Queue();
         }
     }
@@ -351,7 +282,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
     [RelayCommand]
     private void DuplicateFileButtonClicked(string name)
     {
-        if (FilesManager.Files!.Any(val => val.Name == name))
+        if (FilesManager.Files.Any(val => val.Name == name))
         {
             var file = FilesManager.Files.First(val => val.Name == name);
 
@@ -360,16 +291,16 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                 Name = $"Copy-{file.Name}",
                 InputConverter = file.InputConverter,
                 OutputConverter = file.OutputConverter,
-                InputFileText = new AvaloniaEdit.Document.TextDocument()
+                InputFileText = new AvaloniaEdit.Document.TextDocument
                 {
-                    FileName = file.InputFileText.FileName,
+                    FileName = $"Copy-{file.InputFileText.FileName}",
                     Text = file.InputFileText.Text
                 },
-                EditHeaders = new(file.EditHeaders),
-                EditRows = new(file.EditRows),
-                OutputFileText = new AvaloniaEdit.Document.TextDocument()
+                EditHeaders = new ObservableCollection<string>(file.EditHeaders),
+                EditRows = new ObservableCollection<string[]>(file.EditRows),
+                OutputFileText = new AvaloniaEdit.Document.TextDocument
                 {
-                    FileName = file.OutputFileText.FileName,
+                    FileName = $"Copy-{file.OutputFileText.FileName}",
                     Text = file.OutputFileText.Text
                 }
             };
@@ -383,7 +314,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                 .WithContent($"The file '{name}' could not be found.")
                 .OfType(NotificationType.Error)
                 .Dismiss().ByClicking()
-                .Dismiss().After(new(0, 0, 3))
+                .Dismiss().After(new TimeSpan(0, 0, 3))
                 .Queue();
         }
     }
@@ -391,18 +322,216 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
     #endregion
 
     #region Misc Items
+    
+    private async Task ProcessInputtedFileToTableData(ConvertDocumentViewModel doc, int currentPageIndex)
+    {
+        doc.IsBusy = true;
 
+        var data = await doc.InputConverter!.InputConverterHandler!.ReadTextAsync(
+            doc.InputFileText.Text
+        );
+
+        if (data.IsSuccess)
+        {
+            // If the data is successful, set the headers and rows.
+            doc.EditHeaders = new ObservableCollection<string>(data.Value.headers);
+            doc.EditRows = new ObservableCollection<string[]>(data.Value.rows);
+
+            doc.IsBusy = false;
+
+            doc.ProgressStepIndex = currentPageIndex;
+                        
+            // Show a success toast.
+            ToastManager.CreateToast()
+                .WithTitle("File Converted")
+                .WithContent($"The file '{doc.Name}' has been converted to tabular data.")
+                .OfType(NotificationType.Success)
+                .Dismiss().ByClicking()
+                .Dismiss().After(new TimeSpan(0, 0, 3))
+                .Queue();
+        }
+        else
+        {
+            // If the data is not successful, show an error dialog.
+            DialogManager.CreateDialog()
+                .WithTitle("Error converting file")
+                .WithContent(data.Error!)
+                .OfType(NotificationType.Error)
+                .Dismiss().ByClickingBackground()
+                .TryShow();
+                        
+            doc.IsBusy = false;
+        }
+    }
+    
+    private async Task ProcessTableDataToOutputFile(ConvertDocumentViewModel doc, int currentPageIndex)
+    {
+        doc.IsBusy = true;
+
+        var data = await doc.OutputConverter!.OutputConverterHandler!.ConvertAsync(
+            doc.EditHeaders.ToArray(), 
+            doc.EditRows.ToArray()
+        );
+
+        if (data.IsSuccess)
+        {
+            doc.OutputFileText = new AvaloniaEdit.Document.TextDocument
+            {
+                FileName = $"{doc.Name}{doc.OutputConverter.Extensions[0]}",
+                Text = data.Value
+            };
+
+            doc.IsBusy = false;
+
+            doc.ProgressStepIndex = currentPageIndex;
+
+            ToastManager.CreateToast()
+                .WithTitle("File Converted")
+                .WithContent(
+                    $"The file '{doc.Name}' has been converted to a '{doc.OutputConverter.Name}' file.")
+                .OfType(NotificationType.Success)
+                .Dismiss().ByClicking()
+                .Dismiss().After(new TimeSpan(0, 0, 3))
+                .Queue();
+        }
+        else
+        {
+            doc.IsBusy = false;
+            
+            DialogManager.CreateDialog()
+                .WithTitle("Error converting file")
+                .WithContent(data.Error!)
+                .OfType(NotificationType.Error)
+                .Dismiss().ByClickingBackground()
+                .TryShow();
+        }
+    }
+
+    private async Task OnInputFileTypeClicked(string converterName)
+    {
+        var topLevel = TopLevel.GetTopLevel(((IClassicDesktopStyleApplicationLifetime)Application.Current?.ApplicationLifetime!).MainWindow);
+
+        if (topLevel is not null && SelectedConvertDocument is not null)
+        {
+            var doc = new ConvertDocumentViewModel
+            {
+                InputConverter = ConverterTypes.InputTypes.First(converter => converter.Name == converterName),
+            };
+
+            var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+            {
+                Title = $"Open {doc.InputConverter.Name} File",
+                AllowMultiple = false,
+                FileTypeFilter =
+                [
+                    new FilePickerFileType(doc.InputConverter.Name)
+                    {
+                        Patterns = doc.InputConverter.Extensions.Select(ext => $"*{ext}").ToArray(),
+                        MimeTypes = doc.InputConverter.MimeTypes,
+                        AppleUniformTypeIdentifiers = doc.InputConverter.AppleUTIs
+                    },
+                    FilePickerFileTypes.All
+                ]
+            });
+
+            if (files.Count >= 1)
+            {
+                FilesManager.Files.Add(doc);
+
+                var loadingDoc = FilesManager.Files.Last();
+                SelectedConvertDocument = loadingDoc;
+
+                if (loadingDoc.InputConverter is not null)
+                {
+                    loadingDoc.IsBusy = true;
+
+                    loadingDoc.Name = files[0].Name.Split('.')[0];
+                    loadingDoc.Path = files[0].Path.AbsolutePath;
+
+                    await using var stream = await files[0].OpenReadAsync();
+
+                    var data = await loadingDoc.InputConverter.InputConverterHandler!.ReadFileAsync(stream);
+
+                    if (data.IsSuccess)
+                    {
+                        loadingDoc.InputFileText = new AvaloniaEdit.Document.TextDocument
+                        {
+                            FileName = $"{loadingDoc.Name}{loadingDoc.InputConverter.Extensions[0]}",
+                            Text = data.Value
+                        };
+                            
+                        loadingDoc.IsBusy = false;
+
+                        ToastManager.CreateToast()
+                            .WithTitle("File Added")
+                            .WithContent($"The file '{files[0].Name}' has been added to your documents.")
+                            .OfType(NotificationType.Success)
+                            .Dismiss().ByClicking()
+                            .Dismiss().After(new TimeSpan(0, 0, 3))
+                            .Queue();
+                    }
+                    else 
+                    {
+                        loadingDoc.IsBusy = false;
+                            
+                        DialogManager.CreateDialog()
+                            .WithTitle("Error reading file")
+                            .WithContent(data.Error!)
+                            .OfType(NotificationType.Error)
+                            .Dismiss().ByClickingBackground()
+                            .TryShow();
+                    }
+                }
+            }
+        }
+    }
+    
+    private async Task OnOutputFileTypeClicked(string converterName, ConvertDocumentViewModel doc, int currentPageIndex)
+    {
+        doc.OutputConverter =
+                ConverterTypes.OutputTypes.First(converter => converter.Name == converterName);
+
+        if (doc.OutputConverter is not null)
+        {
+            // If the output converter has options, show a dialog to get the options.
+            if (doc.OutputConverter.OutputConverterHandler!.Options is not null &&
+                doc.OutputConverter.OutputConverterHandler is IInitializeControls
+                    controls)
+            {
+                controls.InitializeControls();
+
+                DialogManager.CreateDialog()
+                    .WithViewModel(modal => new ConvertFilesOptionsViewModel(modal)
+                    {
+                        Title =
+                            $"How would you like your {doc.OutputConverter.Name} file outputted?",
+                        Options = new ObservableCollection<Control>(controls.Controls),
+                        OnOkClicked = async () =>
+                            await ProcessTableDataToOutputFile(doc, currentPageIndex)
+                    })
+                    .Dismiss().ByClickingBackground()
+                    .TryShow();
+            }
+            // Otherwise, process the tabular data to the outputted file type.
+            else
+            {
+                await ProcessTableDataToOutputFile(doc, currentPageIndex);
+            }
+        }
+    }
+    
     private ConvertDocumentViewModel ExampleConverterDocument()
     {
-        var name = $"Example-{DateTime.Now.ToFileTime()}.csv";
+        var name = $"Example-{DateTime.Now.ToFileTime()}";
+        var converter = ConverterTypes.InputTypes.First(converter => converter.Name == "CSV");
 
-        return new ConvertDocumentViewModel()
+        return new ConvertDocumentViewModel
         {
             Name = name,
-            InputConverter = ConverterTypes.InputTypes.First(converter => converter.Name == "CSV"),
-            InputFileText = new AvaloniaEdit.Document.TextDocument()
+            InputConverter = converter,
+            InputFileText = new AvaloniaEdit.Document.TextDocument
             {
-                FileName = name,
+                FileName = $"{name}{converter.Extensions[0]}",
                 Text =
                     "FIRST_NAME,LAST_NAME,GENDER,COUNTRY_CODE" + Environment.NewLine +
                     "Luxeena,Binoy,F,GB" + Environment.NewLine +
@@ -421,70 +550,6 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                     "Olivia,Parry,F,GB" + Environment.NewLine
             }
         };
-    }
-
-    private async void OnInputFileTypeClicked(string converterName)
-    {
-        var topLevel = TopLevel.GetTopLevel(((IClassicDesktopStyleApplicationLifetime)App.Current?.ApplicationLifetime!).MainWindow);
-
-        if (topLevel is not null && SelectedConvertDocument is not null)
-        {
-            var doc = new ConvertDocumentViewModel()
-            {
-                InputConverter = ConverterTypes.InputTypes.First(converter => converter.Name == converterName),
-            };
-
-            var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
-            {
-                Title = $"Open {doc.InputConverter.Name} File",
-                AllowMultiple = false,
-                FileTypeFilter =
-                [
-                    new(doc.InputConverter.Name)
-                    {
-                        Patterns = doc.InputConverter.Extensions.Select(ext => $"*{ext}").ToArray(),
-                        MimeTypes = doc.InputConverter.MimeTypes,
-                        AppleUniformTypeIdentifiers = doc.InputConverter.AppleUTIs
-                    },
-                    FilePickerFileTypes.All,
-                ],
-            });
-
-            if (files.Count >= 1)
-            {
-                FilesManager.Files.Add(doc);
-
-                var loadingDoc = FilesManager.Files.Last();
-                SelectedConvertDocument = loadingDoc;
-
-                if (loadingDoc.InputConverter is not null)
-                {
-                    loadingDoc.IsBusy = true;
-
-                    loadingDoc.Name = files[0].Name;
-                    loadingDoc.Path = files[0].Path.AbsolutePath;
-
-                    using (var stream = await files[0].OpenReadAsync())
-                    {
-                        loadingDoc.InputFileText = new AvaloniaEdit.Document.TextDocument()
-                        {
-                            FileName = files[0].Name,
-                            Text = await loadingDoc.InputConverter.InputConverterHandler!.ReadFileAsync(stream)
-                        };
-                    }
-
-                    loadingDoc.IsBusy = false;
-
-                    ToastManager.CreateToast()
-                        .WithTitle("File Added")
-                        .WithContent($"The file '{files[0].Name}' has been added to your documents.")
-                        .OfType(NotificationType.Success)
-                        .Dismiss().ByClicking()
-                        .Dismiss().After(new(0, 0, 3))
-                        .Queue();
-                }
-            }
-        }
     }
 
     #endregion

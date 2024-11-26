@@ -5,51 +5,48 @@ namespace TableConverter.FileConverters.ConverterHandlers
 {
     public class ConverterHandlerJsonLinesInput : ConverterHandlerInputAbstract<ConverterHandlerBaseOptions>
     {
-        public override TableData ReadText(string text)
+        public override Result<TableData> ReadText(string text)
         {
             var headers = new List<string>();
             var rows = new List<string[]>();
 
             using (var reader = new StringReader(text))
             {
-                bool first_line = true;
+                var firstLine = true;
 
-                for (string? line = reader.ReadLine(); !string.IsNullOrEmpty(line); line = reader.ReadLine())
+                for (var line = reader.ReadLine(); !string.IsNullOrEmpty(line); line = reader.ReadLine())
                 { 
                     if (line is not null && line.StartsWith('{') && line.EndsWith('}'))
                     {
-                        List<string> row = new List<string>();
-                        string[] strings = line.Trim('{', '}').Split(',');
+                        var row = new List<string>();
+                        var strings = line.Trim('{', '}').Split(',');
 
-                        foreach (string str in strings)
+                        foreach (var str in strings)
                         {
                             if (string.IsNullOrEmpty(str))
                             {
                                 continue;
                             }
 
-                            string[] key_value = str.Split(':');
+                            var keyValue = str.Split(':');
 
-                            if (first_line)
+                            if (firstLine)
                             {
-                                headers.Add(key_value[0].Trim().Trim('"'));
+                                headers.Add(keyValue[0].Trim().Trim('"'));
                             }
 
-                            row.Add(key_value[1].Trim().Trim('"'));
+                            row.Add(keyValue[1].Trim().Trim('"'));
                         }
 
                         rows.Add(row.ToArray());
                     }
                     else if (line is not null)
                     {
-                        string[] strings = line.Trim('[', ']').Split(',');
+                        var strings = line.Trim('[', ']').Split(',');
 
-                        if (first_line)
+                        if (firstLine)
                         {
-                            foreach (string str in strings)
-                            {
-                                headers.Add(str.Trim().Trim('"'));
-                            }
+                            headers.AddRange(strings.Select(str => str.Trim().Trim('"')));
                         }
                         else
                         {
@@ -57,11 +54,11 @@ namespace TableConverter.FileConverters.ConverterHandlers
                         }
                     }
 
-                    first_line = false;
+                    firstLine = false;
                 }
             }
 
-            return new TableData(headers, rows);
+            return Result<TableData>.Success(new TableData(headers, rows));
         }
     }
 }

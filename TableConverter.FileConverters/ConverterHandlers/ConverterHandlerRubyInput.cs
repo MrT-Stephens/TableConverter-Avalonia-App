@@ -5,33 +5,30 @@ namespace TableConverter.FileConverters.ConverterHandlers
 {
     public class ConverterHandlerRubyInput : ConverterHandlerInputAbstract<ConverterHandlerBaseOptions>
     {
-        public override TableData ReadText(string text)
+        public override Result<TableData> ReadText(string text)
         {
             var headers = new List<string>();
             var rows = new List<string[]>();
 
             using (var reader = new StringReader(text))
             {
-                bool first_line = true;
+                var firstLine = true;
 
-                for (string? line = reader?.ReadLine()?.Trim().Replace("\t", ""); 
+                for (var line = reader?.ReadLine()?.Trim().Replace("\t", ""); 
                         !string.IsNullOrEmpty(line);
                         line = reader?.ReadLine()?.Trim().Replace("\t", ""))
                 {
                     if (line.StartsWith("{") && line.EndsWith("}"))
                     {
-                        string[] values = line.Replace("{", string.Empty).Replace("}", string.Empty).Split(",");
+                        var values = line.Replace("{", string.Empty).Replace("}", string.Empty).Split(",");
 
-                        values = values.Select(val => val.Substring(val.IndexOf("=>") + 2).Trim('"')).ToArray();
+                        values = values.Select(val => val.Substring(val.IndexOf("=>", StringComparison.Ordinal) + 2).Trim('"')).ToArray();
 
-                        if (first_line)
+                        if (firstLine)
                         {
-                            foreach (string value in values)
-                            {
-                                headers.Add(value);
-                            }
+                            headers.AddRange(values);
 
-                            first_line = false;
+                            firstLine = false;
                         }
                         else
                         {
@@ -41,7 +38,7 @@ namespace TableConverter.FileConverters.ConverterHandlers
                 }
             }
 
-            return new TableData(headers, rows);
+            return Result<TableData>.Success(new TableData(headers, rows));
         }
     }
 }

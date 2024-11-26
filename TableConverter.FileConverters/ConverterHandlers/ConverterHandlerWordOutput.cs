@@ -6,37 +6,46 @@ namespace TableConverter.FileConverters.ConverterHandlers
 {
     public class ConverterHandlerWordOutput : ConverterHandlerOutputAbstract<ConverterHandlerBaseOptions>
     {
-        private XWPFDocument? WordDocument { get; set; } = null;
+        private XWPFDocument? WordDocument { get; set; }
 
-        public override string Convert(string[] headers, string[][] rows)
+        public override Result<string> Convert(string[] headers, string[][] rows)
         {
             WordDocument = new XWPFDocument();
 
             var table = WordDocument.CreateTable(rows.Length + 1, headers.Length);
 
-            for (long i = 0; i < headers.LongLength; i++)
+            for (var i = 0; i < headers.Length; i++)
             {
-                table.GetRow(0).GetCell((int)i).SetText(headers[i]);
+                table.GetRow(0).GetCell(i).SetText(headers[i]);
             }
 
-            for (long i = 0; i < rows.LongLength; i++)
+            for (var i = 0; i < rows.Length; i++)
             {
-                for (long j = 0; j < headers.LongLength; j++)
+                for (var j = 0; j < headers.Length; j++)
                 {
-                    table.GetRow((int)i + 1).GetCell((int)j).SetText(rows[i][j]);
+                    table.GetRow(i + 1).GetCell(j).SetText(rows[i][j]);
                 }
             }
 
-            return $"Please save the '.docx' file to view the generated file 😁{Environment.NewLine}";
+            return Result<string>.Success($"Please save the '.docx' file to view the generated file 😁{Environment.NewLine}");
         }
 
-        public override void SaveFile(Stream? stream, ReadOnlyMemory<byte> buffer)
+        public override Result SaveFile(Stream? stream, ReadOnlyMemory<byte> buffer)
         {
             ArgumentNullException.ThrowIfNull(stream, nameof(stream));
 
-            WordDocument?.Write(stream);
+            try
+            {
+                WordDocument?.Write(stream);
 
-            stream.Close();
+                stream.Close();
+            }
+            catch (Exception ex)
+            {
+                return Result.Failure(ex.Message);
+            }
+            
+            return Result.Success();
         }
     }
 }

@@ -5,18 +5,18 @@ namespace TableConverter.FileConverters.ConverterHandlers
 {
     public class ConverterHandlerYamlInput : ConverterHandlerInputAbstract<ConverterHandlerBaseOptions>
     {
-        public override TableData ReadText(string text)
+        public override Result<TableData> ReadText(string text)
         {
             var headers = new List<string>();
             var rows = new List<string[]>();
 
-            Dictionary<string, string> yaml_data = new();
+            Dictionary<string, string> yamlData = new();
 
             using (var reader = new StringReader(text))
             {
-                bool first_line = true;
+                var firstLine = true;
 
-                for (string? line = reader?.ReadLine()?.Trim();
+                for (var line = reader.ReadLine()?.Trim();
                         !string.IsNullOrEmpty(line);
                         line = reader?.ReadLine()?.Trim())
                 {
@@ -27,37 +27,37 @@ namespace TableConverter.FileConverters.ConverterHandlers
 
                     if (line.StartsWith('-') && line.EndsWith('-'))
                     {
-                        if (yaml_data.Count >  0)
+                        if (yamlData.Count >  0)
                         {
-                            if (first_line)
+                            if (firstLine)
                             {
-                                headers = yaml_data.Keys.ToList();
-                                first_line = false;
+                                headers = yamlData.Keys.ToList();
+                                firstLine = false;
                             }
 
-                            rows.Add(yaml_data.Select(values => values.Value).ToArray());
+                            rows.Add(yamlData.Select(values => values.Value).ToArray());
                         }
 
-                        yaml_data = new();
+                        yamlData = new();
                     }
                     else
                     {
-                        string[] line_data = line.Split(':');
+                        var lineData = line.Split(':');
 
-                        if (line_data.Length == 2)
+                        if (lineData.Length == 2)
                         {
-                            yaml_data.Add(line_data[0].Trim(), line_data[1].Trim());
+                            yamlData.Add(lineData[0].Trim(), lineData[1].Trim());
                         }
                     }
                 }
 
-                if (yaml_data.Count > 0)
+                if (yamlData.Count > 0)
                 {
-                    rows.Add(yaml_data.Select(values => values.Value).ToArray());
+                    rows.Add(yamlData.Select(values => values.Value).ToArray());
                 }
             }
 
-            return new TableData(headers, rows);
+            return Result<TableData>.Success(new TableData(headers, rows));
         }
     }
 }

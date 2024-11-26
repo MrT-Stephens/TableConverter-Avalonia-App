@@ -6,11 +6,11 @@ namespace TableConverter.FileConverters.ConverterHandlers
 {
     public class ConverterHandlerSQLOutput : ConverterHandlerOutputAbstract<ConverterHandlerSQLOutputOptions>
     {
-        public override string Convert(string[] headers, string[][] rows)
+        public override Result<string> Convert(string[] headers, string[][] rows)
         {
-            var sql_builder = new StringBuilder();
+            var sqlBuilder = new StringBuilder();
 
-            var headers_text = string.Join(", ", headers.Select(header =>
+            var headersText = string.Join(", ", headers.Select(header =>
                     $"{Options!.QuoteTypes[Options!.SelectedQuoteType]}" +
                     $"{header.Replace(' ', '_')}" +
                     $"{(Options!.QuoteTypes[Options!.SelectedQuoteType] == "[" ? "]" : Options!.QuoteTypes[Options!.SelectedQuoteType])}"
@@ -18,40 +18,40 @@ namespace TableConverter.FileConverters.ConverterHandlers
 
             for (long i = 0; i < rows.LongLength; i++)
             {
-                var row_text = string.Join(", ", rows[i].Select(val => $"\'{val.Replace("\'", "\'\'")}\'"));
+                var rowText = string.Join(", ", rows[i].Select(val => $"\'{val.Replace("\'", "\'\'")}\'"));
 
                 if (Options!.InsertMultiRowsAtOnce)
                 {
                     if (i == 0)
                     {
-                        sql_builder.Append($"INSERT INTO " +
+                        sqlBuilder.Append($"INSERT INTO " +
                                 $"{Options!.QuoteTypes[Options!.SelectedQuoteType]}" +
                                 $"{Options!.TableName.Replace(' ', '_')}" +
                                 $"{(Options!.QuoteTypes[Options!.SelectedQuoteType] == "[" ? "]" : Options!.QuoteTypes[Options!.SelectedQuoteType])} " +
-                                $"({headers_text}) VALUES{Environment.NewLine} ({row_text})");
+                                $"({headersText}) VALUES{Environment.NewLine} ({rowText})");
                     }
                     else
                     {
-                        sql_builder.Append($",{Environment.NewLine} ({row_text})");
+                        sqlBuilder.Append($",{Environment.NewLine} ({rowText})");
 
                         if (i == rows.LongLength - 1)
                         {
-                            sql_builder.Append($";{Environment.NewLine}");
+                            sqlBuilder.Append($";{Environment.NewLine}");
                         }
                     }
                 }
                 else
                 {
-                    sql_builder.AppendLine($"INSERT INTO " +
+                    sqlBuilder.AppendLine($"INSERT INTO " +
                             $"{Options!.QuoteTypes[Options!.SelectedQuoteType]}" +
                             $"{Options!.TableName.Replace(' ', '_')}" +
                             $"{(Options!.QuoteTypes[Options!.SelectedQuoteType] == "[" ? "]" : Options!.QuoteTypes[Options!.SelectedQuoteType])} " +
-                            $"({headers_text}) VALUES ({row_text});"
+                            $"({headersText}) VALUES ({rowText});"
                             );
                 }
             }
 
-            return sql_builder.ToString();
+            return Result<string>.Success(sqlBuilder.ToString());
         }
     }
 }

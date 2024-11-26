@@ -11,26 +11,30 @@ namespace TableConverter.FileConverters.DataModels
             set => Options = value;
         }
 
-        public T? Options { get; set; }
+        public T? Options { get; set; } = (typeof(T) == typeof(ConverterHandlerBaseOptions)) ? null : new T();
 
-        public ConverterHandlerOutputAbstract()
-        {
-            Options = (typeof(T) == typeof(ConverterHandlerBaseOptions)) ? null : new T();
-        }
+        public abstract Result<string> Convert(string[] headers, string[][] rows);
 
-        public abstract string Convert(string[] headers, string[][] rows);
+        public async Task<Result<string>> ConvertAsync(string[] headers, string[][] rows) => await Task.Run(() => Convert(headers, rows));
 
-        public async Task<string> ConvertAsync(string[] headers, string[][] rows) => await Task.Run(() => Convert(headers, rows));
-
-        public virtual void SaveFile(Stream? stream, ReadOnlyMemory<byte> buffer)
+        public virtual Result SaveFile(Stream? stream, ReadOnlyMemory<byte> buffer)
         {
             ArgumentNullException.ThrowIfNull(stream, nameof(stream));
 
-            stream.Write(buffer.Span);
+            try
+            {
+                stream.Write(buffer.Span);
 
-            stream.Close();
+                stream.Close();
+            }
+            catch (Exception ex)
+            {
+                return Result.Failure(ex.Message);
+            }
+            
+            return Result.Success();
         }
 
-        public async Task SaveFileAsync(Stream? output, ReadOnlyMemory<byte> buffer) => await Task.Run(() => SaveFile(output, buffer));
+        public async Task<Result> SaveFileAsync(Stream? output, ReadOnlyMemory<byte> buffer) => await Task.Run(() => SaveFile(output, buffer));
     }
 }

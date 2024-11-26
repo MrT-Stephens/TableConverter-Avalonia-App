@@ -5,24 +5,23 @@ namespace TableConverter.FileConverters.ConverterHandlers
 {
     public class ConverterHandlerYamlOutput : ConverterHandlerOutputAbstract<ConverterHandlerBaseOptions>
     { 
-        public override string Convert(string[] headers, string[][] rows)
+        public override Result<string> Convert(string[] headers, string[][] rows)
         {
-            using (var writer = new StringWriter())
+            using var writer = new StringWriter();
+            
+            writer.Write($"---{Environment.NewLine}");
+
+            foreach (var str in rows)
             {
-                writer.Write($"---{Environment.NewLine}");
+                writer.Write($"-{Environment.NewLine}");
 
-                for (long i = 0; i < rows.LongLength; i++)
+                for (long j = 0; j < headers.LongLength; j++)
                 {
-                    writer.Write($"-{Environment.NewLine}");
-
-                    for (long j = 0; j < headers.LongLength; j++)
-                    {
-                        writer.Write($"\t{headers[j].Replace(' ', '_')}: {rows[i][j]}{Environment.NewLine}");
-                    }
+                    writer.Write($"\t{headers[j].Replace(' ', '_')}: {str[j]}{Environment.NewLine}");
                 }
-
-                return writer.ToString();
             }
+
+            return Result<string>.Success(writer.ToString());
         }
     }
 }

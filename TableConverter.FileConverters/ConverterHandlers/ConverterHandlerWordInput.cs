@@ -6,9 +6,9 @@ namespace TableConverter.FileConverters.ConverterHandlers
 {
     public class ConverterHandlerWordInput : ConverterHandlerInputAbstract<ConverterHandlerBaseOptions>
     {
-        private XWPFDocument? WordDocument { get; set; } = null;
+        private XWPFDocument? WordDocument { get; set; }
 
-        public override TableData ReadText(string text)
+        public override Result<TableData> ReadText(string text)
         {
             var headers = new List<string>();
             var rows = new List<string[]>();
@@ -24,10 +24,7 @@ namespace TableConverter.FileConverters.ConverterHandlers
                 {
                     if (row == WordDocument.Tables[0].Rows[0])
                     {
-                        foreach (var cell in row.GetTableCells())
-                        {
-                            headers.Add(cell.GetText());
-                        }
+                        headers.AddRange(row.GetTableCells().Select(cell => cell.GetText()));
                     }
                     else
                     {
@@ -41,19 +38,19 @@ namespace TableConverter.FileConverters.ConverterHandlers
             }
             catch (Exception ex)
             {
-                throw new Exception("Error while reading the Word file.", ex);
+                return Result<TableData>.Failure(ex.Message);
             }
 
-            return new TableData(headers, rows);
+            return Result<TableData>.Success(new TableData(headers, rows));
         }
 
-        public override string ReadFile(Stream? stream)
+        public override Result<string> ReadFile(Stream? stream)
         {
             ArgumentNullException.ThrowIfNull(stream, nameof(stream));
 
             WordDocument = new XWPFDocument(stream);
 
-            return $"Word files are not visible within this text box 😭{Environment.NewLine}";
+            return Result<string>.Success($"Word files are not visible within this text box 😭{Environment.NewLine}");
         }
     }
 }

@@ -6,75 +6,86 @@ namespace TableConverter.FileConverters.ConverterHandlers
 {
     public class ConverterHandlerJsonOutput : ConverterHandlerOutputAbstract<ConverterHandlerJsonOutputOptions>
     {
-        public override string Convert(string[] headers, string[][] rows)
+        public override Result<string> Convert(string[] headers, string[][] rows)
         {
-            switch (Options!.SelectedJsonFormatType)
+            try
             {
-                case "Array of Objects":
+                switch (Options!.SelectedJsonFormatType)
+                {
+                    case "Array of Objects":
                     {
-                        Dictionary<string, object>[] json_objects = new Dictionary<string, object>[rows.LongLength];
+                        var jsonObjects = new Dictionary<string, object>[rows.Length];
 
-                        for (long i = 0; i < rows.LongLength; i++)
+                        for (var i = 0; i < rows.Length; i++)
                         {
-                            json_objects[i] = new Dictionary<string, object>();
+                            jsonObjects[i] = new Dictionary<string, object>();
 
-                            for (long j = 0; j < headers.LongLength; j++)
+                            for (var j = 0; j < headers.Length; j++)
                             {
-                                json_objects[i].Add(headers[j].Replace(' ', '_'), rows[i][j]);
+                                jsonObjects[i].Add(headers[j].Replace(' ', '_'), rows[i][j]);
                             }
                         }
 
-                        return JsonConvert.SerializeObject(json_objects, Options!.MinifyJson ? Formatting.None : Formatting.Indented);
+                        return Result<string>.Success(JsonConvert.SerializeObject(jsonObjects,
+                            Options!.MinifyJson ? Formatting.None : Formatting.Indented));
                     }
-                case "2D Arrays":
+                    case "2D Arrays":
                     {
-                        string[][] json_array = new string[rows.LongLength + 1][];
+                        var jsonArray = new string[rows.Length + 1][];
 
-                        json_array[0] = headers.Select(c => c.Replace(' ', '_')).ToArray();
+                        jsonArray[0] = headers.Select(c => c.Replace(' ', '_')).ToArray();
 
-                        for (long i = 0; i < rows.LongLength; i++)
+                        for (var i = 0; i < rows.Length; i++)
                         {
-                            json_array[i + 1] = rows[i];
+                            jsonArray[i + 1] = rows[i];
                         }
 
-                        return JsonConvert.SerializeObject(json_array, Options!.MinifyJson ? Formatting.None : Formatting.Indented);
+                        return Result<string>.Success(JsonConvert.SerializeObject(jsonArray,
+                            Options!.MinifyJson ? Formatting.None : Formatting.Indented));
                     }
-                case "Column Arrays":
+                    case "Column Arrays":
                     {
-                        Dictionary<string, string[]>[] json_objects = new Dictionary<string, string[]>[headers.LongLength];
+                        var jsonObjects = new Dictionary<string, string[]>[headers.Length];
 
-                        for (long i = 0; i < headers.LongLength; i++)
+                        for (var i = 0; i < headers.Length; i++)
                         {
-                            json_objects[i] = new Dictionary<string, string[]>()
+                            jsonObjects[i] = new Dictionary<string, string[]>
                             {
                                 { headers[i].Replace(' ', '_'), rows.Select(row => row[i]).ToArray() }
                             };
                         }
 
-                        return JsonConvert.SerializeObject(json_objects, Options!.MinifyJson ? Formatting.None : Formatting.Indented);
+                        return Result<string>.Success(JsonConvert.SerializeObject(jsonObjects,
+                            Options!.MinifyJson ? Formatting.None : Formatting.Indented));
                     }
-                case "Keyed Arrays":
+                    case "Keyed Arrays":
                     {
-                        Dictionary<long, string[]>[] json_objects = new Dictionary<long, string[]>[rows.LongLength + 1];
+                        var jsonObjects = new Dictionary<long, string[]>[rows.Length + 1];
 
-                        json_objects[0] = new Dictionary<long, string[]>
+                        jsonObjects[0] = new Dictionary<long, string[]>
                         {
                             { 0, headers.Select(c => c.Replace(' ', '_')).ToArray() }
                         };
 
-                        for (long i = 0; i < rows.LongLength; i++)
+                        for (var i = 0; i < rows.Length; i++)
                         {
-                            json_objects[i + 1] = new Dictionary<long, string[]>()
+                            jsonObjects[i + 1] = new Dictionary<long, string[]>
                             {
                                 { i + 1, rows[i] }
                             };
                         }
 
-                        return JsonConvert.SerializeObject(json_objects, Options!.MinifyJson ? Formatting.None : Formatting.Indented);
+                        return Result<string>.Success(JsonConvert.SerializeObject(jsonObjects,
+                            Options!.MinifyJson ? Formatting.None : Formatting.Indented));
                     }
+                }
+            }
+            catch (Exception ex)
+            {
+                return Result<string>.Failure(ex.Message);
             }
 
-            return string.Empty;
+            return Result<string>.Failure("Unsupported json format");
         }
     }
 }
