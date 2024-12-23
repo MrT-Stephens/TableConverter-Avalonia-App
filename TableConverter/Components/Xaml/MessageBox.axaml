@@ -19,7 +19,7 @@
             <!-- Main Content -->
             <Border Name="PART_MainBorder"
                     CornerRadius="25" 
-                    Margin="0,90,0,0">
+                    Margin="0,0,0,0">
               <Border CornerRadius="25" 
                       ClipToBounds="True">
                 <!-- Background -->
@@ -65,7 +65,7 @@
                   <Grid RowDefinitions="Auto,*,Auto">
                     <!-- Title -->
                     <TextBlock Grid.Row="0" 
-                               Margin="30,60,30,0" 
+                               Margin="30,30,30,0" 
                                Text="{TemplateBinding Title}" 
                                FontWeight="DemiBold" 
                                FontSize="26" 
@@ -105,13 +105,15 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Top"
                     Background="{DynamicResource SukiGlassCardOpaqueBackground}"
-                    BoxShadow="{DynamicResource SukiBigPopupShadow}" />
+                    BoxShadow="{DynamicResource SukiBigPopupShadow}"
+                    IsVisible="{TemplateBinding ShowIcon}" />
             <Border Margin="0,20,0,0" 
                     Width="100" 
                     Height="100" 
                     CornerRadius="50" 
                     VerticalAlignment="Top" 
-                    HorizontalAlignment="Center">
+                    HorizontalAlignment="Center"
+                    IsVisible="{TemplateBinding ShowIcon}">
               <Border CornerRadius="50" 
                       ClipToBounds="True">
                 <Panel>

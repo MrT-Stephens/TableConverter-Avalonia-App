@@ -28,8 +28,7 @@
     </xamlComponents:MessageBox.Content>
     <xamlComponents:MessageBox.ActionButtons>
       <components:XamlArray x:TypeArguments="Control">
-        <Button Classes="Flat"
-                Content="Cancel"
+        <Button Content="Cancel"
                 Command="{Binding ButtonClickedCommand}"
                 CommandParameter="Cancel" />
         <Button Classes="Flat"

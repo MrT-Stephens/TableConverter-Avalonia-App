@@ -1,7 +1,6 @@
-﻿namespace TableConverter.DataGeneration.DataModels
-{
-    public record TableData(
-        List<string> headers,
-        List<string[]> rows
-    );
-}
+namespace TableConverter.DataGeneration.DataModels;
+
+public record TableData(
+    List<string> Headers,
+    List<string[]> Rows
+);

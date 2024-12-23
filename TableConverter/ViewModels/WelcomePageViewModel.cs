@@ -17,9 +17,9 @@ public partial class WelcomePageViewModel : BasePageViewModel
 
     #endregion
 
-    #region Properties 
-
-    public IReadOnlyDictionary<string, IReadOnlyList<DataGenerationType>> DataGenerationTypes { get; }
+    #region Properties
+    
+    
 
     #endregion
 
@@ -30,18 +30,7 @@ public partial class WelcomePageViewModel : BasePageViewModel
     {
         ConverterTypes = converterTypes;
 
-        DataGenerationTypes = dataGenerationTypes.Types
-            .Select(val => new KeyValuePair<string, IReadOnlyList<DataGenerationType>>(
-                val.Category,
-                new List<DataGenerationType>(
-                    dataGenerationTypes.Types
-                        .Where(types => types.Category == val.Category)
-                        .OrderBy(dataGenerationType => dataGenerationType.Name)
-                )
-            ))
-            .DistinctBy(kv => kv.Key)
-            .OrderBy(kv => kv.Key)
-            .ToDictionary(val => $"{val.Key} ({val.Value.Count})", val => val.Value);
+
     }
 
     #endregion

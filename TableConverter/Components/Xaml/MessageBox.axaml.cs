@@ -20,6 +20,9 @@ public partial class MessageBox : UserControl
 
     public static readonly StyledProperty<bool> ShowCardProperty =
         AvaloniaProperty.Register<MessageBox, bool>(nameof(ShowCard), true);
+    
+    public static readonly StyledProperty<bool> ShowIconProperty =
+        AvaloniaProperty.Register<MessageBox, bool>(nameof(ShowIcon), false);
 
     public object? Icon
     {
@@ -49,6 +52,12 @@ public partial class MessageBox : UserControl
     {
         get => GetValue(ShowCardProperty);
         set => SetValue(ShowCardProperty, value);
+    }
+    
+    public bool ShowIcon
+    {
+        get => GetValue(ShowIconProperty);
+        set => SetValue(ShowIconProperty, value);
     }
 
     public MessageBox()

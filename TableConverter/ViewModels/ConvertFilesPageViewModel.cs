@@ -69,6 +69,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                 ),
                 OnOkClicked = OnInputFileTypeClicked
             })
+            .OfType(NotificationType.Information)
             .Dismiss().ByClickingBackground()
             .TryShow();
     }
@@ -106,6 +107,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                                 Options = new ObservableCollection<Control>(controls.Controls),
                                 OnOkClicked = async () => await ProcessInputtedFileToTableData(currentDoc, pageIndex)
                             })
+                            .OfType(NotificationType.Information)
                             .Dismiss().ByClickingBackground()
                             .TryShow();
                     }
@@ -130,6 +132,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                             ),
                             OnOkClicked = fileType => OnOutputFileTypeClicked(fileType, currentDoc, pageIndex)
                         })
+                        .OfType(NotificationType.Information)
                         .Dismiss().ByClickingBackground()
                         .TryShow();
                     break;
@@ -503,12 +506,12 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                 DialogManager.CreateDialog()
                     .WithViewModel(modal => new ConvertFilesOptionsViewModel(modal)
                     {
-                        Title =
-                            $"How would you like your {doc.OutputConverter.Name} file outputted?",
+                        Title = $"How would you like your {doc.OutputConverter.Name} file outputted?",
                         Options = new ObservableCollection<Control>(controls.Controls),
                         OnOkClicked = async () =>
                             await ProcessTableDataToOutputFile(doc, currentPageIndex)
                     })
+                    .OfType(NotificationType.Information)
                     .Dismiss().ByClickingBackground()
                     .TryShow();
             }

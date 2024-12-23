@@ -3,7 +3,6 @@
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
-                   xmlns:sukiModels="clr-namespace:SukiUI.Models;assembly=SukiUI"
                    xmlns:vm="clr-namespace:TableConverter.ViewModels"
                    x:Class="TableConverter.Views.MainWindowView"
                    Title="TableConverter"

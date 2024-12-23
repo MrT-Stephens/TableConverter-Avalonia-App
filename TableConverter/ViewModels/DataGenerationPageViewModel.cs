@@ -61,36 +61,7 @@ public partial class DataGenerationPageViewModel : BasePageViewModel
     [RelayCommand]
     private void ChooseTypeButtonClicked(DataGenerationFieldViewModel field)
     {
-        DialogManager.CreateDialog()
-            .WithViewModel((dialog) => new DataGenerationTypesViewModel(dialog)
-            {
-                GenerationTypes = new(DataGenerationTypes.Types),
-                OnOkClicked = (type) =>
-                {
-                    field.Type = type.Name;
-
-                    field.DataGenerationTypeHandler = DataGenerationTypes.GetHandlerByName(type.Name);
-
-                    if (field.DataGenerationTypeHandler.Options is not null && field.DataGenerationTypeHandler is IInitializeControls controls)
-                    {
-                        controls.InitializeControls();
-
-                        field.OptionsControls = new(controls.Controls);
-                    }
-                    else
-                    {
-                        field.OptionsControls = new()
-                        {
-                            new TextBlock()
-                            {
-                                Text = "No Options Available"
-                            }
-                        };
-                    }
-                }
-            })
-            .Dismiss().ByClickingBackground()
-            .TryShow();
+        
     }
 
     [RelayCommand]
@@ -118,45 +89,8 @@ public partial class DataGenerationPageViewModel : BasePageViewModel
     [RelayCommand]
     private async Task GenerateDataButtonClicked()
     {
-        TableData tableData = await DataGenerationTypes.GenerateDataAsync(
-            DataGenerationFields.Select(val => new DataGenerationField(
-                val.Name,
-                val.Type,
-                val.BlankPercentage,
-                val.DataGenerationTypeHandler!
-            )).ToArray(), NumberOfRows
-        );
 
-        if (tableData.headers.Count > 0 && tableData.rows.Count > 0)
-        {
-            var newDoc = new ConvertDocumentViewModel()
-            {
-                Name = string.IsNullOrEmpty(GeneratedDocumentName) ?
-                           $"TableConverter-Generated-{DateTime.Now.ToFileTime()}" :
-                           GeneratedDocumentName,
-                EditHeaders = new(tableData.headers),
-                EditRows = new(tableData.rows),
-                IsGenerated = true,
-                ProgressStepIndex = 1,
-            };
-
-            FilesManager.Files.Add(newDoc);
-
-            ToastManager.CreateToast()
-                .WithTitle("Data Generated")
-                .WithContent($"The file '{newDoc.Name}' has been added to your documents.")
-                .OfType(NotificationType.Success)
-                .Dismiss().ByClicking()
-                .Dismiss().After(new(0, 0, 3))
-                .Queue();
-
-            PageNavigation.RequestNavigation<ConvertFilesPageViewModel>((viewModel) => {
-                if (viewModel is ConvertFilesPageViewModel convertFilesPageViewModel)
-                {
-                    convertFilesPageViewModel.SelectedConvertDocument = FilesManager.Files.Last();
-                }
-            });
-        }
+        
     }
 
     #endregion

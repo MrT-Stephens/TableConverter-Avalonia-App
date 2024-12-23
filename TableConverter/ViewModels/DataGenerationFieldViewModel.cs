@@ -22,7 +22,7 @@ public partial class DataGenerationFieldViewModel : ObservableObject
     [ObservableProperty]
     private ObservableCollection<Control> _OptionsControls = new()
     {
-        new TextBlock()
+        new TextBlock
         {
             Text = "No Options Available"
         }
@@ -30,8 +30,6 @@ public partial class DataGenerationFieldViewModel : ObservableObject
 
     [ObservableProperty]
     private ushort _BlankPercentage = 0;
-
-    public IDataGenerationTypeHandler? DataGenerationTypeHandler { get; set; } = null;
 
     #endregion
 }

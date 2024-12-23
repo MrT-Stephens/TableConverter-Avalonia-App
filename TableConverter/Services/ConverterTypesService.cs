@@ -8,7 +8,7 @@ namespace TableConverter.Services
 {
     public class ConverterTypesService
     {
-        public static readonly IEnumerable<ConverterType> Types =
+        private static readonly IEnumerable<ConverterType> Types =
         [
                 new ConverterType("CSV", 
                         [ ".csv", ".txt" ], 
