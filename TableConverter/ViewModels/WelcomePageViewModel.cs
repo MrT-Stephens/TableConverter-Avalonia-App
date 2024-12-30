@@ -14,12 +14,8 @@ public partial class WelcomePageViewModel : BasePageViewModel
     #region Services
 
     public ConverterTypesService ConverterTypes { get; }
-
-    #endregion
-
-    #region Properties
     
-    
+    public DataGenerationTypesService DataGenerationTypes { get; }
 
     #endregion
 
@@ -30,7 +26,7 @@ public partial class WelcomePageViewModel : BasePageViewModel
     {
         ConverterTypes = converterTypes;
 
-
+        DataGenerationTypes = dataGenerationTypes;
     }
 
     #endregion

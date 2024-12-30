@@ -23,6 +23,10 @@ public class Faker(string localeType = "en", int? seed = null) : FakerBase(local
     public override ScienceModule Science => new(this, Locale, Randomizer);
     
     public override MusicModule Music => new(this, Locale, Randomizer);
+    
+    public override NumberModule Number => new(this, Locale, Randomizer);
+    
+    public override ImageModule Image => new(this, Locale, Randomizer);
 
     public static FakerBuilderBase<Faker> Create(Faker? faker = null)
     {

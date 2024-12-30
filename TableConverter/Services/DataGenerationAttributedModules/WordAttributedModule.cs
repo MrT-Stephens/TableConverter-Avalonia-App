@@ -6,7 +6,8 @@ using TableConverter.DataModels;
 namespace TableConverter.Services.DataGenerationAttributedModules;
 
 [DataGenerationModule("Word",
-    "Module for generating random words and word-related data such as nouns, verbs, and phrases.")]
+    "Module for generating random words and word-related data such as nouns, verbs, and phrases.",
+    "DataGenerationWordIcon")]
 public class WordAttributedModule(FakerBase faker, LocaleBase locale, Randomizer randomizer)
     : WordModule(faker, locale, randomizer)
 {

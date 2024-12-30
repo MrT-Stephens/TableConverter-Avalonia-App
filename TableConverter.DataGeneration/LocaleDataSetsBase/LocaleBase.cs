@@ -25,4 +25,6 @@ public abstract class LocaleBase
     public abstract Lazy<ScienceBase> Science { get; }
     
     public abstract Lazy<MusicBase> Music { get; }
+    
+    public abstract Lazy<ColorBase> Color { get; }
 }

@@ -4,10 +4,10 @@ using System.Collections.Generic;
 namespace TableConverter.DataModels;
 
 public record DataGenerationMethod(
+    string Key,
     string Name,
     string Description,
-    IReadOnlyList<DataGenerationMethodParameter> Parameters,
-    Action<object[]> ExecuteMethod);
+    IReadOnlyList<DataGenerationMethodParameter> Parameters);
 
 public record DataGenerationMethodParameter(
     string Name,
@@ -17,4 +17,5 @@ public record DataGenerationMethodParameter(
 public record DataGenerationType(
     string Name,
     string Description,
+    object Icon,
     IReadOnlyList<DataGenerationMethod> Methods);

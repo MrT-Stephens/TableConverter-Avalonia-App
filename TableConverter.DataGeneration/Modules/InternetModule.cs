@@ -124,7 +124,7 @@ public partial class InternetModule(FakerBase faker, LocaleBase locale, Randomiz
 
     public override string ModuleName => "Internet";
 
-    public virtual string Color(int r, int g, int b)
+    public virtual string Color(int r = 255, int g = 255, int b = 255)
     {
         if (r is < 0 or > 255) throw new ArgumentOutOfRangeException(nameof(r), "Value must be between 0 and 255.");
 
@@ -279,7 +279,7 @@ public partial class InternetModule(FakerBase faker, LocaleBase locale, Randomiz
         return $"{localPart}@{internalProvider}";
     }
 
-    public virtual string Emoji(EmojiTypeEnum emojiType)
+    public virtual string Emoji(EmojiTypeEnum emojiType = EmojiTypeEnum.People)
     {
         return emojiType switch
         {
@@ -315,7 +315,7 @@ public partial class InternetModule(FakerBase faker, LocaleBase locale, Randomiz
         return Randomizer.GetRandomElement(["GET", "POST", "PUT", "PATCH", "DELETE"]);
     }
 
-    public virtual string HttpStatusCode(HttpStatusCodeTypeEnum type)
+    public virtual string HttpStatusCode(HttpStatusCodeTypeEnum type = HttpStatusCodeTypeEnum.Informational)
     {
         return type switch
         {

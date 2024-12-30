@@ -38,6 +38,10 @@
     <Compile Update="Components\Xaml\FileTypesSelectorView.axaml.cs">
       <DependentUpon>FileTypesSelectorView.axaml</DependentUpon>
     </Compile>
+    <Compile Update="Components\Xaml\DataGenerationListTypesView.axaml.cs">
+      <DependentUpon>DataGenerationListTypesView.axaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>

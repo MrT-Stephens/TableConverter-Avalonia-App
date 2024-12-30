@@ -1,28 +1,26 @@
-﻿using Avalonia;
+﻿using System;
+using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
-using System;
-using System.Linq;
 using TableConverter.Common;
+using TableConverter.Components.Xaml;
+using TableConverter.Interfaces;
 using TableConverter.Services;
 using TableConverter.ViewModels;
 using TableConverter.Views;
 
 namespace TableConverter;
 
-public partial class App : Application
+public class App : Application
 {
-    public IServiceProvider? ServiceProvider { get; private set; }
-
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
-
-        ServiceProvider = ConfigureServices();
     }
 
     public override void OnFrameworkInitializationCompleted()
@@ -31,33 +29,41 @@ public partial class App : Application
         // Without this line you will get duplicate validations from both Avalonia and CT
         BindingPlugins.DataValidators.RemoveAt(0);
 
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && ServiceProvider is not null)
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            var viewModel = ServiceProvider.GetRequiredService<MainWindowViewModel>();
-            var view = ServiceProvider.GetRequiredService<MainWindowView>();
+            var services = new ServiceCollection();
 
-            view.DataContext = viewModel;
-            desktop.MainWindow = view;
+            var views = ConfigureViews(services);
+            var provider = ConfigureServices(services);
+
+            DataTemplates.Add(new ViewLocator(views));
+
+            desktop.MainWindow = views.CreateView<MainWindowViewModel>(provider) as Window;
         }
 
         base.OnFrameworkInitializationCompleted();
     }
 
-    private static ServiceProvider ConfigureServices()
+    private static IViewsCollection ConfigureViews(IServiceCollection services)
     {
-        ServiceCollection services = new();
+        var views = new ViewsCollection()
+            // Main Window
+            .AddView<MainWindowView, MainWindowViewModel>(services)
+            // Add Views
+            .AddView<WelcomePageView, WelcomePageViewModel>(services)
+            .AddView<ConvertFilesPageView, ConvertFilesPageViewModel>(services)
+            .AddView<DataGenerationPageView, DataGenerationPageViewModel>(services)
+            .AddView<DataGenerationListTypesView, DataGenerationListTypesViewModel>(services)
+            // Add Dialogs Views
+            .AddView<FileTypesSelectorView, FileTypesSelectorViewModel>(services)
+            .AddView<ConvertFilesOptionsView, ConvertFilesOptionsViewModel>(services)
+            .AddView<DataGenerationTypesView, DataGenerationTypesViewModel>(services);
 
-        // ViewLocator
-        var viewLocator = Current?.DataTemplates.First(val => val is ViewLocator);
+        return views;
+    }
 
-        if (viewLocator is not null)
-        {
-            services.AddSingleton(viewLocator);
-        }
-
-        // Views
-        services.AddSingleton<MainWindowView>();
-
+    private static IServiceProvider ConfigureServices(IServiceCollection services)
+    {
         // Custom Services
         services.AddSingleton<PageNavigationService>();
         services.AddSingleton<ConvertFilesManager>();
@@ -67,12 +73,6 @@ public partial class App : Application
         // SukiUI Services
         services.AddSingleton<ISukiToastManager, SukiToastManager>();
         services.AddSingleton<ISukiDialogManager, SukiDialogManager>();
-
-        // ViewModels
-        services.AddSingleton<MainWindowViewModel>();
-        services.AddSingleton<BasePageViewModel, WelcomePageViewModel>();
-        services.AddSingleton<BasePageViewModel, ConvertFilesPageViewModel>();
-        services.AddSingleton<BasePageViewModel, DataGenerationPageViewModel>();
 
         return services.BuildServiceProvider();
     }

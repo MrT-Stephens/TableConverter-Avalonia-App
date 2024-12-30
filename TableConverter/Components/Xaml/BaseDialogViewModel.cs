@@ -3,14 +3,7 @@ using SukiUI.Dialogs;
 
 namespace TableConverter.Components.Xaml;
 
-public abstract partial class BaseDialogViewModel : ObservableObject
+public abstract class BaseDialogViewModel(ISukiDialog dialog) : ObservableObject
 {
-    protected readonly ISukiDialog dialog;
-
-    public BaseDialogViewModel(ISukiDialog dialog)
-    {
-        this.dialog = dialog;
-    }
-
     protected void Close() => dialog.Dismiss();
 }

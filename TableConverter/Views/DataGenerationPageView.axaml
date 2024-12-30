@@ -5,8 +5,8 @@
              xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
              xmlns:sukiUiTheme="clr-namespace:SukiUI.Theme;assembly=SukiUI"
              xmlns:components="clr-namespace:TableConverter.Components.Extensions"
-             xmlns:converters="clr-namespace:TableConverter.Converters"
              xmlns:vm="clr-namespace:TableConverter.ViewModels"
+             xmlns:converters="clr-namespace:TableConverter.Converters"
              x:Class="TableConverter.Views.DataGenerationPageView"
              x:DataType="vm:DataGenerationPageViewModel"
              mc:Ignorable="d" 
@@ -18,141 +18,143 @@
     <vm:DataGenerationPageViewModel />
   </Design.DataContext>
   
-  <components:SpacedGrid RowDefinitions="*,Auto"
-                         RowSpacing="10"
-                         Margin="10">
-    <!-- Data Generation Types Data Grid -->
-    <sukiUi:GlassCard Grid.Row="0"
-                      IsAnimated="False"
-                      Padding="10">
-      <DataGrid ItemsSource="{Binding DataGenerationFields}"
-                SelectionMode="Single"
-                AutoGenerateColumns="False"
-                CanUserResizeColumns="False">
-        <DataGrid.Columns>
-          <!-- Data Generation Field Name -->
-          <DataGridTemplateColumn Header="Field Name"
-                                  Width="Auto"
-                                  MinWidth="200">
-            <DataGridTemplateColumn.CellTemplate>
-              <DataTemplate>
-                <TextBox Text="{Binding Name}"
-                         Watermark="Enter Field Name">
-                </TextBox>
-              </DataTemplate>
-            </DataGridTemplateColumn.CellTemplate>
-          </DataGridTemplateColumn>
-          <!-- Data Generation Field Type -->
-          <DataGridTemplateColumn Header="Field Type">
-            <DataGridTemplateColumn.CellTemplate>
-              <DataTemplate>
-                <Button Classes="Flat"
-                        Command="{Binding ((vm:DataGenerationPageViewModel)DataContext).ChooseTypeButtonClickedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                        CommandParameter="{Binding .}"
-                        HorizontalAlignment="Left">
-                  <StackPanel Spacing="10"
-                              Orientation="Horizontal">
-                    <TextBlock Text="{Binding Type}" />
-                    <PathIcon Data="{StaticResource UpDownIcon}"
-                              Height="18"
-                              Width="18" />
+  <sukiUi:BusyArea IsBusy="{Binding IsBusy}"
+                   BusyText="Generating Data...">
+    <components:SpacedGrid RowDefinitions="*,Auto"
+                           RowSpacing="10"
+                           Margin="10">
+      <!-- Data Generation Types Data Grid -->
+      <sukiUi:GlassCard Grid.Row="0"
+                        IsAnimated="False"
+                        Padding="10">
+        <DataGrid ItemsSource="{Binding DataGenerationFields}"
+                  SelectionMode="Single"
+                  AutoGenerateColumns="False"
+                  CanUserResizeColumns="False">
+          <DataGrid.Columns>
+            <!-- Data Generation Field Name -->
+            <DataGridTemplateColumn Header="Field Name"
+                                    Width="Auto"
+                                    MinWidth="200">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                  <TextBox Text="{Binding Name}"
+                           Watermark="Enter Field Name">
+                  </TextBox>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <!-- Data Generation Field Type -->
+            <DataGridTemplateColumn Header="Field Type">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                  <Button Classes="Flat"
+                          Command="{Binding ((vm:DataGenerationPageViewModel)DataContext).ChooseTypeButtonClickedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                          CommandParameter="{Binding .}"
+                          HorizontalAlignment="Left">
+                    <StackPanel Spacing="10"
+                                Orientation="Horizontal">
+                      <TextBlock Text="{Binding TypeName}" />
+                      <PathIcon Data="{StaticResource UpDownIcon}"
+                                Height="18"
+                                Width="18" />
+                    </StackPanel>
+                  </Button>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <!-- Data Generation Field Options -->
+            <DataGridTemplateColumn Header="Field Options"
+                                    MinWidth="200">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                  <ItemsControl ItemsSource="{Binding Parameters, Converter={x:Static converters:DataGenerationMethodToControlsConverter.Instance}}">
+                    <ItemsControl.ItemsPanel>
+                      <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="5">
+                        </StackPanel>
+                      </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                  </ItemsControl>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <!-- Data Generation Field Number of Blanks -->
+            <DataGridTemplateColumn Header="Blanks Percentage"
+                                    MinWidth="150">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                  <NumericUpDown Minimum="0"
+                                 Maximum="100"
+                                 ParsingNumberStyle="Integer"
+                                 FormatString="N0"
+                                 Value="{Binding BlankPercentage}"
+                                 Margin="5,0,5,0"
+                                 VerticalAlignment="Center"
+                                 HorizontalAlignment="Stretch"
+                                 VerticalContentAlignment="Center"
+                                 sukiUiTheme:NumericUpDownExtensions.Unit="%" />
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <!-- Data Generation Field Remove -->
+            <DataGridTemplateColumn Header="Remove/Add"
+                                    MinWidth="175">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                  <StackPanel Orientation="Horizontal"
+                              Spacing="5">
+                    <Button Classes="Flat Icon"
+                            Command="{Binding ((vm:DataGenerationPageViewModel)DataContext).RemoveFieldButtonClickedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                            CommandParameter="{Binding .}"
+                            VerticalAlignment="Center"
+                            VerticalContentAlignment="Center">
+                      <PathIcon Data="{StaticResource RemoveIcon}"
+                                Foreground="{DynamicResource SukiText}"
+                                Height="18"
+                                Width="18" />
+                    </Button>
+                    <Button Classes="Flat Icon"
+                            Command="{Binding ((vm:DataGenerationPageViewModel)DataContext).AddFieldButtonClickedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                            CommandParameter="{Binding .}">
+                      <PathIcon Data="{StaticResource AddIcon}"
+                                Foreground="{DynamicResource SukiText}"
+                                Height="18"
+                                Width="18" />
+                    </Button>
                   </StackPanel>
-                </Button>
-              </DataTemplate>
-            </DataGridTemplateColumn.CellTemplate>
-          </DataGridTemplateColumn>
-          <!-- Data Generation Field Options -->
-          <DataGridTemplateColumn Header="Field Options"
-                                  MinWidth="200">
-            <DataGridTemplateColumn.CellTemplate>
-              <DataTemplate>
-                <ItemsControl ItemsSource="{Binding OptionsControls}">
-                  <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                      <StackPanel Orientation="Horizontal"
-                                  HorizontalAlignment="Stretch"
-                                  Spacing="5">
-                      </StackPanel>
-                    </ItemsPanelTemplate>
-                  </ItemsControl.ItemsPanel>
-                </ItemsControl>
-              </DataTemplate>
-            </DataGridTemplateColumn.CellTemplate>
-          </DataGridTemplateColumn>
-          <!-- Data Generation Field Number of Blanks -->
-          <DataGridTemplateColumn Header="Blanks Percentage"
-                                  MinWidth="150">
-            <DataGridTemplateColumn.CellTemplate>
-              <DataTemplate>
-                <NumericUpDown Minimum="0"
-                               Maximum="100"
-                               ParsingNumberStyle="Integer"
-                               FormatString="N0"
-                               Value="0"
-                               Margin="5,0,5,0"
-                               VerticalAlignment="Center"
-                               HorizontalAlignment="Stretch"
-                               VerticalContentAlignment="Center"
-                               sukiUiTheme:NumericUpDownExtensions.Unit="%" />
-              </DataTemplate>
-            </DataGridTemplateColumn.CellTemplate>
-          </DataGridTemplateColumn>
-          <!-- Data Generation Field Remove -->
-          <DataGridTemplateColumn Header="Remove/Add"
-                                  MinWidth="175">
-            <DataGridTemplateColumn.CellTemplate>
-              <DataTemplate>
-                <StackPanel Orientation="Horizontal"
-                            Spacing="5">
-                  <Button Classes="Flat"
-                          Command="{Binding ((vm:DataGenerationPageViewModel)DataContext).RemoveFieldButtonClickedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                          CommandParameter="{Binding .}"
-                          VerticalAlignment="Center"
-                          VerticalContentAlignment="Center">
-                    <PathIcon Data="{StaticResource RemoveIcon}"
-                              Height="18"
-                              Width="18" />
-                  </Button>
-                  <Button Classes="Flat"
-                          Command="{Binding ((vm:DataGenerationPageViewModel)DataContext).AddFieldButtonClickedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                          CommandParameter="{Binding .}"
-                          VerticalAlignment="Center"
-                          VerticalContentAlignment="Center">
-                    <PathIcon Data="{StaticResource AddIcon}"
-                              Height="18"
-                              Width="18" />
-                  </Button>
-                </StackPanel>
-              </DataTemplate>
-            </DataGridTemplateColumn.CellTemplate>
-          </DataGridTemplateColumn>
-        </DataGrid.Columns>
-      </DataGrid>
-    </sukiUi:GlassCard>
-    <!-- Data Generation Footer -->
-    <sukiUi:GlassCard Grid.Row="1"
-                      IsAnimated="False"
-                      Padding="10">
-      <components:SpacedGrid ColumnDefinitions="Auto,Auto,*"
-                             ColumnSpacing="10">
-        <TextBox Grid.Column="0"
-                 Watermark="Document Name"
-                 Text="{Binding GeneratedDocumentName}"
-                 MaxWidth="175" />
-        <NumericUpDown Grid.Column="1"
-                       ShowButtonSpinner="True"
-                       Value="{Binding NumberOfRows}"
-                       Minimum="1"
-                       Maximum="10000"
-                       ParsingNumberStyle="Integer"
-                       FormatString="N0"
-                       sukiUiTheme:NumericUpDownExtensions.Unit="Rows" />
-        <Button Grid.Column="2"
-                Classes="Flat"
-                Content="Generate Data"
-                HorizontalAlignment="Right"
-                Command="{Binding GenerateDataButtonClickedCommand}" />
-      </components:SpacedGrid>
-    </sukiUi:GlassCard>
-  </components:SpacedGrid>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+          </DataGrid.Columns>
+        </DataGrid>
+      </sukiUi:GlassCard>
+      <!-- Data Generation Footer -->
+      <sukiUi:GlassCard Grid.Row="1"
+                        IsAnimated="False"
+                        Padding="10">
+        <components:SpacedGrid ColumnDefinitions="Auto,Auto,*"
+                               ColumnSpacing="10">
+          <TextBox Grid.Column="0"
+                   Watermark="Document Name"
+                   Text="{Binding GeneratedDocumentName}"
+                   MaxWidth="175" />
+          <NumericUpDown Grid.Column="1"
+                         ShowButtonSpinner="True"
+                         Value="{Binding NumberOfRows}"
+                         Minimum="1"
+                         Maximum="10000"
+                         ParsingNumberStyle="Integer"
+                         FormatString="N0"
+                         sukiUiTheme:NumericUpDownExtensions.Unit="Rows" />
+          <Button Grid.Column="2"
+                  Classes="Flat"
+                  Content="Generate Data"
+                  HorizontalAlignment="Right"
+                  Command="{Binding GenerateDataButtonClickedCommand}" />
+        </components:SpacedGrid>
+      </sukiUi:GlassCard>
+    </components:SpacedGrid>
+  </sukiUi:BusyArea>
 </UserControl>

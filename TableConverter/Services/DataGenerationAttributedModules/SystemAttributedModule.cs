@@ -6,7 +6,8 @@ using TableConverter.DataModels;
 namespace TableConverter.Services.DataGenerationAttributedModules;
 
 [DataGenerationModule("System",
-    "Module for generating system-related data such as file paths, file types, and version numbers.")]
+    "Module for generating system-related data such as file paths, file types, and version numbers.",
+    "DataGenerationSystemIcon")]
 public class SystemAttributedModule(FakerBase faker, LocaleBase locale, Randomizer randomizer)
     : SystemModule(faker, locale, randomizer)
 {

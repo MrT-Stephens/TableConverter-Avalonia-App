@@ -1,4 +1,5 @@
 using TableConverter.DataGeneration.DataModels;
+using TableConverter.DataGeneration.Interfaces;
 
 namespace TableConverter.DataGeneration;
 
@@ -7,100 +8,125 @@ namespace TableConverter.DataGeneration;
 ///     <typeparamref name="TFaker" /> instance.
 /// </summary>
 /// <typeparam name="TFaker">The type of the Faker instance used to generate column values.</typeparam>
-public abstract class FakerBuilderBase<TFaker>
+public abstract class FakerBuilderBase<TFaker>(TFaker fakerInstance) : IFakerBuilder<TFaker> where TFaker : FakerBase
 {
     /// <summary>
     ///     A dictionary that holds the column names and their corresponding value generation functions.
+    ///     Each column name maps to a list of value generators to allow multiple columns with the same name.
     /// </summary>
-    private readonly Dictionary<string, Func<TFaker, string>> _actions = new();
-
-    private int _rowCount = 1;
+    protected readonly Dictionary<string, List<Func<TFaker, string>>> _actions = new();
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="FakerBuilderBase{TFaker}" /> class.
+    ///     Number of rows to generate during the build process. Default is 1.
     /// </summary>
-    /// <param name="fakerInstance">The Faker instance used for generating data.</param>
-    protected FakerBuilderBase(TFaker fakerInstance)
-    {
-        FakerInstance = fakerInstance;
-    }
+    private int _rowCount = 1;
 
     /// <summary>
     ///     Gets the Faker instance used for generating data.
     /// </summary>
-    public TFaker FakerInstance { get; }
+    public TFaker FakerInstance { get; } = fakerInstance;
 
-    /// <summary>
-    ///     Sets the number of rows to generate during the build process.
-    /// </summary>
-    /// <param name="count">The number of rows to generate.</param>
-    /// <returns>Returns the current <see cref="FakerBuilderBase{TFaker}" /> instance for method chaining.</returns>
-    public FakerBuilderBase<TFaker> WithRowCount(int count)
+    /// <inheritdoc />
+    public IFakerBuilder<TFaker> WithRowCount(int count)
     {
+        if (count <= 0)
+            throw new ArgumentOutOfRangeException(nameof(count), count, "Row count must be greater than zero.");
+
         _rowCount = count;
         return this;
     }
 
-    /// <summary>
-    ///     Adds a rule for generating data for a specific column.
-    /// </summary>
-    /// <param name="columnName">The name of the column.</param>
-    /// <param name="value">
-    ///     A function that takes the <typeparamref name="TFaker" /> instance and returns a string value for the column.
-    /// </param>
-    /// <returns>Returns the current <see cref="FakerBuilderBase{TFaker}" /> instance for method chaining.</returns>
-    /// <exception cref="InvalidOperationException">
-    ///     Thrown if a rule for the specified column name is already defined.
-    /// </exception>
-    public FakerBuilderBase<TFaker> Add(string columnName, Func<TFaker, string> value)
+    /// <inheritdoc />
+    public IFakerBuilder<TFaker> Add(string columnName, Func<TFaker, string> valueGenerator, int blanksPercentage = 0)
     {
-        if (!_actions.TryAdd(columnName, value))
-            throw new InvalidOperationException($"Rule already defined for property '{columnName}'.");
+        if (string.IsNullOrWhiteSpace(columnName))
+            columnName = $"Column-{_actions.SelectMany(kvp => kvp.Value).Count() + 1}";
+        
+        if (valueGenerator is null)
+            throw new ArgumentNullException(nameof(valueGenerator));
+        if (blanksPercentage is < 0 or > 100)
+            throw new ArgumentOutOfRangeException(nameof(blanksPercentage), blanksPercentage,
+                "Blanks percentage must be between 0 and 100.");
+
+        // Add the value generator to the list for the column name
+        if (!_actions.TryGetValue(columnName, out var generators))
+        {
+            generators = [];
+            _actions[columnName] = generators;
+        }
+
+        generators.Add(AdjustedGenerator);
 
         return this;
+
+        // Adjusted generator to handle blanks percentage
+        string AdjustedGenerator(TFaker faker)
+        {
+            return faker.Randomizer.Number(0, 100) < blanksPercentage ? string.Empty : valueGenerator(faker);
+        }
     }
 
-    /// <summary>
-    ///     Adds a conditional rule for generating data for a specific column.
-    /// </summary>
-    /// <param name="columnName">The name of the column.</param>
-    /// <param name="condition">
-    ///     A function that takes the current Faker instance and returns whether the rule should be applied.
-    /// </param>
-    /// <param name="value">
-    ///     A function that generates the value if the condition is met.
-    /// </param>
-    /// <returns>Returns the current <see cref="FakerBuilderBase{TFaker}" /> instance for method chaining.</returns>
-    public FakerBuilderBase<TFaker> AddConditional(string columnName, Func<TFaker, bool> condition,
-        Func<TFaker, string> value)
+    /// <inheritdoc />
+    public IFakerBuilder<TFaker> AddConditional(string columnName, Func<TFaker, bool> condition,
+        Func<TFaker, string> valueGenerator, int blankValuePercentage = 0)
     {
-        return Add(columnName, faker => condition(faker) ? value(faker) : string.Empty);
+        if (string.IsNullOrWhiteSpace(columnName))
+            columnName = $"Column-{_actions.SelectMany(kvp => kvp.Value).Count() + 1}";
+        
+        if (condition is null)
+            throw new ArgumentNullException(nameof(condition));
+        if (valueGenerator is null)
+            throw new ArgumentNullException(nameof(valueGenerator));
+        if (blankValuePercentage is < 0 or > 100)
+            throw new ArgumentOutOfRangeException(nameof(blankValuePercentage), blankValuePercentage,
+                "Blank value percentage must be between 0 and 100.");
+
+        return Add(columnName, faker =>
+        {
+            if (faker.Randomizer.Number(0, 100) < blankValuePercentage || !condition(faker))
+                return string.Empty;
+
+            return valueGenerator(faker);
+        });
     }
 
-
-    /// <summary>
-    ///     Builds and returns a <see cref="TableData" /> object with the generated columns and rows based on the defined
-    ///     rules.
-    /// </summary>
-    /// <returns>
-    ///     A <see cref="TableData" /> object containing the column names and generated rows.
-    /// </returns>
+    /// <inheritdoc />
     public TableData Build()
     {
         var rows = new List<string[]>();
-        
+
         for (var i = 0; i < _rowCount; i++)
         {
             var row = new List<string>();
 
-            foreach (var (_, action) in _actions)
-            {
-                row.Add(action(FakerInstance));
-            }
+            foreach (var (columnName, actions) in _actions)
+                row.AddRange(actions.Select(action => action(FakerInstance)));
 
             rows.Add(row.ToArray());
         }
 
-        return new TableData(_actions.Keys.ToList(), rows);
+        // Flatten the column names to match the number of generators for each column
+        var columnHeaders = _actions.SelectMany(pair => pair.Value.Select(_ => pair.Key)).ToList();
+
+        return new TableData(columnHeaders, rows);
+    }
+
+    /// <inheritdoc />
+    public async Task<TableData> BuildAsync()
+    {
+        var rows = await Task.WhenAll(Enumerable.Range(0, _rowCount).Select(_ =>
+        {
+            var row = new List<string>();
+
+            foreach (var (columnName, actions) in _actions)
+                row.AddRange(actions.Select(action => action(FakerInstance)));
+
+            return Task.FromResult(row.ToArray());
+        }));
+
+        // Flatten the column names to match the number of generators for each column
+        var columnHeaders = _actions.SelectMany(pair => pair.Value.Select(_ => pair.Key)).ToList();
+
+        return new TableData(columnHeaders, rows.ToList());
     }
 }

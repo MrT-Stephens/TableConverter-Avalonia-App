@@ -1,3 +1,4 @@
+using TableConverter.DataGeneration.Interfaces;
 using TableConverter.DataGeneration.LocaleDataSetsBase;
 using TableConverter.DataGeneration.Modules;
 
@@ -7,13 +8,13 @@ namespace TableConverter.DataGeneration;
 ///     Base class for all Faker classes.
 ///     Contain the locale dataset and the locale type.
 /// </summary>
-public abstract class FakerBase
+public abstract class FakerBase : IFaker
 {
     private string _localeType = null!;
 
-    protected LocaleBase Locale = null!;
+    public LocaleBase Locale { get; set; } = null!;
 
-    protected Randomizer Randomizer;
+    public Randomizer Randomizer { get; set; }
 
     protected FakerBase(string localeType = "en", int? seed = null)
     {
@@ -42,6 +43,8 @@ public abstract class FakerBase
     public abstract SystemModule System { get; }
     public abstract ScienceModule Science { get; }
     public abstract MusicModule Music { get; }
+    public abstract NumberModule Number { get; }
+    public abstract ImageModule Image { get; }
 
     public void Seed(int seed)
     {

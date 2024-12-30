@@ -13,7 +13,7 @@ public class PhoneModule(FakerBase faker, LocaleBase locale, Randomizer randomiz
 {
     public override string ModuleName => "Phone";
 
-    public virtual string PhoneNumber(PhoneNumberType type)
+    public virtual string PhoneNumber(PhoneNumberType type = PhoneNumberType.Human)
     {
         return type switch
         {

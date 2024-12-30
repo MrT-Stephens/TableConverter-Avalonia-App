@@ -6,12 +6,13 @@ using TableConverter.DataModels;
 namespace TableConverter.Services.DataGenerationAttributedModules;
 
 [DataGenerationModule("Internet",
-    "Module for generating internet-related data such as URLs, emails, IP addresses, and user agents.")]
+    "Module for generating internet-related data such as URLs, emails, IP addresses, and user agents.",
+    "DataGenerationInternetIcon")]
 public class InternetAttributedModule(FakerBase faker, LocaleBase locale, Randomizer randomizer)
     : InternetModule(faker, locale, randomizer)
 {
     [DataGenerationModuleMethod("Color", "Generates a hexadecimal color code from RGB values. Example: '#ff5733'")]
-    public override string Color(int r, int g, int b)
+    public override string Color(int r = 255, int g = 255, int b = 255)
     {
         return base.Color(r, g, b);
     }
@@ -57,7 +58,7 @@ public class InternetAttributedModule(FakerBase faker, LocaleBase locale, Random
     }
 
     [DataGenerationModuleMethod("Emoji", "Generates an emoji based on the specified emoji type. Example: '😊'")]
-    public override string Emoji(EmojiTypeEnum emojiType)
+    public override string Emoji(EmojiTypeEnum emojiType = EmojiTypeEnum.People)
     {
         return base.Emoji(emojiType);
     }
@@ -77,7 +78,7 @@ public class InternetAttributedModule(FakerBase faker, LocaleBase locale, Random
 
     [DataGenerationModuleMethod("Http Status Code",
         "Generates an HTTP status code based on the specified type. Example: '200'")]
-    public override string HttpStatusCode(HttpStatusCodeTypeEnum type)
+    public override string HttpStatusCode(HttpStatusCodeTypeEnum type = HttpStatusCodeTypeEnum.Informational)
     {
         return base.HttpStatusCode(type);
     }

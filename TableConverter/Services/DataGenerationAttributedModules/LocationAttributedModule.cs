@@ -6,7 +6,8 @@ using TableConverter.DataModels;
 namespace TableConverter.Services.DataGenerationAttributedModules;
 
 [DataGenerationModule("Location",
-    "Module for generating location-related data such as addresses, coordinates, and geographical names.")]
+    "Module for generating location-related data such as addresses, coordinates, and geographical names.",
+    "DataGenerationLocationIcon")]
 public class LocationAttributedModule(FakerBase faker, LocaleBase locale, Randomizer randomizer)
     : LocationModule(faker, locale, randomizer)
 {

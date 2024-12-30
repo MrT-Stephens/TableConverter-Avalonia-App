@@ -5,13 +5,15 @@ using TableConverter.DataModels;
 
 namespace TableConverter.Services.DataGenerationAttributedModules;
 
-[DataGenerationModule("Phone", "Module for generating phone-related data such as phone numbers and IMEI numbers.")]
+[DataGenerationModule("Phone", 
+    "Module for generating phone-related data such as phone numbers and IMEI numbers.",
+    "DataGenerationPhoneIcon")]
 public class PhoneAttributedModule(FakerBase faker, LocaleBase locale, Randomizer randomizer)
     : PhoneModule(faker, locale, randomizer)
 {
     [DataGenerationModuleMethod("Phone Number",
         "Generates a phone number based on the specified type. Example: '(555) 123-4567'")]
-    public override string PhoneNumber(PhoneNumberType type)
+    public override string PhoneNumber(PhoneNumberType type = PhoneNumberType.Human)
     {
         return base.PhoneNumber(type);
     }

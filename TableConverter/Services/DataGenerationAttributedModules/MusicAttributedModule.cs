@@ -6,7 +6,8 @@ using TableConverter.DataModels;
 namespace TableConverter.Services.DataGenerationAttributedModules;
 
 [DataGenerationModule("Music",
-    "Module for generating music-related data, including album names, artist names, song names, and genres.")]
+    "Module for generating music-related data, including album names, artist names, song names, and genres.",
+    "DataGenerationMusicIcon")]
 public class MusicAttributedModule(FakerBase faker, LocaleBase locale, Randomizer randomizer)
     : MusicModule(faker, locale, randomizer)
 {

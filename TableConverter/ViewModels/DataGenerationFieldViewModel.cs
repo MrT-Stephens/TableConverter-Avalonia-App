@@ -1,35 +1,50 @@
-﻿using Avalonia.Controls;
-using Avalonia.LogicalTree;
-using CommunityToolkit.Mvvm.ComponentModel;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
-using TableConverter.DataGeneration.Interfaces;
+using CommunityToolkit.Mvvm.ComponentModel;
+using TableConverter.DataModels;
 
 namespace TableConverter.ViewModels;
 
 public partial class DataGenerationFieldViewModel : ObservableObject
 {
     #region Properties
+    
+    [ObservableProperty] private string _Key = string.Empty;
 
-    [ObservableProperty]
-    private string _Name = string.Empty;
+    [ObservableProperty] private string _Name = string.Empty;
 
-    [ObservableProperty]
-    private string _Type = "Choose a Type";
+    [ObservableProperty] private string _TypeName = "Choose a Type";
 
-    [ObservableProperty]
-    private ObservableCollection<Control> _OptionsControls = new()
+    [ObservableProperty] private ushort _BlankPercentage;
+
+    [ObservableProperty] private ObservableCollection<DataGenerationParameterViewModel> _Parameters = [];
+
+    #endregion
+
+    #region Methods
+
+    public void SetDataGenerationMethod(DataGenerationMethod? method)
     {
-        new TextBlock
+        if (method is null)
         {
-            Text = "No Options Available"
+            TypeName = "Choose a Type";
+            Name = string.Empty;
+            Key = string.Empty;
+            Parameters.Clear();
         }
-    };
+        else
+        {
+            TypeName = method.Name;
+            
+            Key = method.Key;
 
-    [ObservableProperty]
-    private ushort _BlankPercentage = 0;
+            Parameters = new ObservableCollection<DataGenerationParameterViewModel>(
+                method.Parameters.Select(param =>
+                    new DataGenerationParameterViewModel(param.Name, param.DefaultValue, param.Type))
+            );
+        }
+    }
 
     #endregion
 }

@@ -26,7 +26,7 @@ public class PersonModule(FakerBase faker, LocaleBase locale, Randomizer randomi
         return Randomizer.GetWeightedValue(Locale.Person.Value.NamePattern).Build(Faker, Locale, Randomizer);
     }
 
-    public virtual string FirstName(SexEnum sex)
+    public virtual string FirstName(SexEnum sex = SexEnum.Generic)
     {
         return sex switch
         {
@@ -37,7 +37,7 @@ public class PersonModule(FakerBase faker, LocaleBase locale, Randomizer randomi
         };
     }
 
-    public virtual string MiddleName(SexEnum sex)
+    public virtual string MiddleName(SexEnum sex = SexEnum.Generic)
     {
         return sex switch
         {
@@ -48,7 +48,7 @@ public class PersonModule(FakerBase faker, LocaleBase locale, Randomizer randomi
         };
     }
 
-    public virtual string LastName(SexEnum sex)
+    public virtual string LastName(SexEnum sex = SexEnum.Generic)
     {
         return sex switch
         {
@@ -59,7 +59,7 @@ public class PersonModule(FakerBase faker, LocaleBase locale, Randomizer randomi
         };
     }
 
-    public virtual string Title(SexEnum sex)
+    public virtual string Title(SexEnum sex = SexEnum.Generic)
     {
         return sex switch
         {
@@ -70,12 +70,12 @@ public class PersonModule(FakerBase faker, LocaleBase locale, Randomizer randomi
         };
     }
 
-    public virtual string Suffix(SexEnum sex)
+    public virtual string Suffix(SexEnum sex = SexEnum.Generic)
     {
         return Randomizer.GetRandomElement(Locale.Person.Value.Suffix);
     }
 
-    public virtual string Sex(SexFormat format)
+    public virtual string Sex(SexFormat format = SexFormat.UpperFullWord)
     {
         var sex = SexType();
 

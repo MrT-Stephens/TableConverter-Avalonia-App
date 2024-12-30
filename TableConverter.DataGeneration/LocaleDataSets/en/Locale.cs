@@ -24,4 +24,6 @@ public class Locale : LocaleBase
     public override Lazy<ScienceBase> Science { get; } = new(() => new ScienceDataSet());
     
     public override Lazy<MusicBase> Music { get; } = new(() => new MusicDataSet());
+    
+    public override Lazy<ColorBase> Color { get; } = new(() => new ColorDataSet());
 }

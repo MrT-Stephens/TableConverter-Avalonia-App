@@ -1,0 +1,73 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:xamlComponents="clr-namespace:TableConverter.Components.Xaml"
+             xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+             xmlns:components="clr-namespace:TableConverter.Components.Extensions"
+             xmlns:xamlInteractivity="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             xmlns:xamlResponsive="clr-namespace:Avalonia.Xaml.Interactions.Responsive;assembly=Avalonia.Xaml.Interactions.Responsive"
+             x:Class="TableConverter.Components.Xaml.DataGenerationListTypesView"
+             x:DataType="xamlComponents:DataGenerationListTypesViewModel"
+             d:DesignHeight="450"
+             d:DesignWidth="800"
+             mc:Ignorable="d">
+  <UserControl.Styles>
+    <!-- Adaptive Uniform Grid Styles -->
+    <Style Selector="components|SpacedUniformGrid.Adaptive">
+      <Setter Property="(xamlInteractivity:Interaction.Behaviors)">
+        <xamlInteractivity:BehaviorCollectionTemplate>
+          <xamlInteractivity:BehaviorCollection>
+            <xamlResponsive:AdaptiveBehavior SourceControl="{Binding $parent[TopLevel]}">
+              <xamlResponsive:AdaptiveClassSetter MinWidth="0" MaxWidth="1000" ClassName="Small" />
+              <xamlResponsive:AdaptiveClassSetter MinWidth="1000" MaxWidth="1400" ClassName="Medium" />
+              <xamlResponsive:AdaptiveClassSetter MinWidth="1400" MaxWidth="Infinity" ClassName="Wide" />
+            </xamlResponsive:AdaptiveBehavior>
+          </xamlInteractivity:BehaviorCollection>
+        </xamlInteractivity:BehaviorCollectionTemplate>
+      </Setter>
+    </Style>
+    <!-- Adaptive Uniform Grid Styles (Small Screen) -->
+    <Style Selector="components|SpacedUniformGrid.Small">
+      <Setter Property="Columns" Value="1" />
+    </Style>
+    <!-- Adaptive Uniform Grid Styles (Medium Screen) -->
+    <Style Selector="components|SpacedUniformGrid.Medium">
+      <Setter Property="Columns" Value="2" />
+    </Style>
+    <!-- Adaptive Uniform Grid Styles (Wide Screen) -->
+    <Style Selector="components|SpacedUniformGrid.Wide">
+      <Setter Property="Columns" Value="3" />
+    </Style>
+  </UserControl.Styles>
+  
+  <ListBox ItemsSource="{Binding Types}"
+           SelectedItem="{Binding SelectedType}"
+           SelectionMode="AlwaysSelected,Single"
+           Classes="Stack">
+    <ListBox.ItemsPanel>
+      <ItemsPanelTemplate>
+        <components:SpacedUniformGrid Spacing="10"
+                                      Classes="Adaptive" />
+      </ItemsPanelTemplate>
+    </ListBox.ItemsPanel>
+    <ListBox.ItemTemplate>
+      <DataTemplate>
+        <Border Margin="10">
+          <sukiUi:GroupBox VerticalAlignment="Top">
+            <sukiUi:GroupBox.Header>
+              <!-- Data Generation Type Name -->
+              <TextBlock Classes="h4 Primary"
+                         Text="{Binding Name}"
+                         FontWeight="Bold" />
+            </sukiUi:GroupBox.Header>
+            <!-- Data Generation Type Description -->
+            <TextBlock Classes="h6"
+                       Text="{Binding Description}"
+                       TextWrapping="Wrap" />
+          </sukiUi:GroupBox>
+        </Border>
+      </DataTemplate>
+    </ListBox.ItemTemplate>
+  </ListBox>
+</UserControl>

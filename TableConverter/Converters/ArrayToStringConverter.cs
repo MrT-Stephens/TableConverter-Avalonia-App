@@ -21,23 +21,21 @@ namespace TableConverter.Converters
                 {
                     return new BindingNotification("Array to string converter must have elements");
                 }
-                else if (count == 1)
+
+                if (count == 1)
                 {
                     return enumerable.First();
                 }
-                else if (count == 2)
+
+                if (count == 2)
                 {
                     return string.Join(" or ", enumerable);
                 }
-                else
-                {
-                    return $"{string.Join(", ", enumerable.Take(count - 1))} or {enumerable.Last()}";
-                }
+
+                return $"{string.Join(", ", enumerable.Take(count - 1))} or {enumerable.Last()}";
             }
-            else
-            {
-                return new BindingNotification("Array to string converter must be passed an array");
-            }
+
+            return new BindingNotification("Array to string converter must be passed an array");
         }
 
         public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

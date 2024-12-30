@@ -147,7 +147,7 @@
           <sukiUi:SettingsLayoutItem Header="Data Generation">
             <sukiUi:SettingsLayoutItem.Content>
               <!-- Data Generation Categories Items Control -->
-              <ItemsControl ItemsSource="{Binding DataGenerationTypes}">
+              <ItemsControl ItemsSource="{Binding DataGenerationTypes.Types}">
                 <ItemsControl.ItemsPanel>
                   <ItemsPanelTemplate>
                     <StackPanel Spacing="10" />
@@ -155,11 +155,15 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                   <DataTemplate>
-                    <StackPanel Spacing="10">
+                    <StackPanel Spacing="10"
+                                Orientation="Vertical">
                       <TextBlock Classes="h4"
-                                 Text="{Binding Key}" />
+                                 Text="{Binding Name}" />
+                      <TextBlock Classes="h6"
+                                 Text="{Binding Description}"
+                                 TextWrapping="Wrap" />
                       <!-- Data Generation Types By Categorie Items Control -->
-                      <ItemsControl ItemsSource="{Binding Value}">
+                      <ItemsControl ItemsSource="{Binding Methods}">
                         <ItemsControl.ItemsPanel>
                           <ItemsPanelTemplate>
                             <components:SpacedUniformGrid Spacing="10" />

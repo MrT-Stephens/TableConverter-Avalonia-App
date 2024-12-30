@@ -81,6 +81,17 @@ public class Randomizer(int? seed = null)
             return Random.NextDouble() * (max - min) + min;
         }
     }
+    
+    /// <summary>
+    /// Generate a random long between MinValue and MaxValue.
+    /// </summary>
+    /// <param name="min">Min value, inclusive. Default long.MinValue</param>
+    /// <param name="max">Max value, inclusive. Default long.MaxValue</param>
+    public long Long(long min = long.MinValue, long max = long.MaxValue)
+    {
+        var range = (decimal)max - min; //use more bits?
+        return Convert.ToInt64((decimal)Double() * range + min);
+    }
 
     /// <summary>
     ///     Get a random sequence of digits.
@@ -181,6 +192,25 @@ public class Randomizer(int? seed = null)
         for (var i = 0; i < count; i++)
             arr[i] = Char(min, max);
         return arr;
+    }
+    
+    /// <summary>
+    /// Generates a random alphanumeric string of the specified length.
+    /// </summary>
+    /// <param name="length">The length of the alphanumeric string to generate. Default is 5.</param>
+    /// <returns>A randomly generated alphanumeric string.</returns>
+    public string AlphaNumeric(int length = 5)
+    {
+        const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+        var result = new char[length];
+
+        for (var i = 0; i < length; i++)
+        {
+            result[i] = chars[Number(0, chars.Length - 1)];
+        }
+
+        return new string(result);
     }
 
     /// <summary>
@@ -326,11 +356,11 @@ public class Randomizer(int? seed = null)
     ///             <description>'#' - Will be replaced with a random digit (0-9).</description>
     ///         </item>
     ///         <item>
-    ///             <description>'?' - Will be replaced with a random lowercase alphabetic character (a-z).</description>
+    ///             <description>'?' - Will be replaced with a random uppercase alphabetic character (a-z).</description>
     ///         </item>
     ///         <item>
     ///             <description>
-    ///                 '•' - Will be replaced with either a random lowercase alphabetic character (a-z) or a random
+    ///                 '•' - Will be replaced with either a random uppercase alphabetic character (a-z) or a random
     ///                 digit (0-9), chosen randomly.
     ///             </description>
     ///         </item>

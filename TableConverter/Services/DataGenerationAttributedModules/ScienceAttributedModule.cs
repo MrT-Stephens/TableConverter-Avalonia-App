@@ -6,7 +6,8 @@ using TableConverter.DataModels;
 namespace TableConverter.Services.DataGenerationAttributedModules;
 
 [DataGenerationModule("Science",
-    "Module for generating science-related data such as chemical elements and measurement units.")]
+    "Module for generating science-related data such as chemical elements and measurement units.",
+    "DataGenerationScienceIcon")]
 public class ScienceAttributedModule(FakerBase faker, LocaleBase locale, Randomizer randomizer)
     : ScienceModule(faker, locale, randomizer)
 {

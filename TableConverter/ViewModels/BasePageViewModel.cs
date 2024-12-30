@@ -19,7 +19,7 @@ public abstract partial class BasePageViewModel : ObservableValidator
     [ObservableProperty]
     private int _Index;
 
-    public BasePageViewModel(ISukiDialogManager dialogManager, ISukiToastManager toastManager, string displayName, object? icon, int index = 0)
+    protected BasePageViewModel(ISukiDialogManager dialogManager, ISukiToastManager toastManager, string displayName, object? icon, int index = 0)
     {
         ArgumentNullException.ThrowIfNull(icon, nameof(icon));
 
