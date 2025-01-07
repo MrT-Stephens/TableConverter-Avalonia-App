@@ -48,7 +48,14 @@ public partial class DataGenerationMethodToControlsConverter : IValueConverter
                     stackPanel.Children.Add(CreateNumericUpDown(param));
                 else if (param.Type == typeof(bool))
                     stackPanel.Children.Add(CreateToggleSwitch(param));
-                else if (param.Type.IsEnum) stackPanel.Children.Add(CreateComboBox(param));
+                else if (param.Type.IsEnum) 
+                    stackPanel.Children.Add(CreateComboBox(param));
+                else if (param.Type == typeof(DateOnly))
+                    stackPanel.Children.Add(CreateDatePicker(param));
+                else if (param.Type == typeof(TimeOnly))
+                    stackPanel.Children.Add(CreateTimePicker(param));
+                else
+                    stackPanel.Children.Add(CreateTextBlock("Unsupported type.", ["h6"]));
 
                 controls.Add(stackPanel);
             }
@@ -149,6 +156,49 @@ public partial class DataGenerationMethodToControlsConverter : IValueConverter
 
         return control;
     }
+
+    private static DatePicker CreateDatePicker(DataGenerationParameterViewModel param)
+    {
+        var control = new DatePicker
+        {
+            SelectedDate = DateOnly.TryParse(param.Value?.ToString(), out var result)
+                ? result.ToDateTime(TimeOnly.MinValue)
+                : DateTime.Now,
+            MinWidth = 150
+        };
+
+        control.Bind(DatePicker.SelectedDateProperty, new Binding
+        {
+            Path = "Value",
+            Mode = BindingMode.TwoWay,
+            Source = param,
+            Converter = DateOnlyToDateTimeOffsetConverter.Instance // Use a converter to handle DateOnly
+        });
+
+        return control;
+    }
+
+    private static TimePicker CreateTimePicker(DataGenerationParameterViewModel param)
+    {
+        var control = new TimePicker
+        {
+            SelectedTime = TimeOnly.TryParse(param.Value?.ToString(), out var result)
+                ? result.ToTimeSpan()
+                : DateTime.Now.TimeOfDay,
+            MinWidth = 150
+        };
+
+        control.Bind(TimePicker.SelectedTimeProperty, new Binding
+        {
+            Path = "Value",
+            Mode = BindingMode.TwoWay,
+            Source = param,
+            Converter = TimeOnlyToTimeConverter.Instance // Use a converter to handle TimeOnly
+        });
+
+        return control;
+    }
+
 
     [GeneratedRegex("(?<!^)([A-Z])")]
     private static partial Regex UppercaseLettersRegex();

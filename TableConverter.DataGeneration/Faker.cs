@@ -27,6 +27,18 @@ public class Faker(string localeType = "en", int? seed = null) : FakerBase(local
     public override NumberModule Number => new(this, Locale, Randomizer);
     
     public override ImageModule Image => new(this, Locale, Randomizer);
+    
+    public override ColorModule Color => new(this, Locale, Randomizer);
+    
+    public override VehicleModule Vehicle => new(this, Locale, Randomizer);
+    
+    public override CompanyModule Company => new(this, Locale, Randomizer);
+    
+    public override CommerceModule Commerce => new(this, Locale, Randomizer);
+    
+    public override FoodModule Food => new(this, Locale, Randomizer);
+    
+    public override DateTimeModule DateTime => new(this, Locale, Randomizer);
 
     public static FakerBuilderBase<Faker> Create(Faker? faker = null)
     {

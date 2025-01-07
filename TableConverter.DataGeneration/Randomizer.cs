@@ -263,7 +263,7 @@ public class Randomizer(int? seed = null)
         for (var i = 0; i < length; i++)
         {
             // Select a random character based on casing
-            var randomChar = hexChars[Number(0, casing == HexCasing.Mixed ? hexChars.Length : 16)];
+            var randomChar = hexChars[Number(0, casing == HexCasing.Mixed ? hexChars.Length - 1 : 15)];
 
             switch (casing)
             {

@@ -1605,28 +1605,19 @@ public class LocationDataSet : LocationBase
             [
                 new WeightedValue<ITemplatedValueBuilder<FakerBase, LocaleBase>>(
                     new TemplatedValueBuilder<FakerBase, LocaleBase>()
-                        .SetTemplate("{BuildingNumber} {StreetName}")
-                        .AddPlaceholder("BuildingNumber",
-                            (_, dataset, random) =>
-                                random.ReplaceSymbolsWithNumbers(
-                                    random.GetWeightedValue(dataset.Location.Value.BuildingNumberPattern)))
-                        .AddRandomPlaceholder("StreetName", dataset => dataset.Location.Value.StreetName),
+                        .SetTemplate("{BuildingNumber} {Street}")
+                        .AddPlaceholder("BuildingNumber", (faker, _, _) => faker.Location.BuildingNumber())
+                        .AddPlaceholder("Street", (faker, _, _) => faker.Location.Street()),
                     1
                 )
             ],
             [
                 new WeightedValue<ITemplatedValueBuilder<FakerBase, LocaleBase>>(
                     new TemplatedValueBuilder<FakerBase, LocaleBase>()
-                        .SetTemplate("{BuildingNumber} {StreetName} {SecondaryAddress}")
-                        .AddPlaceholder("BuildingNumber",
-                            (_, dataset, random) =>
-                                random.ReplaceSymbolsWithNumbers(
-                                    random.GetWeightedValue(dataset.Location.Value.BuildingNumberPattern)))
-                        .AddRandomPlaceholder("StreetName", dataset => dataset.Location.Value.StreetName)
-                        .AddPlaceholder("SecondaryAddress",
-                            (_, dataset, random) =>
-                                random.ReplaceSymbolsWithNumbers(
-                                    random.GetWeightedValue(dataset.Location.Value.SecondaryAddressPattern))),
+                        .SetTemplate("{BuildingNumber} {Street} {SecondaryAddress}")
+                        .AddPlaceholder("BuildingNumber", (faker, _, _) => faker.Location.BuildingNumber())
+                        .AddPlaceholder("Street", (faker, _, _) => faker.Location.Street())
+                        .AddPlaceholder("SecondaryAddress", (faker, _, _) => faker.Location.SecondaryAddress()),
                     1
                 )
             ]

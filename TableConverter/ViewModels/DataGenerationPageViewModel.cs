@@ -19,38 +19,54 @@ public partial class DataGenerationPageViewModel : BasePageViewModel
 
     public DataGenerationPageViewModel(DataGenerationTypesService dataGenerationTypes, ConvertFilesManager filesManager,
         PageNavigationService pageNavigation, ISukiDialogManager dialogManager, ISukiToastManager toastManager)
-        : base(dialogManager, toastManager, "Data Generation", Application.Current?.Resources["DataIcon"], 2)
+        : base(dialogManager, toastManager, "Data\nGeneration", Application.Current?.Resources["DataIcon"], 2)
     {
-        _dataGenerationTypesService = dataGenerationTypes;
+        _DataGenerationTypesService = dataGenerationTypes;
 
-        _pageNavigation = pageNavigation;
+        _PageNavigation = pageNavigation;
 
-        _filesManager = filesManager;
+        _FilesManager = filesManager;
 
         DataGenerationFields.Add(new DataGenerationFieldViewModel());
-        
-        IsBusy = false;
+
+        IsLoading = false;
+
+        AvailableLocales = new ObservableCollection<string>(_DataGenerationTypesService.AvailableLocales);
+
+        SelectedLocale = "en";
+
+        Seed = Guid.NewGuid().GetHashCode() ^ DateTime.UtcNow.Ticks.GetHashCode() ^ Environment.TickCount.GetHashCode();
     }
 
     #endregion
 
     #region Services
 
-    private readonly DataGenerationTypesService _dataGenerationTypesService;
-    private readonly PageNavigationService _pageNavigation;
-    private readonly ConvertFilesManager _filesManager;
+    private readonly DataGenerationTypesService _DataGenerationTypesService;
+    private readonly PageNavigationService _PageNavigation;
+    private readonly ConvertFilesManager _FilesManager;
 
     #endregion
 
     #region Properties
 
-    [ObservableProperty] private ObservableCollection<DataGenerationFieldViewModel> _DataGenerationFields = new();
+    [ObservableProperty] private ObservableCollection<DataGenerationFieldViewModel> _DataGenerationFields = [];
 
     [ObservableProperty] private int _NumberOfRows = 1000;
 
     [ObservableProperty] private string _GeneratedDocumentName = string.Empty;
-    
-    [ObservableProperty] private bool _IsBusy;
+
+    [ObservableProperty] private bool _IsLoading;
+
+    [ObservableProperty] private ObservableCollection<string> _AvailableLocales;
+
+    [ObservableProperty] private string _SelectedLocale;
+
+    [ObservableProperty] private int _Seed;
+
+    public static int Int64MinValue => int.MinValue;
+
+    public static int Int64MaxValue => int.MaxValue;
 
     #endregion
 
@@ -60,7 +76,7 @@ public partial class DataGenerationPageViewModel : BasePageViewModel
     private void ChooseTypeButtonClicked(DataGenerationFieldViewModel field)
     {
         DialogManager.CreateDialog()
-            .WithViewModel(dialog => new DataGenerationTypesViewModel(dialog, _dataGenerationTypesService)
+            .WithViewModel(dialog => new DataGenerationTypesViewModel(dialog, _DataGenerationTypesService)
             {
                 OnOkClicked = type =>
                 {
@@ -93,15 +109,20 @@ public partial class DataGenerationPageViewModel : BasePageViewModel
     [RelayCommand]
     private async Task GenerateDataButtonClicked()
     {
-        IsBusy = true;
-        
+        IsLoading = true;
+
+        _DataGenerationTypesService.SetLocale(SelectedLocale);
+
+        _DataGenerationTypesService.SetSeed(Seed);
+
         var name = string.IsNullOrWhiteSpace(GeneratedDocumentName)
             ? $"Data-{DateTime.Now.ToFileTime()}"
             : GeneratedDocumentName;
 
-        var data = await _dataGenerationTypesService.GenerateData(DataGenerationFields.ToArray(), NumberOfRows);
-        
-        _filesManager.Files.Add(new ConvertDocumentViewModel
+        var data = await Task.Run(() =>
+            _DataGenerationTypesService.GenerateData(DataGenerationFields.ToArray(), NumberOfRows));
+
+        _FilesManager.Files.Add(new ConvertDocumentViewModel
         {
             Name = name,
             IsGenerated = true,
@@ -109,15 +130,12 @@ public partial class DataGenerationPageViewModel : BasePageViewModel
             EditHeaders = new ObservableCollection<string>(data.Headers),
             EditRows = new ObservableCollection<string[]>(data.Rows)
         });
-        
-        IsBusy = false;
-        
-        _pageNavigation.RequestNavigation<ConvertFilesPageViewModel>(viewModel =>
+
+        IsLoading = false;
+
+        _PageNavigation.RequestNavigation<ConvertFilesPageViewModel>(viewModel =>
         {
-            if (viewModel is ConvertFilesPageViewModel view)
-            {
-                view.SelectedConvertDocument = _filesManager.Files.Last();
-            }
+            if (viewModel is ConvertFilesPageViewModel view) view.SelectedConvertDocument = _FilesManager.Files.Last();
         });
     }
 

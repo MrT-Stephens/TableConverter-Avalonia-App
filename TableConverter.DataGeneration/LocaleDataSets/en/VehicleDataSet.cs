@@ -1,0 +1,167 @@
+using System.Collections.Immutable;
+using TableConverter.DataGeneration.LocaleDataSetsBase;
+
+namespace TableConverter.DataGeneration.LocaleDataSets.en;
+
+public class VehicleDataSet : VehicleBase
+{
+    public override ImmutableArray<string> BicycleType { get; } =
+    [
+        "Adventure Road Bicycle",
+        "BMX Bicycle",
+        "City Bicycle",
+        "Cruiser Bicycle",
+        "Cyclocross Bicycle",
+        "Dual-Sport Bicycle",
+        "Fitness Bicycle",
+        "Flat-Foot Comfort Bicycle",
+        "Folding Bicycle",
+        "Hybrid Bicycle",
+        "Mountain Bicycle",
+        "Recumbent Bicycle",
+        "Road Bicycle",
+        "Tandem Bicycle",
+        "Touring Bicycle",
+        "Track/Fixed-Gear Bicycle",
+        "Triathlon/Time Trial Bicycle",
+        "Tricycle"
+    ];
+
+    public override ImmutableArray<string> FuelType { get; } =
+    [
+        "Diesel",
+        "Electric",
+        "Gasoline",
+        "Hybrid"
+    ];
+
+    public override ImmutableArray<string> Manufacturer { get; } =
+    [
+        "Aston Martin",
+        "Audi",
+        "BMW",
+        "BYD",
+        "Bentley",
+        "Bugatti",
+        "Cadillac",
+        "Chevrolet",
+        "Chrysler",
+        "Citroën",
+        "Dodge",
+        "Ferrari",
+        "Fiat",
+        "Ford",
+        "Honda",
+        "Hyundai",
+        "Jaguar",
+        "Jeep",
+        "Kia",
+        "Lamborghini",
+        "Land Rover",
+        "MG",
+        "Mahindra & Mahindra",
+        "Maruti",
+        "Maserati",
+        "Mazda",
+        "Mercedes Benz",
+        "Mini",
+        "Mitsubishi",
+        "NIO",
+        "Nissan",
+        "Peugeot",
+        "Polestar",
+        "Porsche",
+        "Renault",
+        "Rivian",
+        "Rolls Royce",
+        "Skoda",
+        "Smart",
+        "Subaru",
+        "Suzuki",
+        "Tata",
+        "Tesla",
+        "Toyota",
+        "Vauxhall",
+        "Volkswagen",
+        "Volvo"
+    ];
+
+    public override ImmutableArray<string> Model { get; } =
+    [
+        "1",
+        "2",
+        "911",
+        "A4",
+        "A8",
+        "ATS",
+        "Accord",
+        "Alpine",
+        "Altima",
+        "Aventador",
+        "Beetle",
+        "CTS",
+        "CX-9",
+        "Camaro",
+        "Camry",
+        "Challenger",
+        "Charger",
+        "Civic",
+        "Colorado",
+        "Corvette",
+        "Countach",
+        "Cruze",
+        "Durango",
+        "El Camino",
+        "Element",
+        "Escalade",
+        "Expedition",
+        "Explorer",
+        "F-150",
+        "Fiesta",
+        "Focus",
+        "Fortwo",
+        "Golf",
+        "Grand Caravan",
+        "Grand Cherokee",
+        "Impala",
+        "Jetta",
+        "Land Cruiser",
+        "LeBaron",
+        "Malibu",
+        "Mercielago",
+        "Model 3",
+        "Model S",
+        "Model T",
+        "Model X",
+        "Model Y",
+        "Mustang",
+        "PT Cruiser",
+        "Prius",
+        "Ranchero",
+        "Roadster",
+        "Sentra",
+        "Silverado",
+        "Spyder",
+        "Taurus",
+        "V90",
+        "Volt",
+        "Wrangler",
+        "XC90",
+        "XTS"
+    ];
+
+    public override ImmutableArray<string> VehicleType { get; } =
+    [
+        "Cargo Van",
+        "Convertible",
+        "Coupe",
+        "Crew Cab Pickup",
+        "Extended Cab Pickup",
+        "Hatchback",
+        "Minivan",
+        "Passenger Van",
+        "SUV",
+        "Sedan",
+        "Wagon"
+    ];
+}

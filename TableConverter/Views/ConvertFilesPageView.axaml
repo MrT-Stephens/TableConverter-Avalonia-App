@@ -84,7 +84,8 @@
     <sukiUi:BusyArea Grid.Row="1"
                      Grid.Column="1"
                      IsBusy="{Binding SelectedConvertDocument.IsBusy}"
-                     BusyText="Loading...">
+                     BusyText="Loading..."
+                     IsEnabled="{Binding !SelectedConvertDocument.IsBusy}">
       <Grid>
         <!-- Input Progress Stepper View -->
         <sukiUi:GlassCard IsAnimated="False"
@@ -95,8 +96,9 @@
             <avaloniaEdit:TextEditor Grid.Row="0"
                                      Name="InputFileTextEditor"
                                      ShowLineNumbers="True"
+                                     WordWrap="True"
                                      Document="{Binding SelectedConvertDocument.InputFileText}"
-                                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                      ScrollViewer.VerticalScrollBarVisibility="Visible"
                                      FontFamily="{StaticResource SecondaryFontFamily}">
               <avaloniaEdit:TextEditor.Options>
@@ -199,8 +201,9 @@
             <avaloniaEdit:TextEditor Grid.Row="0"
                                      Name="OutputFileTextEditor"
                                      ShowLineNumbers="True"
+                                     WordWrap="True"
                                      Document="{Binding SelectedConvertDocument.OutputFileText}"
-                                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                      ScrollViewer.VerticalScrollBarVisibility="Visible"
                                      FontFamily="{StaticResource SecondaryFontFamily}">
               <avaloniaEdit:TextEditor.Options>

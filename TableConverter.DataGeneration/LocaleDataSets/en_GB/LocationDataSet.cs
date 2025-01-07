@@ -596,7 +596,8 @@ public class LocationDataSet : en.LocationDataSet
         new WeightedValue<ITemplatedValueBuilder<FakerBase, LocaleBase>>(
             new TemplatedValueBuilder<FakerBase, LocaleBase>()
                 .SetTemplate("{FirstName} {StreetSuffix}")
-                .AddRandomPlaceholder("FirstName", dataset => dataset.Person.Value.FirstName.Generic),
+                .AddRandomPlaceholder("FirstName", dataset => dataset.Person.Value.FirstName.Generic)
+                .AddRandomPlaceholder("StreetSuffix", dataset => dataset.Location.Value.StreetSuffix),
             1
         ),
         new WeightedValue<ITemplatedValueBuilder<FakerBase, LocaleBase>>(

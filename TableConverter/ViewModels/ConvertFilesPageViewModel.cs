@@ -32,7 +32,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
     #region Properties
 
     [ObservableProperty]
-    private ConvertDocumentViewModel? _SelectedConvertDocument;
+    private ConvertDocumentViewModel _SelectedConvertDocument;
 
     #endregion
 
@@ -50,6 +50,8 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
         {
             FilesManager.Files = [ExampleConverterDocument()];
         }
+        
+        SelectedConvertDocument = FilesManager.Files.First();
     }
 
     #endregion
@@ -60,7 +62,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
     private void ConvertFileNewFileButtonClicked()
     {
         // Show a dialog to select the input file type.
-        var dialog = DialogManager.CreateDialog()
+        DialogManager.CreateDialog()
             .WithViewModel(dialog => new FileTypesSelectorViewModel(dialog)
             {
                 Title = "Please select a file type to input",

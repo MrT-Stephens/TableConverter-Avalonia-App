@@ -20,6 +20,12 @@ public class FakerWithAttributedModules(string localeType = "en", int? seed = nu
     public override MusicModule Music => new MusicAttributedModule(this, Locale, Randomizer);
     public override NumberModule Number => new NumberAttributedModule(this, Locale, Randomizer);
     public override ImageModule Image => new ImageAttributedModule(this, Locale, Randomizer);
+    public override ColorModule Color => new ColorAttributedModule(this, Locale, Randomizer);
+    public override VehicleModule Vehicle => new VehicleAttributedModule(this, Locale, Randomizer);
+    public override CompanyModule Company => new CompanyAttributedModule(this, Locale, Randomizer);
+    public override CommerceModule Commerce => new CommerceAttributedModule(this, Locale, Randomizer);
+    public override FoodModule Food => new FoodAttributedModule(this, Locale, Randomizer);
+    public override DateTimeModule DateTime => new DateTimeAttributedModule(this, Locale, Randomizer);
 
     public static KeyedFakerBuilder Create(FakerWithAttributedModules? faker = null)
     {

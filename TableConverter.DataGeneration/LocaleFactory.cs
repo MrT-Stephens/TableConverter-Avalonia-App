@@ -8,12 +8,8 @@ namespace TableConverter.DataGeneration;
 /// Locales are classes that inherit from <see cref="LocaleBase"/> and are marked with the <see cref="LocaleAttribute"/>.
 /// Locales store data for generating fake data.
 /// </summary>
-public class LocaleFactory
+public static class LocaleFactory
 {
-    private readonly string[] _locales = LoadLocaleNames();
-
-    public string[] GetLocaleNames() => _locales;
-
     /// <summary>
     /// Create a locale based on the locale type.
     /// </summary>
@@ -24,7 +20,7 @@ public class LocaleFactory
     {
         foreach (var type in Assembly.GetExecutingAssembly().GetTypes())
         {
-            if (type.BaseType != typeof(LocaleBase))
+            if (!type.IsAssignableTo(typeof(LocaleBase)))
             {
                 continue;
             }
@@ -43,13 +39,13 @@ public class LocaleFactory
     /// Load all locale names from the assembly.
     /// </summary>
     /// <returns>An array of locale names.</returns>
-    private static string[] LoadLocaleNames()
+    public static IReadOnlyList<string> LoadLocaleNames()
     {
         var locales = new List<string>();
 
         foreach (var type in Assembly.GetExecutingAssembly().GetTypes())
         {
-            if (type.BaseType != typeof(LocaleBase))
+            if (!type.IsAssignableTo(typeof(LocaleBase)))
             {
                 continue;
             }
@@ -60,6 +56,6 @@ public class LocaleFactory
             }
         }
 
-        return locales.ToArray();
+        return locales;
     }
 }

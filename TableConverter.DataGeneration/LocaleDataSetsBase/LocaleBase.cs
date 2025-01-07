@@ -27,4 +27,14 @@ public abstract class LocaleBase
     public abstract Lazy<MusicBase> Music { get; }
     
     public abstract Lazy<ColorBase> Color { get; }
+    
+    public abstract Lazy<VehicleBase> Vehicle { get; }
+    
+    public abstract Lazy<CompanyBase> Company { get; }
+    
+    public abstract Lazy<CommerceBase> Commerce { get; }
+    
+    public abstract Lazy<FoodBase> Food { get; }
+    
+    public abstract Lazy<DateBase> Date { get; }
 }

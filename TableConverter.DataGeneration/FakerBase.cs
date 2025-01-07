@@ -45,6 +45,12 @@ public abstract class FakerBase : IFaker
     public abstract MusicModule Music { get; }
     public abstract NumberModule Number { get; }
     public abstract ImageModule Image { get; }
+    public abstract ColorModule Color { get; }
+    public abstract VehicleModule Vehicle { get; }
+    public abstract CompanyModule Company { get; }
+    public abstract CommerceModule Commerce { get; }
+    public abstract FoodModule Food { get; }
+    public abstract DateTimeModule DateTime { get; }
 
     public void Seed(int seed)
     {

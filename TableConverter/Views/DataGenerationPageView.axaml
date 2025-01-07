@@ -18,8 +18,9 @@
     <vm:DataGenerationPageViewModel />
   </Design.DataContext>
   
-  <sukiUi:BusyArea IsBusy="{Binding IsBusy}"
-                   BusyText="Generating Data...">
+  <sukiUi:BusyArea IsBusy="{Binding IsLoading}"
+                   BusyText="Loading..."
+                   IsEnabled="{Binding !IsLoading}">
     <components:SpacedGrid RowDefinitions="*,Auto"
                            RowSpacing="10"
                            Margin="10">
@@ -135,23 +136,49 @@
                         IsAnimated="False"
                         Padding="10">
         <components:SpacedGrid ColumnDefinitions="Auto,Auto,*"
-                               ColumnSpacing="10">
+                               RowDefinitions="Auto,Auto"
+                               ColumnSpacing="1"
+                               RowSpacing="0">
           <TextBox Grid.Column="0"
+                   Grid.Row="0"
                    Watermark="Document Name"
                    Text="{Binding GeneratedDocumentName}"
-                   MaxWidth="175" />
+                   MaxWidth="150"
+                   Width="150" />
           <NumericUpDown Grid.Column="1"
+                         Grid.Row="0"
                          ShowButtonSpinner="True"
                          Value="{Binding NumberOfRows}"
                          Minimum="1"
-                         Maximum="10000"
+                         Maximum="10000000"
                          ParsingNumberStyle="Integer"
                          FormatString="N0"
+                         MaxWidth="150"
+                         Width="150"
                          sukiUiTheme:NumericUpDownExtensions.Unit="Rows" />
+          <ComboBox Grid.Column="0"
+                    Grid.Row="1"
+                    ItemsSource="{Binding AvailableLocales}"
+                    SelectedItem="{Binding SelectedLocale}"
+                    MaxWidth="150"
+                    Width="150" />
+          <NumericUpDown Grid.Row="1"
+                         Grid.Column="1"
+                         ShowButtonSpinner="True"
+                         Value="{Binding Seed}"
+                         ParsingNumberStyle="Integer"
+                         Minimum="{Binding Int64MinValue}"
+                         Maximum="{Binding Int64MaxValue}"
+                         MaxWidth="150"
+                         Width="150"
+                         sukiUiTheme:NumericUpDownExtensions.Unit="Seed" />
           <Button Grid.Column="2"
+                  Grid.Row="0"
+                  Grid.RowSpan="2"
                   Classes="Flat"
-                  Content="Generate Data"
+                  Content="Generate"
                   HorizontalAlignment="Right"
+                  VerticalAlignment="Center"
                   Command="{Binding GenerateDataButtonClickedCommand}" />
         </components:SpacedGrid>
       </sukiUi:GlassCard>

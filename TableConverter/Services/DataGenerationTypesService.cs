@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Avalonia;
+using TableConverter.DataGeneration;
 using TableConverter.DataModels;
 using TableConverter.ViewModels;
 
@@ -16,6 +17,18 @@ public class DataGenerationTypesService
     private static readonly FakerWithAttributedModules Faker = new();
 
     public IReadOnlyList<DataGenerationType> Types => DataGenerationTypes;
+    
+    public IReadOnlyList<string> AvailableLocales => LocaleFactory.LoadLocaleNames();
+    
+    public void SetLocale(string locale)
+    {
+        Faker.LocaleType = locale;
+    }
+
+    public void SetSeed(int seed)
+    {
+        Faker.Seed(seed);
+    }
 
     public Task<DataGeneration.DataModels.TableData> GenerateData(DataGenerationFieldViewModel[] fields, int rowCount = 0)
     {
