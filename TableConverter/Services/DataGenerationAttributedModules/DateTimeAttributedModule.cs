@@ -59,7 +59,7 @@ public class DateTimeAttributedModule(FakerBase faker, LocaleBase locale, Random
     }
 
     [DataGenerationModuleMethod("Any Time", "Generate a random date and time relative to a specified reference date.")]
-    public override string AnyTime(DateOnly referenceDate = default, TimeOnly referenceTime = default,
+    public override string AnyTime(DateOnly referenceDate, TimeOnly referenceTime,
         DateTimeFormatsEnum format = DateTimeFormatsEnum.FullDateTime)
     {
         return base.AnyTime(referenceDate, referenceTime, format);

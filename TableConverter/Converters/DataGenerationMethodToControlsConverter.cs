@@ -48,7 +48,7 @@ public partial class DataGenerationMethodToControlsConverter : IValueConverter
                     stackPanel.Children.Add(CreateNumericUpDown(param));
                 else if (param.Type == typeof(bool))
                     stackPanel.Children.Add(CreateToggleSwitch(param));
-                else if (param.Type.IsEnum) 
+                else if (param.Type.IsEnum)
                     stackPanel.Children.Add(CreateComboBox(param));
                 else if (param.Type == typeof(DateOnly))
                     stackPanel.Children.Add(CreateDatePicker(param));
@@ -161,9 +161,9 @@ public partial class DataGenerationMethodToControlsConverter : IValueConverter
     {
         var control = new DatePicker
         {
-            SelectedDate = DateOnly.TryParse(param.Value?.ToString(), out var result)
+            SelectedDate = param.Value is not null && DateOnly.TryParse(param.Value.ToString(), out var result)
                 ? result.ToDateTime(TimeOnly.MinValue)
-                : DateTime.Now,
+                : DateTimeOffset.Now,
             MinWidth = 150
         };
 
@@ -182,7 +182,7 @@ public partial class DataGenerationMethodToControlsConverter : IValueConverter
     {
         var control = new TimePicker
         {
-            SelectedTime = TimeOnly.TryParse(param.Value?.ToString(), out var result)
+            SelectedTime = param.Value is not null && TimeOnly.TryParse(param.Value.ToString(), out var result)
                 ? result.ToTimeSpan()
                 : DateTime.Now.TimeOfDay,
             MinWidth = 150

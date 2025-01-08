@@ -7,24 +7,24 @@
 
     public static class ConverterHandlerUtilities
     {
-        public static string AlignText(string text, TextAlignment text_alignment, int amount, char padding_character)
+        public static string AlignText(string text, TextAlignment textAlignment, int amount, char paddingCharacter)
         {
-            switch (text_alignment)
+            switch (textAlignment)
             {
                 case TextAlignment.Left:
-                    text = text.PadRight(amount, padding_character);
+                    text = text.PadRight(amount, paddingCharacter);
                     break;
                 case TextAlignment.Center:
                     int leftPadding = (amount - text.Length) / 2;
                     int rightPadding = amount - text.Length - leftPadding;
-                    text = text.PadLeft(text.Length + leftPadding, padding_character);
-                    text = text.PadRight(text.Length + rightPadding, padding_character);
+                    text = text.PadLeft(text.Length + leftPadding, paddingCharacter);
+                    text = text.PadRight(text.Length + rightPadding, paddingCharacter);
                     break;
                 case TextAlignment.Right:
-                    text = text.PadLeft(amount, padding_character);
+                    text = text.PadLeft(amount, paddingCharacter);
                     break;
                 default:
-                    text = text.PadRight(amount, padding_character);
+                    text = text.PadRight(amount, paddingCharacter);
                     break;
             }
 

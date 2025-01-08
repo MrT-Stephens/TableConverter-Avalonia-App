@@ -339,8 +339,8 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
         if (data.IsSuccess)
         {
             // If the data is successful, set the headers and rows.
-            doc.EditHeaders = new ObservableCollection<string>(data.Value.headers);
-            doc.EditRows = new ObservableCollection<string[]>(data.Value.rows);
+            doc.EditHeaders = new ObservableCollection<string>(data.Value.Headers);
+            doc.EditRows = new ObservableCollection<string[]>(data.Value.Rows);
 
             doc.IsBusy = false;
 

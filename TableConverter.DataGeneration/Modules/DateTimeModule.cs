@@ -21,19 +21,28 @@ public class DateTimeModule(FakerBase faker, LocaleBase locale, Randomizer rando
 {
     public override string ModuleName => "DateTime";
 
-    public virtual string AnyTime(DateOnly referenceDate = default, TimeOnly referenceTime = default,
+    public virtual string AnyTime(DateOnly referenceDate, TimeOnly referenceTime,
         DateTimeFormatsEnum format = DateTimeFormatsEnum.FullDateTime)
     {
         var dateTime = new DateTime(referenceDate, referenceTime);
+        
+        var minTicks = dateTime.Date.Ticks - 31536000000;
+        var maxTicks = dateTime.Date.Ticks + 31536000000;
+        
+        if (minTicks < DateTime.MinValue.Ticks)
+            minTicks = DateTime.MinValue.Ticks;
+        
+        if (maxTicks > DateTime.MaxValue.Ticks)
+            maxTicks = DateTime.MaxValue.Ticks;
 
-        var randomTicks = Randomizer.Long(dateTime.Ticks - 31536000000, dateTime.Ticks + 31536000000);
+        var randomTicks = Randomizer.Long(minTicks, maxTicks);
 
         return FormatDateTime(new DateTime(randomTicks), format);
     }
 
     public virtual string Between(
-        DateOnly fromDate = default, 
-        TimeOnly fromTime = default, 
+        DateOnly fromDate = default,
+        TimeOnly fromTime = default,
         DateOnly toDate = default,
         TimeOnly toTime = default,
         DateTimeFormatsEnum format = DateTimeFormatsEnum.FullDateTime)

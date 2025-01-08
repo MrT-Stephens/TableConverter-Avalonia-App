@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TableConverter.DataGenerati
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableConverter.FileConverters", "TableConverter.FileConverters\TableConverter.FileConverters.csproj", "{FEEB78A5-26BA-4246-9FA3-0920CF250AE3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableConverter.DataGeneration.Tests", "TableConverter.DataGeneration.Tests\TableConverter.DataGeneration.Tests.csproj", "{859DA368-1BE7-401B-A66B-FF3600531F14}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableConverter.FileConverters.Tests", "TableConverter.FileConverters.Tests\TableConverter.FileConverters.Tests.csproj", "{14E950EB-21F3-46AC-A4F4-2647B9C49592}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,10 +35,10 @@ Global
 		{FEEB78A5-26BA-4246-9FA3-0920CF250AE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FEEB78A5-26BA-4246-9FA3-0920CF250AE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FEEB78A5-26BA-4246-9FA3-0920CF250AE3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{859DA368-1BE7-401B-A66B-FF3600531F14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{859DA368-1BE7-401B-A66B-FF3600531F14}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{859DA368-1BE7-401B-A66B-FF3600531F14}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{859DA368-1BE7-401B-A66B-FF3600531F14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14E950EB-21F3-46AC-A4F4-2647B9C49592}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14E950EB-21F3-46AC-A4F4-2647B9C49592}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14E950EB-21F3-46AC-A4F4-2647B9C49592}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14E950EB-21F3-46AC-A4F4-2647B9C49592}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
