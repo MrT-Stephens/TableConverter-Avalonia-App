@@ -1,20 +1,18 @@
-using TableConverter.FileConverters.ConverterHandlersOptions;
-using TableConverter.FileConverters.DataModels;
+using System.Collections;
 
 namespace TableConverter.FileConverters.Tests.TestBase;
 
-public abstract class InputConverterTestCasesBase<TInputConverterOptions>
-    where TInputConverterOptions : ConverterHandlerBaseOptions
+public abstract class InputConverterTestCasesBase : IEnumerable<object[]>
 {
-    protected abstract IReadOnlyDictionary<string, (TableData, TInputConverterOptions)> TestCases { get; }
+    protected abstract IReadOnlyList<object[]> TestCases { get; }
 
-    public IEnumerable<object[]> GetTestCases()
+    public IEnumerator<object[]> GetEnumerator()
     {
-        return TestCases.Select(x => new object[] 
-            { 
-                x.Key, 
-                x.Value.Item1, 
-                x.Value.Item2 
-            });
+        return TestCases.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
     }
 }

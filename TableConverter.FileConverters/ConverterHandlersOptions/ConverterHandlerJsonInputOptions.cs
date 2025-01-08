@@ -6,9 +6,9 @@
             "Array of Objects",
             "2D Arrays",
             "Column Arrays",
-            "Keyed Arrays",
+            "Keyed Arrays"
         ];
 
-        public string SelectedJsonFormatType = "Array of Objects";
+        public string SelectedJsonFormatType { get; set; } = "Array of Objects";
     }
 }
