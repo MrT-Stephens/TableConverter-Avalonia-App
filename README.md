@@ -6,23 +6,52 @@
 
 <h4 align="center">A cross-platform desktop application for converting between tabular formats such as (CSV, JSON, XML, etc), generating random data, and exporting it in various tabular file types.</h4>
 
-<h4 align="center">
-  TableConverter is the successor to one of my other projects made in C++ and wxWidgets called <a href="https://github.com/MrT-Stephens/Csv-to-Desktop-Application">Csv to</a> – A conversion tool for CSV files.
+<h5 align="center">
+  <i>
+    TableConverter is the successor to one of my other projects made in C++ and wxWidgets called <a href="https://github.com/MrT-Stephens/Csv-to-Desktop-Application">Csv to</a> – A conversion tool for CSV files.
+  </i>
 </h4>
 
 <p align="center">
+  <a href="#how-it-was-made">How It Was Made</a> ▪︎
   <a href="#key-features">Key Features</a> ▪︎
   <a href="#features">Features</a> ▪︎
   <a href="#supported-file-formats">Supported File Formats</a> ▪︎
   <a href="#installation">Installation</a> ▪︎
   <a href="#how-to-use">How To Use</a> ▪︎
-  <a href="#libraries-used">Libraries Used</a> ▪︎
-  <a href="#how-it-was-made">How It Was Made</a>
+  <a href="#libraries-used">Libraries Used</a>
 </p>
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/1c399110-7e26-47ef-bfd5-ceeda1b18e31" alt="drawing" align="center"/>
 </p>
+
+## How It Was Made
+
+TableConverter was developed using the following technologies and architecture:
+
+### Technologies Used:
+- **<a href="https://dotnet.microsoft.com/en-us/languages/csharp">C#</a>**: The core language for building the application logic and handling file conversions, data generation, and UI interactions.
+- **<a href="https://avaloniaui.net/">Avalonia UI</a>**: A cross-platform UI framework for building the application's graphical interface. Avalonia enables TableConverter to run smoothly on Windows, macOS, and Linux.
+- **<a href="https://github.com/kikipoulet/SukiUI">Suki UI</a>**: A customizable UI toolkit used to build modern, visually appealing user interfaces that enhance the user experience.
+
+### Project Structure:
+The TableConverter project is split into four main parts:
+
+1. **TableConverter Project (Main UI)**  
+   This is the core part of the application, which contains the Avalonia-based user interface. It handles all interactions and visualizations, enabling users to work with different file formats and data generation.
+
+2. **TableConverter.Desktop Project**  
+   This solution compiles the TableConverter Avalonia application into a desktop executable for multiple platforms, ensuring seamless cross-platform compatibility.
+
+3. **TableConverter.FileConverters Project**  
+   A library responsible for the conversion logic, including the handling of different file formats (CSV, JSON, SQL, etc.). It provides the backend functionality for importing, exporting, and transforming tabular data.
+
+4. **TableConverter.DataGeneration Project**  
+   A library dedicated to generating random data for tabular datasets. It leverages **FakerJs** to provide various field types and locale-specific data, allowing users to generate realistic datasets easily.
+
+### Testing Projects:
+In addition to the main application, several testing projects are used to ensure the reliability and correctness of the conversion and data generation functionality. These testing solutions verify that the input/output operations and data transformations work as expected across various file formats.
 
 ## Key Features
 
@@ -112,30 +141,3 @@
 ## Libraries Used
 
 *Details about the libraries and frameworks used go here.*
-
-## How It Was Made
-
-TableConverter was developed using the following technologies and architecture:
-
-### Technologies Used:
-- **C#**: The core language for building the application logic and handling file conversions, data generation, and UI interactions.
-- **Avalonia**: A cross-platform UI framework for building the application's graphical interface. Avalonia enables TableConverter to run smoothly on Windows, macOS, and Linux.
-- **Suki UI**: A customizable UI toolkit used to build modern, visually appealing user interfaces that enhance the user experience.
-
-### Project Structure:
-The TableConverter project is split into four main parts:
-
-1. **TableConverter Solution (Main UI)**  
-   This is the core part of the application, which contains the Avalonia-based user interface. It handles all interactions and visualizations, enabling users to work with different file formats and data generation.
-
-2. **TableConverter.Desktop Solution**  
-   This solution compiles the TableConverter Avalonia application into a desktop executable for multiple platforms, ensuring seamless cross-platform compatibility.
-
-3. **TableConverter.FileConverters Solution**  
-   A library responsible for the conversion logic, including the handling of different file formats (CSV, JSON, SQL, etc.). It provides the backend functionality for importing, exporting, and transforming tabular data.
-
-4. **TableConverter.DataGeneration Solution**  
-   A library dedicated to generating random data for tabular datasets. It leverages **FakerJs** to provide various field types and locale-specific data, allowing users to generate realistic datasets easily.
-
-### Testing Projects:
-In addition to the main application, several testing projects are used to ensure the reliability and correctness of the conversion and data generation functionality. These testing solutions verify that the input/output operations and data transformations work as expected across various file formats.
