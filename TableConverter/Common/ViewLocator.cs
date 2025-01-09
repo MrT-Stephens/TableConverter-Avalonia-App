@@ -39,6 +39,6 @@ public class ViewLocator : IDataTemplate
 
     private static TextBlock CreateText(string text)
     {
-        return new TextBlock() { Text = text };
+        return new TextBlock { Text = text };
     }
 }

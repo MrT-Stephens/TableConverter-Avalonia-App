@@ -7,20 +7,28 @@ namespace TableConverter.FileConverters.Tests.InputConverterTests;
 
 public class ExcelInputTestCases : InputConverterTestCasesBase
 {
+    /// <summary>
+    ///     Test cases for successful test cases.
+    /// </summary>
     protected override
         IReadOnlyList<(string FileName, ConverterHandlerBaseOptions Options, TableData ExpectedTableData)>
         SuccessfulTestCases { get; } =
     [
         (
+            // Test case 1: Test input file with correct data.
             "test_input_excel_1.xlsx",
             new ConverterHandlerBaseOptions(),
             Utils.TestTableData
         )
     ];
 
+    /// <summary>
+    ///     Test cases for unsuccessful test cases.
+    /// </summary>
     protected override IReadOnlyList<(string FileName, ConverterHandlerBaseOptions Options)> FailTestCases { get; } =
     [
         (
+            // Test case 1: Test input file with incorrect data.
             "test_input_incorrect_excel_1.xlsx",
             new ConverterHandlerBaseOptions()
         )

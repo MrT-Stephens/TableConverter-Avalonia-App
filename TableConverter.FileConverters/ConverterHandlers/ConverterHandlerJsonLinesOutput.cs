@@ -21,7 +21,7 @@ public class ConverterHandlerJsonLinesOutput : ConverterHandlerOutputAbstract<Co
                     {
                         writer.Write($"\"{headers[j]}\":\"{rows[i][j]}\"");
 
-                        if (j != rows.LongLength - 1) writer.Write(",");
+                        if (j != headers.LongLength - 1) writer.Write(",");
                     }
 
                     writer.Write("}");

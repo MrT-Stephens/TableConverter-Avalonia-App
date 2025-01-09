@@ -7,11 +7,15 @@ namespace TableConverter.FileConverters.Tests.InputConverterTests;
 
 public class CsvInputTestCases : InputConverterTestCasesBase
 {
+    /// <summary>
+    ///     Test cases for successful conversion.
+    /// </summary>
     protected override
         IReadOnlyList<(string FileName, ConverterHandlerBaseOptions Options, TableData ExpectedTableData)>
         SuccessfulTestCases { get; } =
     [
         (
+            // Test case 1: Correct CSV file with comma delimiter
             "test_input_csv_1.csv",
             new ConverterHandlerCsvOptions
             {
@@ -21,6 +25,7 @@ public class CsvInputTestCases : InputConverterTestCasesBase
             Utils.TestTableData
         ),
         (
+            // Test case 2: Correct CSV file with ampersand delimiter
             "test_input_csv_2.csv",
             new ConverterHandlerCsvOptions
             {
@@ -31,9 +36,13 @@ public class CsvInputTestCases : InputConverterTestCasesBase
         )
     ];
 
+    /// <summary>
+    ///     Test cases for failed conversion.
+    /// </summary>
     protected override IReadOnlyList<(string FileName, ConverterHandlerBaseOptions Options)> FailTestCases { get; } =
     [
         (
+            // Test case 1: Incorrect CSV file with extra column in a row
             "test_input_incorrect_csv_1.csv",
             new ConverterHandlerCsvOptions
             {
@@ -42,6 +51,7 @@ public class CsvInputTestCases : InputConverterTestCasesBase
             }
         ),
         (
+            // Test case 2: Incorrect CSV file with random binary data as row
             "test_input_incorrect_csv_2.csv",
             new ConverterHandlerCsvOptions
             {
