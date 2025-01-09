@@ -43,19 +43,28 @@
   - Load multiple files for batch processing.  
   - Formats include CSV, JSON, XML, SQL, Markdown, YAML, and others.  
   - Input editor allows direct modification of file content before conversion.
+  - 
+![Input Handling](https://github.com/user-attachments/assets/6f81a42a-e503-452a-819b-85dea35b6e31)
 
 - **Tabular Data Editing**  
   - Edit data in a structured grid interface after conversion.  
   - Fine-tune content or adjust formats for specific needs.  
 
-- **Output Options**  
+![Tabular Data Editing](https://github.com/user-attachments/assets/a525f8cc-607a-4910-a829-00fff2e5f5f5)
+
+- **Output Options**
+
   - Export files to various formats, including both document-based (PDF, Word) and tabular (CSV, Excel).  
   - Supports export-only formats like LaTeX and ASCII tables.
+
+![Output Options](https://github.com/user-attachments/assets/33eaa8b3-ab08-4423-ad78-e4a1c1add47a)
 
 ### Data Generation Capabilities
 - **Mockaroo-Inspired Interface**  
   - Add fields to the data grid intuitively.  
   - Choose from 159 data types, such as names, dates, addresses, and custom fields.  
+
+![Data Generation UI](https://github.com/user-attachments/assets/df635f39-fdfb-4c70-a56b-4e4f22505f24)
 
 - **Locale Support**  
   - Generate data specific to locales like `en`, `en_GB`, and `zh_CN`.  
@@ -65,7 +74,7 @@
 
 ## Supported File Formats
 
-<div style="width: 100%; overflow-x: auto;">
+<div style="min-width: 100%; width: 100%; overflow-x: auto;">
   <table style="width: 100%; border-collapse: collapse; text-align: left; table-layout: fixed;">
     <thead>
       <tr>
