@@ -43,7 +43,7 @@
   - Load multiple files for batch processing.  
   - Formats include CSV, JSON, XML, SQL, Markdown, YAML, and others.  
   - Input editor allows direct modification of file content before conversion.
-  - 
+
 ![Input Handling](https://github.com/user-attachments/assets/6f81a42a-e503-452a-819b-85dea35b6e31)
 
 - **Tabular Data Editing**  
