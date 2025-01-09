@@ -17,19 +17,13 @@ public class JsonLinesInputTestCases : InputConverterTestCasesBase
         (
             // Test case 1: Test with json lines in objects format.
             "test_input_jsonlines_1.jsonl",
-            new ConverterHandlerJsonInputOptions
-            {
-                SelectedJsonFormatType = "Objects"
-            },
+            new ConverterHandlerBaseOptions(),
             Utils.TestTableData
         ),
         (
             // Test case 2: Test with json lines in array format.
             "test_input_jsonlines_2.jsonl",
-            new ConverterHandlerJsonInputOptions
-            {
-                SelectedJsonFormatType = "Array"
-            },
+            new ConverterHandlerBaseOptions(),
             Utils.TestTableData
         )
     ];
@@ -39,6 +33,16 @@ public class JsonLinesInputTestCases : InputConverterTestCasesBase
     /// </summary>
     protected override IReadOnlyList<(string FileName, ConverterHandlerBaseOptions Options)> FailTestCases { get; } =
     [
+        (
+            // Test case 1: Test objects format with missing "}"  
+            "test_input_incorrect_jsonlines_1.jsonl",
+            new ConverterHandlerBaseOptions()
+        ),
+        (
+            // Test case 2: Test array format with missing "]"  
+            "test_input_incorrect_jsonlines_2.jsonl",
+            new ConverterHandlerBaseOptions()
+        )
     ];
 }
 
