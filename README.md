@@ -74,104 +74,23 @@
 
 ## Supported File Formats
 
-<div style="min-width: 100%; width: 100%; overflow-x: auto;">
-  <table style="width: 100%; border-collapse: collapse; text-align: left; table-layout: fixed;">
-    <thead>
-      <tr>
-        <th style="border: 1px solid #ddd; padding: 8px;">Format</th>
-        <th style="border: 1px solid #ddd; padding: 8px;">Input</th>
-        <th style="border: 1px solid #ddd; padding: 8px;">Output</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td style="border: 1px solid #ddd; padding: 8px;">CSV</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">✅</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">✅</td>
-      </tr>
-      <tr>
-        <td style="border: 1px solid #ddd; padding: 8px;">JSON</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">✅</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">✅</td>
-      </tr>
-      <tr>
-        <td style="border: 1px solid #ddd; padding: 8px;">JSONLines</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">✅</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">✅</td>
-      </tr>
-      <tr>
-        <td style="border: 1px solid #ddd; padding: 8px;">XML</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">✅</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">✅</td>
-      </tr>
-      <tr>
-        <td style="border: 1px solid #ddd; padding: 8px;">SQL</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">✅</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">✅</td>
-      </tr>
-      <tr>
-        <td style="border: 1px solid #ddd; padding: 8px;">HTML</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">✅</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">✅</td>
-      </tr>
-      <tr>
-        <td style="border: 1px solid #ddd; padding: 8px;">Markdown</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">❌</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">✅</td>
-      </tr>
-      <tr>
-        <td style="border: 1px solid #ddd; padding: 8px;">LaTeX</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">❌</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">✅</td>
-      </tr>
-      <tr>
-        <td style="border: 1px solid #ddd; padding: 8px;">Ascii Tables</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">❌</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">✅</td>
-      </tr>
-      <tr>
-        <td style="border: 1px solid #ddd; padding: 8px;">YAML</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">✅</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">✅</td>
-      </tr>
-      <tr>
-        <td style="border: 1px solid #ddd; padding: 8px;">Excel</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">✅</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">✅</td>
-      </tr>
-      <tr>
-        <td style="border: 1px solid #ddd; padding: 8px;">Word</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">✅</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">✅</td>
-      </tr>
-      <tr>
-        <td style="border: 1px solid #ddd; padding: 8px;">PDF</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">❌</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">✅</td>
-      </tr>
-      <tr>
-        <td style="border: 1px solid #ddd; padding: 8px;">PHP</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">✅</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">✅</td>
-      </tr>
-      <tr>
-        <td style="border: 1px solid #ddd; padding: 8px;">Ruby</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">✅</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">✅</td>
-      </tr>
-      <tr>
-        <td style="border: 1px solid #ddd; padding: 8px;">ASP</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">✅</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">✅</td>
-      </tr>
-      <tr>
-        <td style="border: 1px solid #ddd; padding: 8px;">Multi-Line</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">✅</td>
-        <td style="border: 1px solid #ddd; padding: 8px;">✅</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+- **CSV**: ✅ Input | ✅ Output  
+- **SQL**: ✅ Input | ✅ Output  
+- **ASCII Tables**: ❌ Input | ✅ Output  
+- **Markdown**: ❌ Input | ✅ Output  
+- **XML**: ✅ Input | ✅ Output  
+- **HTML**: ✅ Input | ✅ Output  
+- **LaTeX**: ❌ Input | ✅ Output  
+- **JSON**: ✅ Input | ✅ Output  
+- **JSONLines**: ✅ Input | ✅ Output  
+- **Excel**: ✅ Input | ✅ Output  
+- **Word**: ✅ Input | ✅ Output  
+- **PHP**: ✅ Input | ✅ Output  
+- **Ruby**: ✅ Input | ✅ Output  
+- **ASP**: ✅ Input | ✅ Output  
+- **Multi-Line**: ✅ Input | ✅ Output  
+- **PDF**: ❌ Input | ✅ Output  
+- **YAML**: ✅ Input | ✅ Output  
 
 > **Notes:**
 > **Input and Output**: Formats with ✅ in both columns support both importing and exporting.  
