@@ -1,30 +1,15 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using SukiUI.Dialogs;
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using SukiUI.Dialogs;
 using TableConverter.DataModels;
 
 namespace TableConverter.Components.Xaml;
 
 public partial class FileTypesSelectorViewModel(ISukiDialog dialog) : BaseDialogViewModel(dialog)
 {
-    #region Properties
-
-    [ObservableProperty]
-    private string _Title = string.Empty;
-
-    [ObservableProperty]
-    private ObservableCollection<string> _Values = [];
-
-    [ObservableProperty]
-    private string _SelectedValue = string.Empty;
-
-    public AsyncAction<string>? OnOkClicked { get; set; } = null;
-
-    #endregion
-
     #region Commands
 
     [RelayCommand]
@@ -37,10 +22,7 @@ public partial class FileTypesSelectorViewModel(ISukiDialog dialog) : BaseDialog
             switch (buttonName)
             {
                 case "Ok":
-                    if (OnOkClicked is not null)
-                    {
-                        await OnOkClicked(SelectedValue);
-                    }
+                    if (OnOkClicked is not null) await OnOkClicked(SelectedValue);
                     break;
                 case "Cancel":
                     break;
@@ -49,6 +31,18 @@ public partial class FileTypesSelectorViewModel(ISukiDialog dialog) : BaseDialog
             }
         }
     }
+
+    #endregion
+
+    #region Properties
+
+    [ObservableProperty] private string _Title = string.Empty;
+
+    [ObservableProperty] private ObservableCollection<string> _Values = [];
+
+    [ObservableProperty] private string _SelectedValue = string.Empty;
+
+    public AsyncAction<string>? OnOkClicked { get; set; } = null;
 
     #endregion
 }

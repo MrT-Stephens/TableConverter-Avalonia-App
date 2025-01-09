@@ -7,6 +7,7 @@ using Avalonia;
 using TableConverter.DataGeneration;
 using TableConverter.DataModels;
 using TableConverter.ViewModels;
+using TableData = TableConverter.DataGeneration.DataModels.TableData;
 
 namespace TableConverter.Services;
 
@@ -17,9 +18,9 @@ public class DataGenerationTypesService
     private static readonly FakerWithAttributedModules Faker = new();
 
     public IReadOnlyList<DataGenerationType> Types => DataGenerationTypes;
-    
+
     public IReadOnlyList<string> AvailableLocales => LocaleFactory.LoadLocaleNames();
-    
+
     public void SetLocale(string locale)
     {
         Faker.LocaleType = locale;
@@ -30,22 +31,20 @@ public class DataGenerationTypesService
         Faker.Seed(seed);
     }
 
-    public Task<DataGeneration.DataModels.TableData> GenerateData(DataGenerationFieldViewModel[] fields, int rowCount = 0)
+    public Task<TableData> GenerateData(DataGenerationFieldViewModel[] fields, int rowCount = 0)
     {
         var builder = FakerWithAttributedModules.Create(Faker);
-        
+
         foreach (var field in fields)
-        {
             builder.AddKeyed(
                 field.Name,
                 field.Key,
                 field.Parameters.Select(param => param.Value).ToArray()!,
                 field.BlankPercentage
             );
-        }
 
         builder.WithRowCount(rowCount);
-        
+
         return builder.BuildAsync();
     }
 

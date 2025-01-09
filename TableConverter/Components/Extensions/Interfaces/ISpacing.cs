@@ -1,7 +1,6 @@
-﻿namespace TableConverter.Components.Extensions.Interfaces
+﻿namespace TableConverter.Components.Extensions.Interfaces;
+
+public interface ISpacing
 {
-    public interface ISpacing
-    {
-        double Spacing { get; set; }
-    }
+    double Spacing { get; set; }
 }

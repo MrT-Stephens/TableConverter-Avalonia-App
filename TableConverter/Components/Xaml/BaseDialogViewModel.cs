@@ -5,5 +5,8 @@ namespace TableConverter.Components.Xaml;
 
 public abstract class BaseDialogViewModel(ISukiDialog dialog) : ObservableObject
 {
-    protected void Close() => dialog.Dismiss();
+    protected void Close()
+    {
+        dialog.Dismiss();
+    }
 }

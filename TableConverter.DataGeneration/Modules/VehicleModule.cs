@@ -11,25 +11,25 @@ public class VehicleModule(FakerBase faker, LocaleBase locale, Randomizer random
     {
         return $"{Manufacturer()} {Model()}";
     }
-    
+
     public virtual string Manufacturer()
     {
-        return Randomizer.GetRandomElement(Locale.Vehicle.Value.Manufacturer); 
+        return Randomizer.GetRandomElement(Locale.Vehicle.Value.Manufacturer);
     }
-    
+
     public virtual string Model()
     {
-        return Randomizer.GetRandomElement(Locale.Vehicle.Value.Model); 
+        return Randomizer.GetRandomElement(Locale.Vehicle.Value.Model);
     }
-    
+
     public virtual string Type()
     {
-        return Randomizer.GetRandomElement(Locale.Vehicle.Value.VehicleType); 
+        return Randomizer.GetRandomElement(Locale.Vehicle.Value.VehicleType);
     }
-    
+
     public virtual string Fuel()
     {
-        return Randomizer.GetRandomElement(Locale.Vehicle.Value.FuelType); 
+        return Randomizer.GetRandomElement(Locale.Vehicle.Value.FuelType);
     }
 
     public virtual string Bicycle()
@@ -46,7 +46,7 @@ public class VehicleModule(FakerBase faker, LocaleBase locale, Randomizer random
     {
         return Randomizer.ReplaceSymbols("??##???");
     }
-    
+
     public virtual string Color()
     {
         return Faker.Color.Human();

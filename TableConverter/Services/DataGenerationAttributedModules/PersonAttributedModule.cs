@@ -5,7 +5,7 @@ using TableConverter.DataModels;
 
 namespace TableConverter.Services.DataGenerationAttributedModules;
 
-[DataGenerationModule("Person", 
+[DataGenerationModule("Person",
     "Module for generating personal information such as names, gender, biography, etc.",
     "DataGenerationPersonIcon")]
 public class PersonAttributedModule(FakerBase faker, LocaleBase locale, Randomizer randomizer)

@@ -1,17 +1,16 @@
-﻿namespace TableConverter.FileConverters.ConverterHandlersOptions
+﻿namespace TableConverter.FileConverters.ConverterHandlersOptions;
+
+public class ConverterHandlerSQLInputOptions : ConverterHandlerBaseOptions
 {
-    public class ConverterHandlerSQLInputOptions : ConverterHandlerBaseOptions
+    public readonly Dictionary<string, string> QuoteTypes = new()
     {
-        public readonly Dictionary<string, string> QuoteTypes = new()
-        {
-            { "No Quotes", "" },
-            { "Double Quotes (\")", "\""},
-            { "MySQL Quotes (`)", "`" },
-            { "SQL Server Quotes ([])", "[" },
-        };
+        { "No Quotes", "" },
+        { "Double Quotes (\")", "\"" },
+        { "MySQL Quotes (`)", "`" },
+        { "SQL Server Quotes ([])", "[" }
+    };
 
-        public string SelectedQuoteType { get; set; } = "No Quotes";
+    public string SelectedQuoteType { get; set; } = "No Quotes";
 
-        public bool HasColumnNames { get; set; } = true;
-    }
+    public bool HasColumnNames { get; set; } = true;
 }

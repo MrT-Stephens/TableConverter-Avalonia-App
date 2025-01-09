@@ -3,7 +3,7 @@ using TableConverter.FileConverters.DataModels;
 namespace TableConverter.FileConverters.Tests;
 
 /// <summary>
-/// Helper class for test data and methods.
+///     Helper class for test data and methods.
 /// </summary>
 public static class Utils
 {

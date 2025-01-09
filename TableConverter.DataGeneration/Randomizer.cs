@@ -81,9 +81,9 @@ public class Randomizer(int? seed = null)
             return Random.NextDouble() * (max - min) + min;
         }
     }
-    
+
     /// <summary>
-    /// Generate a random long between MinValue and MaxValue.
+    ///     Generate a random long between MinValue and MaxValue.
     /// </summary>
     /// <param name="min">Min value, inclusive. Default long.MinValue</param>
     /// <param name="max">Max value, inclusive. Default long.MaxValue</param>
@@ -193,9 +193,9 @@ public class Randomizer(int? seed = null)
             arr[i] = Char(min, max);
         return arr;
     }
-    
+
     /// <summary>
-    /// Generates a random alphanumeric string of the specified length.
+    ///     Generates a random alphanumeric string of the specified length.
     /// </summary>
     /// <param name="length">The length of the alphanumeric string to generate. Default is 5.</param>
     /// <returns>A randomly generated alphanumeric string.</returns>
@@ -205,10 +205,7 @@ public class Randomizer(int? seed = null)
 
         var result = new char[length];
 
-        for (var i = 0; i < length; i++)
-        {
-            result[i] = chars[Number(0, chars.Length - 1)];
-        }
+        for (var i = 0; i < length; i++) result[i] = chars[Number(0, chars.Length - 1)];
 
         return new string(result);
     }

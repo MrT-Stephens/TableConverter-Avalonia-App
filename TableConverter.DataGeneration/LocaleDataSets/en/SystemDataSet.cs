@@ -4,5 +4,4 @@ namespace TableConverter.DataGeneration.LocaleDataSets.en;
 
 public class SystemDataSet : SystemBase
 {
-    
 }

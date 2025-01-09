@@ -591,7 +591,8 @@ public class LocationDataSet : en.LocationDataSet
         "York Street"
     ];
 
-    public override ImmutableArray<IWeightedValue<ITemplatedValueBuilder<FakerBase, LocaleBase>>> StreetPattern { get; } =
+    public override ImmutableArray<IWeightedValue<ITemplatedValueBuilder<FakerBase, LocaleBase>>>
+        StreetPattern { get; } =
     [
         new WeightedValue<ITemplatedValueBuilder<FakerBase, LocaleBase>>(
             new TemplatedValueBuilder<FakerBase, LocaleBase>()

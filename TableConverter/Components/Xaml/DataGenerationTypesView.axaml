@@ -10,51 +10,52 @@
              d:DesignHeight="450"
              d:DesignWidth="800"
              mc:Ignorable="d">
-  <sukiUi:GlassCard IsAnimated="False"
-                    Padding="0">
-    <Grid RowDefinitions="*,Auto">
-      <sukiUi:SukiSideMenu Grid.Row="0"
-                           ItemsSource="{Binding Categories}" 
-                           SelectedItem="{Binding SelectedCategory}"
-                           IsSearchEnabled="True">
-        <sukiUi:SukiSideMenu.ItemTemplate>
-          <DataTemplate>
-            <sukiUi:SukiSideMenuItem Classes="Compact">
-              <sukiUi:SukiSideMenuItem.Header>
-                <MultiBinding Converter="{x:Static converters:MergeValuesWithSeparatorConverter.Instance}"
-                              ConverterParameter=": ">
-                  <Binding Path="DisplayName" />
-                  <Binding Path="Types.Count" />
-                </MultiBinding>
-              </sukiUi:SukiSideMenuItem.Header>
-              <sukiUi:SukiSideMenuItem.Icon>
-                <PathIcon Data="{Binding Icon}" />
-              </sukiUi:SukiSideMenuItem.Icon>
-            </sukiUi:SukiSideMenuItem>
-          </DataTemplate>
-        </sukiUi:SukiSideMenu.ItemTemplate>
-      </sukiUi:SukiSideMenu>
-      <sukiUi:GlassCard Grid.Row="1" 
-                        CornerRadius="0,0,0,0"
-                        BorderThickness="0"
-                        Padding="10,10,10,10">
-        <StackPanel Orientation="Horizontal" 
-                    Spacing="10"
-                    HorizontalAlignment="Right">
-          <Button Classes="Flat"
-                  Width="100"
-                  Command="{Binding ButtonClickedCommand}"
-                  CommandParameter="Cancel">
-            Cancel
-          </Button>
-          <Button Classes="Flat"
-                  Width="100"
-                  Command="{Binding ButtonClickedCommand}"
-                  CommandParameter="Select">
-            Select
-          </Button>
-        </StackPanel>
-      </sukiUi:GlassCard>
-    </Grid>
-  </sukiUi:GlassCard>
+    <sukiUi:GlassCard IsAnimated="False"
+                      Padding="0">
+        <Grid RowDefinitions="*,Auto">
+            <sukiUi:SukiSideMenu Grid.Row="0"
+                                 ItemsSource="{Binding Categories}"
+                                 SelectedItem="{Binding SelectedCategory}"
+                                 IsSearchEnabled="True">
+                <sukiUi:SukiSideMenu.ItemTemplate>
+                    <DataTemplate>
+                        <sukiUi:SukiSideMenuItem Classes="Compact">
+                            <sukiUi:SukiSideMenuItem.Header>
+                                <MultiBinding
+                                    Converter="{x:Static converters:MergeValuesWithSeparatorConverter.Instance}"
+                                    ConverterParameter=": ">
+                                    <Binding Path="DisplayName" />
+                                    <Binding Path="Types.Count" />
+                                </MultiBinding>
+                            </sukiUi:SukiSideMenuItem.Header>
+                            <sukiUi:SukiSideMenuItem.Icon>
+                                <PathIcon Data="{Binding Icon}" />
+                            </sukiUi:SukiSideMenuItem.Icon>
+                        </sukiUi:SukiSideMenuItem>
+                    </DataTemplate>
+                </sukiUi:SukiSideMenu.ItemTemplate>
+            </sukiUi:SukiSideMenu>
+            <sukiUi:GlassCard Grid.Row="1"
+                              CornerRadius="0,0,0,0"
+                              BorderThickness="0"
+                              Padding="10,10,10,10">
+                <StackPanel Orientation="Horizontal"
+                            Spacing="10"
+                            HorizontalAlignment="Right">
+                    <Button Classes="Flat"
+                            Width="100"
+                            Command="{Binding ButtonClickedCommand}"
+                            CommandParameter="Cancel">
+                        Cancel
+                    </Button>
+                    <Button Classes="Flat"
+                            Width="100"
+                            Command="{Binding ButtonClickedCommand}"
+                            CommandParameter="Select">
+                        Select
+                    </Button>
+                </StackPanel>
+            </sukiUi:GlassCard>
+        </Grid>
+    </sukiUi:GlassCard>
 </UserControl>

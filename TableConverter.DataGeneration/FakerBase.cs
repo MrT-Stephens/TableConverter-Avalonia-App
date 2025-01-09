@@ -12,10 +12,6 @@ public abstract class FakerBase : IFaker
 {
     private string _localeType = null!;
 
-    public LocaleBase Locale { get; set; } = null!;
-
-    public Randomizer Randomizer { get; set; }
-
     protected FakerBase(string localeType = "en", int? seed = null)
     {
         LocaleType = localeType;
@@ -51,6 +47,10 @@ public abstract class FakerBase : IFaker
     public abstract CommerceModule Commerce { get; }
     public abstract FoodModule Food { get; }
     public abstract DateTimeModule DateTime { get; }
+
+    public LocaleBase Locale { get; set; } = null!;
+
+    public Randomizer Randomizer { get; set; }
 
     public void Seed(int seed)
     {

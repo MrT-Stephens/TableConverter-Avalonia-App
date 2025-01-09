@@ -64,7 +64,7 @@ public class SystemModule(FakerBase faker, LocaleBase locale, Randomizer randomi
 
         return $"{word}.{extension}";
     }
-    
+
     public virtual string CommonFileName(string extension = "")
     {
         if (string.IsNullOrEmpty(extension)) extension = CommonFileExtension();

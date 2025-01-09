@@ -1,63 +1,53 @@
 ﻿using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
 
-namespace TableConverter.FileConverters.ConverterHandlers
+namespace TableConverter.FileConverters.ConverterHandlers;
+
+public class ConverterHandlerYamlInput : ConverterHandlerInputAbstract<ConverterHandlerBaseOptions>
 {
-    public class ConverterHandlerYamlInput : ConverterHandlerInputAbstract<ConverterHandlerBaseOptions>
+    public override Result<TableData> ReadText(string text)
     {
-        public override Result<TableData> ReadText(string text)
+        var headers = new List<string>();
+        var rows = new List<string[]>();
+
+        Dictionary<string, string> yamlData = new();
+
+        using (var reader = new StringReader(text))
         {
-            var headers = new List<string>();
-            var rows = new List<string[]>();
+            var firstLine = true;
 
-            Dictionary<string, string> yamlData = new();
-
-            using (var reader = new StringReader(text))
+            for (var line = reader.ReadLine()?.Trim();
+                 !string.IsNullOrEmpty(line);
+                 line = reader?.ReadLine()?.Trim())
             {
-                var firstLine = true;
+                if (line.StartsWith("---")) continue;
 
-                for (var line = reader.ReadLine()?.Trim();
-                        !string.IsNullOrEmpty(line);
-                        line = reader?.ReadLine()?.Trim())
+                if (line.StartsWith('-') && line.EndsWith('-'))
                 {
-                    if (line.StartsWith("---"))
+                    if (yamlData.Count > 0)
                     {
-                        continue;
-                    }
-
-                    if (line.StartsWith('-') && line.EndsWith('-'))
-                    {
-                        if (yamlData.Count >  0)
+                        if (firstLine)
                         {
-                            if (firstLine)
-                            {
-                                headers = yamlData.Keys.ToList();
-                                firstLine = false;
-                            }
-
-                            rows.Add(yamlData.Select(values => values.Value).ToArray());
+                            headers = yamlData.Keys.ToList();
+                            firstLine = false;
                         }
 
-                        yamlData = new();
+                        rows.Add(yamlData.Select(values => values.Value).ToArray());
                     }
-                    else
-                    {
-                        var lineData = line.Split(':');
 
-                        if (lineData.Length == 2)
-                        {
-                            yamlData.Add(lineData[0].Trim(), lineData[1].Trim());
-                        }
-                    }
+                    yamlData = new Dictionary<string, string>();
                 }
-
-                if (yamlData.Count > 0)
+                else
                 {
-                    rows.Add(yamlData.Select(values => values.Value).ToArray());
+                    var lineData = line.Split(':');
+
+                    if (lineData.Length == 2) yamlData.Add(lineData[0].Trim(), lineData[1].Trim());
                 }
             }
 
-            return Result<TableData>.Success(new TableData(headers, rows));
+            if (yamlData.Count > 0) rows.Add(yamlData.Select(values => values.Value).ToArray());
         }
+
+        return Result<TableData>.Success(new TableData(headers, rows));
     }
 }

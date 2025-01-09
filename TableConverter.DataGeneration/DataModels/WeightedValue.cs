@@ -3,9 +3,9 @@ using TableConverter.DataGeneration.Interfaces;
 namespace TableConverter.DataGeneration.DataModels;
 
 /// <summary>
-/// A value with a weight.
-/// Allows for a value to have an attached weight.
-/// The weight is used to determine the probability of the value being selected.
+///     A value with a weight.
+///     Allows for a value to have an attached weight.
+///     The weight is used to determine the probability of the value being selected.
 /// </summary>
 /// <param name="value">The value.</param>
 /// <param name="weight">The weight of the value.</param>

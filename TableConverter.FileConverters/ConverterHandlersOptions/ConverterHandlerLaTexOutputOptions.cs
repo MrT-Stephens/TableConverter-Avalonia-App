@@ -1,46 +1,45 @@
-﻿namespace TableConverter.FileConverters.ConverterHandlersOptions
+﻿namespace TableConverter.FileConverters.ConverterHandlersOptions;
+
+public class ConverterHandlerLaTexOutputOptions : ConverterHandlerBaseOptions
 {
-    public class ConverterHandlerLaTexOutputOptions : ConverterHandlerBaseOptions
-    {
-        public readonly string[] TableTypes = 
-        [
-            "All",
-            "MySQL",
-            "Excel",
-            "Horizontal",
-            "Markdown",
-            "None"
-        ];
+    public readonly string[] Alignments =
+    [
+        "Left",
+        "Center",
+        "Right"
+    ];
 
-        public string SelectedTableType { get; set; } = "All";
+    public readonly string[] CaptionAlignments =
+    [
+        "Top",
+        "Bottom"
+    ];
 
-        public readonly string[] Alignments = 
-        [
-            "Left",
-            "Center",
-            "Right"
-        ];
+    public readonly string[] TableTypes =
+    [
+        "All",
+        "MySQL",
+        "Excel",
+        "Horizontal",
+        "Markdown",
+        "None"
+    ];
 
-        public string SelectedTextAlignment { get; set; } = "Left";
+    public string SelectedTableType { get; set; } = "All";
 
-        public string SelectedTableAlignment { get; set; } = "Left";
+    public string SelectedTextAlignment { get; set; } = "Left";
 
-        public readonly string[] CaptionAlignments = 
-        [
-            "Top",
-            "Bottom"
-        ];
+    public string SelectedTableAlignment { get; set; } = "Left";
 
-        public string SelectedCaptionAlignment { get; set; } = "Top";
+    public string SelectedCaptionAlignment { get; set; } = "Top";
 
-        public string CaptionName { get; set; } = "";
+    public string CaptionName { get; set; } = "";
 
-        public string LabelName { get; set; } = "";
+    public string LabelName { get; set; } = "";
 
-        public bool MinimalWorkingExample { get; set; } = false;
+    public bool MinimalWorkingExample { get; set; } = false;
 
-        public bool BoldHeader { get; set; } = false;
+    public bool BoldHeader { get; set; } = false;
 
-        public bool BoldFirstColumn { get; set; } = false;
-    }
+    public bool BoldFirstColumn { get; set; } = false;
 }

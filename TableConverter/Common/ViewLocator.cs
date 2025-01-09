@@ -1,8 +1,6 @@
-﻿using Avalonia.Controls;
+﻿using System.Collections.Generic;
+using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using TableConverter.Interfaces;
 
@@ -10,9 +8,9 @@ namespace TableConverter.Common;
 
 public class ViewLocator : IDataTemplate
 {
-    private readonly IViewsCollection _views;
     private readonly Dictionary<object, Control> _controlCache = [];
-    
+    private readonly IViewsCollection _views;
+
     public ViewLocator(IViewsCollection views)
     {
         _views = views;
@@ -20,15 +18,9 @@ public class ViewLocator : IDataTemplate
 
     public Control Build(object? param)
     {
-        if (param is null)
-        {
-            return CreateText("Data is null.");
-        }
+        if (param is null) return CreateText("Data is null.");
 
-        if (_controlCache.TryGetValue(param, out var control))
-        {
-            return control;
-        }
+        if (_controlCache.TryGetValue(param, out var control)) return control;
 
         if (_views.TryCreateView(param, out var view))
         {
@@ -40,7 +32,13 @@ public class ViewLocator : IDataTemplate
         return CreateText($"No View For {param.GetType().Name}.");
     }
 
-    public bool Match(object? data) => data is ObservableObject;
+    public bool Match(object? data)
+    {
+        return data is ObservableObject;
+    }
 
-    private static TextBlock CreateText(string text) => new TextBlock { Text = text };
+    private static TextBlock CreateText(string text)
+    {
+        return new TextBlock() { Text = text };
+    }
 }

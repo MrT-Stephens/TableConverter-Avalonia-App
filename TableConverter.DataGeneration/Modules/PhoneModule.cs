@@ -9,7 +9,8 @@ public enum PhoneNumberType
     Human
 }
 
-public class PhoneModule(FakerBase faker, LocaleBase locale, Randomizer randomizer) : ModuleBase(faker, locale, randomizer)
+public class PhoneModule(FakerBase faker, LocaleBase locale, Randomizer randomizer)
+    : ModuleBase(faker, locale, randomizer)
 {
     public override string ModuleName => "Phone";
 
@@ -26,7 +27,7 @@ public class PhoneModule(FakerBase faker, LocaleBase locale, Randomizer randomiz
             _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
         };
     }
-    
+
     public virtual string Imei()
     {
         return Randomizer.ReplaceCreditCardSymbols("##-######-######-L");

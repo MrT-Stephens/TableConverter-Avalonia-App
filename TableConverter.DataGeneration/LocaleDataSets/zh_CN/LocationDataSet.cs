@@ -185,13 +185,13 @@ public class LocationDataSet : en.LocationDataSet
 
     public override ImmutableArray<string> StreetSuffix { get; } =
     [
-        "巷", 
-        "街", 
-        "路", 
-        "桥", 
-        "侬", 
-        "旁", 
-        "中心", 
+        "巷",
+        "街",
+        "路",
+        "桥",
+        "侬",
+        "旁",
+        "中心",
         "栋"
     ];
 }

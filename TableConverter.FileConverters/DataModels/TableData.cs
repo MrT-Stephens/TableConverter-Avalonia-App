@@ -23,7 +23,7 @@ public class TableData(List<string> headers, List<string[]> rows)
     public override string ToString()
     {
         var sb = new StringBuilder();
-        
+
         sb.AppendJoin(',', Headers);
         sb.AppendLine();
 

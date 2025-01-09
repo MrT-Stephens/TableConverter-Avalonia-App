@@ -11,8 +11,8 @@ public partial class DataGenerationListTypesViewModel : ObservableObject
     [ObservableProperty] private string _Description;
     [ObservableProperty] private string _DisplayName;
     [ObservableProperty] private object _Icon;
-    [ObservableProperty] private ObservableCollection<DataGenerationMethod> _Types;
     [ObservableProperty] private DataGenerationMethod _SelectedType;
+    [ObservableProperty] private ObservableCollection<DataGenerationMethod> _Types;
 
     public DataGenerationListTypesViewModel(string displayName, string description, object icon,
         IReadOnlyList<DataGenerationMethod> types)

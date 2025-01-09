@@ -1,28 +1,16 @@
-﻿using Avalonia.Controls;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Threading.Tasks;
+using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SukiUI.Dialogs;
-using System;
-using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using TableConverter.DataModels;
 
 namespace TableConverter.Components.Xaml;
 
 public partial class ConvertFilesOptionsViewModel(ISukiDialog dialog) : BaseDialogViewModel(dialog)
 {
-    #region Properties
-
-    [ObservableProperty]
-    private string _Title = string.Empty;
-
-    [ObservableProperty]
-    private ObservableCollection<Control> _Options = new();
-
-    public AsyncAction? OnOkClicked { get; set; }
-
-    #endregion
-
     #region Commands
 
     [RelayCommand]
@@ -35,10 +23,7 @@ public partial class ConvertFilesOptionsViewModel(ISukiDialog dialog) : BaseDial
             switch (buttonName)
             {
                 case "Ok":
-                    if (OnOkClicked is not null)
-                    {
-                        await OnOkClicked();
-                    }
+                    if (OnOkClicked is not null) await OnOkClicked();
                     break;
                 case "Cancel":
                     break;
@@ -47,6 +32,16 @@ public partial class ConvertFilesOptionsViewModel(ISukiDialog dialog) : BaseDial
             }
         }
     }
+
+    #endregion
+
+    #region Properties
+
+    [ObservableProperty] private string _Title = string.Empty;
+
+    [ObservableProperty] private ObservableCollection<Control> _Options = new();
+
+    public AsyncAction? OnOkClicked { get; set; }
 
     #endregion
 }

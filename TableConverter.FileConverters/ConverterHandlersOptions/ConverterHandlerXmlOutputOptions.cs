@@ -1,11 +1,10 @@
-﻿namespace TableConverter.FileConverters.ConverterHandlersOptions
+﻿namespace TableConverter.FileConverters.ConverterHandlersOptions;
+
+public class ConverterHandlerXmlOutputOptions : ConverterHandlerBaseOptions
 {
-    public class ConverterHandlerXmlOutputOptions : ConverterHandlerBaseOptions
-    {
-        public string XmlRootNodeName { get; set; } = "root";
+    public string XmlRootNodeName { get; set; } = "root";
 
-        public string XmlElementNodeName { get; set; } = "element";
+    public string XmlElementNodeName { get; set; } = "element";
 
-        public bool MinifyXml { get; set; } = false;
-    }
+    public bool MinifyXml { get; set; } = false;
 }

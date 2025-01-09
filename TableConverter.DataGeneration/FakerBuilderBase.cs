@@ -41,7 +41,7 @@ public abstract class FakerBuilderBase<TFaker>(TFaker fakerInstance) : IFakerBui
     {
         if (string.IsNullOrWhiteSpace(columnName))
             columnName = $"Column-{_actions.SelectMany(kvp => kvp.Value).Count() + 1}";
-        
+
         if (valueGenerator is null)
             throw new ArgumentNullException(nameof(valueGenerator));
         if (blanksPercentage is < 0 or > 100)
@@ -72,7 +72,7 @@ public abstract class FakerBuilderBase<TFaker>(TFaker fakerInstance) : IFakerBui
     {
         if (string.IsNullOrWhiteSpace(columnName))
             columnName = $"Column-{_actions.SelectMany(kvp => kvp.Value).Count() + 1}";
-        
+
         if (condition is null)
             throw new ArgumentNullException(nameof(condition));
         if (valueGenerator is null)

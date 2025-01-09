@@ -1,5 +1,3 @@
-using System;
-using System.Numerics;
 using TableConverter.DataGeneration;
 using TableConverter.DataGeneration.LocaleDataSetsBase;
 using TableConverter.DataGeneration.Modules;

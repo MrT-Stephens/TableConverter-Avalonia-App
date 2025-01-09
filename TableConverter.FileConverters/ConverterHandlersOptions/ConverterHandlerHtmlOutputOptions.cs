@@ -1,9 +1,8 @@
-﻿namespace TableConverter.FileConverters.ConverterHandlersOptions
-{
-    public class ConverterHandlerHtmlOutputOptions : ConverterHandlerBaseOptions
-    {
-        public bool MinifyHtml { get; set; } = false;
+﻿namespace TableConverter.FileConverters.ConverterHandlersOptions;
 
-        public bool IncludeTheadTbody { get; set; } = false;
-    }
+public class ConverterHandlerHtmlOutputOptions : ConverterHandlerBaseOptions
+{
+    public bool MinifyHtml { get; set; } = false;
+
+    public bool IncludeTheadTbody { get; set; } = false;
 }

@@ -105,7 +105,8 @@ public enum ProtocolTypeEnum
     Any
 }
 
-public partial class InternetModule(FakerBase faker, LocaleBase locale, Randomizer randomizer) : ModuleBase(faker, locale, randomizer)
+public partial class InternetModule(FakerBase faker, LocaleBase locale, Randomizer randomizer)
+    : ModuleBase(faker, locale, randomizer)
 {
     private static readonly IReadOnlyDictionary<Ipv4NetworkEnum, string> Ipv4Networks =
         new Dictionary<Ipv4NetworkEnum, string>
@@ -387,28 +388,29 @@ public partial class InternetModule(FakerBase faker, LocaleBase locale, Randomiz
     {
         return Randomizer.Bool() ? Ipv4() : Ipv6();
     }
-    
+
     public virtual string JwtAlgorithm()
     {
         return Randomizer.GetRandomElement(Locale.Internet.Value.JwtAlgorithm);
     }
-    
+
     public virtual string Mac(string separator = ":")
     {
         string[] separators = [":", "-", ""];
 
         if (string.IsNullOrEmpty(separator))
             separator = Randomizer.GetRandomElement(separators);
-        
+
         if (!separators.Contains(separator))
             throw new ArgumentException("Separator must be one of ':', '-', or an empty string.", nameof(separator));
-        
-        return string.Join(separator, Enumerable.Range(0, 6).Select(_ => Randomizer.Hexadecimal(2, HexCasing.Lower, string.Empty)));
+
+        return string.Join(separator,
+            Enumerable.Range(0, 6).Select(_ => Randomizer.Hexadecimal(2, HexCasing.Lower, string.Empty)));
     }
-    
+
     /// <summary>
-    /// Generates a random password-like string. Do not use this method for generating actual passwords for users.
-    /// Since the source of randomness is not cryptographically secure, neither is this generator.
+    ///     Generates a random password-like string. Do not use this method for generating actual passwords for users.
+    ///     Since the source of randomness is not cryptographically secure, neither is this generator.
     /// </summary>
     /// <param name="length">The length of the password to generate. Defaults to 15.</param>
     /// <param name="memorable">Whether the generated password should be memorable. Defaults to false.</param>
@@ -418,7 +420,7 @@ public partial class InternetModule(FakerBase faker, LocaleBase locale, Randomiz
     public virtual string Password(int length = 15, bool memorable = false, string pattern = @"\w", string prefix = "")
     {
         if (length <= 0) throw new ArgumentException("Length must be greater than 0.");
-        
+
         if (prefix.Length >= length) return prefix;
 
         var vowel = new Regex("[aeiouAEIOU]$");
@@ -432,25 +434,17 @@ public partial class InternetModule(FakerBase faker, LocaleBase locale, Randomiz
             if (currentPrefix.Length >= remainingLength) return currentPrefix;
 
             // Determine the pattern if memorable
-            if (isMemorable)
-            {
-                currentPattern = consonant.IsMatch(currentPrefix) ? vowel : consonant;
-            }
+            if (isMemorable) currentPattern = consonant.IsMatch(currentPrefix) ? vowel : consonant;
 
             // Generate a random character in the printable ASCII range
             var generatedChar = Randomizer.Char((char)33, (char)126); // Range 33-126 (printable ASCII)
 
             // If memorable, force lowercase
-            if (isMemorable)
-            {
-                generatedChar = char.ToLower(generatedChar);
-            }
+            if (isMemorable) generatedChar = char.ToLower(generatedChar);
 
             // Validate the character against the pattern
             if (!currentPattern.IsMatch(generatedChar.ToString()))
-            {
                 return Generate(remainingLength, isMemorable, currentPattern, currentPrefix);
-            }
 
             // Append the character and continue
             return Generate(remainingLength, isMemorable, currentPattern, currentPrefix + generatedChar);
@@ -461,12 +455,12 @@ public partial class InternetModule(FakerBase faker, LocaleBase locale, Randomiz
     {
         return Randomizer.Number(65535).ToString();
     }
-    
+
     public virtual string Protocol()
     {
         return Randomizer.GetRandomElement(["http", "https"]);
     }
-    
+
     public virtual string Url(bool appendSlash = false, ProtocolTypeEnum protocol = ProtocolTypeEnum.Any)
     {
         var protocolString = protocol switch
@@ -476,7 +470,7 @@ public partial class InternetModule(FakerBase faker, LocaleBase locale, Randomiz
             ProtocolTypeEnum.Any => Randomizer.GetRandomElement(["http", "https"]),
             _ => throw new ArgumentOutOfRangeException(nameof(protocol), protocol, null)
         };
-        
+
         return $"{protocolString}://{DomainName()}{(appendSlash ? "/" : string.Empty)}";
     }
 

@@ -1,73 +1,63 @@
 ﻿using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
 
-namespace TableConverter.FileConverters.ConverterHandlers
+namespace TableConverter.FileConverters.ConverterHandlers;
+
+public class ConverterHandlerJsonLinesOutput : ConverterHandlerOutputAbstract<ConverterHandlerJsonLinesOutputOptions>
 {
-    public class ConverterHandlerJsonLinesOutput : ConverterHandlerOutputAbstract<ConverterHandlerJsonLinesOutputOptions>
+    public override Result<string> Convert(string[] headers, string[][] rows)
     {
-        public override Result<string> Convert(string[] headers, string[][] rows)
+        using var writer = new StringWriter();
+
+        switch (Options!.SelectedJsonLinesFormatType)
         {
-            using var writer = new StringWriter();
-            
-            switch (Options!.SelectedJsonLinesFormatType)
+            case "Objects":
             {
-                case "Objects":
+                for (long i = 0; i < rows.LongLength; i++)
                 {
-                    for (long i = 0; i < rows.LongLength; i++)
+                    writer.Write("{");
+
+                    for (long j = 0; j < headers.LongLength; j++)
                     {
-                        writer.Write("{");
+                        writer.Write($"\"{headers[j]}\":\"{rows[i][j]}\"");
 
-                        for (long j = 0; j < headers.LongLength; j++)
-                        {
-                            writer.Write($"\"{headers[j]}\":\"{rows[i][j]}\"");
-
-                            if (j != rows.LongLength - 1)
-                            {
-                                writer.Write(",");
-                            }
-                        }
-
-                        writer.Write("}");
-
-                        if (i != rows.LongLength - 1)
-                        {
-                            writer.Write(Environment.NewLine);
-                        }
+                        if (j != rows.LongLength - 1) writer.Write(",");
                     }
 
-                    break;
+                    writer.Write("}");
+
+                    if (i != rows.LongLength - 1) writer.Write(Environment.NewLine);
                 }
-                case "Arrays":
+
+                break;
+            }
+            case "Arrays":
+            {
+                // Write headers
+                writer.Write("[");
+
+                writer.Write(string.Join(",", headers.Select(column => $"\"{column}\"").ToArray()));
+
+                writer.Write("]");
+
+                writer.Write(Environment.NewLine);
+
+                // Write rows
+                for (long i = 0; i < rows.LongLength; i++)
                 {
-                    // Write headers
                     writer.Write("[");
 
-                    writer.Write(string.Join(",", headers.Select(column => $"\"{column}\"").ToArray()));
+                    writer.Write(string.Join(",", rows[i].Select(str => $"\"{str}\"").ToArray()));
 
                     writer.Write("]");
 
-                    writer.Write(Environment.NewLine);
-
-                    // Write rows
-                    for (long i = 0; i < rows.LongLength; i++)
-                    {
-                        writer.Write("[");
-
-                        writer.Write(string.Join(",", rows[i].Select(str => $"\"{str}\"").ToArray()));
-
-                        writer.Write("]");
-
-                        if (i != rows.LongLength - 1)
-                        {
-                            writer.Write(Environment.NewLine);
-                        }
-                    }
-
-                    break;
+                    if (i != rows.LongLength - 1) writer.Write(Environment.NewLine);
                 }
-            }
 
-            return Result<string>.Success(writer.ToString());
+                break;
+            }
         }
+
+        return Result<string>.Success(writer.ToString());
     }
 }

@@ -25,13 +25,13 @@ public class DateTimeModule(FakerBase faker, LocaleBase locale, Randomizer rando
         DateTimeFormatsEnum format = DateTimeFormatsEnum.FullDateTime)
     {
         var dateTime = new DateTime(referenceDate, referenceTime);
-        
+
         var minTicks = dateTime.Date.Ticks - 31536000000;
         var maxTicks = dateTime.Date.Ticks + 31536000000;
-        
+
         if (minTicks < DateTime.MinValue.Ticks)
             minTicks = DateTime.MinValue.Ticks;
-        
+
         if (maxTicks > DateTime.MaxValue.Ticks)
             maxTicks = DateTime.MaxValue.Ticks;
 

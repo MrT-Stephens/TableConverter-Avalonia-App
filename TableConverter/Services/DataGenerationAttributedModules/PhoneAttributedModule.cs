@@ -5,7 +5,7 @@ using TableConverter.DataModels;
 
 namespace TableConverter.Services.DataGenerationAttributedModules;
 
-[DataGenerationModule("Phone", 
+[DataGenerationModule("Phone",
     "Module for generating phone-related data such as phone numbers and IMEI numbers.",
     "DataGenerationPhoneIcon")]
 public class PhoneAttributedModule(FakerBase faker, LocaleBase locale, Randomizer randomizer)

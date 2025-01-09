@@ -1,4 +1,3 @@
-using Avalonia;
 using TableConverter.DataGeneration;
 using TableConverter.DataGeneration.LocaleDataSetsBase;
 using TableConverter.DataGeneration.Modules;

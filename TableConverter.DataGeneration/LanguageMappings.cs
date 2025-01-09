@@ -76,7 +76,7 @@ public static class LanguageMapping
         { "ע", "a" }, { "פ", "f" }, { "ף", "ph" }, { "צ", "ts" }, { "ץ", "ts" }, { "ק", "k" },
         { "ר", "r" }, { "ש", "sh" }, { "ת", "t" }
     };
-    
+
     public static readonly IReadOnlyDictionary<string, string> CharacterMapping = new Dictionary<string, string>()
         .Concat(CyrillicMapping)
         .Concat(GreekMapping)

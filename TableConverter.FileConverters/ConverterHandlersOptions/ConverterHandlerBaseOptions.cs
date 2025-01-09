@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using System.Text;
+﻿using System.Text;
 
 namespace TableConverter.FileConverters.ConverterHandlersOptions;
 
@@ -16,7 +15,8 @@ public class ConverterHandlerBaseOptions
 
         var sb = new StringBuilder();
 
-        foreach (var property in properties) sb.Append($"{property.Name}: {(property.GetValue(this) is {} value ? value.ToString() : "null")}\n");
+        foreach (var property in properties)
+            sb.Append($"{property.Name}: {(property.GetValue(this) is { } value ? value.ToString() : "null")}\n");
 
         return sb.ToString();
     }

@@ -141,7 +141,7 @@ public class ColorModule(FakerBase faker, LocaleBase locale, Randomizer randomiz
             _ => throw new ArgumentOutOfRangeException(nameof(colorFormat), "Invalid color format.")
         };
     }
-    
+
     public virtual string Hsl(ColorFormatEnum colorFormat = ColorFormatEnum.Decimal, bool includeAlpha = false)
     {
         var values = new List<double>(includeAlpha ? 4 : 3)
@@ -158,11 +158,12 @@ public class ColorModule(FakerBase faker, LocaleBase locale, Randomizer randomiz
         {
             ColorFormatEnum.Decimal => ToDecimalString(values.ToArray()),
             ColorFormatEnum.Binary => string.Join(" ", ToBinaryStrings(values.ToArray())),
-            ColorFormatEnum.Css => FormatCss(values.ToArray(), includeAlpha ? CssFunctionEnum.Hsla : CssFunctionEnum.Hsl),
+            ColorFormatEnum.Css => FormatCss(values.ToArray(),
+                includeAlpha ? CssFunctionEnum.Hsla : CssFunctionEnum.Hsl),
             _ => throw new ArgumentOutOfRangeException(nameof(colorFormat), "Invalid color format.")
         };
     }
-    
+
     public virtual string Hwb(ColorFormatEnum colorFormat = ColorFormatEnum.Decimal)
     {
         var values = new List<double>(3)
@@ -180,7 +181,7 @@ public class ColorModule(FakerBase faker, LocaleBase locale, Randomizer randomiz
             _ => throw new ArgumentOutOfRangeException(nameof(colorFormat), "Invalid color format.")
         };
     }
-    
+
     public virtual string Lab(ColorFormatEnum colorFormat = ColorFormatEnum.Decimal)
     {
         var values = new List<double>(3)
@@ -198,7 +199,7 @@ public class ColorModule(FakerBase faker, LocaleBase locale, Randomizer randomiz
             _ => throw new ArgumentOutOfRangeException(nameof(colorFormat), "Invalid color format.")
         };
     }
-    
+
     public virtual string Lch(ColorFormatEnum colorFormat = ColorFormatEnum.Decimal)
     {
         var values = new List<double>(3)
@@ -226,7 +227,7 @@ public class ColorModule(FakerBase faker, LocaleBase locale, Randomizer randomiz
             Randomizer.Float(),
             Randomizer.Float()
         };
-        
+
         return colorFormat switch
         {
             ColorFormatEnum.Decimal => ToDecimalString(values.ToArray()),

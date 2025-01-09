@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using TableConverter.DataModels;
@@ -8,20 +7,6 @@ namespace TableConverter.ViewModels;
 
 public partial class DataGenerationFieldViewModel : ObservableObject
 {
-    #region Properties
-    
-    [ObservableProperty] private string _Key = string.Empty;
-
-    [ObservableProperty] private string _Name = string.Empty;
-
-    [ObservableProperty] private string _TypeName = "Choose a Type";
-
-    [ObservableProperty] private ushort _BlankPercentage;
-
-    [ObservableProperty] private ObservableCollection<DataGenerationParameterViewModel> _Parameters = [];
-
-    #endregion
-
     #region Methods
 
     public void SetDataGenerationMethod(DataGenerationMethod? method)
@@ -36,7 +21,7 @@ public partial class DataGenerationFieldViewModel : ObservableObject
         else
         {
             TypeName = method.Name;
-            
+
             Key = method.Key;
 
             Parameters = new ObservableCollection<DataGenerationParameterViewModel>(
@@ -45,6 +30,20 @@ public partial class DataGenerationFieldViewModel : ObservableObject
             );
         }
     }
+
+    #endregion
+
+    #region Properties
+
+    [ObservableProperty] private string _Key = string.Empty;
+
+    [ObservableProperty] private string _Name = string.Empty;
+
+    [ObservableProperty] private string _TypeName = "Choose a Type";
+
+    [ObservableProperty] private ushort _BlankPercentage;
+
+    [ObservableProperty] private ObservableCollection<DataGenerationParameterViewModel> _Parameters = [];
 
     #endregion
 }

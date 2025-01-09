@@ -1,18 +1,39 @@
-using System.Collections;
+using TableConverter.FileConverters.ConverterHandlersOptions;
+using TableConverter.FileConverters.DataModels;
 
 namespace TableConverter.FileConverters.Tests.TestBase;
 
-public abstract class InputConverterTestCasesBase : IEnumerable<object[]>
+public abstract class InputConverterTestCasesBase
 {
-    protected abstract IReadOnlyList<object[]> TestCases { get; }
+    protected abstract IReadOnlyList<
+        (
+        string FileName,
+        ConverterHandlerBaseOptions Options,
+        TableData ExpectedTableData
+        )> SuccessfulTestCases { get; }
 
-    public IEnumerator<object[]> GetEnumerator()
+    protected abstract IReadOnlyList<
+        (
+        string FileName,
+        ConverterHandlerBaseOptions Options
+        )> FailTestCases { get; }
+
+    public IEnumerable<object[]> GetSuccessfulTestCases()
     {
-        return TestCases.GetEnumerator();
+        return SuccessfulTestCases.Select(val => new object[]
+        {
+            val.FileName,
+            val.Options,
+            val.ExpectedTableData
+        });
     }
 
-    IEnumerator IEnumerable.GetEnumerator()
+    public IEnumerable<object[]> GetFailTestCases()
     {
-        return GetEnumerator();
+        return FailTestCases.Select(val => new object[]
+        {
+            val.FileName,
+            val.Options
+        });
     }
 }

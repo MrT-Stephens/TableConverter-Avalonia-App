@@ -1,57 +1,50 @@
 ﻿using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
 
-namespace TableConverter.FileConverters.ConverterHandlers
+namespace TableConverter.FileConverters.ConverterHandlers;
+
+public class ConverterHandlerMultiLineInput : ConverterHandlerInputAbstract<ConverterHandlerMultiLineOptions>
 {
-    public class ConverterHandlerMultiLineInput : ConverterHandlerInputAbstract<ConverterHandlerMultiLineOptions>
+    public override Result<TableData> ReadText(string text)
     {
-        public override Result<TableData> ReadText(string text)
+        var headers = new List<string>();
+        var rows = new List<string[]>();
+
+        using (var reader = new StringReader(text))
         {
-            var headers = new List<string>();
-            var rows = new List<string[]>();
+            var firstLine = true;
 
-            using (var reader = new StringReader(text))
+            var row = new List<string>();
+
+            for (var line = reader?.ReadLine()?.Trim(); !string.IsNullOrEmpty(line); line = reader?.ReadLine()?.Trim())
             {
-                var firstLine = true;
+                if (line is null) continue;
 
-                var row = new List<string>();
-
-                for (var line = reader?.ReadLine()?.Trim(); !string.IsNullOrEmpty(line); line = reader?.ReadLine()?.Trim())
+                if (line == Options!.RowSeparator)
                 {
-                    if (line is null)
+                    if (firstLine)
                     {
-                        continue;
-                    }
-                    
-                    if (line == Options!.RowSeparator)
-                    {
-                        if (firstLine)
-                        {
-                            firstLine = false;
-                        }
-                        else
-                        {
-                            rows.Add(row.ToArray());
-                            row.Clear();
-                        }
-                    }
-                    else if (firstLine)
-                    {
-                        headers.Add(line);
+                        firstLine = false;
                     }
                     else
                     {
-                        row.Add(line);
+                        rows.Add(row.ToArray());
+                        row.Clear();
                     }
                 }
-
-                if (row.Count > 0)
+                else if (firstLine)
                 {
-                    rows.Add(row.ToArray());
+                    headers.Add(line);
+                }
+                else
+                {
+                    row.Add(line);
                 }
             }
 
-            return Result<TableData>.Success(new TableData(headers, rows));
+            if (row.Count > 0) rows.Add(row.ToArray());
         }
+
+        return Result<TableData>.Success(new TableData(headers, rows));
     }
 }

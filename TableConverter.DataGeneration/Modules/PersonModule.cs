@@ -17,7 +17,8 @@ public enum SexFormat
     LowerAbbreviation
 }
 
-public class PersonModule(FakerBase faker, LocaleBase locale, Randomizer randomizer) : ModuleBase(faker, locale, randomizer)
+public class PersonModule(FakerBase faker, LocaleBase locale, Randomizer randomizer)
+    : ModuleBase(faker, locale, randomizer)
 {
     public override string ModuleName => "Person";
 
@@ -88,7 +89,7 @@ public class PersonModule(FakerBase faker, LocaleBase locale, Randomizer randomi
             _ => throw new ArgumentOutOfRangeException(nameof(format), format, null)
         };
     }
-    
+
     public virtual SexEnum SexType()
     {
         SexEnum[] sex = [SexEnum.Male, SexEnum.Female];

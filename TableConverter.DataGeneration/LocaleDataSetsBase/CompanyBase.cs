@@ -18,8 +18,8 @@ public abstract class CompanyBase
     public abstract ImmutableArray<IWeightedValue<ITemplatedValueBuilder<FakerBase, LocaleBase>>> NamePattern { get; }
 
     public abstract ImmutableArray<string> Noun { get; }
-    
+
     public abstract ImmutableArray<string> Category { get; }
-    
+
     public abstract ImmutableArray<string> LegalEntitySuffix { get; }
 }

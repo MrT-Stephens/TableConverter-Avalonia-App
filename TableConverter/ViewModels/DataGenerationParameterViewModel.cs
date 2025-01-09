@@ -1,6 +1,5 @@
 using System;
 using CommunityToolkit.Mvvm.ComponentModel;
-using NPOI.SS.Formula.Functions;
 
 namespace TableConverter.ViewModels;
 
@@ -16,8 +15,8 @@ public partial class DataGenerationParameterViewModel : ObservableObject
         if (defaultValue is not null)
             Value = defaultValue;
         else
-            Value = type.IsValueType 
-                ? Activator.CreateInstance(type) 
+            Value = type.IsValueType
+                ? Activator.CreateInstance(type)
                 : Convert.ChangeType(null, type);
     }
 

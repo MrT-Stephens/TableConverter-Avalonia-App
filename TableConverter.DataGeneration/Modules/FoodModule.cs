@@ -24,32 +24,32 @@ public class FoodModule(FakerBase faker, LocaleBase locale, Randomizer randomize
             ? ToTitleCase(Randomizer.GetRandomElement(Locale.Food.Value.Dish))
             : ToTitleCase(Randomizer.GetRandomElement(Locale.Food.Value.DishPattern).Build(Faker, Locale, Randomizer));
     }
-    
+
     public virtual string EthnicCategory()
     {
         return Randomizer.GetRandomElement(Locale.Food.Value.EthnicCategory);
     }
-    
+
     public virtual string Fruit()
     {
         return Randomizer.GetRandomElement(Locale.Food.Value.Fruit);
     }
-    
+
     public virtual string Ingredient()
     {
         return Randomizer.GetRandomElement(Locale.Food.Value.Ingredient);
     }
-    
+
     public virtual string Meat()
     {
         return Randomizer.GetRandomElement(Locale.Food.Value.Meat);
     }
-    
+
     public virtual string Spice()
     {
         return Randomizer.GetRandomElement(Locale.Food.Value.Spice);
     }
-    
+
     public virtual string Vegetable()
     {
         return Randomizer.GetRandomElement(Locale.Food.Value.Vegetable);

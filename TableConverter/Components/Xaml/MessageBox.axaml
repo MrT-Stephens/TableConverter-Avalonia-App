@@ -11,139 +11,139 @@
              d:DesignHeight="450"
              d:DesignWidth="800"
              mc:Ignorable="d">
-  <UserControl.Styles>
-    <Style Selector="xamlComponents|MessageBox">
-      <Setter Property="Template">
-        <ControlTemplate>
-          <Panel>
-            <!-- Main Content -->
-            <Border Name="PART_MainBorder"
-                    CornerRadius="25" 
-                    Margin="0,0,0,0">
-              <Border CornerRadius="25" 
-                      ClipToBounds="True">
-                <!-- Background -->
-                <Panel>
-                  <Panel Name="PART_MainCard"
-                         IsVisible="{TemplateBinding ShowCard}">
-                    <xamlInteractivity:Interaction.Behaviors>
-                      <xamlInteractions:DataTriggerBehavior Binding="{DynamicResource IsDark}"
-                                                            ComparisonCondition="Equal"
-                                                            Value="True">
-                        <ChangePropertyAction TargetObject="PART_MainCard"
-                                              PropertyName="Background">
-                          <ChangePropertyAction.Value>
-                            <LinearGradientBrush StartPoint="0%,0%"
-                                           EndPoint="100%,100%">
-                              <GradientStop Color="{DynamicResource SukiAccentColor3}"
-                                            Offset="0" />
-                              <GradientStop Color="{DynamicResource SukiPrimaryColor15}"
-                                            Offset="1" />
-                            </LinearGradientBrush>
-                          </ChangePropertyAction.Value>
-                        </ChangePropertyAction>
-                      </xamlInteractions:DataTriggerBehavior>
-                      <xamlInteractions:DataTriggerBehavior Binding="{DynamicResource IsLight}"
-                                                            ComparisonCondition="Equal"
-                                                            Value="True">
-                        <ChangePropertyAction TargetObject="PART_MainCard"
-                                              PropertyName="Background">
-                          <ChangePropertyAction.Value>
-                            <LinearGradientBrush StartPoint="0%,0%"
-                                           EndPoint="100%,100%">
-                              <GradientStop Color="{DynamicResource SukiAccentColor5}"
-                                            Offset="0" />
-                              <GradientStop Color="{DynamicResource SukiPrimaryColor7}"
-                                            Offset="1" />
-                            </LinearGradientBrush>
-                          </ChangePropertyAction.Value>
-                        </ChangePropertyAction>
-                      </xamlInteractions:DataTriggerBehavior>
-                    </xamlInteractivity:Interaction.Behaviors>
-                  </Panel>
-                  <!-- Main Content Stack Panel -->
-                  <Grid RowDefinitions="Auto,*,Auto">
-                    <!-- Title -->
-                    <TextBlock Grid.Row="0" 
-                               Margin="30,30,30,0" 
-                               Text="{TemplateBinding Title}" 
-                               FontWeight="DemiBold" 
-                               FontSize="26" 
-                               TextWrapping="WrapWithOverflow"
-                               HorizontalAlignment="Center" 
-                               Foreground="{DynamicResource SukiText}" />
-                    <!-- Content -->
-                    <ScrollViewer Grid.Row="1"
-                                  Margin="30,20,30,30"
-                                  VerticalScrollBarVisibility="{TemplateBinding ContentScrollEnabled, Converter={x:Static converters:BoolToScrollVisibilityConverter.Instance}}"
-                                  HorizontalScrollBarVisibility="{TemplateBinding ContentScrollEnabled, Converter={x:Static converters:BoolToScrollVisibilityConverter.Instance}}">
-                      <ContentPresenter Content="{TemplateBinding Content}" 
-                                        FontWeight="DemiBold" 
-                                        TextWrapping="Wrap" 
-                                        Foreground="{DynamicResource SukiLowText}" />
-                    </ScrollViewer>
-                    <!-- Action Buttons -->
-                    <ItemsControl Grid.Row="2" 
-                                  ItemsSource="{TemplateBinding ActionButtons}"
-                                  Margin="30,0,30,30"
-                                  IsVisible="{TemplateBinding ActionButtons, Converter={x:Static converters:IsArrayEmptyConverter.Instance}}">
-                      <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                          <components:SpacedUniformGrid Spacing="15" Columns="2" />
-                        </ItemsPanelTemplate>
-                      </ItemsControl.ItemsPanel>
-                    </ItemsControl>
-                  </Grid>
-                </Panel>
-              </Border>
-            </Border>
-            <!-- Circle Shadow Background -->
-            <Border CornerRadius="55"
-                    Margin="0,15,0,0"
-                    Height="110"
-                    Width="110"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Top"
-                    Background="{DynamicResource SukiGlassCardOpaqueBackground}"
-                    BoxShadow="{DynamicResource SukiBigPopupShadow}"
-                    IsVisible="{TemplateBinding ShowIcon}" />
-            <Border Margin="0,20,0,0" 
-                    Width="100" 
-                    Height="100" 
-                    CornerRadius="50" 
-                    VerticalAlignment="Top" 
-                    HorizontalAlignment="Center"
-                    IsVisible="{TemplateBinding ShowIcon}">
-              <Border CornerRadius="50" 
-                      ClipToBounds="True">
-                <Panel>
-                  <!-- Circle Background -->
-                  <Panel Opacity="1">
-                    <Panel.Background>
-                      <LinearGradientBrush StartPoint="0%,0%"
-                                           EndPoint="100%,100%"
-                                           SpreadMethod="Pad">
-                        <GradientStop Color="{DynamicResource SukiAccentColor}"
-                                      Offset="0" />
-                        <GradientStop Color="{DynamicResource SukiPrimaryColor}"
-                                      Offset="1" />
-                      </LinearGradientBrush>
-                    </Panel.Background>
-                  </Panel>
-                  <!-- Circle Icon -->
-                  <PathIcon Width="32" 
-                            Margin="0,0,0,0"
-                            Height="32" 
-                            HorizontalAlignment="Center" 
-                            VerticalAlignment="Center"
-                            Data="{TemplateBinding Icon}"
-                            Foreground="White" />
-                </Panel>
-              </Border>
-            </Border>
-          </Panel>
-        </ControlTemplate>
-      </Setter>
-    </Style>
-  </UserControl.Styles>
+    <UserControl.Styles>
+        <Style Selector="xamlComponents|MessageBox">
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Panel>
+                        <!-- Main Content -->
+                        <Border Name="PART_MainBorder"
+                                CornerRadius="25"
+                                Margin="0,0,0,0">
+                            <Border CornerRadius="25"
+                                    ClipToBounds="True">
+                                <!-- Background -->
+                                <Panel>
+                                    <Panel Name="PART_MainCard"
+                                           IsVisible="{TemplateBinding ShowCard}">
+                                        <xamlInteractivity:Interaction.Behaviors>
+                                            <xamlInteractions:DataTriggerBehavior Binding="{DynamicResource IsDark}"
+                                                ComparisonCondition="Equal"
+                                                Value="True">
+                                                <ChangePropertyAction TargetObject="PART_MainCard"
+                                                                      PropertyName="Background">
+                                                    <ChangePropertyAction.Value>
+                                                        <LinearGradientBrush StartPoint="0%,0%"
+                                                                             EndPoint="100%,100%">
+                                                            <GradientStop Color="{DynamicResource SukiAccentColor3}"
+                                                                          Offset="0" />
+                                                            <GradientStop Color="{DynamicResource SukiPrimaryColor15}"
+                                                                          Offset="1" />
+                                                        </LinearGradientBrush>
+                                                    </ChangePropertyAction.Value>
+                                                </ChangePropertyAction>
+                                            </xamlInteractions:DataTriggerBehavior>
+                                            <xamlInteractions:DataTriggerBehavior Binding="{DynamicResource IsLight}"
+                                                ComparisonCondition="Equal"
+                                                Value="True">
+                                                <ChangePropertyAction TargetObject="PART_MainCard"
+                                                                      PropertyName="Background">
+                                                    <ChangePropertyAction.Value>
+                                                        <LinearGradientBrush StartPoint="0%,0%"
+                                                                             EndPoint="100%,100%">
+                                                            <GradientStop Color="{DynamicResource SukiAccentColor5}"
+                                                                          Offset="0" />
+                                                            <GradientStop Color="{DynamicResource SukiPrimaryColor7}"
+                                                                          Offset="1" />
+                                                        </LinearGradientBrush>
+                                                    </ChangePropertyAction.Value>
+                                                </ChangePropertyAction>
+                                            </xamlInteractions:DataTriggerBehavior>
+                                        </xamlInteractivity:Interaction.Behaviors>
+                                    </Panel>
+                                    <!-- Main Content Stack Panel -->
+                                    <Grid RowDefinitions="Auto,*,Auto">
+                                        <!-- Title -->
+                                        <TextBlock Grid.Row="0"
+                                                   Margin="30,30,30,0"
+                                                   Text="{TemplateBinding Title}"
+                                                   FontWeight="DemiBold"
+                                                   FontSize="26"
+                                                   TextWrapping="WrapWithOverflow"
+                                                   HorizontalAlignment="Center"
+                                                   Foreground="{DynamicResource SukiText}" />
+                                        <!-- Content -->
+                                        <ScrollViewer Grid.Row="1"
+                                                      Margin="30,20,30,30"
+                                                      VerticalScrollBarVisibility="{TemplateBinding ContentScrollEnabled, Converter={x:Static converters:BoolToScrollVisibilityConverter.Instance}}"
+                                                      HorizontalScrollBarVisibility="{TemplateBinding ContentScrollEnabled, Converter={x:Static converters:BoolToScrollVisibilityConverter.Instance}}">
+                                            <ContentPresenter Content="{TemplateBinding Content}"
+                                                              FontWeight="DemiBold"
+                                                              TextWrapping="Wrap"
+                                                              Foreground="{DynamicResource SukiLowText}" />
+                                        </ScrollViewer>
+                                        <!-- Action Buttons -->
+                                        <ItemsControl Grid.Row="2"
+                                                      ItemsSource="{TemplateBinding ActionButtons}"
+                                                      Margin="30,0,30,30"
+                                                      IsVisible="{TemplateBinding ActionButtons, Converter={x:Static converters:IsArrayEmptyConverter.Instance}}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <components:SpacedUniformGrid Spacing="15" Columns="2" />
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                        </ItemsControl>
+                                    </Grid>
+                                </Panel>
+                            </Border>
+                        </Border>
+                        <!-- Circle Shadow Background -->
+                        <Border CornerRadius="55"
+                                Margin="0,15,0,0"
+                                Height="110"
+                                Width="110"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Top"
+                                Background="{DynamicResource SukiGlassCardOpaqueBackground}"
+                                BoxShadow="{DynamicResource SukiBigPopupShadow}"
+                                IsVisible="{TemplateBinding ShowIcon}" />
+                        <Border Margin="0,20,0,0"
+                                Width="100"
+                                Height="100"
+                                CornerRadius="50"
+                                VerticalAlignment="Top"
+                                HorizontalAlignment="Center"
+                                IsVisible="{TemplateBinding ShowIcon}">
+                            <Border CornerRadius="50"
+                                    ClipToBounds="True">
+                                <Panel>
+                                    <!-- Circle Background -->
+                                    <Panel Opacity="1">
+                                        <Panel.Background>
+                                            <LinearGradientBrush StartPoint="0%,0%"
+                                                                 EndPoint="100%,100%"
+                                                                 SpreadMethod="Pad">
+                                                <GradientStop Color="{DynamicResource SukiAccentColor}"
+                                                              Offset="0" />
+                                                <GradientStop Color="{DynamicResource SukiPrimaryColor}"
+                                                              Offset="1" />
+                                            </LinearGradientBrush>
+                                        </Panel.Background>
+                                    </Panel>
+                                    <!-- Circle Icon -->
+                                    <PathIcon Width="32"
+                                              Margin="0,0,0,0"
+                                              Height="32"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              Data="{TemplateBinding Icon}"
+                                              Foreground="White" />
+                                </Panel>
+                            </Border>
+                        </Border>
+                    </Panel>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+    </UserControl.Styles>
 </UserControl>

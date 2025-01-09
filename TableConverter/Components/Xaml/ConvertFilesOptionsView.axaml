@@ -10,32 +10,31 @@
              d:DesignHeight="450"
              d:DesignWidth="800"
              mc:Ignorable="d">
-  <xamlComponents:MessageBox Title="{Binding Title}"
-                             Icon="{StaticResource OptionsIcon}"
-                             ShowCard="False">
-    <xamlComponents:MessageBox.Content>
-      <sukiUi:GlassCard Padding="10">
-        <ItemsControl ItemsSource="{Binding Options}">
-          <ItemsControl.ItemsPanel>
-            <ItemsPanelTemplate>
-              <StackPanel Orientation="Vertical"
-                          Spacing="10">
-              </StackPanel>
-            </ItemsPanelTemplate>
-          </ItemsControl.ItemsPanel>
-        </ItemsControl>
-      </sukiUi:GlassCard>
-    </xamlComponents:MessageBox.Content>
-    <xamlComponents:MessageBox.ActionButtons>
-      <components:XamlArray x:TypeArguments="Control">
-        <Button Content="Cancel"
-                Command="{Binding ButtonClickedCommand}"
-                CommandParameter="Cancel" />
-        <Button Classes="Flat"
-                Content="Ok"
-                Command="{Binding ButtonClickedCommand}"
-                CommandParameter="Ok" />
-      </components:XamlArray>
-    </xamlComponents:MessageBox.ActionButtons>
-  </xamlComponents:MessageBox>
+    <xamlComponents:MessageBox Title="{Binding Title}"
+                               Icon="{StaticResource OptionsIcon}"
+                               ShowCard="False">
+        <xamlComponents:MessageBox.Content>
+            <sukiUi:GlassCard Padding="10">
+                <ItemsControl ItemsSource="{Binding Options}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Vertical"
+                                        Spacing="10" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </sukiUi:GlassCard>
+        </xamlComponents:MessageBox.Content>
+        <xamlComponents:MessageBox.ActionButtons>
+            <components:XamlArray x:TypeArguments="Control">
+                <Button Content="Cancel"
+                        Command="{Binding ButtonClickedCommand}"
+                        CommandParameter="Cancel" />
+                <Button Classes="Flat"
+                        Content="Ok"
+                        Command="{Binding ButtonClickedCommand}"
+                        CommandParameter="Ok" />
+            </components:XamlArray>
+        </xamlComponents:MessageBox.ActionButtons>
+    </xamlComponents:MessageBox>
 </UserControl>

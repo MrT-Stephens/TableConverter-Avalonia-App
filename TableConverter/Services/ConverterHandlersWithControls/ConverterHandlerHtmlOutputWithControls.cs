@@ -1,76 +1,69 @@
-﻿using Avalonia.Controls;
+﻿using System.Collections.ObjectModel;
+using Avalonia.Controls;
 using Avalonia.Layout;
-using System.Collections.ObjectModel;
 using TableConverter.FileConverters.ConverterHandlers;
 using TableConverter.Interfaces;
 
-namespace TableConverter.Services.ConverterHandlersWithControls
+namespace TableConverter.Services.ConverterHandlersWithControls;
+
+public class ConverterHandlerHtmlOutputWithControls : ConverterHandlerHtmlOutput, IInitializeControls
 {
-    public class ConverterHandlerHtmlOutputWithControls : ConverterHandlerHtmlOutput, IInitializeControls
+    public Collection<Control> Controls { get; set; } = new();
+
+    public void InitializeControls()
     {
-        public Collection<Control> Controls { get; set; } = new();
+        Controls.Clear();
 
-        public void InitializeControls()
+        var minify_html_stack_panel = new StackPanel
         {
-            Controls.Clear();
+            Orientation = Orientation.Horizontal,
+            Spacing = 10
+        };
 
-            var minify_html_stack_panel = new StackPanel()
-            {
-                Orientation = Orientation.Horizontal,
-                Spacing = 10
-            };
+        var minify_html_check_box = new ToggleSwitch
+        {
+            IsChecked = Options!.MinifyHtml
+        };
 
-            var minify_html_check_box = new ToggleSwitch()
-            {
-                IsChecked = Options!.MinifyHtml
-            };
+        minify_html_check_box.IsCheckedChanged += (sender, e) =>
+        {
+            if (sender is ToggleSwitch check_box) Options!.MinifyHtml = check_box.IsChecked ?? false;
+        };
 
-            minify_html_check_box.IsCheckedChanged += (sender, e) =>
-            {
-                if (sender is ToggleSwitch check_box)
-                {
-                    Options!.MinifyHtml = check_box.IsChecked ?? false;
-                }
-            };
+        var minify_html_label = new TextBlock
+        {
+            Text = "Minify HTML"
+        };
 
-            var minify_html_label = new TextBlock()
-            {
-                Text = "Minify HTML",
-            };
+        minify_html_stack_panel.Children.Add(minify_html_check_box);
+        minify_html_stack_panel.Children.Add(minify_html_label);
 
-            minify_html_stack_panel.Children.Add(minify_html_check_box);
-            minify_html_stack_panel.Children.Add(minify_html_label);
+        Controls?.Add(minify_html_stack_panel);
 
-            Controls?.Add(minify_html_stack_panel);
+        var include_thead_tbody_stack_panel = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 10
+        };
 
-            var include_thead_tbody_stack_panel = new StackPanel()
-            {
-                Orientation = Orientation.Horizontal,
-                Spacing = 10
-            };
+        var include_thead_tbody_check_box = new ToggleSwitch
+        {
+            IsChecked = Options!.IncludeTheadTbody
+        };
 
-            var include_thead_tbody_check_box = new ToggleSwitch()
-            {
-                IsChecked = Options!.IncludeTheadTbody
-            };
+        include_thead_tbody_check_box.IsCheckedChanged += (sender, e) =>
+        {
+            if (sender is ToggleSwitch check_box) Options!.IncludeTheadTbody = check_box.IsChecked ?? false;
+        };
 
-            include_thead_tbody_check_box.IsCheckedChanged += (sender, e) =>
-            {
-                if (sender is ToggleSwitch check_box)
-                {
-                    Options!.IncludeTheadTbody = check_box.IsChecked ?? false;
-                }
-            };
+        var include_thead_tbody_label = new TextBlock
+        {
+            Text = "Include thead/tbody"
+        };
 
-            var include_thead_tbody_label = new TextBlock()
-            {
-                Text = "Include thead/tbody",
-            };
+        include_thead_tbody_stack_panel.Children.Add(include_thead_tbody_check_box);
+        include_thead_tbody_stack_panel.Children.Add(include_thead_tbody_label);
 
-            include_thead_tbody_stack_panel.Children.Add(include_thead_tbody_check_box);
-            include_thead_tbody_stack_panel.Children.Add(include_thead_tbody_label);
-
-            Controls?.Add(include_thead_tbody_stack_panel);
-        }
+        Controls?.Add(include_thead_tbody_stack_panel);
     }
 }

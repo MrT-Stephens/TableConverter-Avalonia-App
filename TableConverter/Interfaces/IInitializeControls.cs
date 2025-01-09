@@ -1,12 +1,11 @@
-﻿using Avalonia.Controls;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
+using Avalonia.Controls;
 
-namespace TableConverter.Interfaces
+namespace TableConverter.Interfaces;
+
+public interface IInitializeControls
 {
-    public interface IInitializeControls
-    {
-        public Collection<Control> Controls { get; set; }
+    public Collection<Control> Controls { get; set; }
 
-        public void InitializeControls();
-    }
+    public void InitializeControls();
 }

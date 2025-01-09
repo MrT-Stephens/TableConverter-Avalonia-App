@@ -3,39 +3,37 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:xamlComponents="clr-namespace:TableConverter.Components.Xaml"
-             xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
-             xmlns:views="clr-namespace:TableConverter.Views"
              xmlns:components="clr-namespace:TableConverter.Components.Extensions"
              x:Class="TableConverter.Components.Xaml.FileTypesSelectorView"
              x:DataType="xamlComponents:FileTypesSelectorViewModel"
              d:DesignHeight="450"
              d:DesignWidth="800"
              mc:Ignorable="d">
-  <xamlComponents:MessageBox Title="{Binding Title}"
-                             Icon="{StaticResource FileSearchIcon}"
-                             ShowCard="False">
-    <xamlComponents:MessageBox.Content>
-      <ListBox ItemsSource="{Binding Values}"
-               SelectedItem="{Binding SelectedValue}"
-               SelectionMode="AlwaysSelected,Single">
-        <ListBox.ItemsPanel>
-          <ItemsPanelTemplate>
-            <components:SpacedUniformGrid Spacing="10"
-                                          Columns="4" />
-          </ItemsPanelTemplate>
-        </ListBox.ItemsPanel>
-      </ListBox>
-    </xamlComponents:MessageBox.Content>
-    <xamlComponents:MessageBox.ActionButtons>
-      <components:XamlArray x:TypeArguments="Control">
-        <Button Content="Cancel"
-                Command="{Binding ButtonClickedCommand}"
-                CommandParameter="Cancel" />
-        <Button Classes="Flat"
-                Content="Ok"
-                Command="{Binding ButtonClickedCommand}"
-                CommandParameter="Ok" />
-      </components:XamlArray>
-    </xamlComponents:MessageBox.ActionButtons>
-  </xamlComponents:MessageBox>
+    <xamlComponents:MessageBox Title="{Binding Title}"
+                               Icon="{StaticResource FileSearchIcon}"
+                               ShowCard="False">
+        <xamlComponents:MessageBox.Content>
+            <ListBox ItemsSource="{Binding Values}"
+                     SelectedItem="{Binding SelectedValue}"
+                     SelectionMode="AlwaysSelected,Single">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <components:SpacedUniformGrid Spacing="10"
+                                                      Columns="4" />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+            </ListBox>
+        </xamlComponents:MessageBox.Content>
+        <xamlComponents:MessageBox.ActionButtons>
+            <components:XamlArray x:TypeArguments="Control">
+                <Button Content="Cancel"
+                        Command="{Binding ButtonClickedCommand}"
+                        CommandParameter="Cancel" />
+                <Button Classes="Flat"
+                        Content="Ok"
+                        Command="{Binding ButtonClickedCommand}"
+                        CommandParameter="Ok" />
+            </components:XamlArray>
+        </xamlComponents:MessageBox.ActionButtons>
+    </xamlComponents:MessageBox>
 </UserControl>

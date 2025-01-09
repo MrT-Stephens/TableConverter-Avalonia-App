@@ -2,7 +2,8 @@ using TableConverter.DataGeneration.LocaleDataSetsBase;
 
 namespace TableConverter.DataGeneration.Modules;
 
-public class LoremModule(FakerBase faker, LocaleBase locale, Randomizer randomizer) : ModuleBase(faker, locale, randomizer)
+public class LoremModule(FakerBase faker, LocaleBase locale, Randomizer randomizer)
+    : ModuleBase(faker, locale, randomizer)
 {
     public override string ModuleName => "Lorem";
 
@@ -71,17 +72,17 @@ public class LoremModule(FakerBase faker, LocaleBase locale, Randomizer randomiz
 
         return string.Join(separator, Enumerable.Range(0, count).Select(_ => Sentence()));
     }
-    
+
     public virtual string Paragraph(int minCount = 3, int maxCount = 10)
     {
         return Sentences(minCount, maxCount);
     }
-    
+
     public virtual string Paragraphs(int minCount = 3, int maxCount = 6, string separator = "\n")
     {
         return Sentences(minCount, maxCount, separator);
     }
-    
+
     public virtual string Lines(int minCount = 3, int maxCount = 6)
     {
         return Sentences(minCount, maxCount, Environment.NewLine);
@@ -90,7 +91,7 @@ public class LoremModule(FakerBase faker, LocaleBase locale, Randomizer randomiz
     public virtual string Text()
     {
         var number = Randomizer.Number(0, 6);
-        
+
         return number switch
         {
             0 => Word(),

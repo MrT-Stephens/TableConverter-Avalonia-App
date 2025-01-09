@@ -1,9 +1,6 @@
-using System;
-using System.Diagnostics;
 using System.IO;
 using Avalonia.Controls;
 using Avalonia.Styling;
-using AvaloniaEdit;
 using AvaloniaEdit.Document;
 using AvaloniaEdit.TextMate;
 using SukiUI;
@@ -18,12 +15,12 @@ public partial class ConvertFilesPageView : UserControl
     public ConvertFilesPageView()
     {
         InitializeComponent();
-        
+
         _options = new RegistryOptions(ThemeName.HighContrastDark);
-        
+
         var inputInstallation = InputFileTextEditor.InstallTextMate(_options);
         var outputInstallation = OutputFileTextEditor.InstallTextMate(_options);
-        
+
         InputFileTextEditor.DocumentChanged += (_, e) => DocumentOnChanged(e, inputInstallation);
         OutputFileTextEditor.DocumentChanged += (_, e) => DocumentOnChanged(e, outputInstallation);
 
@@ -41,21 +38,15 @@ public partial class ConvertFilesPageView : UserControl
             }
         };
     }
-    
+
     private void DocumentOnChanged(DocumentChangedEventArgs e, TextMate.Installation? installation)
     {
-        if (e.NewDocument is null)
-        {
-            return;
-        }
-        
+        if (e.NewDocument is null) return;
+
         var extension = Path.GetExtension(e.NewDocument.FileName);
-        
-        if (string.IsNullOrEmpty(extension))
-        {
-            return;
-        }
-        
+
+        if (string.IsNullOrEmpty(extension)) return;
+
         var language = _options?.GetLanguageByExtension(extension);
 
         installation?.SetGrammar(language is not null

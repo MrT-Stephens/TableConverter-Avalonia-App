@@ -18,7 +18,10 @@ public abstract class PersonBase
 
     public abstract ImmutableArray<IWeightedValue<ITemplatedValueBuilder<FakerBase, LocaleBase>>> NamePattern { get; }
 
-    public abstract ImmutableArray<IWeightedValue<ITemplatedValueBuilder<FakerBase, LocaleBase>>> LastNamePattern { get; }
+    public abstract ImmutableArray<IWeightedValue<ITemplatedValueBuilder<FakerBase, LocaleBase>>> LastNamePattern
+    {
+        get;
+    }
 
     public abstract ImmutableArray<string> Gender { get; }
 
@@ -28,11 +31,17 @@ public abstract class PersonBase
 
     public abstract ImmutableArray<string> JobDescriptor { get; }
 
-    public abstract ImmutableArray<IWeightedValue<ITemplatedValueBuilder<FakerBase, LocaleBase>>> JobTypePattern { get; }
+    public abstract ImmutableArray<IWeightedValue<ITemplatedValueBuilder<FakerBase, LocaleBase>>> JobTypePattern
+    {
+        get;
+    }
 
     public abstract ImmutableArray<string> BiographyPart { get; }
 
     public abstract ImmutableArray<string> BiographySupporter { get; }
 
-    public abstract ImmutableArray<IWeightedValue<ITemplatedValueBuilder<FakerBase, LocaleBase>>> BiographyPattern { get; }
+    public abstract ImmutableArray<IWeightedValue<ITemplatedValueBuilder<FakerBase, LocaleBase>>> BiographyPattern
+    {
+        get;
+    }
 }

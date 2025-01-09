@@ -2,7 +2,8 @@ using TableConverter.DataGeneration.LocaleDataSetsBase;
 
 namespace TableConverter.DataGeneration.Modules;
 
-public class WordModule(FakerBase faker, LocaleBase locale, Randomizer randomizer) : ModuleBase(faker, locale, randomizer)
+public class WordModule(FakerBase faker, LocaleBase locale, Randomizer randomizer)
+    : ModuleBase(faker, locale, randomizer)
 {
     public override string ModuleName => "Word";
 

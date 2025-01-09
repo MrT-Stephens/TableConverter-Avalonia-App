@@ -36,7 +36,7 @@ public partial class DataGenerationTypesViewModel : BaseDialogViewModel
                 dataGenerationTypesService.Types.SelectMany(type => type.Methods).ToList()));
 
         Categories = new ObservableCollection<DataGenerationListTypesViewModel>(categories);
-        
+
         SelectedCategory = Categories.First();
     }
 

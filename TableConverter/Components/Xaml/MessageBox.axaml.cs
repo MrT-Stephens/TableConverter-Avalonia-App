@@ -1,6 +1,6 @@
+using System.Collections.ObjectModel;
 using Avalonia;
 using Avalonia.Controls;
-using System.Collections.ObjectModel;
 
 namespace TableConverter.Components.Xaml;
 
@@ -20,9 +20,14 @@ public partial class MessageBox : UserControl
 
     public static readonly StyledProperty<bool> ShowCardProperty =
         AvaloniaProperty.Register<MessageBox, bool>(nameof(ShowCard), true);
-    
+
     public static readonly StyledProperty<bool> ShowIconProperty =
-        AvaloniaProperty.Register<MessageBox, bool>(nameof(ShowIcon), false);
+        AvaloniaProperty.Register<MessageBox, bool>(nameof(ShowIcon));
+
+    public MessageBox()
+    {
+        InitializeComponent();
+    }
 
     public object? Icon
     {
@@ -53,15 +58,10 @@ public partial class MessageBox : UserControl
         get => GetValue(ShowCardProperty);
         set => SetValue(ShowCardProperty, value);
     }
-    
+
     public bool ShowIcon
     {
         get => GetValue(ShowIconProperty);
         set => SetValue(ShowIconProperty, value);
-    }
-
-    public MessageBox()
-    {
-        InitializeComponent();
     }
 }

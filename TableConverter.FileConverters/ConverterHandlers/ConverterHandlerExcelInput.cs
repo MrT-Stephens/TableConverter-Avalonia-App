@@ -3,79 +3,73 @@ using NPOI.XSSF.UserModel;
 using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
 
-namespace TableConverter.FileConverters.ConverterHandlers
+namespace TableConverter.FileConverters.ConverterHandlers;
+
+public class ConverterHandlerExcelInput : ConverterHandlerInputAbstract<ConverterHandlerBaseOptions>
 {
-    public class ConverterHandlerExcelInput : ConverterHandlerInputAbstract<ConverterHandlerBaseOptions>
+    private XSSFWorkbook? ExcelWorkbook { get; set; }
+
+    public override Result<TableData> ReadText(string text)
     {
-        private XSSFWorkbook? ExcelWorkbook { get; set; }
+        var headers = new List<string>();
+        var rows = new List<string[]>();
 
-        public override Result<TableData> ReadText(string text)
+        try
         {
-            var headers = new List<string>();
-            var rows = new List<string[]>();
+            if (ExcelWorkbook == null) throw new Exception("Excel Workbook is not initialized");
 
-            try
-            {
-                if (ExcelWorkbook == null)
+            var sheet = ExcelWorkbook.GetSheetAt(0);
+
+            foreach (IRow row in sheet)
+                if (row.RowNum == 0)
                 {
-                    throw new Exception("Excel Workbook is not initialized");
+                    headers.AddRange(row.Cells.Select(cell => cell.ToString() ?? ""));
                 }
-
-                var sheet = ExcelWorkbook.GetSheetAt(0);
-
-                foreach (IRow row in sheet)
+                else
                 {
-                    if (row.RowNum == 0)
-                    {
-                        headers.AddRange(row.Cells.Select(cell => cell.ToString() ?? ""));
-                    }
-                    else
-                    {
-                        var values = new List<string>();
+                    var values = new List<string>();
 
-                        for (var i = 0; i < headers.Count; i++)
+                    for (var i = 0; i < headers.Count; i++)
+                    {
+                        var cell = row.GetCell(i);
+
+                        if (cell == null)
                         {
-                            var cell = row.GetCell(i);
-
-                            if (cell == null)
-                            {
-                                values.Add("");
-                                continue;
-                            }
-
-                            values.Add(cell.ToString() ?? "");
+                            values.Add("");
+                            continue;
                         }
 
-                        rows.Add(values.ToArray());
+                        values.Add(cell.ToString() ?? "");
                     }
+
+                    rows.Add(values.ToArray());
                 }
 
-                ExcelWorkbook.Close();
-                ExcelWorkbook.Dispose();
-                ExcelWorkbook = null;
-            }
-            catch (Exception ex)
-            {
-                return Result<TableData>.Failure(ex.Message);
-            }
-
-            return Result<TableData>.Success(new TableData(headers, rows));
+            ExcelWorkbook.Close();
+            ExcelWorkbook.Dispose();
+            ExcelWorkbook = null;
         }
-
-        public override Result<string> ReadFile(Stream? stream)
+        catch (Exception ex)
         {
-            ArgumentNullException.ThrowIfNull(stream, nameof(stream));
-
-            try
-            {
-                ExcelWorkbook = new XSSFWorkbook(stream);
-            }
-            catch (Exception ex)
-            {
-                return Result<string>.Failure(ex.Message);
-            }
-
-            return Result<string>.Success($"Excel files are not visible within this text box 😭{Environment.NewLine}");
+            return Result<TableData>.Failure(ex.Message);
         }
+
+        return Result<TableData>.Success(new TableData(headers, rows));
+    }
+
+    public override Result<string> ReadFile(Stream? stream)
+    {
+        ArgumentNullException.ThrowIfNull(stream, nameof(stream));
+
+        try
+        {
+            ExcelWorkbook = new XSSFWorkbook(stream);
+        }
+        catch (Exception ex)
+        {
+            return Result<string>.Failure(ex.Message);
+        }
+
+        return Result<string>.Success($"Excel files are not visible within this text box 😭{Environment.NewLine}");
     }
 }

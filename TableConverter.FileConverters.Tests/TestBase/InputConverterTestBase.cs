@@ -23,7 +23,7 @@ namespace TableConverter.FileConverters.Tests.TestBase;
 public abstract class InputConverterTestBase<TInputConverter, TInputConverterData>
     // Ensures that a new instance of TInputConverter is created for each test class.
     : IClassFixture<TInputConverter>
-    // Constraints TInputConverter to be a class, implement IConverterHandlerInput, and have a parameterless constructor.
+// Constraints TInputConverter to be a class, implement IConverterHandlerInput, and have a parameterless constructor.
     where TInputConverter : class, IConverterHandlerInput, new()
     // Constraints TInputConverterData to extend InputConverterTestCasesBase and be instantiated with a parameterless constructor.
     where TInputConverterData : InputConverterTestCasesBase, new()
@@ -34,9 +34,9 @@ public abstract class InputConverterTestBase<TInputConverter, TInputConverterDat
     ///     Synchronous test method that tests file conversion functionality.
     /// </summary>
     [Theory]
-    [MemberData(nameof(GetAllInputTestCases))]
-    public void TestInputFile(
-        string fileName, 
+    [MemberData(nameof(GetSuccessfulTestCases))]
+    public void TestInputFile_WithSuccessfulData(
+        string fileName,
         ConverterHandlerBaseOptions options,
         TableData expectedTableDataResult)
     {
@@ -59,9 +59,9 @@ public abstract class InputConverterTestBase<TInputConverter, TInputConverterDat
     ///     Asynchronous test method that tests asynchronous file conversion functionality.
     /// </summary>
     [Theory]
-    [MemberData(nameof(GetAllInputTestCases))]
-    public async void TestInputFileAsync(
-        string fileName, 
+    [MemberData(nameof(GetSuccessfulTestCases))]
+    public async void TestInputFileAsync_WithSuccessfulData(
+        string fileName,
         ConverterHandlerBaseOptions options,
         TableData expectedTableDataResult)
     {
@@ -81,12 +81,59 @@ public abstract class InputConverterTestBase<TInputConverter, TInputConverterDat
     }
 
     /// <summary>
+    ///     Synchronous test method that tests file conversion functionality with incorrect data.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(GetFailTestCases))]
+    public virtual void TestInputFile_WithFailData(string fileName, ConverterHandlerBaseOptions options)
+    {
+        Handler.Options = options; // Sets the options for the handler.
+
+        using var stream = GetFileStream(fileName); // Retrieves the file stream from resources.
+
+        // Perform file reading and conversion, asserting success at each stage.
+        var fileResult = Handler.ReadFile(stream);
+        Assert.True(fileResult.IsSuccess, $"fileResult.IsSuccess is false. Error: {fileResult.Error}");
+
+        var convertResult = Handler.ReadText(fileResult.Value);
+        Assert.False(convertResult.IsSuccess,
+            $"convertResult.IsSuccess is true. Should be false due to data being incorrect. Data: {convertResult.Value}");
+    }
+
+    /// <summary>
+    ///     Asynchronous test method that tests asynchronous file conversion functionality with incorrect data.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(GetFailTestCases))]
+    public virtual async void TestInputFileAsync_WithFailData(string fileName, ConverterHandlerBaseOptions options)
+    {
+        Handler.Options = options; // Sets the options for the handler.
+
+        await using var stream = GetFileStream(fileName); // Asynchronously retrieves the file stream.
+
+        // Perform asynchronous file reading and conversion, asserting success at each stage.
+        var fileResult = await Handler.ReadFileAsync(stream);
+        Assert.True(fileResult.IsSuccess, $"fileResult.IsSuccess is false. Error: {fileResult.Error}");
+
+        var convertResult = await Handler.ReadTextAsync(fileResult.Value);
+        Assert.False(convertResult.IsSuccess,
+            $"convertResult.IsSuccess is true. Should be false due to data being incorrect. Data: {convertResult.Value}");
+    }
+
+    /// <summary>
     ///     Static method that returns test cases as input for the test methods.
     /// </summary>
-    public static IEnumerable<object[]> GetAllInputTestCases()
+    public static IEnumerable<object[]> GetSuccessfulTestCases()
     {
-        // Retrieves the test cases from an instance of TInputConverterData.
-        return new TInputConverterData();
+        return new TInputConverterData().GetSuccessfulTestCases();
+    }
+
+    /// <summary>
+    ///     Static method that returns test cases as input for the test methods.
+    /// </summary>
+    public static IEnumerable<object[]> GetFailTestCases()
+    {
+        return new TInputConverterData().GetFailTestCases();
     }
 
     /// <summary>

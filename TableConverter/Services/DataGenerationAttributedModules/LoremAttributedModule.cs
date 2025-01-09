@@ -5,7 +5,7 @@ using TableConverter.DataModels;
 
 namespace TableConverter.Services.DataGenerationAttributedModules;
 
-[DataGenerationModule("Lorem", 
+[DataGenerationModule("Lorem",
     "Module for generating random text such as words, sentences, and paragraphs.",
     "DataGenerationLoremIcon")]
 public class LoremAttributedModule(FakerBase faker, LocaleBase locale, Randomizer randomizer)
