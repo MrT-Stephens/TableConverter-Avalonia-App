@@ -64,6 +64,9 @@ public class ConverterHandlerExcelInput : ConverterHandlerInputAbstract<Converte
         try
         {
             ExcelWorkbook = new XSSFWorkbook(stream);
+            
+            if (ExcelWorkbook.NumberOfSheets == 0 || ExcelWorkbook.GetSheetAt(0).PhysicalNumberOfRows == 0)
+                return Result<string>.Failure("Excel file is empty");
         }
         catch (Exception ex)
         {

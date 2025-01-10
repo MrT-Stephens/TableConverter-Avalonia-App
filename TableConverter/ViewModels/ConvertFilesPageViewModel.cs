@@ -478,6 +478,8 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                     }
                     else
                     {
+                        FilesManager.Files.Remove(loadingDoc);
+                        
                         loadingDoc.IsBusy = false;
 
                         DialogManager.CreateDialog()

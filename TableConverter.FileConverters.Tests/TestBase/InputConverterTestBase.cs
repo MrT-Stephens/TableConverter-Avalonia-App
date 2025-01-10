@@ -119,6 +119,22 @@ public abstract class InputConverterTestBase<TInputConverter, TInputConverterDat
         Assert.False(convertResult.IsSuccess,
             $"convertResult.IsSuccess is true. Should be false due to data being incorrect. Data: {convertResult.Value}");
     }
+    
+    /// <summary>
+    ///     Test method that tests file conversion functionality with empty data.
+    /// </summary>
+    /// <param name="fileName"></param>
+    [Theory]
+    [InlineData("test_input_empty.txt")]
+    [InlineData("test_input_whitespace.txt")]
+    public virtual void TestInputFile_WithEmptyData(string fileName)
+    {
+        using var stream = GetFileStream(fileName); // Retrieves the file stream from resources.
+
+        // Perform file reading, asserting failure due to empty data.
+        var fileResult = Handler.ReadFile(stream);
+        Assert.False(fileResult.IsSuccess, $"fileResult.IsSuccess is true. Should be false due to empty data.");
+    }
 
     /// <summary>
     ///     Static method that returns test cases as input for the test methods.

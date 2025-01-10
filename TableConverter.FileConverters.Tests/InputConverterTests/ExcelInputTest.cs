@@ -81,4 +81,18 @@ public class ExcelInputTest : InputConverterTestBase<ConverterHandlerExcelInput,
         Assert.False(fileResult.IsSuccess,
             $"fileResult.IsSuccess is true. Should be false due to data being incorrect. Data: {fileResult.Value}");
     }
+
+    /// <summary>
+    ///     Overrides the
+    ///     <see cref="InputConverterTestBase{TInputConverter,TInputConverterData}.TestInputFile_WithEmptyData" /> test method
+    ///     to test the conversion of a file with empty data.
+    ///     Due to <see cref="NPOI.XSSF" /> being used for inputting the Excel file, the test is expected to fail early in the
+    ///     process.
+    /// </summary>
+    [Theory]
+    [InlineData("test_input_empty_excel.xlsx")]
+    public override void TestInputFile_WithEmptyData(string fileName)
+    {
+        base.TestInputFile_WithEmptyData(fileName);
+    }
 }

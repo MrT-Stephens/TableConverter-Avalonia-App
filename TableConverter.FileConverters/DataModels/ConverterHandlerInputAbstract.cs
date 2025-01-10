@@ -25,7 +25,12 @@ public abstract class ConverterHandlerInputAbstract<T> : IConverterHandlerInput
         while (attempts < maxRetries)
             try
             {
-                return Result<string>.Success(reader.ReadToEnd());
+                var text = reader.ReadToEnd();
+                
+                if (string.IsNullOrEmpty(text) || string.IsNullOrWhiteSpace(text))
+                    return Result<string>.Failure("File is empty");
+                
+                return Result<string>.Success(text);
             }
             catch (IOException exception) when (exception.Message.Contains("timed out"))
             {
