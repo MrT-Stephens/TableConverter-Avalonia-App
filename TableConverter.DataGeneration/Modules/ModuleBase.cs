@@ -1,8 +1,9 @@
+using TableConverter.DataGeneration.Interfaces;
 using TableConverter.DataGeneration.LocaleDataSetsBase;
 
 namespace TableConverter.DataGeneration.Modules;
 
-public abstract class ModuleBase(FakerBase faker, LocaleBase locale, Randomizer randomizer)
+public abstract class ModuleBase(FakerBase faker, LocaleBase locale, Randomizer randomizer) : IModule
 {
     protected readonly FakerBase Faker = faker;
 

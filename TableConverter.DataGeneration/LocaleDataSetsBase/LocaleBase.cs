@@ -1,12 +1,16 @@
+using TableConverter.DataGeneration.Interfaces;
+
 namespace TableConverter.DataGeneration.LocaleDataSetsBase;
 
 /// <summary>
 ///     Base class for locale datasets.
 ///     Contains a title and multiple datasets.
 /// </summary>
-public abstract class LocaleBase
+public abstract class LocaleBase : ILocale
 {
     public abstract string Title { get; }
+    
+    public abstract string Code { get; }
 
     public abstract Lazy<PersonBase> Person { get; }
 

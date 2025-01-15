@@ -22,6 +22,8 @@ namespace TableConverter.DataGeneration.LocaleDataSets.en_GB;
 public sealed class Locale : en.Locale
 {
     public override string Title => "English (United Kingdom)";
+    
+    public override string Code => "en_GB";
 
     public override Lazy<PersonBase> Person { get; } = new(() => new PersonDataSet());
 

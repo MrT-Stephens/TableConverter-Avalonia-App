@@ -1,4 +1,5 @@
 using System.Reflection;
+using TableConverter.DataGeneration.Interfaces;
 using TableConverter.DataGeneration.LocaleDataSetsBase;
 
 namespace TableConverter.DataGeneration;
@@ -17,15 +18,15 @@ public static class LocaleFactory
     /// <param name="localeType">The locale type to create.</param>
     /// <returns>The created locale.</returns>
     /// <exception cref="Exception">Thrown when the locale type is not found.</exception>
-    public static LocaleBase CreateLocale(string localeType = "en")
+    public static ILocale CreateLocale(string localeType = "en")
     {
         foreach (var type in Assembly.GetExecutingAssembly().GetTypes())
         {
-            if (!type.IsAssignableTo(typeof(LocaleBase))) continue;
+            if (!type.IsAssignableTo(typeof(ILocale))) continue;
 
             if (Attribute.GetCustomAttribute(type, typeof(LocaleAttribute)) is LocaleAttribute attribute &&
                 attribute.Locale == localeType)
-                return Activator.CreateInstance(type) as LocaleBase ?? throw new Exception("Failed to create locale");
+                return Activator.CreateInstance(type) as ILocale ?? throw new Exception("Failed to create locale");
         }
 
         throw new Exception("Locale not found");
@@ -41,7 +42,7 @@ public static class LocaleFactory
 
         foreach (var type in Assembly.GetExecutingAssembly().GetTypes())
         {
-            if (!type.IsAssignableTo(typeof(LocaleBase))) continue;
+            if (!type.IsAssignableTo(typeof(ILocale))) continue;
 
             if (Attribute.GetCustomAttribute(type, typeof(LocaleAttribute)) is LocaleAttribute attribute)
                 locales.Add(attribute.Locale);

@@ -22,6 +22,8 @@ namespace TableConverter.DataGeneration.LocaleDataSets.zh_CN;
 public sealed class Locale : en.Locale
 {
     public override string Title => "Chinese (China)";
+    
+    public override string Code => "zh_CN";
 
     public override Lazy<PersonBase> Person { get; } = new(() => new PersonDataSet());
 

@@ -10,7 +10,16 @@ namespace TableConverter.DataGeneration;
 /// </summary>
 public abstract class FakerBase : IFaker
 {
-    private string _localeType = null!;
+    /// <summary>
+    ///     Cached locales. Used to store locales that have already been created.
+    ///     This is to prevent creating the same locale multiple times.
+    /// </summary>
+    private readonly Dictionary<string, ILocale> _CachedLocales = new();
+
+    /// <summary>
+    ///     The internal locale name of the dataset. E.g. "en".
+    /// </summary>
+    private string _LocaleType = null!;
 
     protected FakerBase(string localeType = "en", int? seed = null)
     {
@@ -18,15 +27,27 @@ public abstract class FakerBase : IFaker
         Randomizer = seed.HasValue ? new Randomizer(seed.Value) : new Randomizer();
     }
 
+    /// <summary>
+    ///     The locale type of the dataset. E.g. "en".
+    /// </summary>
     public string LocaleType
     {
-        get => _localeType;
+        get => _LocaleType;
         set
         {
-            if (_localeType == value) return;
+            if (_LocaleType == value) return;
 
-            _localeType = value;
-            Locale = LocaleFactory.CreateLocale(_localeType);
+            _LocaleType = value;
+
+            if (_CachedLocales.TryGetValue(_LocaleType, out var locale))
+            {
+                Locale = (LocaleBase)locale;
+            }
+            else
+            {
+                Locale = (LocaleBase)LocaleFactory.CreateLocale(_LocaleType);
+                _CachedLocales.Add(_LocaleType, Locale);
+            }
         }
     }
 
@@ -47,7 +68,7 @@ public abstract class FakerBase : IFaker
     public abstract CommerceModule Commerce { get; }
     public abstract FoodModule Food { get; }
     public abstract DateTimeModule DateTime { get; }
-
+    
     public LocaleBase Locale { get; set; } = null!;
 
     public Randomizer Randomizer { get; set; }
