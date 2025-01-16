@@ -1,5 +1,6 @@
 ﻿using System;
 using Avalonia;
+using Avalonia.Dialogs;
 
 namespace TableConverter.Desktop;
 
@@ -8,7 +9,7 @@ internal class Program
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
-    [MTAThread]
+    [STAThread]
     public static void Main(string[] args)
     {
         BuildAvaloniaApp()
@@ -23,10 +24,10 @@ internal class Program
             .WithInterFont()
             .LogToTrace();
 
-        /* if (OperatingSystem.IsWindows() || OperatingSystem.IsMacOS() || OperatingSystem.IsLinux())
+        if (OperatingSystem.IsWindows() || OperatingSystem.IsMacOS() || OperatingSystem.IsLinux())
         {
             app.UseManagedSystemDialogs();
-        } */
+        }
 
         return app;
     }
