@@ -8,7 +8,6 @@
                    Title="TableConverter"
                    BackgroundAnimationEnabled="False"
                    BackgroundTransitionsEnabled="False"
-                   BackgroundStyle="Bubble"
                    MinHeight="400"
                    MinWidth="400"
                    x:DataType="vm:MainWindowViewModel"
