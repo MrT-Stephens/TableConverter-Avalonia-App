@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableConverter.FileConverte
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableConverter.FileConverters.Tests", "TableConverter.FileConverters.Tests\TableConverter.FileConverters.Tests.csproj", "{14E950EB-21F3-46AC-A4F4-2647B9C49592}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableConverter.DataGeneration.Tests", "TableConverter.DataGeneration.Tests\TableConverter.DataGeneration.Tests.csproj", "{772E7913-9A1A-4308-A0A4-3C80FE43946F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{14E950EB-21F3-46AC-A4F4-2647B9C49592}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{14E950EB-21F3-46AC-A4F4-2647B9C49592}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{14E950EB-21F3-46AC-A4F4-2647B9C49592}.Release|Any CPU.Build.0 = Release|Any CPU
+		{772E7913-9A1A-4308-A0A4-3C80FE43946F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{772E7913-9A1A-4308-A0A4-3C80FE43946F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{772E7913-9A1A-4308-A0A4-3C80FE43946F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{772E7913-9A1A-4308-A0A4-3C80FE43946F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

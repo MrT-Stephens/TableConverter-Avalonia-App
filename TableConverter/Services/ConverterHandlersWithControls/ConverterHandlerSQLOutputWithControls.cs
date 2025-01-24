@@ -6,7 +6,7 @@ using TableConverter.Interfaces;
 
 namespace TableConverter.Services.ConverterHandlersWithControls;
 
-public class ConverterHandlerSQLOutputWithControls : ConverterHandlerSQLOutput, IInitializeControls
+public class ConverterHandlerSqlOutputWithControls : ConverterHandlerSQLOutput, IInitializeControls
 {
     public Collection<Control> Controls { get; set; } = new();
 
@@ -14,83 +14,83 @@ public class ConverterHandlerSQLOutputWithControls : ConverterHandlerSQLOutput, 
     {
         Controls.Clear();
 
-        var table_name_stack_panel = new StackPanel
+        var tableNameStackPanel = new StackPanel
         {
             Orientation = Orientation.Vertical
         };
 
-        var table_name_label = new TextBlock
+        var tableNameLabel = new TextBlock
         {
             Text = "Table Name:"
         };
 
-        var table_name_text_box = new TextBox
+        var tableNameTextBox = new TextBox
         {
             Text = Options!.TableName
         };
 
-        table_name_text_box.TextChanged += (sender, e) =>
+        tableNameTextBox.TextChanged += (sender, e) =>
         {
-            if (sender is TextBox text_box && !string.IsNullOrEmpty(text_box.Text)) Options!.TableName = text_box.Text;
+            if (sender is TextBox textBox && !string.IsNullOrEmpty(textBox.Text)) Options!.TableName = textBox.Text;
         };
 
-        table_name_stack_panel.Children.Add(table_name_label);
-        table_name_stack_panel.Children.Add(table_name_text_box);
+        tableNameStackPanel.Children.Add(tableNameLabel);
+        tableNameStackPanel.Children.Add(tableNameTextBox);
 
-        Controls?.Add(table_name_stack_panel);
+        Controls?.Add(tableNameStackPanel);
 
-        var quote_type_stack_panel = new StackPanel
+        var quoteTypeStackPanel = new StackPanel
         {
             Orientation = Orientation.Vertical
         };
 
-        var quote_type_label = new TextBlock
+        var quoteTypeLabel = new TextBlock
         {
             Text = "Quote Type:"
         };
 
-        var quote_type_combo_box = new ComboBox
+        var quoteTypeComboBox = new ComboBox
         {
             ItemsSource = Options!.QuoteTypes.Keys,
             SelectedItem = Options!.SelectedQuoteType,
             HorizontalAlignment = HorizontalAlignment.Stretch
         };
 
-        quote_type_combo_box.SelectionChanged += (sender, e) =>
+        quoteTypeComboBox.SelectionChanged += (sender, e) =>
         {
-            if (sender is ComboBox combo_box && combo_box.SelectedItem is string selected_quote_type)
-                Options!.SelectedQuoteType = selected_quote_type;
+            if (sender is ComboBox comboBox && comboBox.SelectedItem is string selectedQuoteType)
+                Options!.SelectedQuoteType = selectedQuoteType;
         };
 
-        quote_type_stack_panel.Children.Add(quote_type_label);
-        quote_type_stack_panel.Children.Add(quote_type_combo_box);
+        quoteTypeStackPanel.Children.Add(quoteTypeLabel);
+        quoteTypeStackPanel.Children.Add(quoteTypeComboBox);
 
-        Controls?.Add(quote_type_stack_panel);
+        Controls?.Add(quoteTypeStackPanel);
 
-        var insert_multi_rows_at_once_stack_panel = new StackPanel
+        var insertMultiRowsAtOnceStackPanel = new StackPanel
         {
             Orientation = Orientation.Horizontal,
             Spacing = 10
         };
 
-        var insert_multi_rows_at_once_check_box = new ToggleSwitch
+        var insertMultiRowsAtOnceCheckBox = new ToggleSwitch
         {
             IsChecked = Options!.InsertMultiRowsAtOnce
         };
 
-        insert_multi_rows_at_once_check_box.IsCheckedChanged += (sender, e) =>
+        insertMultiRowsAtOnceCheckBox.IsCheckedChanged += (sender, e) =>
         {
-            if (sender is ToggleSwitch check_box) Options!.InsertMultiRowsAtOnce = check_box.IsChecked ?? false;
+            if (sender is ToggleSwitch checkBox) Options!.InsertMultiRowsAtOnce = checkBox.IsChecked ?? false;
         };
 
-        var insert_multi_rows_at_once_label = new TextBlock
+        var insertMultiRowsAtOnceLabel = new TextBlock
         {
             Text = "Insert Multiple Rows at Once"
         };
 
-        insert_multi_rows_at_once_stack_panel.Children.Add(insert_multi_rows_at_once_check_box);
-        insert_multi_rows_at_once_stack_panel.Children.Add(insert_multi_rows_at_once_label);
+        insertMultiRowsAtOnceStackPanel.Children.Add(insertMultiRowsAtOnceCheckBox);
+        insertMultiRowsAtOnceStackPanel.Children.Add(insertMultiRowsAtOnceLabel);
 
-        Controls?.Add(insert_multi_rows_at_once_stack_panel);
+        Controls?.Add(insertMultiRowsAtOnceStackPanel);
     }
 }

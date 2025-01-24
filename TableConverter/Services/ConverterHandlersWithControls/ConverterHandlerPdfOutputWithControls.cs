@@ -18,9 +18,9 @@ public class ConverterHandlerPdfOutputWithControls : ConverterHandlerPdfOutput, 
     {
         Controls.Clear();
 
-        var ColourDataTemplate = new FuncDataTemplate<string>((item, _) =>
+        var colourDataTemplate = new FuncDataTemplate<string>((item, _) =>
         {
-            var stack_panel = new StackPanel
+            var stackPanel = new StackPanel
             {
                 Orientation = Orientation.Horizontal
             };
@@ -33,127 +33,127 @@ public class ConverterHandlerPdfOutputWithControls : ConverterHandlerPdfOutput, 
                 Margin = new Thickness(0, 0, 10, 0)
             };
 
-            var text_block = new TextBlock
+            var textBlock = new TextBlock
             {
                 Text = item
             };
 
-            stack_panel.Children.Add(square);
-            stack_panel.Children.Add(text_block);
+            stackPanel.Children.Add(square);
+            stackPanel.Children.Add(textBlock);
 
-            return stack_panel;
+            return stackPanel;
         });
 
-        var background_colour_stack_panel = new StackPanel
+        var backgroundColourStackPanel = new StackPanel
         {
             Orientation = Orientation.Vertical
         };
 
-        var background_colour_label = new TextBlock
+        var backgroundColourLabel = new TextBlock
         {
             Text = "Background Colour:"
         };
 
-        var background_colour_combo_box = new ComboBox
+        var backgroundColourComboBox = new ComboBox
         {
             ItemsSource = Options!.Colours,
             SelectedItem = Options!.SelectedBackgroundColor,
             HorizontalAlignment = HorizontalAlignment.Stretch
         };
 
-        background_colour_combo_box.DataTemplates.Add(ColourDataTemplate);
+        backgroundColourComboBox.DataTemplates.Add(colourDataTemplate);
 
-        background_colour_combo_box.SelectionChanged += (sender, e) =>
+        backgroundColourComboBox.SelectionChanged += (sender, e) =>
         {
-            if (sender is ComboBox combo_box && combo_box.SelectedItem is string selected_background_colour)
-                Options!.SelectedBackgroundColor = selected_background_colour;
+            if (sender is ComboBox comboBox && comboBox.SelectedItem is string selectedBackgroundColour)
+                Options!.SelectedBackgroundColor = selectedBackgroundColour;
         };
 
-        background_colour_stack_panel.Children.Add(background_colour_label);
-        background_colour_stack_panel.Children.Add(background_colour_combo_box);
+        backgroundColourStackPanel.Children.Add(backgroundColourLabel);
+        backgroundColourStackPanel.Children.Add(backgroundColourComboBox);
 
-        Controls?.Add(background_colour_stack_panel);
+        Controls?.Add(backgroundColourStackPanel);
 
-        var foreground_colour_stack_panel = new StackPanel
+        var foregroundColourStackPanel = new StackPanel
         {
             Orientation = Orientation.Vertical
         };
 
-        var foreground_colour_label = new TextBlock
+        var foregroundColourLabel = new TextBlock
         {
             Text = "Text Colour:"
         };
 
-        var foreground_colour_combo_box = new ComboBox
+        var foregroundColourComboBox = new ComboBox
         {
             ItemsSource = Options!.Colours,
             SelectedItem = Options!.SelectedForegroundColor,
             HorizontalAlignment = HorizontalAlignment.Stretch
         };
 
-        foreground_colour_combo_box.DataTemplates.Add(ColourDataTemplate);
+        foregroundColourComboBox.DataTemplates.Add(colourDataTemplate);
 
-        foreground_colour_combo_box.SelectionChanged += (sender, e) =>
+        foregroundColourComboBox.SelectionChanged += (sender, e) =>
         {
-            if (sender is ComboBox combo_box && combo_box.SelectedItem is string selected_foreground_colour)
-                Options!.SelectedForegroundColor = selected_foreground_colour;
+            if (sender is ComboBox comboBox && comboBox.SelectedItem is string selectedForegroundColour)
+                Options!.SelectedForegroundColor = selectedForegroundColour;
         };
 
-        foreground_colour_stack_panel.Children.Add(foreground_colour_label);
-        foreground_colour_stack_panel.Children.Add(foreground_colour_combo_box);
+        foregroundColourStackPanel.Children.Add(foregroundColourLabel);
+        foregroundColourStackPanel.Children.Add(foregroundColourComboBox);
 
-        Controls?.Add(foreground_colour_stack_panel);
+        Controls?.Add(foregroundColourStackPanel);
 
-        var bold_header_stack_panel = new StackPanel
+        var boldHeaderStackPanel = new StackPanel
         {
             Orientation = Orientation.Horizontal,
             Spacing = 10
         };
 
-        var bold_header_check_box = new ToggleSwitch
+        var boldHeaderCheckBox = new ToggleSwitch
         {
             IsChecked = Options!.BoldHeader
         };
 
-        bold_header_check_box.IsCheckedChanged += (sender, e) =>
+        boldHeaderCheckBox.IsCheckedChanged += (sender, e) =>
         {
-            if (sender is ToggleSwitch check_box) Options!.BoldHeader = check_box.IsChecked ?? false;
+            if (sender is ToggleSwitch checkBox) Options!.BoldHeader = checkBox.IsChecked ?? false;
         };
 
-        var bold_header_label = new TextBlock
+        var boldHeaderLabel = new TextBlock
         {
             Text = "Bold Header"
         };
 
-        bold_header_stack_panel.Children.Add(bold_header_check_box);
-        bold_header_stack_panel.Children.Add(bold_header_label);
+        boldHeaderStackPanel.Children.Add(boldHeaderCheckBox);
+        boldHeaderStackPanel.Children.Add(boldHeaderLabel);
 
-        Controls?.Add(bold_header_stack_panel);
+        Controls?.Add(boldHeaderStackPanel);
 
-        var show_grid_lines_stack_panel = new StackPanel
+        var showGridLinesStackPanel = new StackPanel
         {
             Orientation = Orientation.Horizontal,
             Spacing = 10
         };
 
-        var show_grid_lines_check_box = new ToggleSwitch
+        var showGridLinesCheckBox = new ToggleSwitch
         {
             IsChecked = Options!.ShowGridLines
         };
 
-        show_grid_lines_check_box.IsCheckedChanged += (sender, e) =>
+        showGridLinesCheckBox.IsCheckedChanged += (sender, e) =>
         {
-            if (sender is ToggleSwitch check_box) Options!.ShowGridLines = check_box.IsChecked ?? false;
+            if (sender is ToggleSwitch checkBox) Options!.ShowGridLines = checkBox.IsChecked ?? false;
         };
 
-        var show_grid_lines_label = new TextBlock
+        var showGridLinesLabel = new TextBlock
         {
             Text = "Show Grid Lines"
         };
 
-        show_grid_lines_stack_panel.Children.Add(show_grid_lines_check_box);
-        show_grid_lines_stack_panel.Children.Add(show_grid_lines_label);
+        showGridLinesStackPanel.Children.Add(showGridLinesCheckBox);
+        showGridLinesStackPanel.Children.Add(showGridLinesLabel);
 
-        Controls?.Add(show_grid_lines_stack_panel);
+        Controls?.Add(showGridLinesStackPanel);
     }
 }

@@ -14,32 +14,32 @@ public class ConverterHandlerJsonLinesOutputWithControls : ConverterHandlerJsonL
     {
         Controls.Clear();
 
-        var json_lines_format_type_stack_panel = new StackPanel
+        var jsonLinesFormatTypeStackPanel = new StackPanel
         {
             Orientation = Orientation.Vertical
         };
 
-        var json_lines_format_type_label = new TextBlock
+        var jsonLinesFormatTypeLabel = new TextBlock
         {
             Text = "JSONLines File Format:"
         };
 
-        var json_lines_format_type_combo_box = new ComboBox
+        var jsonLinesFormatTypeComboBox = new ComboBox
         {
             ItemsSource = Options!.JsonLinesFormatTypes,
             SelectedItem = Options!.SelectedJsonLinesFormatType,
             HorizontalAlignment = HorizontalAlignment.Stretch
         };
 
-        json_lines_format_type_combo_box.SelectionChanged += (sender, e) =>
+        jsonLinesFormatTypeComboBox.SelectionChanged += (sender, e) =>
         {
-            if (sender is ComboBox combo_box && combo_box.SelectedItem is string selected_json_lines_format_type)
-                Options!.SelectedJsonLinesFormatType = selected_json_lines_format_type;
+            if (sender is ComboBox comboBox && comboBox.SelectedItem is string selectedJsonLinesFormatType)
+                Options!.SelectedJsonLinesFormatType = selectedJsonLinesFormatType;
         };
 
-        json_lines_format_type_stack_panel.Children.Add(json_lines_format_type_label);
-        json_lines_format_type_stack_panel.Children.Add(json_lines_format_type_combo_box);
+        jsonLinesFormatTypeStackPanel.Children.Add(jsonLinesFormatTypeLabel);
+        jsonLinesFormatTypeStackPanel.Children.Add(jsonLinesFormatTypeComboBox);
 
-        Controls?.Add(json_lines_format_type_stack_panel);
+        Controls?.Add(jsonLinesFormatTypeStackPanel);
     }
 }

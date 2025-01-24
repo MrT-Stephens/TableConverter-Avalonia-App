@@ -14,56 +14,56 @@ public class ConverterHandlerHtmlOutputWithControls : ConverterHandlerHtmlOutput
     {
         Controls.Clear();
 
-        var minify_html_stack_panel = new StackPanel
+        var minifyHtmlStackPanel = new StackPanel
         {
             Orientation = Orientation.Horizontal,
             Spacing = 10
         };
 
-        var minify_html_check_box = new ToggleSwitch
+        var minifyHtmlCheckBox = new ToggleSwitch
         {
             IsChecked = Options!.MinifyHtml
         };
 
-        minify_html_check_box.IsCheckedChanged += (sender, e) =>
+        minifyHtmlCheckBox.IsCheckedChanged += (sender, e) =>
         {
-            if (sender is ToggleSwitch check_box) Options!.MinifyHtml = check_box.IsChecked ?? false;
+            if (sender is ToggleSwitch checkBox) Options!.MinifyHtml = checkBox.IsChecked ?? false;
         };
 
-        var minify_html_label = new TextBlock
+        var minifyHtmlLabel = new TextBlock
         {
             Text = "Minify HTML"
         };
 
-        minify_html_stack_panel.Children.Add(minify_html_check_box);
-        minify_html_stack_panel.Children.Add(minify_html_label);
+        minifyHtmlStackPanel.Children.Add(minifyHtmlCheckBox);
+        minifyHtmlStackPanel.Children.Add(minifyHtmlLabel);
 
-        Controls?.Add(minify_html_stack_panel);
+        Controls?.Add(minifyHtmlStackPanel);
 
-        var include_thead_tbody_stack_panel = new StackPanel
+        var includeTheadTbodyStackPanel = new StackPanel
         {
             Orientation = Orientation.Horizontal,
             Spacing = 10
         };
 
-        var include_thead_tbody_check_box = new ToggleSwitch
+        var includeTheadTbodyCheckBox = new ToggleSwitch
         {
             IsChecked = Options!.IncludeTheadTbody
         };
 
-        include_thead_tbody_check_box.IsCheckedChanged += (sender, e) =>
+        includeTheadTbodyCheckBox.IsCheckedChanged += (sender, e) =>
         {
-            if (sender is ToggleSwitch check_box) Options!.IncludeTheadTbody = check_box.IsChecked ?? false;
+            if (sender is ToggleSwitch checkBox) Options!.IncludeTheadTbody = checkBox.IsChecked ?? false;
         };
 
-        var include_thead_tbody_label = new TextBlock
+        var includeTheadTbodyLabel = new TextBlock
         {
             Text = "Include thead/tbody"
         };
 
-        include_thead_tbody_stack_panel.Children.Add(include_thead_tbody_check_box);
-        include_thead_tbody_stack_panel.Children.Add(include_thead_tbody_label);
+        includeTheadTbodyStackPanel.Children.Add(includeTheadTbodyCheckBox);
+        includeTheadTbodyStackPanel.Children.Add(includeTheadTbodyLabel);
 
-        Controls?.Add(include_thead_tbody_stack_panel);
+        Controls?.Add(includeTheadTbodyStackPanel);
     }
 }

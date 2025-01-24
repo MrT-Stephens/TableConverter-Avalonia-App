@@ -6,7 +6,7 @@ using TableConverter.Interfaces;
 
 namespace TableConverter.Services.ConverterHandlersWithControls;
 
-public class ConverterHandlerSQLInputWithControls : ConverterHandlerSQLInput, IInitializeControls
+public class ConverterHandlerSqlInputWithControls : ConverterHandlerSQLInput, IInitializeControls
 {
     public Collection<Control> Controls { get; set; } = new();
 
@@ -14,58 +14,58 @@ public class ConverterHandlerSQLInputWithControls : ConverterHandlerSQLInput, II
     {
         Controls.Clear();
 
-        var quote_type_stack_panel = new StackPanel
+        var quoteTypeStackPanel = new StackPanel
         {
             Orientation = Orientation.Vertical
         };
 
-        var quote_type_label = new TextBlock
+        var quoteTypeLabel = new TextBlock
         {
             Text = "Quote Type:"
         };
 
-        var quote_type_combo_box = new ComboBox
+        var quoteTypeComboBox = new ComboBox
         {
             ItemsSource = Options!.QuoteTypes.Keys,
             SelectedItem = Options!.SelectedQuoteType,
             HorizontalAlignment = HorizontalAlignment.Stretch
         };
 
-        quote_type_combo_box.SelectionChanged += (sender, e) =>
+        quoteTypeComboBox.SelectionChanged += (sender, e) =>
         {
-            if (sender is ComboBox combo_box && combo_box.SelectedItem is string selected_quote_type)
-                Options!.SelectedQuoteType = selected_quote_type;
+            if (sender is ComboBox comboBox && comboBox.SelectedItem is string selectedQuoteType)
+                Options!.SelectedQuoteType = selectedQuoteType;
         };
 
-        quote_type_stack_panel.Children.Add(quote_type_label);
-        quote_type_stack_panel.Children.Add(quote_type_combo_box);
+        quoteTypeStackPanel.Children.Add(quoteTypeLabel);
+        quoteTypeStackPanel.Children.Add(quoteTypeComboBox);
 
-        Controls?.Add(quote_type_stack_panel);
+        Controls?.Add(quoteTypeStackPanel);
 
-        var has_column_names_stack_panel = new StackPanel
+        var hasColumnNamesStackPanel = new StackPanel
         {
             Orientation = Orientation.Horizontal,
             Spacing = 10
         };
 
-        var has_column_names_check_box = new ToggleSwitch
+        var hasColumnNamesCheckBox = new ToggleSwitch
         {
             IsChecked = Options!.HasColumnNames
         };
 
-        has_column_names_check_box.IsCheckedChanged += (sender, e) =>
+        hasColumnNamesCheckBox.IsCheckedChanged += (sender, e) =>
         {
-            if (sender is ToggleSwitch check_box) Options!.HasColumnNames = check_box.IsChecked ?? false;
+            if (sender is ToggleSwitch checkBox) Options!.HasColumnNames = checkBox.IsChecked ?? false;
         };
 
-        var has_column_names_label = new TextBlock
+        var hasColumnNamesLabel = new TextBlock
         {
             Text = "Has Column Names"
         };
 
-        has_column_names_stack_panel.Children.Add(has_column_names_check_box);
-        has_column_names_stack_panel.Children.Add(has_column_names_label);
+        hasColumnNamesStackPanel.Children.Add(hasColumnNamesCheckBox);
+        hasColumnNamesStackPanel.Children.Add(hasColumnNamesLabel);
 
-        Controls?.Add(has_column_names_stack_panel);
+        Controls?.Add(hasColumnNamesStackPanel);
     }
 }

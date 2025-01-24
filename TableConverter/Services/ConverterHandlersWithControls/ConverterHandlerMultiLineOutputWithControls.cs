@@ -14,29 +14,29 @@ public class ConverterHandlerMultiLineOutputWithControls : ConverterHandlerMulti
     {
         Controls.Clear();
 
-        var row_separator_stack_panel = new StackPanel
+        var rowSeparatorStackPanel = new StackPanel
         {
             Orientation = Orientation.Vertical
         };
 
-        var row_separator_label = new TextBlock
+        var rowSeparatorLabel = new TextBlock
         {
             Text = "Row Separator:"
         };
 
-        var row_separator_text_box = new TextBox
+        var rowSeparatorTextBox = new TextBox
         {
             Text = Options!.RowSeparator
         };
 
-        row_separator_text_box.TextChanged += (sender, e) =>
+        rowSeparatorTextBox.TextChanged += (sender, e) =>
         {
-            if (sender is TextBox text_box) Options!.RowSeparator = text_box.Text ?? "";
+            if (sender is TextBox textBox) Options!.RowSeparator = textBox.Text ?? "";
         };
 
-        row_separator_stack_panel.Children.Add(row_separator_label);
-        row_separator_stack_panel.Children.Add(row_separator_text_box);
+        rowSeparatorStackPanel.Children.Add(rowSeparatorLabel);
+        rowSeparatorStackPanel.Children.Add(rowSeparatorTextBox);
 
-        Controls?.Add(row_separator_stack_panel);
+        Controls?.Add(rowSeparatorStackPanel);
     }
 }

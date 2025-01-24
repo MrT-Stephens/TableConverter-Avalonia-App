@@ -14,246 +14,246 @@ public class ConverterHandlerLaTexOutputWithControls : ConverterHandlerLaTexOutp
     {
         Controls.Clear();
 
-        var table_type_stack_panel = new StackPanel
+        var tableTypeStackPanel = new StackPanel
         {
             Orientation = Orientation.Vertical
         };
 
-        var table_type_label = new TextBlock
+        var tableTypeLabel = new TextBlock
         {
             Text = "LaTex Table Type:"
         };
 
-        var table_type_combo_box = new ComboBox
+        var tableTypeComboBox = new ComboBox
         {
             ItemsSource = Options!.TableTypes,
             SelectedItem = Options!.SelectedTableType,
             HorizontalAlignment = HorizontalAlignment.Stretch
         };
 
-        table_type_combo_box.SelectionChanged += (sender, e) =>
+        tableTypeComboBox.SelectionChanged += (sender, e) =>
         {
-            if (sender is ComboBox combo_box && combo_box.SelectedItem is string selected_table_type)
-                Options!.SelectedTableType = selected_table_type;
+            if (sender is ComboBox comboBox && comboBox.SelectedItem is string selectedTableType)
+                Options!.SelectedTableType = selectedTableType;
         };
 
-        table_type_stack_panel.Children.Add(table_type_label);
-        table_type_stack_panel.Children.Add(table_type_combo_box);
+        tableTypeStackPanel.Children.Add(tableTypeLabel);
+        tableTypeStackPanel.Children.Add(tableTypeComboBox);
 
-        Controls?.Add(table_type_stack_panel);
+        Controls?.Add(tableTypeStackPanel);
 
-        var text_alignment_stack_panel = new StackPanel
+        var textAlignmentStackPanel = new StackPanel
         {
             Orientation = Orientation.Vertical
         };
 
-        var text_alignment_label = new TextBlock
+        var textAlignmentLabel = new TextBlock
         {
             Text = "Text Alignment:"
         };
 
-        var text_alignment_combo_box = new ComboBox
+        var textAlignmentComboBox = new ComboBox
         {
             ItemsSource = Options!.Alignments,
             SelectedItem = Options!.SelectedTextAlignment,
             HorizontalAlignment = HorizontalAlignment.Stretch
         };
 
-        text_alignment_combo_box.SelectionChanged += (sender, e) =>
+        textAlignmentComboBox.SelectionChanged += (sender, e) =>
         {
-            if (sender is ComboBox combo_box && combo_box.SelectedItem is string selected_text_alignment)
-                Options!.SelectedTextAlignment = selected_text_alignment;
+            if (sender is ComboBox comboBox && comboBox.SelectedItem is string selectedTextAlignment)
+                Options!.SelectedTextAlignment = selectedTextAlignment;
         };
 
-        text_alignment_stack_panel.Children.Add(text_alignment_label);
-        text_alignment_stack_panel.Children.Add(text_alignment_combo_box);
+        textAlignmentStackPanel.Children.Add(textAlignmentLabel);
+        textAlignmentStackPanel.Children.Add(textAlignmentComboBox);
 
-        Controls?.Add(text_alignment_stack_panel);
+        Controls?.Add(textAlignmentStackPanel);
 
-        var table_alignment_stack_panel = new StackPanel
+        var tableAlignmentStackPanel = new StackPanel
         {
             Orientation = Orientation.Vertical
         };
 
-        var table_alignment_label = new TextBlock
+        var tableAlignmentLabel = new TextBlock
         {
             Text = "Table Alignment:"
         };
 
-        var table_alignment_combo_box = new ComboBox
+        var tableAlignmentComboBox = new ComboBox
         {
             ItemsSource = Options!.Alignments,
             SelectedItem = Options!.SelectedTableAlignment,
             HorizontalAlignment = HorizontalAlignment.Stretch
         };
 
-        table_alignment_combo_box.SelectionChanged += (sender, e) =>
+        tableAlignmentComboBox.SelectionChanged += (sender, e) =>
         {
-            if (sender is ComboBox combo_box && combo_box.SelectedItem is string selected_table_alignment)
-                Options!.SelectedTableAlignment = selected_table_alignment;
+            if (sender is ComboBox comboBox && comboBox.SelectedItem is string selectedTableAlignment)
+                Options!.SelectedTableAlignment = selectedTableAlignment;
         };
 
-        table_alignment_stack_panel.Children.Add(table_alignment_label);
-        table_alignment_stack_panel.Children.Add(table_alignment_combo_box);
+        tableAlignmentStackPanel.Children.Add(tableAlignmentLabel);
+        tableAlignmentStackPanel.Children.Add(tableAlignmentComboBox);
 
-        Controls?.Add(table_alignment_stack_panel);
+        Controls?.Add(tableAlignmentStackPanel);
 
-        var caption_alignment_stack_panel = new StackPanel
+        var captionAlignmentStackPanel = new StackPanel
         {
             Orientation = Orientation.Vertical
         };
 
-        var caption_alignment_label = new TextBlock
+        var captionAlignmentLabel = new TextBlock
         {
             Text = "Caption Alignment:"
         };
 
-        var caption_alignment_combo_box = new ComboBox
+        var captionAlignmentComboBox = new ComboBox
         {
             ItemsSource = Options!.CaptionAlignments,
             SelectedItem = Options!.SelectedCaptionAlignment,
             HorizontalAlignment = HorizontalAlignment.Stretch
         };
 
-        caption_alignment_combo_box.SelectionChanged += (sender, e) =>
+        captionAlignmentComboBox.SelectionChanged += (sender, e) =>
         {
-            if (sender is ComboBox combo_box && combo_box.SelectedItem is string selected_caption_alignment)
-                Options!.SelectedCaptionAlignment = selected_caption_alignment;
+            if (sender is ComboBox comboBox && comboBox.SelectedItem is string selectedCaptionAlignment)
+                Options!.SelectedCaptionAlignment = selectedCaptionAlignment;
         };
 
-        caption_alignment_stack_panel.Children.Add(caption_alignment_label);
-        caption_alignment_stack_panel.Children.Add(caption_alignment_combo_box);
+        captionAlignmentStackPanel.Children.Add(captionAlignmentLabel);
+        captionAlignmentStackPanel.Children.Add(captionAlignmentComboBox);
 
-        Controls?.Add(caption_alignment_stack_panel);
+        Controls?.Add(captionAlignmentStackPanel);
 
-        var caption_name_stack_panel = new StackPanel
+        var captionNameStackPanel = new StackPanel
         {
             Orientation = Orientation.Vertical
         };
 
-        var caption_name_label = new TextBlock
+        var captionNameLabel = new TextBlock
         {
             Text = "Caption Name:"
         };
 
-        var caption_name_text_box = new TextBox
+        var captionNameTextBox = new TextBox
         {
             Text = Options!.CaptionName,
             HorizontalAlignment = HorizontalAlignment.Stretch
         };
 
-        caption_name_text_box.TextChanged += (sender, e) =>
+        captionNameTextBox.TextChanged += (sender, e) =>
         {
-            if (sender is TextBox text_box) Options!.CaptionName = text_box.Text ?? "";
+            if (sender is TextBox textBox) Options!.CaptionName = textBox.Text ?? "";
         };
 
-        caption_name_stack_panel.Children.Add(caption_name_label);
-        caption_name_stack_panel.Children.Add(caption_name_text_box);
+        captionNameStackPanel.Children.Add(captionNameLabel);
+        captionNameStackPanel.Children.Add(captionNameTextBox);
 
-        Controls?.Add(caption_name_stack_panel);
+        Controls?.Add(captionNameStackPanel);
 
-        var label_name_stack_panel = new StackPanel
+        var labelNameStackPanel = new StackPanel
         {
             Orientation = Orientation.Vertical
         };
 
-        var label_name_label = new TextBlock
+        var labelNameLabel = new TextBlock
         {
             Text = "Label Name:"
         };
 
-        var label_name_text_box = new TextBox
+        var labelNameTextBox = new TextBox
         {
             Text = Options!.LabelName,
             HorizontalAlignment = HorizontalAlignment.Stretch
         };
 
-        label_name_text_box.TextChanged += (sender, e) =>
+        labelNameTextBox.TextChanged += (sender, e) =>
         {
-            if (sender is TextBox text_box) Options!.LabelName = text_box.Text ?? "";
+            if (sender is TextBox textBox) Options!.LabelName = textBox.Text ?? "";
         };
 
-        label_name_stack_panel.Children.Add(label_name_label);
-        label_name_stack_panel.Children.Add(label_name_text_box);
+        labelNameStackPanel.Children.Add(labelNameLabel);
+        labelNameStackPanel.Children.Add(labelNameTextBox);
 
-        Controls?.Add(label_name_stack_panel);
+        Controls?.Add(labelNameStackPanel);
 
-        var minimal_working_example_stack_panel = new StackPanel
+        var minimalWorkingExampleStackPanel = new StackPanel
         {
             Orientation = Orientation.Horizontal,
             Spacing = 10
         };
 
-        var minimal_working_example_check_box = new ToggleSwitch
+        var minimalWorkingExampleCheckBox = new ToggleSwitch
         {
             IsChecked = Options!.MinimalWorkingExample
         };
 
-        minimal_working_example_check_box.IsCheckedChanged += (sender, e) =>
+        minimalWorkingExampleCheckBox.IsCheckedChanged += (sender, e) =>
         {
-            if (sender is ToggleSwitch check_box) Options!.MinimalWorkingExample = check_box.IsChecked ?? false;
+            if (sender is ToggleSwitch checkBox) Options!.MinimalWorkingExample = checkBox.IsChecked ?? false;
         };
 
-        var minimal_working_example_label = new TextBlock
+        var minimalWorkingExampleLabel = new TextBlock
         {
             Text = "Minimal Working Example"
         };
 
-        minimal_working_example_stack_panel.Children.Add(minimal_working_example_check_box);
-        minimal_working_example_stack_panel.Children.Add(minimal_working_example_label);
+        minimalWorkingExampleStackPanel.Children.Add(minimalWorkingExampleCheckBox);
+        minimalWorkingExampleStackPanel.Children.Add(minimalWorkingExampleLabel);
 
-        Controls?.Add(minimal_working_example_stack_panel);
+        Controls?.Add(minimalWorkingExampleStackPanel);
 
-        var bold_header_stack_panel = new StackPanel
+        var boldHeaderStackPanel = new StackPanel
         {
             Orientation = Orientation.Horizontal,
             Spacing = 10
         };
 
-        var bold_header_check_box = new ToggleSwitch
+        var boldHeaderCheckBox = new ToggleSwitch
         {
             IsChecked = Options!.BoldHeader
         };
 
-        bold_header_check_box.IsCheckedChanged += (sender, e) =>
+        boldHeaderCheckBox.IsCheckedChanged += (sender, e) =>
         {
-            if (sender is ToggleSwitch check_box) Options!.BoldHeader = check_box.IsChecked ?? false;
+            if (sender is ToggleSwitch checkBox) Options!.BoldHeader = checkBox.IsChecked ?? false;
         };
 
-        var bold_header_label = new TextBlock
+        var boldHeaderLabel = new TextBlock
         {
             Text = "Bold Header"
         };
 
-        bold_header_stack_panel.Children.Add(bold_header_check_box);
-        bold_header_stack_panel.Children.Add(bold_header_label);
+        boldHeaderStackPanel.Children.Add(boldHeaderCheckBox);
+        boldHeaderStackPanel.Children.Add(boldHeaderLabel);
 
-        Controls?.Add(bold_header_stack_panel);
+        Controls?.Add(boldHeaderStackPanel);
 
-        var bold_first_column_stack_panel = new StackPanel
+        var boldFirstColumnStackPanel = new StackPanel
         {
             Orientation = Orientation.Horizontal,
             Spacing = 10
         };
 
-        var bold_first_column_check_box = new ToggleSwitch
+        var boldFirstColumnCheckBox = new ToggleSwitch
         {
             IsChecked = Options!.BoldFirstColumn
         };
 
-        bold_first_column_check_box.IsCheckedChanged += (sender, e) =>
+        boldFirstColumnCheckBox.IsCheckedChanged += (sender, e) =>
         {
-            if (sender is ToggleSwitch check_box) Options!.BoldFirstColumn = check_box.IsChecked ?? false;
+            if (sender is ToggleSwitch checkBox) Options!.BoldFirstColumn = checkBox.IsChecked ?? false;
         };
 
-        var bold_first_column_label = new TextBlock
+        var boldFirstColumnLabel = new TextBlock
         {
             Text = "Bold First Column"
         };
 
-        bold_first_column_stack_panel.Children.Add(bold_first_column_check_box);
-        bold_first_column_stack_panel.Children.Add(bold_first_column_label);
+        boldFirstColumnStackPanel.Children.Add(boldFirstColumnCheckBox);
+        boldFirstColumnStackPanel.Children.Add(boldFirstColumnLabel);
 
-        Controls?.Add(bold_first_column_stack_panel);
+        Controls?.Add(boldFirstColumnStackPanel);
     }
 }

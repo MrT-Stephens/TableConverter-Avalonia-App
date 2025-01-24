@@ -14,82 +14,82 @@ public class ConverterHandlerXmlOutputWithControls : ConverterHandlerXmlOutput, 
     {
         Controls.Clear();
 
-        var xml_root_node_name_stack_panel = new StackPanel
+        var xmlRootNodeNameStackPanel = new StackPanel
         {
             Orientation = Orientation.Vertical
         };
 
-        var xml_root_node_name_label = new TextBlock
+        var xmlRootNodeNameLabel = new TextBlock
         {
             Text = "XML Root Node Name:"
         };
 
-        var xml_root_node_name_text_box = new TextBox
+        var xmlRootNodeNameTextBox = new TextBox
         {
             Text = Options!.XmlElementNodeName
         };
 
-        xml_root_node_name_text_box.TextChanged += (sender, e) =>
+        xmlRootNodeNameTextBox.TextChanged += (sender, e) =>
         {
-            if (sender is TextBox text_box && !string.IsNullOrEmpty(text_box.Text))
-                Options!.XmlElementNodeName = text_box.Text ?? "root";
+            if (sender is TextBox textBox && !string.IsNullOrEmpty(textBox.Text))
+                Options!.XmlElementNodeName = textBox.Text ?? "root";
         };
 
-        xml_root_node_name_stack_panel.Children.Add(xml_root_node_name_label);
-        xml_root_node_name_stack_panel.Children.Add(xml_root_node_name_text_box);
+        xmlRootNodeNameStackPanel.Children.Add(xmlRootNodeNameLabel);
+        xmlRootNodeNameStackPanel.Children.Add(xmlRootNodeNameTextBox);
 
-        Controls?.Add(xml_root_node_name_stack_panel);
+        Controls?.Add(xmlRootNodeNameStackPanel);
 
-        var xml_element_node_name_stack_panel = new StackPanel
+        var xmlElementNodeNameStackPanel = new StackPanel
         {
             Orientation = Orientation.Vertical
         };
 
-        var xml_element_node_name_label = new TextBlock
+        var xmlElementNodeNameLabel = new TextBlock
         {
             Text = "XML Element Node Name:"
         };
 
-        var xml_element_node_name_text_box = new TextBox
+        var xmlElementNodeNameTextBox = new TextBox
         {
             Text = Options!.XmlRootNodeName
         };
 
-        xml_element_node_name_text_box.TextChanged += (sender, e) =>
+        xmlElementNodeNameTextBox.TextChanged += (sender, e) =>
         {
-            if (sender is TextBox text_box && !string.IsNullOrEmpty(text_box.Text))
-                Options!.XmlRootNodeName = text_box.Text ?? "element";
+            if (sender is TextBox textBox && !string.IsNullOrEmpty(textBox.Text))
+                Options!.XmlRootNodeName = textBox.Text ?? "element";
         };
 
-        xml_element_node_name_stack_panel.Children.Add(xml_element_node_name_label);
-        xml_element_node_name_stack_panel.Children.Add(xml_element_node_name_text_box);
+        xmlElementNodeNameStackPanel.Children.Add(xmlElementNodeNameLabel);
+        xmlElementNodeNameStackPanel.Children.Add(xmlElementNodeNameTextBox);
 
-        Controls?.Add(xml_element_node_name_stack_panel);
+        Controls?.Add(xmlElementNodeNameStackPanel);
 
-        var minify_xml_stack_panel = new StackPanel
+        var minifyXmlStackPanel = new StackPanel
         {
             Orientation = Orientation.Horizontal,
             Spacing = 10
         };
 
-        var minify_xml_check_box = new ToggleSwitch
+        var minifyXmlCheckBox = new ToggleSwitch
         {
             IsChecked = Options!.MinifyXml
         };
 
-        minify_xml_check_box.IsCheckedChanged += (sender, e) =>
+        minifyXmlCheckBox.IsCheckedChanged += (sender, e) =>
         {
-            if (sender is ToggleSwitch check_box) Options!.MinifyXml = check_box.IsChecked ?? false;
+            if (sender is ToggleSwitch checkBox) Options!.MinifyXml = checkBox.IsChecked ?? false;
         };
 
-        var minify_xml_label = new TextBlock
+        var minifyXmlLabel = new TextBlock
         {
             Text = "Minify XML"
         };
 
-        minify_xml_stack_panel.Children.Add(minify_xml_check_box);
-        minify_xml_stack_panel.Children.Add(minify_xml_label);
+        minifyXmlStackPanel.Children.Add(minifyXmlCheckBox);
+        minifyXmlStackPanel.Children.Add(minifyXmlLabel);
 
-        Controls?.Add(minify_xml_stack_panel);
+        Controls?.Add(minifyXmlStackPanel);
     }
 }

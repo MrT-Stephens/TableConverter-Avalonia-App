@@ -14,113 +14,113 @@ public class ConverterHandlerAsciiOutputWithControls : ConverterHandlerAsciiOutp
     {
         Controls.Clear();
 
-        var table_type_stack_panel = new StackPanel
+        var tableTypeStackPanel = new StackPanel
         {
             Orientation = Orientation.Vertical
         };
 
-        var table_type_label = new TextBlock
+        var tableTypeLabel = new TextBlock
         {
             Text = "Table Type:"
         };
 
-        var table_type_combo_box = new ComboBox
+        var tableTypeComboBox = new ComboBox
         {
             ItemsSource = Options!.TableTypes.Keys,
             SelectedItem = Options!.SelectedTableType,
             HorizontalAlignment = HorizontalAlignment.Stretch
         };
 
-        table_type_combo_box.SelectionChanged += (sender, e) =>
+        tableTypeComboBox.SelectionChanged += (sender, e) =>
         {
-            if (sender is ComboBox combo_box && combo_box.SelectedItem is string selected_table_type)
-                Options!.SelectedTableType = selected_table_type;
+            if (sender is ComboBox comboBox && comboBox.SelectedItem is string selectedTableType)
+                Options!.SelectedTableType = selectedTableType;
         };
 
-        table_type_stack_panel.Children.Add(table_type_label);
-        table_type_stack_panel.Children.Add(table_type_combo_box);
+        tableTypeStackPanel.Children.Add(tableTypeLabel);
+        tableTypeStackPanel.Children.Add(tableTypeComboBox);
 
-        Controls?.Add(table_type_stack_panel);
+        Controls?.Add(tableTypeStackPanel);
 
-        var text_alignment_stack_panel = new StackPanel
+        var textAlignmentStackPanel = new StackPanel
         {
             Orientation = Orientation.Vertical
         };
 
-        var text_alignment_label = new TextBlock
+        var textAlignmentLabel = new TextBlock
         {
             Text = "Text Alignment:"
         };
 
-        var text_alignment_combo_box = new ComboBox
+        var textAlignmentComboBox = new ComboBox
         {
             ItemsSource = Options!.TextAlignment.Keys,
             SelectedItem = Options!.SelectedTextAlignment,
             HorizontalAlignment = HorizontalAlignment.Stretch
         };
 
-        text_alignment_combo_box.SelectionChanged += (sender, e) =>
+        textAlignmentComboBox.SelectionChanged += (sender, e) =>
         {
-            if (sender is ComboBox combo_box && combo_box.SelectedItem is string selected_text_alignment)
-                Options!.SelectedTextAlignment = selected_text_alignment;
+            if (sender is ComboBox comboBox && comboBox.SelectedItem is string selectedTextAlignment)
+                Options!.SelectedTextAlignment = selectedTextAlignment;
         };
 
-        text_alignment_stack_panel.Children.Add(text_alignment_label);
-        text_alignment_stack_panel.Children.Add(text_alignment_combo_box);
+        textAlignmentStackPanel.Children.Add(textAlignmentLabel);
+        textAlignmentStackPanel.Children.Add(textAlignmentComboBox);
 
-        Controls?.Add(text_alignment_stack_panel);
+        Controls?.Add(textAlignmentStackPanel);
 
-        var comment_type_stack_panel = new StackPanel
+        var commentTypeStackPanel = new StackPanel
         {
             Orientation = Orientation.Vertical
         };
 
-        var comment_type_label = new TextBlock
+        var commentTypeLabel = new TextBlock
         {
             Text = "Comment Type:"
         };
 
-        var comment_type_combo_box = new ComboBox
+        var commentTypeComboBox = new ComboBox
         {
             ItemsSource = Options!.CommentTypes.Keys,
             SelectedItem = Options!.SelectedCommentType,
             HorizontalAlignment = HorizontalAlignment.Stretch
         };
 
-        comment_type_combo_box.SelectionChanged += (sender, e) =>
+        commentTypeComboBox.SelectionChanged += (sender, e) =>
         {
-            if (sender is ComboBox combo_box && combo_box.SelectedItem is string selected_comment_type)
-                Options!.SelectedCommentType = selected_comment_type;
+            if (sender is ComboBox comboBox && comboBox.SelectedItem is string selectedCommentType)
+                Options!.SelectedCommentType = selectedCommentType;
         };
 
-        comment_type_stack_panel.Children.Add(comment_type_label);
-        comment_type_stack_panel.Children.Add(comment_type_combo_box);
+        commentTypeStackPanel.Children.Add(commentTypeLabel);
+        commentTypeStackPanel.Children.Add(commentTypeComboBox);
 
-        Controls?.Add(comment_type_stack_panel);
+        Controls?.Add(commentTypeStackPanel);
 
-        var force_row_separators_stack_panel = new StackPanel
+        var forceRowSeparatorsStackPanel = new StackPanel
         {
             Orientation = Orientation.Horizontal
         };
 
-        var force_row_separators_check_box = new CheckBox
+        var forceRowSeparatorsCheckBox = new CheckBox
         {
             IsChecked = Options!.ForceRowSeparators
         };
 
-        force_row_separators_check_box.IsCheckedChanged += (sender, e) =>
+        forceRowSeparatorsCheckBox.IsCheckedChanged += (sender, e) =>
         {
-            if (sender is CheckBox check_box) Options!.ForceRowSeparators = check_box.IsChecked ?? false;
+            if (sender is CheckBox checkBox) Options!.ForceRowSeparators = checkBox.IsChecked ?? false;
         };
 
-        var force_row_separators_label = new TextBlock
+        var forceRowSeparatorsLabel = new TextBlock
         {
             Text = "Force Row Separators"
         };
 
-        force_row_separators_stack_panel.Children.Add(force_row_separators_check_box);
-        force_row_separators_stack_panel.Children.Add(force_row_separators_label);
+        forceRowSeparatorsStackPanel.Children.Add(forceRowSeparatorsCheckBox);
+        forceRowSeparatorsStackPanel.Children.Add(forceRowSeparatorsLabel);
 
-        Controls?.Add(force_row_separators_stack_panel);
+        Controls?.Add(forceRowSeparatorsStackPanel);
     }
 }

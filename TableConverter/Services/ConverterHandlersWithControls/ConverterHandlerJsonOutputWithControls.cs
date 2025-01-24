@@ -14,58 +14,58 @@ public class ConverterHandlerJsonOutputWithControls : ConverterHandlerJsonOutput
     {
         Controls.Clear();
 
-        var json_format_type_stack_panel = new StackPanel
+        var jsonFormatTypeStackPanel = new StackPanel
         {
             Orientation = Orientation.Vertical
         };
 
-        var json_format_type_label = new TextBlock
+        var jsonFormatTypeLabel = new TextBlock
         {
             Text = "JSON File Format:"
         };
 
-        var json_format_type_combo_box = new ComboBox
+        var jsonFormatTypeComboBox = new ComboBox
         {
             ItemsSource = Options!.JsonFormatTypes,
             SelectedItem = Options!.SelectedJsonFormatType,
             HorizontalAlignment = HorizontalAlignment.Stretch
         };
 
-        json_format_type_combo_box.SelectionChanged += (sender, e) =>
+        jsonFormatTypeComboBox.SelectionChanged += (sender, e) =>
         {
-            if (sender is ComboBox combo_box && combo_box.SelectedItem is string selected_json_format_type)
-                Options!.SelectedJsonFormatType = selected_json_format_type;
+            if (sender is ComboBox comboBox && comboBox.SelectedItem is string selectedJsonFormatType)
+                Options!.SelectedJsonFormatType = selectedJsonFormatType;
         };
 
-        json_format_type_stack_panel.Children.Add(json_format_type_label);
-        json_format_type_stack_panel.Children.Add(json_format_type_combo_box);
+        jsonFormatTypeStackPanel.Children.Add(jsonFormatTypeLabel);
+        jsonFormatTypeStackPanel.Children.Add(jsonFormatTypeComboBox);
 
-        Controls?.Add(json_format_type_stack_panel);
+        Controls?.Add(jsonFormatTypeStackPanel);
 
-        var minify_json_stack_panel = new StackPanel
+        var minifyJsonStackPanel = new StackPanel
         {
             Orientation = Orientation.Horizontal,
             Spacing = 10
         };
 
-        var minify_json_check_box = new ToggleSwitch
+        var minifyJsonCheckBox = new ToggleSwitch
         {
             IsChecked = Options!.MinifyJson
         };
 
-        minify_json_check_box.IsCheckedChanged += (sender, e) =>
+        minifyJsonCheckBox.IsCheckedChanged += (sender, e) =>
         {
-            if (sender is ToggleSwitch check_box) Options!.MinifyJson = check_box.IsChecked ?? false;
+            if (sender is ToggleSwitch checkBox) Options!.MinifyJson = checkBox.IsChecked ?? false;
         };
 
-        var minify_json_label = new TextBlock
+        var minifyJsonLabel = new TextBlock
         {
             Text = "Minify JSON"
         };
 
-        minify_json_stack_panel.Children.Add(minify_json_check_box);
-        minify_json_stack_panel.Children.Add(minify_json_label);
+        minifyJsonStackPanel.Children.Add(minifyJsonCheckBox);
+        minifyJsonStackPanel.Children.Add(minifyJsonLabel);
 
-        Controls?.Add(minify_json_stack_panel);
+        Controls?.Add(minifyJsonStackPanel);
     }
 }

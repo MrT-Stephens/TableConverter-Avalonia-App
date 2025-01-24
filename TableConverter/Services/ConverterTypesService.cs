@@ -21,7 +21,7 @@ public class ConverterTypesService
             ["application/sql", "text/plain"],
             ["public.sql", "public.plain-text"],
             "SQL stands for Structured Query Language. It is used for storing, retrieving, managing and manipulating data in relational database management system (RDMS).",
-            new ConverterHandlerSQLInputWithControls(), new ConverterHandlerSQLOutputWithControls()),
+            new ConverterHandlerSqlInputWithControls(), new ConverterHandlerSqlOutputWithControls()),
         new("Ascii Tables",
             [".txt"],
             ["text/plain"],

@@ -14,29 +14,29 @@ public class ConverterHandlerExcelOutputWithControls : ConverterHandlerExcelOutp
     {
         Controls.Clear();
 
-        var delimiter_stack_panel = new StackPanel
+        var delimiterStackPanel = new StackPanel
         {
             Orientation = Orientation.Vertical
         };
 
-        var delimiter_label = new TextBlock
+        var delimiterLabel = new TextBlock
         {
             Text = "Excel Workbook Sheet Name:"
         };
 
-        var delimiter_text_box = new TextBox
+        var delimiterTextBox = new TextBox
         {
             Text = Options!.SheetName
         };
 
-        delimiter_text_box.TextChanged += (sender, e) =>
+        delimiterTextBox.TextChanged += (sender, e) =>
         {
-            if (sender is TextBox text_box) Options!.SheetName = text_box.Text ?? "Sheet1";
+            if (sender is TextBox textBox) Options!.SheetName = textBox.Text ?? "Sheet1";
         };
 
-        delimiter_stack_panel.Children.Add(delimiter_label);
-        delimiter_stack_panel.Children.Add(delimiter_text_box);
+        delimiterStackPanel.Children.Add(delimiterLabel);
+        delimiterStackPanel.Children.Add(delimiterTextBox);
 
-        Controls?.Add(delimiter_stack_panel);
+        Controls?.Add(delimiterStackPanel);
     }
 }
