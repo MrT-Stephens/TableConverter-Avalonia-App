@@ -66,7 +66,7 @@ public class App : Application
     {
         // Custom Services
         services.AddSingleton<PageNavigationService>();
-        services.AddSingleton<ConvertFilesManager>();
+        services.AddSingleton<ConvertFilesManagerService>();
         services.AddSingleton<ConverterTypesService>();
         services.AddSingleton<DataGenerationTypesService>();
 

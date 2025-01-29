@@ -2,7 +2,7 @@ using TableConverter.DataGeneration.Modules;
 
 namespace TableConverter.DataGeneration;
 
-public class Faker(string localeType = "en", int? seed = null) : FakerBase(localeType, seed)
+public class Faker : FakerBase
 {
     public override PersonModule Person => new(this, Locale, Randomizer);
 

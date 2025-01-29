@@ -31,7 +31,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
 
     #region Constructors
 
-    public ConvertFilesPageViewModel(ConverterTypesService converterTypes, ConvertFilesManager filesManager,
+    public ConvertFilesPageViewModel(ConverterTypesService converterTypes, ConvertFilesManagerService filesManager,
         ISukiDialogManager dialogManager, ISukiToastManager toastManager)
         : base(dialogManager, toastManager, "Convert Files", Application.Current?.Resources["ConvertIcon"], 1)
     {
@@ -50,7 +50,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
     #region Services
 
     private readonly ConverterTypesService ConverterTypes;
-    public ConvertFilesManager FilesManager { get; }
+    public ConvertFilesManagerService FilesManager { get; }
 
     #endregion
 

@@ -19,7 +19,7 @@ public abstract class FakerBuilderBase<TFaker>(TFaker fakerInstance) : IFakerBui
     /// <summary>
     ///     Number of rows to generate during the build process. Default is 1.
     /// </summary>
-    private int _rowCount = 1;
+    private int _RowCount = 1;
 
     /// <summary>
     ///     Gets the Faker instance used for generating data.
@@ -32,7 +32,7 @@ public abstract class FakerBuilderBase<TFaker>(TFaker fakerInstance) : IFakerBui
         if (count <= 0)
             throw new ArgumentOutOfRangeException(nameof(count), count, "Row count must be greater than zero.");
 
-        _rowCount = count;
+        _RowCount = count;
         return this;
     }
 
@@ -95,7 +95,7 @@ public abstract class FakerBuilderBase<TFaker>(TFaker fakerInstance) : IFakerBui
     {
         var rows = new List<string[]>();
 
-        for (var i = 0; i < _rowCount; i++)
+        for (var i = 0; i < _RowCount; i++)
         {
             var row = new List<string>();
 
@@ -114,7 +114,7 @@ public abstract class FakerBuilderBase<TFaker>(TFaker fakerInstance) : IFakerBui
     /// <inheritdoc />
     public async Task<TableData> BuildAsync()
     {
-        var rows = await Task.WhenAll(Enumerable.Range(0, _rowCount).Select(_ =>
+        var rows = await Task.WhenAll(Enumerable.Range(0, _RowCount).Select(_ =>
         {
             var row = new List<string>();
 

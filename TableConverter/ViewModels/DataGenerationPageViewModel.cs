@@ -17,7 +17,7 @@ public partial class DataGenerationPageViewModel : BasePageViewModel
 {
     #region Constructors
 
-    public DataGenerationPageViewModel(DataGenerationTypesService dataGenerationTypes, ConvertFilesManager filesManager,
+    public DataGenerationPageViewModel(DataGenerationTypesService dataGenerationTypes, ConvertFilesManagerService filesManager,
         PageNavigationService pageNavigation, ISukiDialogManager dialogManager, ISukiToastManager toastManager)
         : base(dialogManager, toastManager, "Data\nGeneration", Application.Current?.Resources["DataIcon"], 2)
     {
@@ -44,7 +44,7 @@ public partial class DataGenerationPageViewModel : BasePageViewModel
 
     private readonly DataGenerationTypesService _DataGenerationTypesService;
     private readonly PageNavigationService _PageNavigation;
-    private readonly ConvertFilesManager _FilesManager;
+    private readonly ConvertFilesManagerService _FilesManager;
 
     #endregion
 

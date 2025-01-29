@@ -19,17 +19,14 @@
     </Design.DataContext>
 
     <components:SpacedGrid RowDefinitions="Auto,*"
-                           ColumnDefinitions="150,*"
                            RowSpacing="10"
                            ColumnSpacing="10"
                            Margin="10">
         <!-- Convert Files View Header -->
         <sukiUi:GlassCard Grid.Row="0"
-                          Grid.Column="0"
-                          Grid.ColumnSpan="2"
                           IsAnimated="False"
                           Padding="10">
-            <components:SpacedGrid ColumnDefinitions="Auto,*"
+            <components:SpacedGrid ColumnDefinitions="Auto,Auto,*"
                                    ColumnSpacing="10">
                 <StackPanel Grid.Column="0"
                             Orientation="Horizontal"
@@ -40,47 +37,21 @@
                         New
                     </Button>
                 </StackPanel>
+                <!-- Select File Button -->
+                <ComboBox Grid.Column="1" 
+                          MaxWidth="200"
+                          ItemsSource="{Binding FilesManager.Files}" 
+                          SelectedItem="{Binding SelectedConvertDocument}"
+                          DisplayMemberBinding="{Binding Name}"/>
                 <!-- Converstion Progress Stepper Bar -->
-                <sukiUi:Stepper Grid.Column="1"
+                <sukiUi:Stepper Grid.Column="2"
                                 HorizontalAlignment="Right"
                                 Index="{Binding SelectedConvertDocument.ProgressStepIndex}"
                                 Steps="{Binding SelectedConvertDocument.ProgressStepValues}" />
             </components:SpacedGrid>
         </sukiUi:GlassCard>
-        <!-- Current Files Card -->
-        <sukiUi:GlassCard Grid.Row="1"
-                          Grid.Column="0"
-                          IsAnimated="False"
-                          Padding="10">
-            <!-- Current Files List Box -->
-            <ListBox ItemsSource="{Binding FilesManager.Files}"
-                     SelectedItem="{Binding SelectedConvertDocument}"
-                     SelectionMode="AlwaysSelected,Single"
-                     ScrollViewer.HorizontalScrollBarVisibility="Visible"
-                     ScrollViewer.VerticalScrollBarVisibility="Visible"
-                     HorizontalAlignment="Stretch"
-                     VerticalAlignment="Stretch">
-                <ListBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Spacing="5"
-                                    Orientation="Vertical" />
-                    </ItemsPanelTemplate>
-                </ListBox.ItemsPanel>
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Classes="h5"
-                                   FontWeight="Bold"
-                                   Text="{Binding Name}"
-                                   TextWrapping="NoWrap"
-                                   TextTrimming="CharacterEllipsis"
-                                   MinWidth="150" />
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-        </sukiUi:GlassCard>
         <!-- Convert Files Progress Stepper Views -->
         <sukiUi:BusyArea Grid.Row="1"
-                         Grid.Column="1"
                          IsBusy="{Binding SelectedConvertDocument.IsBusy}"
                          BusyText="Loading..."
                          IsEnabled="{Binding !SelectedConvertDocument.IsBusy}">
