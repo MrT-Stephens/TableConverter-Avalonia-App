@@ -27,26 +27,26 @@ public partial class ConvertFilesManagerService : ObservableObject, IConvertFile
 
     public Task AddFileAsync(string sourceFilePath)
     {
-        throw new NotImplementedException();
+        return Task.CompletedTask;
     }
 
     public void RemoveFile(string id)
     {
-        throw new NotImplementedException();
+        
     }
 
     public Task RemoveFileAsync(string id)
     {
-        throw new NotImplementedException();
+        return Task.CompletedTask;
     }
 
     public Task LoadFilesAsync()
     {
-        throw new NotImplementedException();
+        return Task.CompletedTask;
     }
 
     public Task SaveMetadataAsync()
     {
-        throw new NotImplementedException();
+        return Task.CompletedTask;
     }
 }

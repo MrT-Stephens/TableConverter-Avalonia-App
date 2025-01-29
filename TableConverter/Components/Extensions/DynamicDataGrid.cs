@@ -17,8 +17,8 @@ public class DynamicDataGrid : DataGrid
 
     public DynamicDataGrid()
     {
-        Headers = new ObservableCollection<string>();
-        Rows = new ObservableCollection<string[]>();
+        Headers = [];
+        Rows = [];
     }
 
     protected override Type StyleKeyOverride => typeof(DataGrid);
@@ -47,9 +47,15 @@ public class DynamicDataGrid : DataGrid
     {
         base.OnPropertyChanged(change);
 
-        if (change.Property.Name == nameof(Headers))
-            UpdateColumns();
-        else if (change.Property.Name == nameof(Rows)) UpdateRows();
+        switch (change.Property.Name)
+        {
+            case nameof(Headers):
+                UpdateColumns();
+                break;
+            case nameof(Rows):
+                UpdateRows();
+                break;
+        }
     }
 
     private void UpdateRows()
@@ -61,7 +67,7 @@ public class DynamicDataGrid : DataGrid
     {
         Columns.Clear();
 
-        for (var i = 0; Headers is not null && i < Headers.Count; ++i)
+        for (var i = 0; i < Headers.Count; ++i)
             Columns.Add(new DataGridTextColumn
             {
                 Header = new TextBox
