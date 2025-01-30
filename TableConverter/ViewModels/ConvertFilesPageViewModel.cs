@@ -479,6 +479,8 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                     else
                     {
                         FilesManager.Files.Remove(loadingDoc);
+
+                        SelectedConvertDocument = FilesManager.Files.First();
                         
                         loadingDoc.IsBusy = false;
 

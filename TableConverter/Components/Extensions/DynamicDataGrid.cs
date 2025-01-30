@@ -67,6 +67,9 @@ public class DynamicDataGrid : DataGrid
     {
         Columns.Clear();
 
+        if (Headers is null)
+            return;
+
         for (var i = 0; i < Headers.Count; ++i)
             Columns.Add(new DataGridTextColumn
             {
