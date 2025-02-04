@@ -313,13 +313,12 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
         }
         else
         {
-            ToastManager.CreateToast()
+            DialogManager.CreateDialog()
                 .WithTitle("File Not Found")
                 .WithContent($"The file '{name}' could not be found.")
                 .OfType(NotificationType.Error)
-                .Dismiss().ByClicking()
-                .Dismiss().After(new TimeSpan(0, 0, 3))
-                .Queue();
+                .Dismiss().ByClickingBackground()
+                .TryShow();
         }
     }
 
@@ -344,15 +343,6 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
             doc.IsBusy = false;
 
             doc.ProgressStepIndex = currentPageIndex;
-
-            // Show a success toast.
-            ToastManager.CreateToast()
-                .WithTitle("File Converted")
-                .WithContent($"The file '{doc.Name}' has been converted to tabular data.")
-                .OfType(NotificationType.Success)
-                .Dismiss().ByClicking()
-                .Dismiss().After(new TimeSpan(0, 0, 3))
-                .Queue();
         }
         else
         {
@@ -388,15 +378,6 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
             doc.IsBusy = false;
 
             doc.ProgressStepIndex = currentPageIndex;
-
-            ToastManager.CreateToast()
-                .WithTitle("File Converted")
-                .WithContent(
-                    $"The file '{doc.Name}' has been converted to a '{doc.OutputConverter.Name}' file.")
-                .OfType(NotificationType.Success)
-                .Dismiss().ByClicking()
-                .Dismiss().After(new TimeSpan(0, 0, 3))
-                .Queue();
         }
         else
         {
@@ -467,14 +448,6 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                         };
 
                         loadingDoc.IsBusy = false;
-
-                        ToastManager.CreateToast()
-                            .WithTitle("File Added")
-                            .WithContent($"The file '{files[0].Name}' has been added to your documents.")
-                            .OfType(NotificationType.Success)
-                            .Dismiss().ByClicking()
-                            .Dismiss().After(new TimeSpan(0, 0, 3))
-                            .Queue();
                     }
                     else
                     {
