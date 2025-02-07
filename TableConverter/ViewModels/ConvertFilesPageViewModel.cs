@@ -409,7 +409,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
         {
             var doc = new ConvertDocumentViewModel
             {
-                InputConverter = _ConverterTypes.InputTypes.First(converter => converter.Name == converterName)
+                InputConverter = _ConverterTypes.GetInputConverter(converterName)
             };
 
             var file = await _FilesDialogManager.OpenFileAsync(new FilePickerOpenOptions
@@ -487,8 +487,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
 
     private async Task OnOutputFileTypeClicked(string converterName, ConvertDocumentViewModel doc, int currentPageIndex)
     {
-        doc.OutputConverter =
-            _ConverterTypes.OutputTypes.First(converter => converter.Name == converterName);
+        doc.OutputConverter = _ConverterTypes.GetOutputConverter(converterName);
 
         if (doc.OutputConverter is not null)
         {
