@@ -32,12 +32,14 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
     #region Constructors
 
     public ConvertFilesPageViewModel(ConverterTypesService converterTypes, ConvertFilesManagerService filesManager,
-        ISukiDialogManager dialogManager, ISukiToastManager toastManager)
+        ISukiDialogManager dialogManager, ISukiToastManager toastManager, FilesDialogManagerService filesDialogManager)
         : base(dialogManager, toastManager, "Convert Files", Application.Current?.Resources["ConvertIcon"], 1)
     {
-        ConverterTypes = converterTypes;
+        _ConverterTypes = converterTypes;
 
         FilesManager = filesManager;
+
+        _FilesDialogManager = filesDialogManager;
 
         // If there are no files, add an example file.
         if (FilesManager.Files.Count <= 0) FilesManager.Files = [ExampleConverterDocument()];
@@ -49,7 +51,10 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
 
     #region Services
 
-    private readonly ConverterTypesService ConverterTypes;
+    private readonly ConverterTypesService _ConverterTypes;
+
+    private readonly FilesDialogManagerService _FilesDialogManager;
+
     public ConvertFilesManagerService FilesManager { get; }
 
     #endregion
@@ -65,7 +70,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
             {
                 Title = "Please select a file type to input",
                 Values = new ObservableCollection<string>(
-                    ConverterTypes.InputTypes.Select(converter => converter.Name)
+                    _ConverterTypes.InputTypes.Select(converter => converter.Name)
                 ),
                 OnOkClicked = OnInputFileTypeClicked
             })
@@ -127,7 +132,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                         {
                             Title = "Please select a file type to output",
                             Values = new ObservableCollection<string>(
-                                ConverterTypes.OutputTypes.Select(converter => converter.Name)
+                                _ConverterTypes.OutputTypes.Select(converter => converter.Name)
                             ),
                             OnOkClicked = fileType => OnOutputFileTypeClicked(fileType, currentDoc, pageIndex)
                         })
@@ -177,16 +182,12 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
     private async Task SaveFileButtonClicked()
     {
         var currentDoc = SelectedConvertDocument;
-        var topLevel =
-            TopLevel.GetTopLevel(((IClassicDesktopStyleApplicationLifetime)Application.Current?.ApplicationLifetime!)
-                .MainWindow);
 
-        if (topLevel is not null &&
-            currentDoc is { InputConverter: not null, OutputConverter: not null } &&
+        if (currentDoc is { InputConverter: not null, OutputConverter: not null } &&
             !string.IsNullOrEmpty(currentDoc.OutputFileText.Text))
         {
             // Show a dialog to save the file.
-            var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+            var file = await _FilesDialogManager.SaveFileAsync(new FilePickerSaveOptions
             {
                 Title = $"Save {currentDoc.OutputConverter.Name} File",
                 FileTypeChoices =
@@ -205,13 +206,13 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                     $"TableConverter-{currentDoc.InputConverter.Name}-{currentDoc.OutputConverter.Name}-{DateTime.Now.ToFileTime()}"
             });
 
-            if (file is not null)
+            if (file.IsSuccess)
             {
                 AsyncAction action = async () =>
                 {
                     currentDoc.IsBusy = true;
 
-                    await using (var stream = await file.OpenWriteAsync())
+                    await using (var stream = file.Value.Stream)
                     {
                         await currentDoc.OutputConverter.OutputConverterHandler!.SaveFileAsync(stream,
                             Encoding.UTF8.GetBytes(currentDoc.OutputFileText.Text));
@@ -221,24 +222,34 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
 
                     ToastManager.CreateToast()
                         .WithTitle("File Saved")
-                        .WithContent($"The file '{currentDoc.Name}' has been saved to '{file.Path.AbsolutePath}'.")
+                        .WithContent(
+                            $"The file '{currentDoc.Name}' has been saved to '{file.Value.Path.AbsolutePath}'.")
                         .OfType(NotificationType.Success)
                         .Dismiss().ByClicking()
                         .Dismiss().After(new TimeSpan(0, 0, 3))
                         .Queue();
                 };
 
-                if (File.Exists(file.Path.AbsolutePath))
+                if (File.Exists(file.Value.Path.AbsolutePath))
                     DialogManager.CreateDialog()
                         .WithTitle("File already exists")
                         .WithContent(
-                            $"The file '{file.Name}' already exists at that location. Would you like to replace it?")
+                            $"The file '{file.Value.Name}' already exists at that location. Would you like to replace it?")
                         .OfType(NotificationType.Warning)
                         .WithActionButton("No", _ => { }, true)
                         .WithActionButton("Yes", _ => action.Invoke(), true)
                         .TryShow();
                 else
                     await action.Invoke();
+            }
+            else
+            {
+                DialogManager.CreateDialog()
+                    .WithTitle("Error saving file")
+                    .WithContent(file.Error!)
+                    .OfType(NotificationType.Error)
+                    .Dismiss().ByClickingBackground()
+                    .TryShow();
             }
         }
     }
@@ -394,18 +405,14 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
 
     private async Task OnInputFileTypeClicked(string converterName)
     {
-        var topLevel =
-            TopLevel.GetTopLevel(((IClassicDesktopStyleApplicationLifetime)Application.Current?.ApplicationLifetime!)
-                .MainWindow);
-
-        if (topLevel is not null && SelectedConvertDocument is not null)
+        if (SelectedConvertDocument is not null)
         {
             var doc = new ConvertDocumentViewModel
             {
-                InputConverter = ConverterTypes.InputTypes.First(converter => converter.Name == converterName)
+                InputConverter = _ConverterTypes.InputTypes.First(converter => converter.Name == converterName)
             };
 
-            var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+            var file = await _FilesDialogManager.OpenFileAsync(new FilePickerOpenOptions
             {
                 Title = $"Open {doc.InputConverter.Name} File",
                 AllowMultiple = false,
@@ -421,7 +428,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                 ]
             });
 
-            if (files.Count >= 1)
+            if (file.IsSuccess)
             {
                 FilesManager.Files.Add(doc);
 
@@ -432,10 +439,10 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                 {
                     loadingDoc.IsBusy = true;
 
-                    loadingDoc.Name = files[0].Name.Split('.')[0];
-                    loadingDoc.Path = files[0].Path.AbsolutePath;
+                    loadingDoc.Name = file.Value.Name.Split('.')[0];
+                    loadingDoc.Path = file.Value.Path.AbsolutePath;
 
-                    await using var stream = await files[0].OpenReadAsync();
+                    await using var stream = file.Value.Stream;
 
                     var data = await loadingDoc.InputConverter.InputConverterHandler!.ReadFileAsync(stream);
 
@@ -454,7 +461,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                         FilesManager.Files.Remove(loadingDoc);
 
                         SelectedConvertDocument = FilesManager.Files.First();
-                        
+
                         loadingDoc.IsBusy = false;
 
                         DialogManager.CreateDialog()
@@ -466,13 +473,22 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                     }
                 }
             }
+            else
+            {
+                DialogManager.CreateDialog()
+                    .WithTitle("Error opening file")
+                    .WithContent(file.Error!)
+                    .OfType(NotificationType.Error)
+                    .Dismiss().ByClickingBackground()
+                    .TryShow();
+            }
         }
     }
 
     private async Task OnOutputFileTypeClicked(string converterName, ConvertDocumentViewModel doc, int currentPageIndex)
     {
         doc.OutputConverter =
-            ConverterTypes.OutputTypes.First(converter => converter.Name == converterName);
+            _ConverterTypes.OutputTypes.First(converter => converter.Name == converterName);
 
         if (doc.OutputConverter is not null)
         {
@@ -506,7 +522,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
     private ConvertDocumentViewModel ExampleConverterDocument()
     {
         var name = $"Example-{DateTime.Now.ToFileTime()}";
-        var converter = ConverterTypes.InputTypes.First(converter => converter.Name == "CSV");
+        var converter = _ConverterTypes.InputTypes.First(converter => converter.Name == "CSV");
 
         return new ConvertDocumentViewModel
         {

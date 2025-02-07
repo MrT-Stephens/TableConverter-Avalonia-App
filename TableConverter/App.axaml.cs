@@ -66,9 +66,10 @@ public class App : Application
     {
         // Custom Services
         services.AddSingleton<PageNavigationService>();
-        services.AddSingleton<ConvertFilesManagerService>();
         services.AddSingleton<ConverterTypesService>();
         services.AddSingleton<DataGenerationTypesService>();
+        services.AddSingleton<ConvertFilesManagerService>();
+        services.AddSingleton<FilesDialogManagerService>();
 
         // SukiUI Services
         services.AddSingleton<ISukiToastManager, SukiToastManager>();

@@ -9,7 +9,7 @@ using TableConverter.ViewModels;
 
 namespace TableConverter.Services;
 
-public partial class ConvertFilesManagerService : ObservableObject, IConvertFilesManager
+public partial class ConvertFilesManagerService : ObservableObject, IConvertFilesManagerService
 {
     private static readonly string AppDataPath =
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),

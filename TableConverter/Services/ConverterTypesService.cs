@@ -120,9 +120,14 @@ public class ConverterTypesService
     public IReadOnlyList<ConverterType> OutputTypes { get; } =
         Types.Where(val => val.OutputConverterHandler is not null).ToList();
 
-    public ConverterType GetByName(string name)
+    public ConverterType GetInputConverter(string name)
     {
-        return Types.First(val => val.Name == name);
+        return InputTypes.First(val => val.Name == name);
+    }
+    
+    public ConverterType GetOutputConverter(string name)
+    {
+        return OutputTypes.First(val => val.Name == name);
     }
 
     //public IConverterHanderInput GetInputHandlerByName(string name)

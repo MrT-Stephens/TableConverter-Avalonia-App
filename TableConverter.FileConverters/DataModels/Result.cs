@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace TableConverter.FileConverters.DataModels;
 
 /// <summary>

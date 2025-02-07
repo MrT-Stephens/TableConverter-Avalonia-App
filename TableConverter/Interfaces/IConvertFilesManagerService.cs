@@ -6,7 +6,7 @@ namespace TableConverter.Interfaces;
 /// Defines the contract for managing file conversions,
 /// including adding, removing, loading, and saving file metadata.
 /// </summary>
-public interface IConvertFilesManager
+public interface IConvertFilesManagerService
 {
     /// <summary>
     /// Adds a file to the application storage directory (Synchronous).
