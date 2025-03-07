@@ -16,7 +16,9 @@
     <sukiUi:GlassCard IsAnimated="False"
                       Margin="10"
                       Padding="10">
-        <sukiUi:SettingsLayout>
+        <sukiUi:SettingsLayout RenderOptions.BitmapInterpolationMode="LowQuality"
+                               RenderOptions.TextRenderingMode="SubpixelAntialias"
+                               >
             <sukiUi:SettingsLayout.Styles>
                 <!-- Adaptive Uniform Grid Styles -->
                 <Style Selector="components|SpacedUniformGrid">
@@ -53,7 +55,49 @@
                     <!-- "What is TableDConverter" Section -->
                     <sukiUi:SettingsLayoutItem Header="TableConverter">
                         <sukiUi:SettingsLayoutItem.Content>
-                            <TextBlock Text="Hello" />
+                            <TextBlock TextWrapping="Wrap" 
+                                       TextAlignment="Left">
+                                Welcome to TableConverter – your all-in-one solution for converting, editing, and generating tabular data effortlessly. Built with a modern, cross-platform interface, TableConverter lets you seamlessly transform data between formats like CSV, JSON, XML, SQL, and more. Whether you're converting files, generating realistic datasets, or fine-tuning data within the app, TableConverter provides a powerful yet intuitive experience. With batch processing, customizable editing tools, and export options for multiple formats, handling tabular data has never been easier. Designed for speed, flexibility, and ease of use, TableConverter is here to streamline your workflow across Windows, macOS, and Linux.
+                            </TextBlock>
+                        </sukiUi:SettingsLayoutItem.Content>
+                    </sukiUi:SettingsLayoutItem>
+                    <!-- "Quick Start" Section -->
+                    <sukiUi:SettingsLayoutItem Header="Quick Start Guide">
+                        <sukiUi:SettingsLayoutItem.Content>
+                            <StackPanel Spacing="20">
+                                <TextBlock Classes="h5"
+                                           Text="🔄 Converting Files" />
+                                <ItemsControl ItemsSource="{Binding ConversionSteps}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Spacing="10" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock TextWrapping="Wrap" 
+                                                       TextAlignment="Left" 
+                                                       Text="{Binding}" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <TextBlock Classes="h5"
+                                           Text="🎲 Generating Random Data" />
+                                <ItemsControl ItemsSource="{Binding DataGenerationSteps}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Spacing="10" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock TextWrapping="Wrap" 
+                                                       TextAlignment="Left" 
+                                                       Text="{Binding}" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
                         </sukiUi:SettingsLayoutItem.Content>
                     </sukiUi:SettingsLayoutItem>
                     <!-- "Convert File Types" Section -->
