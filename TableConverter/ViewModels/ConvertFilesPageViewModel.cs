@@ -183,7 +183,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
     {
         var currentDoc = SelectedConvertDocument;
 
-        if (currentDoc is { InputConverter: not null, OutputConverter: not null } &&
+        if (currentDoc is { OutputConverter: not null } &&
             !string.IsNullOrEmpty(currentDoc.OutputFileText.Text))
         {
             // Show a dialog to save the file.
@@ -203,7 +203,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                 DefaultExtension = currentDoc.OutputConverter.Extensions[0],
                 ShowOverwritePrompt = false,
                 SuggestedFileName =
-                    $"TableConverter-{currentDoc.InputConverter.Name}-{currentDoc.OutputConverter.Name}-{DateTime.Now.ToFileTime()}"
+                    $"TableConverter-{DateTime.Now.ToFileTime()}"
             });
 
             if (file.IsSuccess)
@@ -255,26 +255,34 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
     }
 
     [RelayCommand]
-    private void RemoveFileButtonClicked(string name)
+    private void RemoveFileButtonClicked(string id)
     {
-        if (FilesManager.Files.Any(val => val.Name == name))
+        if (FilesManager.Files.Any(val => val.Id == id))
         {
-            var file = FilesManager.Files.First(val => val.Name == name);
+            var file = FilesManager.Files.First(val => val.Id == id);
 
             DialogManager.CreateDialog()
                 .WithTitle("Are you sure?")
-                .WithContent($"Are you sure you want to remove the file '{name}'?")
+                .WithContent($"Are you sure you want to remove the file '{id}'?")
                 .OfType(NotificationType.Warning)
                 .WithActionButton("No", _ => { }, true)
                 .WithActionButton("Yes", _ =>
                 {
                     if (FilesManager.Files.Count == 1) FilesManager.Files.Add(ExampleConverterDocument());
 
-                    FilesManager.Files.Remove(file);
+                    if (SelectedConvertDocument.Id == id)
+                    {
+                        FilesManager.Files.Remove(file);
+                        SelectedConvertDocument = FilesManager.Files.First();
+                    }
+                    else
+                    {
+                        FilesManager.Files.Remove(file);
+                    }
 
                     ToastManager.CreateToast()
                         .WithTitle("File Removed")
-                        .WithContent($"The file '{name}' has been removed from your documents.")
+                        .WithContent($"The file '{id}' has been removed from your documents.")
                         .OfType(NotificationType.Success)
                         .Dismiss().ByClicking()
                         .Dismiss().After(new TimeSpan(0, 0, 3))
@@ -286,7 +294,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
         {
             ToastManager.CreateToast()
                 .WithTitle("File Not Found")
-                .WithContent($"The file '{name}' could not be found.")
+                .WithContent($"The file '{id}' could not be found.")
                 .OfType(NotificationType.Error)
                 .Dismiss().ByClicking()
                 .Dismiss().After(new TimeSpan(0, 0, 3))
@@ -295,14 +303,15 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
     }
 
     [RelayCommand]
-    private void DuplicateFileButtonClicked(string name)
+    private void DuplicateFileButtonClicked(string id)
     {
-        if (FilesManager.Files.Any(val => val.Name == name))
+        if (FilesManager.Files.Any(val => val.Id == id))
         {
-            var file = FilesManager.Files.First(val => val.Name == name);
+            var file = FilesManager.Files.First(val => val.Id == id);
 
             var newDoc = new ConvertDocumentViewModel
             {
+                Id = Guid.NewGuid().ToString(),
                 Name = $"Copy-{file.Name}",
                 InputConverter = file.InputConverter,
                 OutputConverter = file.OutputConverter,
@@ -321,12 +330,14 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
             };
 
             FilesManager.Files.Add(newDoc);
+
+            SelectedConvertDocument = FilesManager.Files.Last();
         }
         else
         {
             DialogManager.CreateDialog()
                 .WithTitle("File Not Found")
-                .WithContent($"The file '{name}' could not be found.")
+                .WithContent($"The file '{id}' could not be found.")
                 .OfType(NotificationType.Error)
                 .Dismiss().ByClickingBackground()
                 .TryShow();
@@ -441,6 +452,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
 
                     loadingDoc.Name = file.Value.Name.Split('.')[0];
                     loadingDoc.Path = file.Value.Path.AbsolutePath;
+                    loadingDoc.Id = Guid.NewGuid().ToString();
 
                     await using var stream = file.Value.Stream;
 
@@ -527,6 +539,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
         {
             Name = name,
             InputConverter = converter,
+            Id = Guid.NewGuid().ToString(),
             InputFileText = new TextDocument
             {
                 FileName = $"{name}{converter.Extensions[0]}",

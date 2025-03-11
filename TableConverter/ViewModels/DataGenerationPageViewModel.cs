@@ -124,6 +124,7 @@ public partial class DataGenerationPageViewModel : BasePageViewModel
 
         _FilesManager.Files.Add(new ConvertDocumentViewModel
         {
+            Id = Guid.NewGuid().ToString(),
             Name = name,
             IsGenerated = true,
             ProgressStepIndex = 1,

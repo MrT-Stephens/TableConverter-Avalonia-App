@@ -33,8 +33,18 @@
                             Spacing="5">
                     <!-- New File Button -->
                     <Button Command="{Binding ConvertFileNewFileButtonClickedCommand}"
-                            Classes="Flat">
-                        New
+                            Classes="Flat Icon">
+                        <PathIcon Data="{DynamicResource AddIcon}" />
+                    </Button>
+                    <Button Command="{Binding RemoveFileButtonClickedCommand}"
+                            CommandParameter="{Binding SelectedConvertDocument.Id}"
+                            Classes="Flat Icon">
+                        <PathIcon Data="{DynamicResource RemoveIcon}" />
+                    </Button>
+                    <Button Command="{Binding DuplicateFileButtonClickedCommand}"
+                            CommandParameter="{Binding SelectedConvertDocument.Id}"
+                            Classes="Flat Icon">
+                        <PathIcon Data="{DynamicResource DuplicateIcon}" />
                     </Button>
                 </StackPanel>
                 <!-- Select File Button -->
