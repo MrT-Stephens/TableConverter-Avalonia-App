@@ -86,7 +86,7 @@ public partial class DataGenerationPageViewModel : BasePageViewModel
                     return Task.FromResult(Task.CompletedTask);
                 }
             })
-            .OfType(NotificationType.Information)
+            .ShowCardBackground(false)
             .Dismiss()
             .ByClickingBackground()
             .TryShow();
