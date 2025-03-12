@@ -40,7 +40,7 @@
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBox Text="{Binding Name}"
-                                             Watermark="Enter Field Name" />
+                                             Watermark="{Binding PlaceHolder}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>

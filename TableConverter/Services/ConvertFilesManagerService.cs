@@ -20,6 +20,11 @@ public partial class ConvertFilesManagerService : ObservableObject, IConvertFile
 
     [ObservableProperty] private ObservableCollection<ConvertDocumentViewModel> _Files = [];
 
+    public ConvertFilesManagerService()
+    {
+        
+    }
+
     public void AddFile(string sourceFilePath)
     {
         
@@ -27,7 +32,10 @@ public partial class ConvertFilesManagerService : ObservableObject, IConvertFile
 
     public Task AddFileAsync(string sourceFilePath)
     {
-        return Task.CompletedTask;
+        return Task.Run(() =>
+        {
+            AddFile(sourceFilePath);
+        });
     }
 
     public void RemoveFile(string id)

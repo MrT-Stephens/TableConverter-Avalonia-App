@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using AvaloniaEdit.Document;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Newtonsoft.Json;
 using TableConverter.DataModels;
 
 namespace TableConverter.ViewModels;

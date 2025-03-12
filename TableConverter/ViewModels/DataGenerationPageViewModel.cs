@@ -17,7 +17,8 @@ public partial class DataGenerationPageViewModel : BasePageViewModel
 {
     #region Constructors
 
-    public DataGenerationPageViewModel(DataGenerationTypesService dataGenerationTypes, ConvertFilesManagerService filesManager,
+    public DataGenerationPageViewModel(DataGenerationTypesService dataGenerationTypes,
+        ConvertFilesManagerService filesManager,
         PageNavigationService pageNavigation, ISukiDialogManager dialogManager, ISukiToastManager toastManager)
         : base(dialogManager, toastManager, "Data\nGeneration", Application.Current?.Resources["DataIcon"], 2)
     {
@@ -109,6 +110,20 @@ public partial class DataGenerationPageViewModel : BasePageViewModel
     [RelayCommand]
     private async Task GenerateDataButtonClicked()
     {
+        if (DataGenerationFields.Select((field, index) => (field, index))
+                .Where(field => string.IsNullOrEmpty(field.field.Key)).ToArray() is { Length: > 0 } fields)
+        {
+            DialogManager.CreateDialog()
+                .WithTitle("Something went wrong")
+                .WithContent(
+                    $"Some of the data generation fields could not be generated. Please try again.\n{string.Join("\n", fields.Select(field => $"At row {field.index} the field is null or empty."))}")
+                .OfType(NotificationType.Error)
+                .WithActionButton("Ok", _ => { }, true)
+                .TryShow();
+            
+            return;
+        }
+        
         IsLoading = true;
 
         _DataGenerationTypesService.SetLocale(SelectedLocale);
@@ -116,7 +131,7 @@ public partial class DataGenerationPageViewModel : BasePageViewModel
         _DataGenerationTypesService.SetSeed(Seed);
 
         var name = string.IsNullOrWhiteSpace(GeneratedDocumentName)
-            ? $"Data-{DateTime.Now.ToFileTime()}"
+            ? $"Generated-Data-{DateTime.Now.ToFileTime()}"
             : GeneratedDocumentName;
 
         var data = await Task.Run(() =>

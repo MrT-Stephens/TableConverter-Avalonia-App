@@ -13,6 +13,7 @@ public partial class DataGenerationFieldViewModel : ObservableObject
     {
         if (method is null)
         {
+            PlaceHolder = "Field Name";
             TypeName = "Choose a Type";
             Name = string.Empty;
             Key = string.Empty;
@@ -20,6 +21,8 @@ public partial class DataGenerationFieldViewModel : ObservableObject
         }
         else
         {
+            PlaceHolder = $"Example: {method.Name.Replace(" ", "_")}";
+            
             TypeName = method.Name;
 
             Key = method.Key;
@@ -38,6 +41,8 @@ public partial class DataGenerationFieldViewModel : ObservableObject
     [ObservableProperty] private string _Key = string.Empty;
 
     [ObservableProperty] private string _Name = string.Empty;
+    
+    [ObservableProperty] private string _PlaceHolder = "Field Name";
 
     [ObservableProperty] private string _TypeName = "Choose a Type";
 

@@ -23,12 +23,7 @@ internal class Program
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace();
-
-        if (OperatingSystem.IsWindows() || OperatingSystem.IsMacOS() || OperatingSystem.IsLinux())
-        {
-            app.UseManagedSystemDialogs();
-        }
-
+        
         return app;
     }
 }

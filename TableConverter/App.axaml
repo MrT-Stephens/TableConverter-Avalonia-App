@@ -129,7 +129,6 @@
         <!-- Application Styles -->
         <FluentTheme />
         <sukiUi:SukiTheme ThemeColor="Green" />
-
         <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
     </Application.Styles>
 </Application>
