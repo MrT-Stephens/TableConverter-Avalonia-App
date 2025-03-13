@@ -13,15 +13,17 @@ public interface IConvertFilesManagerService
     /// Copies the file and stores its metadata.
     /// </summary>
     /// <param name="sourceFilePath">The full path of the file to be added.</param>
-    void AddFile(string sourceFilePath);
+    /// <param name="converterName">The converter type which was selected.</param>
+    void AddFile(string sourceFilePath, string converterName);
 
     /// <summary>
     /// Adds a file asynchronously to the application storage directory.
     /// Copies the file and stores its metadata.
     /// </summary>
     /// <param name="sourceFilePath">The full path of the file to be added.</param>
+    /// <param name="converterName">The converter type which was selected.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    Task AddFileAsync(string sourceFilePath);
+    Task AddFileAsync(string sourceFilePath, string converterName);
 
     /// <summary>
     /// Removes a file from the application storage directory (Synchronous).
@@ -37,18 +39,18 @@ public interface IConvertFilesManagerService
     /// <param name="id">The file id representing the file to be removed.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task RemoveFileAsync(string id);
-
+    
     /// <summary>
-    /// Loads the file metadata from persistent storage.
-    /// Typically called at application startup.
+    /// Loads the files from the application storage directory (Synchronous).
     /// </summary>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    Task LoadFilesAsync();
-
+    /// <param name="id">The file id representing the file to be loaded.</param>
+    /// <returns>The text content of the file.</returns>
+    string LoadAllText(string id);
+    
     /// <summary>
-    /// Saves the current file metadata to persistent storage.
-    /// Ensures that the stored file list remains updated.
+    /// Loads the files from the application storage directory (Asynchronous).
     /// </summary>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    Task SaveMetadataAsync();
+    /// <param name="id">The file id representing the file to be loaded.</param>
+    /// <returns>The text content of the file.</returns>
+    Task<string> LoadAllTextAsync(string id);
 }

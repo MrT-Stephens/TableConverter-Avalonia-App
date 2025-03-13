@@ -9,7 +9,8 @@ using TableConverter.ViewModels;
 
 namespace TableConverter.Services;
 
-public partial class ConvertFilesManagerService : ObservableObject, IConvertFilesManagerService
+public partial class ConvertFilesManagerService(ConverterTypesService types)
+    : ObservableObject, IConvertFilesManagerService
 {
     private static readonly string AppDataPath =
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -17,44 +18,38 @@ public partial class ConvertFilesManagerService : ObservableObject, IConvertFile
             throw new ArgumentNullException(nameof(Application.Current.Name), "Name of the application is null"));
 
     private static readonly string AppFilesPath = Path.Combine(AppDataPath, "Files");
+    
+    protected readonly ConverterTypesService ConverterTypesService = types;
 
     [ObservableProperty] private ObservableCollection<ConvertDocumentViewModel> _Files = [];
 
-    public ConvertFilesManagerService()
+    public void AddFile(string sourceFilePath, string converterName)
     {
         
     }
 
-    public void AddFile(string sourceFilePath)
+    public Task AddFileAsync(string sourceFilePath, string converterName)
     {
-        
-    }
-
-    public Task AddFileAsync(string sourceFilePath)
-    {
-        return Task.Run(() =>
-        {
-            AddFile(sourceFilePath);
-        });
+        throw new NotImplementedException();
     }
 
     public void RemoveFile(string id)
     {
-        
+        throw new NotImplementedException();
     }
 
     public Task RemoveFileAsync(string id)
     {
-        return Task.CompletedTask;
+        throw new NotImplementedException();
     }
 
-    public Task LoadFilesAsync()
+    public string LoadAllText(string id)
     {
-        return Task.CompletedTask;
+        throw new NotImplementedException();
     }
 
-    public Task SaveMetadataAsync()
+    public Task<string> LoadAllTextAsync(string id)
     {
-        return Task.CompletedTask;
+        throw new NotImplementedException();
     }
 }
