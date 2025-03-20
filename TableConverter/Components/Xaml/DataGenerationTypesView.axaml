@@ -4,7 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:xamlComponents="clr-namespace:TableConverter.Components.Xaml"
              xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+             xmlns:sukiUiTheme="clr-namespace:SukiUI.Theme;assembly=SukiUI"
              xmlns:converters="clr-namespace:TableConverter.Converters"
+             xmlns:suki="https://github.com/kikipoulet/SukiUI"
              x:Class="TableConverter.Components.Xaml.DataGenerationTypesView"
              x:DataType="xamlComponents:DataGenerationTypesViewModel"
              d:DesignHeight="450"
@@ -17,7 +19,24 @@
             <sukiUi:SukiSideMenu Grid.Row="0"
                                  ItemsSource="{Binding Categories}"
                                  SelectedItem="{Binding SelectedCategory}"
-                                 IsSearchEnabled="True">
+                                 IsSearchEnabled="False">
+                <sukiUi:SukiSideMenu.HeaderContent>
+                    <TextBox Text="{Binding SearchText, Mode=TwoWay}"
+                             Watermark="Search..."
+                             VerticalAlignment="Center"
+                             HorizontalAlignment="Stretch"
+                             Margin="10,10,10,10"
+                             sukiUiTheme:TextBoxExtensions.AddDeleteButton="True">
+                        <TextBox.InnerLeftContent>
+                            <PathIcon Data="{x:Static suki:Icons.Search}"
+                                      Foreground="{DynamicResource SukiLowText}"
+                                      Margin="5,0"
+                                      Height="17"
+                                      Width="17"
+                                      VerticalAlignment="Center" />
+                        </TextBox.InnerLeftContent>
+                    </TextBox>
+                </sukiUi:SukiSideMenu.HeaderContent>
                 <sukiUi:SukiSideMenu.ItemTemplate>
                     <DataTemplate>
                         <sukiUi:SukiSideMenuItem Classes="Compact">
@@ -26,7 +45,7 @@
                                     Converter="{x:Static converters:MergeValuesWithSeparatorConverter.Instance}"
                                     ConverterParameter=": ">
                                     <Binding Path="DisplayName" />
-                                    <Binding Path="Types.Count" />
+                                    <Binding Path="FilteredTypes.Count" />
                                 </MultiBinding>
                             </sukiUi:SukiSideMenuItem.Header>
                             <sukiUi:SukiSideMenuItem.Icon>

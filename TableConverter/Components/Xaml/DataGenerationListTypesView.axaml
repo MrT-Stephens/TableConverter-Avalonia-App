@@ -18,7 +18,7 @@
             <Setter Property="(xamlInteractivity:Interaction.Behaviors)">
                 <xamlInteractivity:BehaviorCollectionTemplate>
                     <xamlInteractivity:BehaviorCollection>
-                        <xamlResponsive:AdaptiveBehavior SourceControl="{Binding $parent[TopLevel]}">
+                        <xamlResponsive:AdaptiveBehavior SourceControl="{Binding #Window}">
                             <xamlResponsive:AdaptiveClassSetter MinWidth="0" MaxWidth="1000" ClassName="Small" />
                             <xamlResponsive:AdaptiveClassSetter MinWidth="1000" MaxWidth="1400" ClassName="Medium" />
                             <xamlResponsive:AdaptiveClassSetter MinWidth="1400" MaxWidth="Infinity" ClassName="Wide" />
@@ -41,33 +41,37 @@
         </Style>
     </UserControl.Styles>
 
-    <ListBox ItemsSource="{Binding Types}"
-             SelectedItem="{Binding SelectedType}"
-             SelectionMode="AlwaysSelected,Single"
-             Classes="Stack">
-        <ListBox.ItemsPanel>
-            <ItemsPanelTemplate>
-                <components:SpacedUniformGrid Spacing="10"
-                                              Classes="Adaptive" />
-            </ItemsPanelTemplate>
-        </ListBox.ItemsPanel>
-        <ListBox.ItemTemplate>
-            <DataTemplate>
-                <Border Margin="10">
-                    <sukiUi:GroupBox VerticalAlignment="Top">
-                        <sukiUi:GroupBox.Header>
-                            <!-- Data Generation Type Name -->
-                            <TextBlock Classes="h4 Primary"
-                                       Text="{Binding Name}"
-                                       FontWeight="Bold" />
-                        </sukiUi:GroupBox.Header>
-                        <!-- Data Generation Type Description -->
-                        <TextBlock Classes="h6"
-                                   Text="{Binding Description}"
-                                   TextWrapping="Wrap" />
-                    </sukiUi:GroupBox>
-                </Border>
-            </DataTemplate>
-        </ListBox.ItemTemplate>
-    </ListBox>
+    <Grid>
+        <ListBox ItemsSource="{Binding FilteredTypes}"
+                 SelectionMode="AlwaysSelected,Single"
+                 Classes="Stack"
+                 SelectedItem="{Binding SelectedType}">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <components:SpacedUniformGrid Spacing="10"
+                                                  Classes="Adaptive"
+                                                  HorizontalAlignment="Stretch"
+                                                  VerticalAlignment="Center" />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Border Margin="10">
+                        <sukiUi:GroupBox VerticalAlignment="Top">
+                            <sukiUi:GroupBox.Header>
+                                <!-- Data Generation Type Name -->
+                                <TextBlock Classes="h4 Primary"
+                                           Text="{Binding Name}"
+                                           FontWeight="Bold" />
+                            </sukiUi:GroupBox.Header>
+                            <!-- Data Generation Type Description -->
+                            <TextBlock Classes="h6"
+                                       Text="{Binding Description}"
+                                       TextWrapping="Wrap" />
+                        </sukiUi:GroupBox>
+                    </Border>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
 </UserControl>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
@@ -33,11 +34,29 @@ public partial class DataGenerationTypesViewModel : BaseDialogViewModel
                 "All of the available data generation methods.",
                 Application.Current?.Resources["DataGenerationAllIcon"] ??
                 throw new KeyNotFoundException("Icon not found"),
-                dataGenerationTypesService.Types.SelectMany(type => type.Methods).ToList()));
+                dataGenerationTypesService.Types
+                    .SelectMany(type => type.Methods)
+                    .ToList()));
 
         Categories = new ObservableCollection<DataGenerationListTypesViewModel>(categories);
 
         SelectedCategory = Categories.First();
+
+        SearchText = string.Empty;
+    }
+
+    #endregion
+
+    #region Misc
+
+    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+    {
+        base.OnPropertyChanged(e);
+
+        if (e.PropertyName == nameof(SearchText))
+        {
+            SelectedCategory.FilterItems(SearchText);
+        }
     }
 
     #endregion
@@ -67,6 +86,8 @@ public partial class DataGenerationTypesViewModel : BaseDialogViewModel
     #endregion
 
     #region Properties
+
+    [ObservableProperty] private string _SearchText;
 
     [ObservableProperty] private DataGenerationListTypesViewModel _SelectedCategory;
 
