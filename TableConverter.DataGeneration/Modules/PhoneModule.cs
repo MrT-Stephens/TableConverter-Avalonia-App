@@ -1,3 +1,4 @@
+using TableConverter.DataGeneration.Exceptions;
 using TableConverter.DataGeneration.LocaleDataSetsBase;
 
 namespace TableConverter.DataGeneration.Modules;
@@ -24,7 +25,7 @@ public class PhoneModule(FakerBase faker, LocaleBase locale, Randomizer randomiz
                 Randomizer.GetWeightedValue(Locale.PhoneNumber.Value.InternationalPattern)),
             PhoneNumberType.National => Randomizer.ReplaceSymbolsWithNumbers(
                 Randomizer.GetWeightedValue(Locale.PhoneNumber.Value.NationalPattern)),
-            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            _ => FakerArgumentException.CreateException<string>(type, "Invalid phone number type")
         };
     }
 

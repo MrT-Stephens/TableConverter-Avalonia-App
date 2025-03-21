@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Numerics;
+using TableConverter.DataGeneration.Exceptions;
 using TableConverter.DataGeneration.LocaleDataSetsBase;
 
 namespace TableConverter.DataGeneration.Modules;
@@ -11,23 +12,30 @@ public class NumberModule(FakerBase faker, LocaleBase locale, Randomizer randomi
 
     public virtual string Integer(int minNumber = int.MinValue, int maxNumber = int.MaxValue)
     {
+        if (minNumber > maxNumber)
+            FakerArgumentException.CreateException<object>(minNumber, "Min number cannot be greater than max number");
+        
         return Randomizer.Number(minNumber, maxNumber).ToString(CultureInfo.InvariantCulture);
     }
 
     public virtual string Long(long minNumber = long.MinValue, long maxNumber = long.MaxValue)
     {
+        if (minNumber > maxNumber)
+            FakerArgumentException.CreateException<object>(minNumber, "Min number cannot be greater than max number");
+        
         return Randomizer.Long(minNumber, maxNumber).ToString(CultureInfo.InvariantCulture);
     }
 
     public virtual string BigInteger(string minNumber = "0", string maxNumber = "9999999999999999999999999999")
     {
         if (!System.Numerics.BigInteger.TryParse(minNumber, out var min))
-            throw new ArgumentException("minNumber must be a valid BigInteger.", nameof(minNumber));
+            FakerArgumentException.CreateException<object>(minNumber, "Min number must be a valid BigInteger");
 
         if (!System.Numerics.BigInteger.TryParse(maxNumber, out var max))
-            throw new ArgumentException("maxNumber must be a valid BigInteger.", nameof(maxNumber));
+            FakerArgumentException.CreateException<object>(maxNumber, "Max number must be a valid BigInteger");
 
-        if (min > max) throw new ArgumentException("minNumber must be less than or equal to maxNumber.");
+        if (min > max)
+            FakerArgumentException.CreateException<object>(min, "Min number cannot be greater than max number");
 
         // Calculate the range between the min and max values
         var range = max - min + 1;
@@ -52,10 +60,11 @@ public class NumberModule(FakerBase faker, LocaleBase locale, Randomizer randomi
     public virtual string Float(float minNumber = float.MinValue, float maxNumber = float.MaxValue,
         int decimalPlaces = 2)
     {
-        if (maxNumber <= minNumber)
-            throw new ArgumentException($"Max {maxNumber} should be greater than min {minNumber}.");
+        if (minNumber > maxNumber)
+            FakerArgumentException.CreateException<object>(minNumber, "Min number cannot be greater than max number");
 
-        if (decimalPlaces < 0) throw new ArgumentException("Precision should be a non-negative integer.");
+        if (decimalPlaces < 0)
+            FakerArgumentException.CreateException<object>(decimalPlaces, "Decimal places cannot be negative");
 
         return Randomizer.Float(minNumber, maxNumber).ToString($"F{decimalPlaces}", CultureInfo.InvariantCulture);
     }
@@ -63,10 +72,11 @@ public class NumberModule(FakerBase faker, LocaleBase locale, Randomizer randomi
     public virtual string Double(double minNumber = double.MinValue, double maxNumber = double.MaxValue,
         int decimalPlaces = 2)
     {
-        if (maxNumber <= minNumber)
-            throw new ArgumentException($"Max {maxNumber} should be greater than min {minNumber}.");
+        if (minNumber > maxNumber)
+            FakerArgumentException.CreateException<object>(minNumber, "Min number cannot be greater than max number");
 
-        if (decimalPlaces < 0) throw new ArgumentException("Precision should be a non-negative integer.");
+        if (decimalPlaces < 0)
+            FakerArgumentException.CreateException<object>(decimalPlaces, "Decimal places cannot be negative");
 
         return Randomizer.Double(minNumber, maxNumber).ToString($"F{decimalPlaces}", CultureInfo.InvariantCulture);
     }
@@ -74,46 +84,48 @@ public class NumberModule(FakerBase faker, LocaleBase locale, Randomizer randomi
     public virtual string Decimal(decimal minNumber = decimal.MinValue, decimal maxNumber = decimal.MaxValue,
         int decimalPlaces = 2)
     {
-        if (maxNumber <= minNumber)
-            throw new ArgumentException($"Max {maxNumber} should be greater than min {minNumber}.");
+        if (minNumber > maxNumber)
+            FakerArgumentException.CreateException<object>(minNumber, "Min number cannot be greater than max number");
 
-        if (decimalPlaces < 0) throw new ArgumentException("Precision should be a non-negative integer.");
+        if (decimalPlaces < 0)
+            FakerArgumentException.CreateException<object>(decimalPlaces, "Decimal places cannot be negative");
 
         return Randomizer.Decimal(minNumber, maxNumber).ToString($"F{decimalPlaces}", CultureInfo.InvariantCulture);
     }
 
     public virtual string Binary(int minNumber = 0, int maxNumber = 255)
     {
-        if (maxNumber <= minNumber)
-            throw new ArgumentException($"Max {maxNumber} should be greater than min {minNumber}.");
+        if (minNumber > maxNumber)
+            FakerArgumentException.CreateException<object>(minNumber, "Min number cannot be greater than max number");
 
         return Convert.ToString(Randomizer.Number(minNumber, maxNumber), 2);
     }
 
     public virtual string Octal(int minNumber = 0, int maxNumber = 255)
     {
-        if (maxNumber <= minNumber)
-            throw new ArgumentException($"Max {maxNumber} should be greater than min {minNumber}.");
+        if (minNumber > maxNumber)
+            FakerArgumentException.CreateException<object>(minNumber, "Min number cannot be greater than max number");
 
         return Convert.ToString(Randomizer.Number(minNumber, maxNumber), 8);
     }
 
     public virtual string Hexadecimal(int minNumber = 0, int maxNumber = 255)
     {
-        if (maxNumber <= minNumber)
-            throw new ArgumentException($"Max {maxNumber} should be greater than min {minNumber}.");
+        if (minNumber > maxNumber)
+            FakerArgumentException.CreateException<object>(minNumber, "Min number cannot be greater than max number");
 
         return Convert.ToString(Randomizer.Number(minNumber, maxNumber), 16);
     }
 
     public virtual string RomanNumeral(int minNumber = 1, int maxNumber = 3999)
     {
-        if (maxNumber <= minNumber)
-            throw new ArgumentException($"Max {maxNumber} should be greater than min {minNumber}.");
+        if (minNumber > maxNumber)
+            FakerArgumentException.CreateException<object>(minNumber, "Min number cannot be greater than max number");
 
-        if (minNumber < 1) throw new ArgumentException("Min value should be greater than 0.");
+        if (minNumber < 1) FakerArgumentException.CreateException<object>(minNumber, "Min number cannot be negative");
 
-        if (maxNumber > 3999) throw new ArgumentException("Max value should be less than 4000.");
+        if (maxNumber > 3999)
+            FakerArgumentException.CreateException<object>(maxNumber, "Max number cannot be greater than 3999");
 
         var number = Randomizer.Number(minNumber, maxNumber);
 
@@ -149,11 +161,11 @@ public class NumberModule(FakerBase faker, LocaleBase locale, Randomizer randomi
     public virtual string Percent(int minNumber = 0, int maxNumber = 100, int decimalPlaces = 2,
         bool includeSymbol = true)
     {
-        if (maxNumber <= minNumber)
-            throw new ArgumentException($"Max {maxNumber} should be greater than min {minNumber}.");
+        if (minNumber > maxNumber)
+            FakerArgumentException.CreateException<object>(minNumber, "Min number cannot be greater than max number");
 
         if (decimalPlaces < 0)
-            throw new ArgumentException("Precision should be a non-negative integer.");
+            FakerArgumentException.CreateException<object>(decimalPlaces, "Decimal places cannot be negative");
 
         return Randomizer.Float(minNumber, maxNumber).ToString($"F{decimalPlaces}", CultureInfo.InvariantCulture) +
                (includeSymbol ? "%" : string.Empty);
@@ -161,11 +173,12 @@ public class NumberModule(FakerBase faker, LocaleBase locale, Randomizer randomi
 
     public virtual long PrimeNumber(long minNumber = 1, long maxNumber = long.MaxValue)
     {
-        if (minNumber < 0) throw new ArgumentException("Min value should be greater than or equal to 0.");
+        if (minNumber < 0) FakerArgumentException.CreateException<object>(minNumber, "Min number cannot be negative");
 
-        if (maxNumber < 0) throw new ArgumentException("Max value should be greater than or equal to 0.");
+        if (maxNumber < 0) FakerArgumentException.CreateException<object>(maxNumber, "Max number cannot be negative");
 
-        if (minNumber > maxNumber) throw new ArgumentException("Min value should be less than or equal to max value.");
+        if (minNumber > maxNumber)
+            FakerArgumentException.CreateException<object>(minNumber, "Min number cannot be greater than max number");
 
         // Generate a random number within the range
         var prime = Randomizer.Long(minNumber, maxNumber);

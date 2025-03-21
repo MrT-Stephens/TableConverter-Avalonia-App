@@ -9,14 +9,6 @@ namespace TableConverter.DataGeneration.Exceptions;
 /// </summary>
 public class FakerArgumentException : Exception
 {
-    protected FakerArgumentException(string? generatorName, string? paramName, object? actualValue) : base(
-        "Invalid argument")
-    {
-        ParamName = paramName;
-        GeneratorName = generatorName;
-        ActualValue = actualValue;
-    }
-
     protected FakerArgumentException(string? generatorName, string? paramName, object? actualValue, string message) :
         base(message)
     {

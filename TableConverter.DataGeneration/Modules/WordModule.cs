@@ -1,3 +1,4 @@
+using TableConverter.DataGeneration.Exceptions;
 using TableConverter.DataGeneration.LocaleDataSetsBase;
 
 namespace TableConverter.DataGeneration.Modules;
@@ -10,16 +11,13 @@ public class WordModule(FakerBase faker, LocaleBase locale, Randomizer randomize
     public virtual string Adjective(int minLength = 0, int maxLength = int.MaxValue)
     {
         if (minLength < 0)
-            throw new ArgumentOutOfRangeException(nameof(minLength), minLength,
-                "minLength must be greater than or equal to 0");
+            FakerArgumentException.CreateException<object>(minLength, "Min length must be greater than or equal to 0");
 
         if (maxLength < 0)
-            throw new ArgumentOutOfRangeException(nameof(maxLength), maxLength,
-                "maxLength must be greater than or equal to 0");
+            FakerArgumentException.CreateException<object>(maxLength, "Max length must be greater than or equal to 0");
 
         if (minLength > maxLength)
-            throw new ArgumentOutOfRangeException(nameof(minLength), minLength,
-                "minLength must be less than or equal to maxLength");
+            FakerArgumentException.CreateException<object>(minLength, "Min length must be less than max length");
 
         var data = FilterStringList(Locale.Word.Value.Adjective, minLength, maxLength);
 
@@ -29,16 +27,13 @@ public class WordModule(FakerBase faker, LocaleBase locale, Randomizer randomize
     public virtual string Adverb(int minLength = 0, int maxLength = int.MaxValue)
     {
         if (minLength < 0)
-            throw new ArgumentOutOfRangeException(nameof(minLength), minLength,
-                "minLength must be greater than or equal to 0");
+            FakerArgumentException.CreateException<object>(minLength, "Min length must be greater than or equal to 0");
 
         if (maxLength < 0)
-            throw new ArgumentOutOfRangeException(nameof(maxLength), maxLength,
-                "maxLength must be greater than or equal to 0");
+            FakerArgumentException.CreateException<object>(maxLength, "Max length must be greater than or equal to 0");
 
         if (minLength > maxLength)
-            throw new ArgumentOutOfRangeException(nameof(minLength), minLength,
-                "minLength must be less than or equal to maxLength");
+            FakerArgumentException.CreateException<object>(minLength, "Min length must be less than max length");
 
         var data = FilterStringList(Locale.Word.Value.Adverb, minLength, maxLength);
 
@@ -48,16 +43,13 @@ public class WordModule(FakerBase faker, LocaleBase locale, Randomizer randomize
     public virtual string Conjunction(int minLength = 0, int maxLength = int.MaxValue)
     {
         if (minLength < 0)
-            throw new ArgumentOutOfRangeException(nameof(minLength), minLength,
-                "minLength must be greater than or equal to 0");
+            FakerArgumentException.CreateException<object>(minLength, "Min length must be greater than or equal to 0");
 
         if (maxLength < 0)
-            throw new ArgumentOutOfRangeException(nameof(maxLength), maxLength,
-                "maxLength must be greater than or equal to 0");
+            FakerArgumentException.CreateException<object>(maxLength, "Max length must be greater than or equal to 0");
 
         if (minLength > maxLength)
-            throw new ArgumentOutOfRangeException(nameof(minLength), minLength,
-                "minLength must be less than or equal to maxLength");
+            FakerArgumentException.CreateException<object>(minLength, "Min length must be less than max length");
 
         var data = FilterStringList(Locale.Word.Value.Conjunction, minLength, maxLength);
 
@@ -67,16 +59,13 @@ public class WordModule(FakerBase faker, LocaleBase locale, Randomizer randomize
     public virtual string Interjection(int minLength = 0, int maxLength = int.MaxValue)
     {
         if (minLength < 0)
-            throw new ArgumentOutOfRangeException(nameof(minLength), minLength,
-                "minLength must be greater than or equal to 0");
+            FakerArgumentException.CreateException<object>(minLength, "Min length must be greater than or equal to 0");
 
         if (maxLength < 0)
-            throw new ArgumentOutOfRangeException(nameof(maxLength), maxLength,
-                "maxLength must be greater than or equal to 0");
+            FakerArgumentException.CreateException<object>(maxLength, "Max length must be greater than or equal to 0");
 
         if (minLength > maxLength)
-            throw new ArgumentOutOfRangeException(nameof(minLength), minLength,
-                "minLength must be less than or equal to maxLength");
+            FakerArgumentException.CreateException<object>(minLength, "Min length must be less than max length");
 
         var data = FilterStringList(Locale.Word.Value.Interjection, minLength, maxLength);
 
@@ -86,16 +75,13 @@ public class WordModule(FakerBase faker, LocaleBase locale, Randomizer randomize
     public virtual string Noun(int minLength = 0, int maxLength = int.MaxValue)
     {
         if (minLength < 0)
-            throw new ArgumentOutOfRangeException(nameof(minLength), minLength,
-                "minLength must be greater than or equal to 0");
+            FakerArgumentException.CreateException<object>(minLength, "Min length must be greater than or equal to 0");
 
         if (maxLength < 0)
-            throw new ArgumentOutOfRangeException(nameof(maxLength), maxLength,
-                "maxLength must be greater than or equal to 0");
+            FakerArgumentException.CreateException<object>(maxLength, "Max length must be greater than or equal to 0");
 
         if (minLength > maxLength)
-            throw new ArgumentOutOfRangeException(nameof(minLength), minLength,
-                "minLength must be less than or equal to maxLength");
+            FakerArgumentException.CreateException<object>(minLength, "Min length must be less than max length");
 
         var data = FilterStringList(Locale.Word.Value.Noun, minLength, maxLength);
 
@@ -105,16 +91,13 @@ public class WordModule(FakerBase faker, LocaleBase locale, Randomizer randomize
     public virtual string Preposition(int minLength = 0, int maxLength = int.MaxValue)
     {
         if (minLength < 0)
-            throw new ArgumentOutOfRangeException(nameof(minLength), minLength,
-                "minLength must be greater than or equal to 0");
+            FakerArgumentException.CreateException<object>(minLength, "Min length must be greater than or equal to 0");
 
         if (maxLength < 0)
-            throw new ArgumentOutOfRangeException(nameof(maxLength), maxLength,
-                "maxLength must be greater than or equal to 0");
+            FakerArgumentException.CreateException<object>(maxLength, "Max length must be greater than or equal to 0");
 
         if (minLength > maxLength)
-            throw new ArgumentOutOfRangeException(nameof(minLength), minLength,
-                "minLength must be less than or equal to maxLength");
+            FakerArgumentException.CreateException<object>(minLength, "Min length must be less than max length");
 
         var data = FilterStringList(Locale.Word.Value.Preposition, minLength, maxLength);
 
@@ -124,16 +107,13 @@ public class WordModule(FakerBase faker, LocaleBase locale, Randomizer randomize
     public virtual string Verb(int minLength = 0, int maxLength = int.MaxValue)
     {
         if (minLength < 0)
-            throw new ArgumentOutOfRangeException(nameof(minLength), minLength,
-                "minLength must be greater than or equal to 0");
+            FakerArgumentException.CreateException<object>(minLength, "Min length must be greater than or equal to 0");
 
         if (maxLength < 0)
-            throw new ArgumentOutOfRangeException(nameof(maxLength), maxLength,
-                "maxLength must be greater than or equal to 0");
+            FakerArgumentException.CreateException<object>(maxLength, "Max length must be greater than or equal to 0");
 
         if (minLength > maxLength)
-            throw new ArgumentOutOfRangeException(nameof(minLength), minLength,
-                "minLength must be less than or equal to maxLength");
+            FakerArgumentException.CreateException<object>(minLength, "Min length must be less than max length");
 
         var data = FilterStringList(Locale.Word.Value.Verb, minLength, maxLength);
 
@@ -153,23 +133,20 @@ public class WordModule(FakerBase faker, LocaleBase locale, Randomizer randomize
             4 => Noun(minLength, maxLength),
             5 => Preposition(minLength, maxLength),
             6 => Verb(minLength, maxLength),
-            _ => throw new ArgumentOutOfRangeException(nameof(number), number, "Number must be between 0 and 6")
+            _ => FakerArgumentException.CreateException<string>(number, "Invalid number")
         };
     }
 
     public virtual string Words(int minCount = 3, int maxCount = 10)
     {
         if (minCount < 0)
-            throw new ArgumentOutOfRangeException(nameof(minCount), minCount,
-                "minCount must be greater than or equal to 0");
+            FakerArgumentException.CreateException<object>(minCount, "Min count must be greater than or equal to 0");
 
         if (maxCount < 0)
-            throw new ArgumentOutOfRangeException(nameof(maxCount), maxCount,
-                "maxCount must be greater than or equal to 0");
+            FakerArgumentException.CreateException<object>(maxCount, "Max count must be greater than or equal to 0");
 
         if (minCount > maxCount)
-            throw new ArgumentOutOfRangeException(nameof(minCount), minCount,
-                "minCount must be less than or equal to maxCount");
+            FakerArgumentException.CreateException<object>(minCount, "Min count must be less than max count");
 
         var count = Randomizer.Number(minCount, maxCount);
 

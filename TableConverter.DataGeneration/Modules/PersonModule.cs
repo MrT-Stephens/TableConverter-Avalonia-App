@@ -1,3 +1,4 @@
+using TableConverter.DataGeneration.Exceptions;
 using TableConverter.DataGeneration.LocaleDataSetsBase;
 
 namespace TableConverter.DataGeneration.Modules;
@@ -34,7 +35,7 @@ public class PersonModule(FakerBase faker, LocaleBase locale, Randomizer randomi
             SexEnum.Generic => Randomizer.GetRandomElement(Locale.Person.Value.FirstName.Generic),
             SexEnum.Male => Randomizer.GetRandomElement(Locale.Person.Value.FirstName.Male),
             SexEnum.Female => Randomizer.GetRandomElement(Locale.Person.Value.FirstName.Female),
-            _ => throw new ArgumentOutOfRangeException(nameof(sex), sex, null)
+            _ => FakerArgumentException.CreateException<string>(sex, "Invalid sex type")
         };
     }
 
@@ -45,7 +46,7 @@ public class PersonModule(FakerBase faker, LocaleBase locale, Randomizer randomi
             SexEnum.Generic => Randomizer.GetRandomElement(Locale.Person.Value.MiddleName.Generic),
             SexEnum.Male => Randomizer.GetRandomElement(Locale.Person.Value.MiddleName.Male),
             SexEnum.Female => Randomizer.GetRandomElement(Locale.Person.Value.MiddleName.Female),
-            _ => throw new ArgumentOutOfRangeException(nameof(sex), sex, null)
+            _ => FakerArgumentException.CreateException<string>(sex, "Invalid sex type")
         };
     }
 
@@ -56,7 +57,7 @@ public class PersonModule(FakerBase faker, LocaleBase locale, Randomizer randomi
             SexEnum.Generic => Randomizer.GetRandomElement(Locale.Person.Value.LastName.Generic),
             SexEnum.Male => Randomizer.GetRandomElement(Locale.Person.Value.LastName.Male),
             SexEnum.Female => Randomizer.GetRandomElement(Locale.Person.Value.LastName.Female),
-            _ => throw new ArgumentOutOfRangeException(nameof(sex), sex, null)
+            _ => FakerArgumentException.CreateException<string>(sex, "Invalid sex type")
         };
     }
 
@@ -67,7 +68,7 @@ public class PersonModule(FakerBase faker, LocaleBase locale, Randomizer randomi
             SexEnum.Generic => Randomizer.GetRandomElement(Locale.Person.Value.Title.Generic),
             SexEnum.Male => Randomizer.GetRandomElement(Locale.Person.Value.Title.Male),
             SexEnum.Female => Randomizer.GetRandomElement(Locale.Person.Value.Title.Female),
-            _ => throw new ArgumentOutOfRangeException(nameof(sex), sex, null)
+            _ => FakerArgumentException.CreateException<string>(sex, "Invalid sex type")
         };
     }
 
@@ -86,7 +87,7 @@ public class PersonModule(FakerBase faker, LocaleBase locale, Randomizer randomi
             SexFormat.LowerFullWord => sex == SexEnum.Male ? "male" : "female",
             SexFormat.UpperAbbreviation => sex == SexEnum.Male ? "M" : "F",
             SexFormat.LowerAbbreviation => sex == SexEnum.Male ? "m" : "f",
-            _ => throw new ArgumentOutOfRangeException(nameof(format), format, null)
+            _ => FakerArgumentException.CreateException<string>(format, "Invalid format type")
         };
     }
 

@@ -27,16 +27,13 @@ public class LoremModule(FakerBase faker, LocaleBase locale, Randomizer randomiz
     public virtual string Words(int minCount = 3, int maxCount = 10)
     {
         if (minCount < 0)
-            throw new ArgumentOutOfRangeException(nameof(minCount), minCount,
-                "minCount must be greater than or equal to 0");
+            FakerArgumentException.CreateException<int>(minCount, "Min count must be greater than 0");
 
         if (maxCount < 0)
-            throw new ArgumentOutOfRangeException(nameof(maxCount), maxCount,
-                "maxCount must be greater than or equal to 0");
+            FakerArgumentException.CreateException<int>(maxCount, "Max count must be greater than 0");
 
         if (minCount > maxCount)
-            throw new ArgumentOutOfRangeException(nameof(minCount), minCount,
-                "minCount must be less than or equal to maxCount");
+            FakerArgumentException.CreateException<int>(minCount, "Min count must be less than max count");
 
         var count = Randomizer.Number(minCount, maxCount);
 
@@ -55,16 +52,13 @@ public class LoremModule(FakerBase faker, LocaleBase locale, Randomizer randomiz
     public virtual string Sentences(int minCount = 3, int maxCount = 10, string separator = " ")
     {
         if (minCount < 0)
-            throw new ArgumentOutOfRangeException(nameof(minCount), minCount,
-                "minCount must be greater than or equal to 0");
+            FakerArgumentException.CreateException<int>(minCount, "Min count must be greater than 0");
 
         if (maxCount < 0)
-            throw new ArgumentOutOfRangeException(nameof(maxCount), maxCount,
-                "maxCount must be greater than or equal to 0");
+            FakerArgumentException.CreateException<int>(maxCount, "Max count must be greater than 0");
 
         if (minCount > maxCount)
-            throw new ArgumentOutOfRangeException(nameof(minCount), minCount,
-                "minCount must be less than or equal to maxCount");
+            FakerArgumentException.CreateException<int>(minCount, "Min count must be less than maxCount");
 
         var count = Randomizer.Number(minCount, maxCount);
 
@@ -99,7 +93,7 @@ public class LoremModule(FakerBase faker, LocaleBase locale, Randomizer randomiz
             4 => Paragraph(),
             5 => Paragraphs(),
             6 => Lines(),
-            _ => throw new ArgumentOutOfRangeException(nameof(number), number, "Number must be between 0 and 6")
+            _ => FakerArgumentException.CreateException<string>(number, "Invalid number")
         };
     }
 
