@@ -1,3 +1,4 @@
+using TableConverter.DataGeneration.Exceptions;
 using TableConverter.DataGeneration.LocaleDataSetsBase;
 
 namespace TableConverter.DataGeneration.Modules;
@@ -55,7 +56,7 @@ public class CommerceModule(FakerBase faker, LocaleBase locale, Randomizer rando
         {
             IsbnLengthEnum.Isbn10 => GenerateIsbn10(separator),
             IsbnLengthEnum.Isbn13 => GenerateIsbn13(separator),
-            _ => throw new ArgumentOutOfRangeException(nameof(length), "Invalid ISBN length")
+            _ => FakerArgumentException.CreateException<string>(length, "Invalid ISBN length")
         };
     }
 

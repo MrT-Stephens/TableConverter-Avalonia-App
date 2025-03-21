@@ -110,11 +110,12 @@ public partial class DataGenerationMethodToControlsConverter : IValueConverter
             MinWidth = 150
         };
 
-        control.Bind(TextBox.TextProperty, new Binding
+        control.Bind(NumericUpDown.ValueProperty, new Binding
         {
             Path = "Value",
             Mode = BindingMode.TwoWay,
-            Source = param
+            Source = param,
+            Converter = new DynamicNumericConverter(param.Type)
         });
 
         return control;

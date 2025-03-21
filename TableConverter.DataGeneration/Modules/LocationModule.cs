@@ -1,4 +1,5 @@
 using System.Globalization;
+using TableConverter.DataGeneration.Exceptions;
 using TableConverter.DataGeneration.LocaleDataSetsBase;
 
 namespace TableConverter.DataGeneration.Modules;
@@ -71,7 +72,7 @@ public class LocationModule(FakerBase faker, LocaleBase locale, Randomizer rando
             CountryCodeFormatEnum.Alpha2 => val.Alpha2,
             CountryCodeFormatEnum.Alpha3 => val.Alpha3,
             CountryCodeFormatEnum.Numeric => val.Numeric,
-            _ => throw new ArgumentOutOfRangeException(nameof(format), format, null)
+            _ => FakerArgumentException.CreateException<string>(format, "Invalid country code")
         };
     }
 
@@ -140,7 +141,7 @@ public class LocationModule(FakerBase faker, LocaleBase locale, Randomizer rando
             LanguageFormatEnum.Normal => val.Name,
             LanguageFormatEnum.Alpha2 => val.Alpha2,
             LanguageFormatEnum.Alpha3 => val.Alpha3,
-            _ => throw new ArgumentOutOfRangeException(nameof(format), format, null)
+            _ => FakerArgumentException.CreateException<string>(format, "Invalid language")
         };
     }
 }

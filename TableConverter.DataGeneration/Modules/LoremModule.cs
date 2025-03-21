@@ -1,3 +1,4 @@
+using TableConverter.DataGeneration.Exceptions;
 using TableConverter.DataGeneration.LocaleDataSetsBase;
 
 namespace TableConverter.DataGeneration.Modules;
@@ -10,16 +11,13 @@ public class LoremModule(FakerBase faker, LocaleBase locale, Randomizer randomiz
     public virtual string Word(int minLength = 1, int maxLength = int.MaxValue)
     {
         if (minLength < 0)
-            throw new ArgumentOutOfRangeException(nameof(minLength), minLength,
-                "minLength must be greater than or equal to 0");
+            FakerArgumentException.CreateException<int>(minLength, "Min length must be greater than 0");
 
         if (maxLength < 0)
-            throw new ArgumentOutOfRangeException(nameof(maxLength), maxLength,
-                "maxLength must be greater than or equal to 0");
+            FakerArgumentException.CreateException<int>(maxLength, "Max length must be greater than 0");
 
         if (minLength > maxLength)
-            throw new ArgumentOutOfRangeException(nameof(minLength), minLength,
-                "minLength must be less than or equal to maxLength");
+            FakerArgumentException.CreateException<int>(minLength, "Min length must be less than max length");
 
         var data = FilterStringList(Locale.Lorem.Value.Word, minLength, maxLength);
 

@@ -1,9 +1,14 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using TableConverter.DataGeneration;
+using TableConverter.DataGeneration.DataModels;
+using TableConverter.DataGeneration.Exceptions;
 using TableConverter.DataGeneration.Modules;
+using TableConverter.FileConverters.DataModels;
 using TableConverter.Services.DataGenerationAttributedModules;
+using TableData = TableConverter.DataGeneration.DataModels.TableData;
 
 namespace TableConverter.Services;
 

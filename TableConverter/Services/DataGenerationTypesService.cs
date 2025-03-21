@@ -5,7 +5,9 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Avalonia;
 using TableConverter.DataGeneration;
+using TableConverter.DataGeneration.Exceptions;
 using TableConverter.DataModels;
+using TableConverter.FileConverters.DataModels;
 using TableConverter.ViewModels;
 using TableData = TableConverter.DataGeneration.DataModels.TableData;
 
@@ -31,7 +33,7 @@ public class DataGenerationTypesService
         Faker.Seed(seed);
     }
 
-    public Task<TableData> GenerateData(DataGenerationFieldViewModel[] fields, int rowCount = 0)
+    public async Task<Result<TableData>> GenerateData(DataGenerationFieldViewModel[] fields, int rowCount = 0)
     {
         var builder = FakerWithAttributedModules.Create(Faker);
 
@@ -45,7 +47,17 @@ public class DataGenerationTypesService
 
         builder.WithRowCount(rowCount);
 
-        return builder.BuildAsync();
+        try
+        {
+            return Result<TableData>.Success(await builder.BuildAsync());
+        }
+        catch (Exception ex)
+        {
+            if (ex.InnerException is FakerArgumentException fakerArgumentException)
+                return Result<TableData>.Failure(fakerArgumentException.ToString());
+
+            throw;
+        }
     }
 
     private static IReadOnlyList<DataGenerationType> LoadDataGenerationTypes()

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
@@ -120,10 +121,10 @@ public partial class DataGenerationPageViewModel : BasePageViewModel
                 .OfType(NotificationType.Error)
                 .WithActionButton("Ok", _ => { }, true)
                 .TryShow();
-            
+
             return;
         }
-        
+
         IsLoading = true;
 
         _DataGenerationTypesService.SetLocale(SelectedLocale);
@@ -134,25 +135,37 @@ public partial class DataGenerationPageViewModel : BasePageViewModel
             ? $"Generated-Data-{DateTime.Now.ToFileTime()}"
             : GeneratedDocumentName;
 
-        var data = await Task.Run(() =>
-            _DataGenerationTypesService.GenerateData(DataGenerationFields.ToArray(), NumberOfRows));
+        var data = await _DataGenerationTypesService.GenerateData(DataGenerationFields.ToArray(), NumberOfRows);
 
-        _FilesManager.Files.Add(new ConvertDocumentViewModel
+        if (data.IsSuccess)
         {
-            Id = Guid.NewGuid().ToString(),
-            Name = name,
-            IsGenerated = true,
-            ProgressStepIndex = 1,
-            EditHeaders = new ObservableCollection<string>(data.Headers),
-            EditRows = new ObservableCollection<string[]>(data.Rows)
-        });
+            _FilesManager.Files.Add(new ConvertDocumentViewModel
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = name,
+                IsGenerated = true,
+                ProgressStepIndex = 1,
+                EditHeaders = new ObservableCollection<string>(data.Value.Headers),
+                EditRows = new ObservableCollection<string[]>(data.Value.Rows)
+            });
+
+            _PageNavigation.RequestNavigation<ConvertFilesPageViewModel>(viewModel =>
+            {
+                if (viewModel is ConvertFilesPageViewModel view)
+                    view.SelectedConvertDocument = _FilesManager.Files.Last();
+            });
+        }
+        else
+        {
+            DialogManager.CreateDialog()
+                .WithTitle("Something went wrong")
+                .WithContent(data.Error!)
+                .OfType(NotificationType.Error)
+                .WithActionButton("Ok", _ => { }, true)
+                .TryShow();
+        }
 
         IsLoading = false;
-
-        _PageNavigation.RequestNavigation<ConvertFilesPageViewModel>(viewModel =>
-        {
-            if (viewModel is ConvertFilesPageViewModel view) view.SelectedConvertDocument = _FilesManager.Files.Last();
-        });
     }
 
     #endregion

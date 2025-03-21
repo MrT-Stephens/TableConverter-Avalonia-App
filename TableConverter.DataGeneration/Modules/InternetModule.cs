@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
+using TableConverter.DataGeneration.Exceptions;
 using TableConverter.DataGeneration.LocaleDataSetsBase;
 
 namespace TableConverter.DataGeneration.Modules;
@@ -127,11 +128,14 @@ public partial class InternetModule(FakerBase faker, LocaleBase locale, Randomiz
 
     public virtual string Color(int r = 255, int g = 255, int b = 255)
     {
-        if (r is < 0 or > 255) throw new ArgumentOutOfRangeException(nameof(r), "Value must be between 0 and 255.");
+        if (r is < 0 or > 255)
+            FakerArgumentOutOfRangeException.CreateException<object>(r, "Value must be between 0 and 255");
 
-        if (g is < 0 or > 255) throw new ArgumentOutOfRangeException(nameof(g), "Value must be between 0 and 255.");
+        if (g is < 0 or > 255)
+            FakerArgumentOutOfRangeException.CreateException<object>(g, "Value must be between 0 and 255");
 
-        if (b is < 0 or > 255) throw new ArgumentOutOfRangeException(nameof(b), "Value must be between 0 and 255.");
+        if (b is < 0 or > 255)
+           FakerArgumentOutOfRangeException.CreateException<object>(b, "Value must be between 0 and 255");
 
         return $"#{r:X2}{g:X2}{b:X2}";
     }
@@ -157,7 +161,7 @@ public partial class InternetModule(FakerBase faker, LocaleBase locale, Randomiz
             0 => $"{internalFirstName}{disambiguator}",
             1 => $"{internalFirstName}{separator}{internalLastName}",
             2 => $"{internalFirstName}{separator}{internalLastName}{disambiguator}",
-            _ => throw new ArgumentOutOfRangeException(nameof(switchValue), switchValue, null)
+            _ => FakerArgumentException.CreateException<string>(switchValue, "Invalid display name switch value")
         }).Replace(' ', separator);
     }
 
@@ -200,7 +204,7 @@ public partial class InternetModule(FakerBase faker, LocaleBase locale, Randomiz
             0 => $"{internalFirstName}{disambiguator}",
             1 => $"{internalFirstName}{separator}{internalLastName}",
             2 => $"{internalFirstName}{separator}{internalLastName}{disambiguator}",
-            _ => throw new ArgumentOutOfRangeException(nameof(switchValue), switchValue, null)
+            _ => FakerArgumentException.CreateException<string>(switchValue, "Invalid username switch value")
         }).Normalize(NormalizationForm.FormKD);
 
         result = DiacriticalMarksRegex().Replace(result, string.Empty);
@@ -292,7 +296,7 @@ public partial class InternetModule(FakerBase faker, LocaleBase locale, Randomiz
             EmojiTypeEnum.Objects => Randomizer.GetRandomElement(Locale.Internet.Value.Emoji.Object),
             EmojiTypeEnum.Symbols => Randomizer.GetRandomElement(Locale.Internet.Value.Emoji.Symbol),
             EmojiTypeEnum.Flags => Randomizer.GetRandomElement(Locale.Internet.Value.Emoji.Flag),
-            _ => throw new ArgumentOutOfRangeException(nameof(emojiType), emojiType, null)
+            _ => FakerArgumentException.CreateException<string>(emojiType, "Invalid emoji type")
         };
     }
 
@@ -329,7 +333,7 @@ public partial class InternetModule(FakerBase faker, LocaleBase locale, Randomiz
                 .ClientError),
             HttpStatusCodeTypeEnum.ServerError => Randomizer.GetRandomElement(Locale.Internet.Value.HttpStatusCode
                 .ServerError),
-            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            _ => FakerArgumentException.CreateException<string>(type, "Invalid http status code type")
         };
     }
 
@@ -338,7 +342,7 @@ public partial class InternetModule(FakerBase faker, LocaleBase locale, Randomiz
         if (string.IsNullOrEmpty(cidr))
             cidr = Ipv4Networks[network];
         else if (!CidrRegex().IsMatch(cidr))
-            throw new ArgumentException("CIDR must be in the format 'x.x.x.x/y'.", nameof(cidr));
+            FakerArgumentException.CreateException<object>(cidr, "CIDR must be in the format 'x.x.x.x/y'");
 
         // Split CIDR into IP and mask
         var parts = cidr.Split('/');
@@ -402,7 +406,7 @@ public partial class InternetModule(FakerBase faker, LocaleBase locale, Randomiz
             separator = Randomizer.GetRandomElement(separators);
 
         if (!separators.Contains(separator))
-            throw new ArgumentException("Separator must be one of ':', '-', or an empty string.", nameof(separator));
+            FakerArgumentException.CreateException<object>(separator, "Separator must be one of ':', '-', or an empty string");
 
         return string.Join(separator,
             Enumerable.Range(0, 6).Select(_ => Randomizer.Hexadecimal(2, HexCasing.Lower, string.Empty)));
@@ -419,7 +423,8 @@ public partial class InternetModule(FakerBase faker, LocaleBase locale, Randomiz
     /// <returns>A randomly generated password string.</returns>
     public virtual string Password(int length = 15, bool memorable = false, string pattern = @"\w", string prefix = "")
     {
-        if (length <= 0) throw new ArgumentException("Length must be greater than 0.");
+        if (length <= 0)
+            FakerArgumentException.CreateException<int>(length, "Length must be greater than 0");
 
         if (prefix.Length >= length) return prefix;
 
@@ -468,7 +473,7 @@ public partial class InternetModule(FakerBase faker, LocaleBase locale, Randomiz
             ProtocolTypeEnum.Http => "http",
             ProtocolTypeEnum.Https => "https",
             ProtocolTypeEnum.Any => Randomizer.GetRandomElement(["http", "https"]),
-            _ => throw new ArgumentOutOfRangeException(nameof(protocol), protocol, null)
+            _ => FakerArgumentException.CreateException<string>(protocol, "Invalid protocol")
         };
 
         return $"{protocolString}://{DomainName()}{(appendSlash ? "/" : string.Empty)}";

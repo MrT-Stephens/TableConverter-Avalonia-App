@@ -1,4 +1,5 @@
 using System.Globalization;
+using TableConverter.DataGeneration.Exceptions;
 using TableConverter.DataGeneration.LocaleDataSetsBase;
 
 namespace TableConverter.DataGeneration.Modules;
@@ -124,7 +125,7 @@ public class ColorModule(FakerBase faker, LocaleBase locale, Randomizer randomiz
         if (colorFormat == RgbColorFormatEnum.Css)
             return FormatCss(values.ToArray(), includeAlpha ? CssFunctionEnum.Rgba : CssFunctionEnum.Rgb);
 
-        throw new ArgumentOutOfRangeException(nameof(colorFormat), "Invalid color format.");
+        return FakerArgumentException.CreateException<string>(colorFormat, "Invalid color format");
     }
 
     public virtual string Cmyk(ColorFormatEnum colorFormat = ColorFormatEnum.Decimal)
@@ -138,7 +139,7 @@ public class ColorModule(FakerBase faker, LocaleBase locale, Randomizer randomiz
             ColorFormatEnum.Decimal => ToDecimalString(values.ToArray()),
             ColorFormatEnum.Binary => string.Join(" ", ToBinaryStrings(values.ToArray())),
             ColorFormatEnum.Css => FormatCss(values.ToArray(), CssFunctionEnum.Cmyk),
-            _ => throw new ArgumentOutOfRangeException(nameof(colorFormat), "Invalid color format.")
+            _ => FakerArgumentException.CreateException<string>(colorFormat, "Invalid color format")
         };
     }
 
@@ -160,7 +161,7 @@ public class ColorModule(FakerBase faker, LocaleBase locale, Randomizer randomiz
             ColorFormatEnum.Binary => string.Join(" ", ToBinaryStrings(values.ToArray())),
             ColorFormatEnum.Css => FormatCss(values.ToArray(),
                 includeAlpha ? CssFunctionEnum.Hsla : CssFunctionEnum.Hsl),
-            _ => throw new ArgumentOutOfRangeException(nameof(colorFormat), "Invalid color format.")
+            _ => FakerArgumentException.CreateException<string>(colorFormat, "Invalid color format")
         };
     }
 
@@ -178,7 +179,7 @@ public class ColorModule(FakerBase faker, LocaleBase locale, Randomizer randomiz
             ColorFormatEnum.Decimal => ToDecimalString(values.ToArray()),
             ColorFormatEnum.Binary => string.Join(" ", ToBinaryStrings(values.ToArray())),
             ColorFormatEnum.Css => FormatCss(values.ToArray(), CssFunctionEnum.Hwb),
-            _ => throw new ArgumentOutOfRangeException(nameof(colorFormat), "Invalid color format.")
+            _ => FakerArgumentException.CreateException<string>(colorFormat, "Invalid color format")
         };
     }
 
@@ -196,7 +197,7 @@ public class ColorModule(FakerBase faker, LocaleBase locale, Randomizer randomiz
             ColorFormatEnum.Decimal => ToDecimalString(values.ToArray()),
             ColorFormatEnum.Binary => string.Join(" ", ToBinaryStrings(values.ToArray())),
             ColorFormatEnum.Css => FormatCss(values.ToArray(), CssFunctionEnum.Lab),
-            _ => throw new ArgumentOutOfRangeException(nameof(colorFormat), "Invalid color format.")
+            _ => FakerArgumentException.CreateException<string>(colorFormat, "Invalid color format")
         };
     }
 
@@ -214,7 +215,7 @@ public class ColorModule(FakerBase faker, LocaleBase locale, Randomizer randomiz
             ColorFormatEnum.Decimal => ToDecimalString(values.ToArray()),
             ColorFormatEnum.Binary => string.Join(" ", ToBinaryStrings(values.ToArray())),
             ColorFormatEnum.Css => FormatCss(values.ToArray(), CssFunctionEnum.Lch),
-            _ => throw new ArgumentOutOfRangeException(nameof(colorFormat), "Invalid color format.")
+            _ => FakerArgumentException.CreateException<string>(colorFormat, "Invalid color format")
         };
     }
 
@@ -233,7 +234,7 @@ public class ColorModule(FakerBase faker, LocaleBase locale, Randomizer randomiz
             ColorFormatEnum.Decimal => ToDecimalString(values.ToArray()),
             ColorFormatEnum.Binary => string.Join(" ", ToBinaryStrings(values.ToArray())),
             ColorFormatEnum.Css => FormatCss(values.ToArray(), CssFunctionEnum.Color, colorSpace),
-            _ => throw new ArgumentOutOfRangeException(nameof(colorFormat), "Invalid color format.")
+            _ => FakerArgumentException.CreateException<string>(colorFormat, "Invalid color format")
         };
     }
 
@@ -269,7 +270,7 @@ public class ColorModule(FakerBase faker, LocaleBase locale, Randomizer randomiz
                 $"lch({ToPercentage(values[0])}% {FormatValue(values[1])} {FormatValue(values[2])})",
             CssFunctionEnum.Rgb =>
                 $"rgb({FormatValue(values[0])}, {FormatValue(values[1])}, {FormatValue(values[2])})",
-            _ => throw new ArgumentOutOfRangeException(nameof(cssFunction), "Invalid CSS function type.")
+            _ => FakerArgumentException.CreateException<string>(cssFunction, "Invalid CSS function type")
         };
 
         // Helper function to convert values to int or round floats to 2dp

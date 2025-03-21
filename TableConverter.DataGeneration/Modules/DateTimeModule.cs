@@ -1,3 +1,4 @@
+using TableConverter.DataGeneration.Exceptions;
 using TableConverter.DataGeneration.LocaleDataSetsBase;
 
 namespace TableConverter.DataGeneration.Modules;
@@ -51,7 +52,7 @@ public class DateTimeModule(FakerBase faker, LocaleBase locale, Randomizer rando
         var toDateTime = new DateTime(toDate, toTime);
 
         if (fromDateTime > toDateTime)
-            throw new ArgumentException("From date should be less than To date", nameof(fromDate));
+            FakerArgumentException.CreateException<object>(fromDate, "From date should be less than To date");
 
         var randomTicks = Randomizer.Long(fromDateTime.Ticks, toDateTime.Ticks);
 
@@ -128,7 +129,7 @@ public class DateTimeModule(FakerBase faker, LocaleBase locale, Randomizer rando
             DateTimeFormatsEnum.UniversalSortableDateTime => dateTime.ToUniversalTime().ToString("u"),
             DateTimeFormatsEnum.YearMonth => dateTime.ToString("Y"),
             DateTimeFormatsEnum.MonthDay => dateTime.ToString("M"),
-            _ => throw new ArgumentOutOfRangeException(nameof(format), format, null)
+            _ => FakerArgumentException.CreateException<string>(format, "Invalid date time format")
         };
     }
 }
