@@ -34,17 +34,20 @@
                     <!-- New File Button -->
                     <Button Command="{Binding ConvertFileNewFileButtonClickedCommand}"
                             Classes="Flat Icon">
-                        <PathIcon Data="{DynamicResource AddIcon}" />
+                        <PathIcon Data="{DynamicResource AddIcon}"
+                                  Foreground="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}" />
                     </Button>
                     <Button Command="{Binding RemoveFileButtonClickedCommand}"
                             CommandParameter="{Binding SelectedConvertDocument.Id}"
                             Classes="Flat Icon">
-                        <PathIcon Data="{DynamicResource RemoveIcon}" />
+                        <PathIcon Data="{DynamicResource RemoveIcon}"
+                                  Foreground="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}" />
                     </Button>
                     <Button Command="{Binding DuplicateFileButtonClickedCommand}"
                             CommandParameter="{Binding SelectedConvertDocument.Id}"
                             Classes="Flat Icon">
-                        <PathIcon Data="{DynamicResource DuplicateIcon}" />
+                        <PathIcon Data="{DynamicResource DuplicateIcon}"
+                                  Foreground="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}" />
                     </Button>
                 </StackPanel>
                 <!-- Select File Button -->
@@ -75,9 +78,9 @@
                         <avaloniaEdit:TextEditor Grid.Row="0"
                                                  Name="InputFileTextEditor"
                                                  ShowLineNumbers="True"
-                                                 WordWrap="True"
+                                                 WordWrap="False"
                                                  Document="{Binding SelectedConvertDocument.InputFileText}"
-                                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                                 ScrollViewer.HorizontalScrollBarVisibility="Visible"
                                                  ScrollViewer.VerticalScrollBarVisibility="Visible"
                                                  FontFamily="{StaticResource SecondaryFontFamily}">
                             <avaloniaEdit:TextEditor.Options>
@@ -180,9 +183,9 @@
                         <avaloniaEdit:TextEditor Grid.Row="0"
                                                  Name="OutputFileTextEditor"
                                                  ShowLineNumbers="True"
-                                                 WordWrap="True"
+                                                 WordWrap="False"
                                                  Document="{Binding SelectedConvertDocument.OutputFileText}"
-                                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                                 ScrollViewer.HorizontalScrollBarVisibility="Visible"
                                                  ScrollViewer.VerticalScrollBarVisibility="Visible"
                                                  FontFamily="{StaticResource SecondaryFontFamily}">
                             <avaloniaEdit:TextEditor.Options>

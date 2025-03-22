@@ -57,6 +57,11 @@ public partial class DataGenerationTypesViewModel : BaseDialogViewModel
         {
             SelectedCategory.FilterItems(SearchText);
         }
+        
+        if (e.PropertyName == nameof(SelectedCategory))
+        {
+            SearchText = string.Empty;
+        }
     }
 
     #endregion

@@ -56,6 +56,7 @@
                                                     Orientation="Horizontal">
                                             <TextBlock Text="{Binding TypeName}" />
                                             <PathIcon Data="{StaticResource UpDownIcon}"
+                                                      Foreground="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}"
                                                       Height="18"
                                                       Width="18" />
                                         </StackPanel>
@@ -111,7 +112,7 @@
                                                 VerticalAlignment="Center"
                                                 VerticalContentAlignment="Center">
                                             <PathIcon Data="{StaticResource RemoveIcon}"
-                                                      Foreground="{DynamicResource SukiText}"
+                                                      Foreground="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}"
                                                       Height="18"
                                                       Width="18" />
                                         </Button>
@@ -119,7 +120,7 @@
                                                 Command="{Binding ((vm:DataGenerationPageViewModel)DataContext).AddFieldButtonClickedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                                 CommandParameter="{Binding .}">
                                             <PathIcon Data="{StaticResource AddIcon}"
-                                                      Foreground="{DynamicResource SukiText}"
+                                                      Foreground="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}"
                                                       Height="18"
                                                       Width="18" />
                                         </Button>

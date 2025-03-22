@@ -16,9 +16,7 @@
     <sukiUi:GlassCard IsAnimated="False"
                       Margin="10"
                       Padding="10">
-        <sukiUi:SettingsLayout RenderOptions.BitmapInterpolationMode="LowQuality"
-                               RenderOptions.TextRenderingMode="SubpixelAntialias"
-                               >
+        <sukiUi:SettingsLayout>
             <sukiUi:SettingsLayout.Styles>
                 <!-- Adaptive Uniform Grid Styles -->
                 <Style Selector="components|SpacedUniformGrid">

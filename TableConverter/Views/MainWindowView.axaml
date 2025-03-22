@@ -62,13 +62,13 @@
                                         <StackPanel Orientation="Horizontal"
                                                     Spacing="5">
                                             <PathIcon Data="{StaticResource LightbulbIcon}"
-                                                      Foreground="{DynamicResource SukiText}" />
+                                                      Foreground="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}" />
                                             <TextBlock Classes="h5"
                                                        Text="{Binding SelectedBaseTheme}"
-                                                       Foreground="{DynamicResource SukiText}" />
+                                                       Foreground="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}" />
                                             <TextBlock Classes="h5"
                                                        Text="Mode"
-                                                       Foreground="{DynamicResource SukiText}" />
+                                                       Foreground="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}" />
                                         </StackPanel>
                                     </Button>
                                 </StackPanel>
