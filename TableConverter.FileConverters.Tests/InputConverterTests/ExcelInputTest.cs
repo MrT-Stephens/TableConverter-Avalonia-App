@@ -70,7 +70,7 @@ public class ExcelInputTest : InputConverterTestBase<ConverterHandlerExcelInput,
     ///     Due to <see cref="NPOI.XSSF" /> being used for inputting the Excel file, the test is expected to fail early in the
     ///     process.
     /// </summary>
-    public override async void TestInputFileAsync_WithFailData(string fileName, ConverterHandlerBaseOptions options)
+    public override async Task TestInputFileAsync_WithFailData(string fileName, ConverterHandlerBaseOptions options)
     {
         Handler.Options = options;
 

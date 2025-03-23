@@ -21,8 +21,19 @@ public partial class ConverterHandlerSQLInput : ConverterHandlerInputAbstract<Co
 
                 foreach (var match in matches.Cast<Match>())
                 {
+                    var tableName = match.Groups[1].Value;
                     var columns = match.Groups[2].Value.Split(',');
                     var values = match.Groups[3].Value.Split(',');
+
+                    foreach (var quoteType in Options!.QuoteTypes.Skip(1))
+                    {
+                        if (tableName.StartsWith(quoteType.Value) && tableName.EndsWith(quoteType.Value) &&
+                            quoteType.Key != Options!.SelectedQuoteType)
+                        {
+                            return Result<TableData>.Failure(
+                                $"The table name is enclosed in {quoteType.Key} but the selected quote type is {Options!.SelectedQuoteType}.");
+                        }
+                    }
 
                     if (firstLoop)
                     {
@@ -30,12 +41,18 @@ public partial class ConverterHandlerSQLInput : ConverterHandlerInputAbstract<Co
 
                         for (long i = 0; i < columns.Length; i++)
                         {
-                            if (columns[i].StartsWith(Options!.SelectedQuoteType) && columns[i]
-                                    .EndsWith(Options!.SelectedQuoteType == "[" ? "]" : Options!.SelectedQuoteType))
-                                columns[i] = columns[i].Substring(1, columns[i].Length - 2);
-
-                            headers.Add(columns[i].Trim());
+                            headers.Add(columns[i].Trim()
+                                .TrimStart(Options!.QuoteTypes[Options!.SelectedQuoteType].ToCharArray())
+                                .TrimEnd((Options!.QuoteTypes[Options!.SelectedQuoteType] == "["
+                                    ? "]"
+                                    : Options!.QuoteTypes[Options!.SelectedQuoteType]).ToCharArray()));
                         }
+                    }
+
+                    if (columns.Length != values.Length)
+                    {
+                        return Result<TableData>.Failure(
+                            $"The number of columns and values do not match at row {rows.Count + 1}.");
                     }
 
                     rows.Add(values.Select(value => value.Trim().Trim('\'')).ToArray());

@@ -33,6 +33,9 @@ public class ConverterHandlerRubyInput : ConverterHandlerInputAbstract<Converter
                     }
                     else
                     {
+                        if (values.Length != headers.Count)
+                            return Result<TableData>.Failure($"Incorrect number of columns at row {rows.Count}.");
+
                         rows.Add(values);
                     }
                 }

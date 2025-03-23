@@ -60,7 +60,7 @@ public abstract class InputConverterTestBase<TInputConverter, TInputConverterDat
     /// </summary>
     [Theory]
     [MemberData(nameof(GetSuccessfulTestCases))]
-    public async void TestInputFileAsync_WithSuccessfulData(
+    public async Task TestInputFileAsync_WithSuccessfulData(
         string fileName,
         ConverterHandlerBaseOptions options,
         TableData expectedTableDataResult)
@@ -105,7 +105,7 @@ public abstract class InputConverterTestBase<TInputConverter, TInputConverterDat
     /// </summary>
     [Theory]
     [MemberData(nameof(GetFailTestCases))]
-    public virtual async void TestInputFileAsync_WithFailData(string fileName, ConverterHandlerBaseOptions options)
+    public virtual async Task TestInputFileAsync_WithFailData(string fileName, ConverterHandlerBaseOptions options)
     {
         Handler.Options = options; // Sets the options for the handler.
 
