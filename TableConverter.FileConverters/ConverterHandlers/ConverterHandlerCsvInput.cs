@@ -19,7 +19,6 @@ public class ConverterHandlerCsvInput : ConverterHandlerInputAbstract<ConverterH
                 new CsvConfiguration(CultureInfo.InvariantCulture)
                 {
                     Delimiter = Options!.Delimiter,
-                    NewLine = Environment.NewLine,
                     DetectColumnCountChanges = true,
                     TrimOptions = TrimOptions.Trim
                 });
