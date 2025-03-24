@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -25,7 +26,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
 {
     #region Properties
 
-    [ObservableProperty] private ConvertDocumentViewModel _SelectedConvertDocument;
+    [MaybeNull] [ObservableProperty] private ConvertDocumentViewModel _SelectedConvertDocument;
 
     #endregion
 
@@ -198,46 +199,34 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                     FilePickerFileTypes.All
                 ],
                 DefaultExtension = currentDoc.OutputConverter.Extensions[0],
-                ShowOverwritePrompt = false,
+                ShowOverwritePrompt = true,
                 SuggestedFileName =
                     $"TableConverter-{DateTime.Now.ToFileTime()}"
             });
 
+            if (file is null)
+                return;
+
             if (file.IsSuccess)
             {
-                AsyncAction action = async () =>
+                currentDoc.IsBusy = true;
+
+                await using (var stream = file.Value.Stream)
                 {
-                    currentDoc.IsBusy = true;
+                    await currentDoc.OutputConverter.OutputConverterHandler!.SaveFileAsync(stream,
+                        Encoding.UTF8.GetBytes(currentDoc.OutputFileText.Text));
+                }
 
-                    await using (var stream = file.Value.Stream)
-                    {
-                        await currentDoc.OutputConverter.OutputConverterHandler!.SaveFileAsync(stream,
-                            Encoding.UTF8.GetBytes(currentDoc.OutputFileText.Text));
-                    }
+                currentDoc.IsBusy = false;
 
-                    currentDoc.IsBusy = false;
-
-                    ToastManager.CreateToast()
-                        .WithTitle("File Saved")
-                        .WithContent(
-                            $"The file '{currentDoc.Name}' has been saved to '{file.Value.Path.AbsolutePath}'.")
-                        .OfType(NotificationType.Success)
-                        .Dismiss().ByClicking()
-                        .Dismiss().After(new TimeSpan(0, 0, 3))
-                        .Queue();
-                };
-
-                if (File.Exists(file.Value.Path.AbsolutePath))
-                    DialogManager.CreateDialog()
-                        .WithTitle("File already exists")
-                        .WithContent(
-                            $"The file '{file.Value.Name}' already exists at that location. Would you like to replace it?")
-                        .OfType(NotificationType.Warning)
-                        .WithActionButton("No", _ => { }, true)
-                        .WithActionButton("Yes", _ => action.Invoke(), true)
-                        .TryShow();
-                else
-                    await action.Invoke();
+                ToastManager.CreateToast()
+                    .WithTitle("File Saved")
+                    .WithContent(
+                        $"The file '{currentDoc.Name}' has been saved to '{file.Value.Path.AbsolutePath}'.")
+                    .OfType(NotificationType.Success)
+                    .Dismiss().ByClicking()
+                    .Dismiss().After(new TimeSpan(0, 0, 3))
+                    .Queue();
             }
             else
             {
@@ -435,6 +424,9 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                     FilePickerFileTypes.All
                 ]
             });
+
+            if (file is null)
+                return;
 
             if (file.IsSuccess)
             {

@@ -133,7 +133,7 @@ public abstract class InputConverterTestBase<TInputConverter, TInputConverterDat
 
         // Perform file reading, asserting failure due to empty data.
         var fileResult = Handler.ReadFile(stream);
-        Assert.False(fileResult.IsSuccess, $"fileResult.IsSuccess is true. Should be false due to empty data.");
+        Assert.False(fileResult.IsSuccess, "fileResult.IsSuccess is true. Should be false due to empty data.");
     }
 
     /// <summary>

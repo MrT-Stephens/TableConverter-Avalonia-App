@@ -9,7 +9,7 @@ namespace TableConverter.Services;
 
 public class FilesDialogManagerService : IFilesDialogManagerService, ITopLevelAware
 {
-    public async Task<Result<FileDialogManagerFile>> OpenFileAsync(FilePickerOpenOptions options)
+    public async Task<Result<FileDialogManagerFile>?> OpenFileAsync(FilePickerOpenOptions options)
     {
         var window = ITopLevelAware.GetTopLevel();
         
@@ -36,10 +36,10 @@ public class FilesDialogManagerService : IFilesDialogManagerService, ITopLevelAw
             return Result<FileDialogManagerFile>.Failure($"Error occurred while opening file. (Exception: {ex.Message})");
         }
 
-        return Result<FileDialogManagerFile>.Failure("Error occurred while opening file");
+        return null;
     }
 
-    public async Task<Result<FileDialogManagerFile>> SaveFileAsync(FilePickerSaveOptions options)
+    public async Task<Result<FileDialogManagerFile>?> SaveFileAsync(FilePickerSaveOptions options)
     {
         var window = ITopLevelAware.GetTopLevel();
         
@@ -66,6 +66,6 @@ public class FilesDialogManagerService : IFilesDialogManagerService, ITopLevelAw
             return Result<FileDialogManagerFile>.Failure($"Error occurred while saving file. (Exception: {ex.Message})");
         }
 
-        return Result<FileDialogManagerFile>.Failure("Error occurred while saving file");
+        return null;
     }
 }

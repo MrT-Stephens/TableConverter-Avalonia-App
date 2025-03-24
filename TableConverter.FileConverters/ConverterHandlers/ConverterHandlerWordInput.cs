@@ -39,7 +39,17 @@ public class ConverterHandlerWordInput : ConverterHandlerInputAbstract<Converter
     {
         ArgumentNullException.ThrowIfNull(stream, nameof(stream));
 
-        WordDocument = new XWPFDocument(stream);
+        try
+        {
+            WordDocument = new XWPFDocument(stream);
+
+            if (WordDocument.Tables.Count == 0)
+                return Result<string>.Failure("No tables found in the Word document");
+        }
+        catch (Exception ex)
+        {
+            return Result<string>.Failure($"Error reading Word file: '{ex.Message}'");
+        }
 
         return Result<string>.Success($"Word files are not visible within this text box 😭{Environment.NewLine}");
     }

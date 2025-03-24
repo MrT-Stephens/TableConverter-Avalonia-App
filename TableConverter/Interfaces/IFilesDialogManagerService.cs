@@ -11,7 +11,7 @@ namespace TableConverter.Interfaces;
 
 public interface IFilesDialogManagerService
 {
-    public Task<Result<FileDialogManagerFile>> OpenFileAsync(FilePickerOpenOptions options);
+    public Task<Result<FileDialogManagerFile>?> OpenFileAsync(FilePickerOpenOptions options);
     
-    public Task<Result<FileDialogManagerFile>> SaveFileAsync(FilePickerSaveOptions options);
+    public Task<Result<FileDialogManagerFile>?> SaveFileAsync(FilePickerSaveOptions options);
 }
