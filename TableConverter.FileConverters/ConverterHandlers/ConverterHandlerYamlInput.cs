@@ -14,15 +14,19 @@ public class ConverterHandlerYamlInput : ConverterHandlerInputAbstract<Converter
 
         using (var reader = new StringReader(text))
         {
+            int position = 0, lineNumber = 0;
             var firstLine = true;
 
             for (var line = reader.ReadLine()?.Trim();
                  !string.IsNullOrEmpty(line);
                  line = reader?.ReadLine()?.Trim())
             {
+                position += line.Length + 1;
+                lineNumber += 1;
+
                 if (line.StartsWith("---")) continue;
 
-                if (line.StartsWith('-') && line.EndsWith('-'))
+                if (line.StartsWith('-'))
                 {
                     if (yamlData.Count > 0)
                     {
@@ -31,6 +35,10 @@ public class ConverterHandlerYamlInput : ConverterHandlerInputAbstract<Converter
                             headers = yamlData.Keys.ToList();
                             firstLine = false;
                         }
+
+                        if (yamlData.Count != headers.Count)
+                            return Result<TableData>.Failure(
+                                $"Incorrect number of columns at char position '{position}' in line '{lineNumber}'");
 
                         rows.Add(yamlData.Select(values => values.Value).ToArray());
                     }
@@ -45,7 +53,14 @@ public class ConverterHandlerYamlInput : ConverterHandlerInputAbstract<Converter
                 }
             }
 
-            if (yamlData.Count > 0) rows.Add(yamlData.Select(values => values.Value).ToArray());
+            if (yamlData.Count > 0)
+            {
+                if (yamlData.Count != headers.Count)
+                    return Result<TableData>.Failure(
+                        $"Incorrect number of columns at char position '{position}' in line '{lineNumber}'");
+
+                rows.Add(yamlData.Select(values => values.Value).ToArray());
+            }
         }
 
         return Result<TableData>.Success(new TableData(headers, rows));

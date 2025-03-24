@@ -16,7 +16,7 @@ public class ConverterHandlerYamlOutput : ConverterHandlerOutputAbstract<Convert
             writer.Write($"-{Environment.NewLine}");
 
             for (long j = 0; j < headers.LongLength; j++)
-                writer.Write($"\t{headers[j].Replace(' ', '_')}: {str[j]}{Environment.NewLine}");
+                writer.Write($"    {headers[j].Replace(' ', '_')}: {str[j]}{Environment.NewLine}");
         }
 
         return Result<string>.Success(writer.ToString());
