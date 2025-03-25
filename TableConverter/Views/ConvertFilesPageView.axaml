@@ -78,9 +78,9 @@
                         <avaloniaEdit:TextEditor Grid.Row="0"
                                                  Name="InputFileTextEditor"
                                                  ShowLineNumbers="True"
-                                                 WordWrap="False"
+                                                 WordWrap="True"
                                                  Document="{Binding SelectedConvertDocument.InputFileText}"
-                                                 ScrollViewer.HorizontalScrollBarVisibility="Visible"
+                                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                                  ScrollViewer.VerticalScrollBarVisibility="Visible"
                                                  FontFamily="{StaticResource SecondaryFontFamily}">
                             <avaloniaEdit:TextEditor.Options>
@@ -183,9 +183,9 @@
                         <avaloniaEdit:TextEditor Grid.Row="0"
                                                  Name="OutputFileTextEditor"
                                                  ShowLineNumbers="True"
-                                                 WordWrap="False"
+                                                 WordWrap="True"
                                                  Document="{Binding SelectedConvertDocument.OutputFileText}"
-                                                 ScrollViewer.HorizontalScrollBarVisibility="Visible"
+                                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                                  ScrollViewer.VerticalScrollBarVisibility="Visible"
                                                  FontFamily="{StaticResource SecondaryFontFamily}">
                             <avaloniaEdit:TextEditor.Options>

@@ -301,17 +301,15 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                 Name = $"Copy-{file.Name}",
                 InputConverter = file.InputConverter,
                 OutputConverter = file.OutputConverter,
-                InputFileText = new TextDocument
+                InputFileText = new TextDocument(new StringTextSource(file.InputFileText.Text))
                 {
                     FileName = $"Copy-{file.InputFileText.FileName}",
-                    Text = file.InputFileText.Text
                 },
                 EditHeaders = new ObservableCollection<string>(file.EditHeaders),
                 EditRows = new ObservableCollection<string[]>(file.EditRows),
-                OutputFileText = new TextDocument
+                OutputFileText = new TextDocument(new StringTextSource(file.OutputFileText.Text))
                 {
                     FileName = $"Copy-{file.OutputFileText.FileName}",
-                    Text = file.OutputFileText.Text
                 }
             };
 
@@ -377,10 +375,9 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
 
         if (data.IsSuccess)
         {
-            doc.OutputFileText = new TextDocument
+            doc.OutputFileText = new TextDocument(new StringTextSource(data.Value))
             {
                 FileName = $"{doc.Name}{doc.OutputConverter.Extensions[0]}",
-                Text = data.Value
             };
 
             doc.IsBusy = false;
@@ -449,10 +446,9 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
 
                     if (data.IsSuccess)
                     {
-                        loadingDoc.InputFileText = new TextDocument
+                        loadingDoc.InputFileText = new TextDocument(new StringTextSource(data.Value))
                         {
-                            FileName = $"{loadingDoc.Name}{loadingDoc.InputConverter.Extensions[0]}",
-                            Text = data.Value
+                            FileName = $"{loadingDoc.Name}{loadingDoc.InputConverter.Extensions[0]}"
                         };
 
                         loadingDoc.IsBusy = false;
@@ -528,25 +524,25 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
             Name = name,
             InputConverter = converter,
             Id = Guid.NewGuid().ToString(),
-            InputFileText = new TextDocument
+            InputFileText = new TextDocument(new StringTextSource(
+                "FIRST_NAME,LAST_NAME,GENDER,COUNTRY_CODE" +
+                Environment.NewLine +
+                "Luxeena,Binoy,F,GB" + Environment.NewLine +
+                "Lisa,Allen,F,GB" + Environment.NewLine +
+                "Richard,Wood,M,GB" + Environment.NewLine +
+                "Luke,Murphy,M,GB" + Environment.NewLine +
+                "Adrian,Heacock,M,GB" + Environment.NewLine +
+                "Elvinas,Palubinskas,M,GB" + Environment.NewLine +
+                "Sian,Turner,F,GB" + Environment.NewLine +
+                "Potar,Potts,M,GB" + Environment.NewLine +
+                "Janis,Chrisp,F,GB" + Environment.NewLine +
+                "Sarah,Proffitt,F,GB" + Environment.NewLine +
+                "Calissa,Noonan,F,GB" + Environment.NewLine +
+                "Andrew,Connors,M,GB" + Environment.NewLine +
+                "Siann,Tynan,F,GB" + Environment.NewLine +
+                "Olivia,Parry,F,GB" + Environment.NewLine))
             {
-                FileName = $"{name}{converter.Extensions[0]}",
-                Text =
-                    "FIRST_NAME,LAST_NAME,GENDER,COUNTRY_CODE" + Environment.NewLine +
-                    "Luxeena,Binoy,F,GB" + Environment.NewLine +
-                    "Lisa,Allen,F,GB" + Environment.NewLine +
-                    "Richard,Wood,M,GB" + Environment.NewLine +
-                    "Luke,Murphy,M,GB" + Environment.NewLine +
-                    "Adrian,Heacock,M,GB" + Environment.NewLine +
-                    "Elvinas,Palubinskas,M,GB" + Environment.NewLine +
-                    "Sian,Turner,F,GB" + Environment.NewLine +
-                    "Potar,Potts,M,GB" + Environment.NewLine +
-                    "Janis,Chrisp,F,GB" + Environment.NewLine +
-                    "Sarah,Proffitt,F,GB" + Environment.NewLine +
-                    "Calissa,Noonan,F,GB" + Environment.NewLine +
-                    "Andrew,Connors,M,GB" + Environment.NewLine +
-                    "Siann,Tynan,F,GB" + Environment.NewLine +
-                    "Olivia,Parry,F,GB" + Environment.NewLine
+                FileName = $"{name}{converter.Extensions[0]}"
             }
         };
     }

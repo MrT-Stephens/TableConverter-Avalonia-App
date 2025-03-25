@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading.Tasks;
 using Avalonia;
+using AvaloniaEdit.Document;
 using CommunityToolkit.Mvvm.ComponentModel;
 using TableConverter.Interfaces;
 using TableConverter.ViewModels;
@@ -25,7 +26,6 @@ public partial class ConvertFilesManagerService(ConverterTypesService types)
 
     public void AddFile(string sourceFilePath, string converterName)
     {
-        
     }
 
     public Task AddFileAsync(string sourceFilePath, string converterName)
