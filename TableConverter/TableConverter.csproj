@@ -7,6 +7,15 @@
         <OutputType>Exe</OutputType>
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
         <ApplicationManifest>app.manifest</ApplicationManifest>
+        <Version>0.1.0</Version>
+        <Title>TableConverter</Title>
+        <Authors>MrT Stephens</Authors>
+        <Description>A cross-platfrom desktop application for converting between tabular formats such as (CSV, JSON, XML, etc), generating random data, and exporting it in various tabular file types. </Description>
+        <PackageProjectUrl>https://github.com/MrT-Stephens/TableConverter-Avalonia-App.git</PackageProjectUrl>
+        <PackageIcon>icon.ico</PackageIcon>
+        <RepositoryUrl>https://github.com/MrT-Stephens/TableConverter-Avalonia-App.git</RepositoryUrl>
+        <AssemblyVersion>0.1.0</AssemblyVersion>
+        <NeutralLanguage>en-GB</NeutralLanguage>
     </PropertyGroup>
 
 
