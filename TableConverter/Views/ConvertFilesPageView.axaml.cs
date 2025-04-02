@@ -1,8 +1,13 @@
+using System;
 using System.IO;
+using System.Linq;
 using Avalonia.Controls;
+using Avalonia.Media;
 using Avalonia.Styling;
 using AvaloniaEdit.Document;
+using AvaloniaEdit.Rendering;
 using AvaloniaEdit.TextMate;
+using AvaloniaEdit.Utils;
 using SukiUI;
 using TextMateSharp.Grammars;
 
@@ -42,6 +47,12 @@ public partial class ConvertFilesPageView : UserControl
     private void DocumentOnChanged(DocumentChangedEventArgs e, TextMate.Installation? installation)
     {
         if (e.NewDocument is null) return;
+
+        if (e.NewDocument.Lines.Any(line => line.TotalLength >= 3000))
+        {
+            installation?.SetGrammar(_Options?.GetScopeByLanguageId("plaintext"));
+            return;
+        }
 
         var extension = Path.GetExtension(e.NewDocument.FileName);
 

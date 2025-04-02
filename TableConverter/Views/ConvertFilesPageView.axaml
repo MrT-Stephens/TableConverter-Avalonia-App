@@ -84,15 +84,16 @@
                                                  ScrollViewer.VerticalScrollBarVisibility="Visible"
                                                  FontFamily="{StaticResource SecondaryFontFamily}">
                             <avaloniaEdit:TextEditor.Options>
-                                <avaloniaEdit:TextEditorOptions AllowScrollBelowDocument="False"
+                                <avaloniaEdit:TextEditorOptions AllowScrollBelowDocument="True"
                                                                 HighlightCurrentLine="True"
                                                                 IndentationSize="5"
                                                                 EnableRectangularSelection="True"
-                                                                ShowBoxForControlCharacters="True"
-                                                                ShowEndOfLine="True"
-                                                                ShowSpaces="True"
-                                                                ShowTabs="True"
-                                                                RequireControlModifierForHyperlinkClick="True"
+                                                                ShowBoxForControlCharacters="False"
+                                                                ShowEndOfLine="False"
+                                                                ShowSpaces="False"
+                                                                ShowTabs="False"
+                                                                RequireControlModifierForHyperlinkClick="False"
+                                                                EnableHyperlinks="False"
                                                                 EnableEmailHyperlinks="False" />
                             </avaloniaEdit:TextEditor.Options>
                         </avaloniaEdit:TextEditor>
