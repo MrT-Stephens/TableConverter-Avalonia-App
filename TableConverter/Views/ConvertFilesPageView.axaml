@@ -51,11 +51,11 @@
                     </Button>
                 </StackPanel>
                 <!-- Select File Button -->
-                <ComboBox Grid.Column="1" 
+                <ComboBox Grid.Column="1"
                           MaxWidth="200"
-                          ItemsSource="{Binding FilesManager.Files}" 
+                          ItemsSource="{Binding FilesManager.Files}"
                           SelectedItem="{Binding SelectedConvertDocument}"
-                          DisplayMemberBinding="{Binding Name}"/>
+                          DisplayMemberBinding="{Binding Name}" />
                 <!-- Converstion Progress Stepper Bar -->
                 <sukiUi:Stepper Grid.Column="2"
                                 HorizontalAlignment="Right"
@@ -85,16 +85,16 @@
                                                  FontFamily="{StaticResource SecondaryFontFamily}">
                             <avaloniaEdit:TextEditor.Options>
                                 <avaloniaEdit:TextEditorOptions AllowScrollBelowDocument="True"
-                                                                HighlightCurrentLine="True"
+                                                                HighlightCurrentLine="False"
                                                                 IndentationSize="5"
                                                                 EnableRectangularSelection="True"
-                                                                ShowBoxForControlCharacters="False"
-                                                                ShowEndOfLine="False"
-                                                                ShowSpaces="False"
-                                                                ShowTabs="False"
+                                                                ShowBoxForControlCharacters="True"
+                                                                ShowEndOfLine="True"
+                                                                ShowSpaces="True"
+                                                                ShowTabs="True"
                                                                 RequireControlModifierForHyperlinkClick="False"
-                                                                EnableHyperlinks="False"
-                                                                EnableEmailHyperlinks="False" />
+                                                                EnableEmailHyperlinks="False"
+                                                                EnableHyperlinks="False" />
                             </avaloniaEdit:TextEditor.Options>
                         </avaloniaEdit:TextEditor>
                         <!-- Footer Buttons -->
@@ -190,16 +190,17 @@
                                                  ScrollViewer.VerticalScrollBarVisibility="Visible"
                                                  FontFamily="{StaticResource SecondaryFontFamily}">
                             <avaloniaEdit:TextEditor.Options>
-                                <avaloniaEdit:TextEditorOptions AllowScrollBelowDocument="False"
-                                                                HighlightCurrentLine="True"
+                                <avaloniaEdit:TextEditorOptions AllowScrollBelowDocument="True"
+                                                                HighlightCurrentLine="False"
                                                                 IndentationSize="5"
                                                                 EnableRectangularSelection="True"
                                                                 ShowBoxForControlCharacters="True"
                                                                 ShowEndOfLine="True"
                                                                 ShowSpaces="True"
                                                                 ShowTabs="True"
-                                                                RequireControlModifierForHyperlinkClick="True"
-                                                                EnableEmailHyperlinks="False" />
+                                                                RequireControlModifierForHyperlinkClick="False"
+                                                                EnableEmailHyperlinks="False"
+                                                                EnableHyperlinks="False" />
                             </avaloniaEdit:TextEditor.Options>
                         </avaloniaEdit:TextEditor>
                         <!-- Footer Buttons -->
