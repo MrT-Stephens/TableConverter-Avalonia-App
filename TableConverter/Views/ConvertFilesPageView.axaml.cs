@@ -10,16 +10,16 @@ namespace TableConverter.Views;
 
 public partial class ConvertFilesPageView : UserControl
 {
-    private readonly RegistryOptions? _options;
+    private readonly RegistryOptions? _Options;
 
     public ConvertFilesPageView()
     {
         InitializeComponent();
 
-        _options = new RegistryOptions(ThemeName.HighContrastDark);
+        _Options = new RegistryOptions(ThemeName.HighContrastDark);
 
-        var inputInstallation = InputFileTextEditor.InstallTextMate(_options);
-        var outputInstallation = OutputFileTextEditor.InstallTextMate(_options);
+        var inputInstallation = InputFileTextEditor.InstallTextMate(_Options);
+        var outputInstallation = OutputFileTextEditor.InstallTextMate(_Options);
 
         InputFileTextEditor.DocumentChanged += (_, e) => DocumentOnChanged(e, inputInstallation);
         OutputFileTextEditor.DocumentChanged += (_, e) => DocumentOnChanged(e, outputInstallation);
@@ -28,13 +28,13 @@ public partial class ConvertFilesPageView : UserControl
         {
             if (variant == ThemeVariant.Dark)
             {
-                inputInstallation.SetTheme(_options.LoadTheme(ThemeName.HighContrastDark));
-                outputInstallation.SetTheme(_options.LoadTheme(ThemeName.HighContrastDark));
+                inputInstallation.SetTheme(_Options.LoadTheme(ThemeName.HighContrastDark));
+                outputInstallation.SetTheme(_Options.LoadTheme(ThemeName.HighContrastDark));
             }
             else
             {
-                inputInstallation.SetTheme(_options.LoadTheme(ThemeName.HighContrastLight));
-                outputInstallation.SetTheme(_options.LoadTheme(ThemeName.HighContrastLight));
+                inputInstallation.SetTheme(_Options.LoadTheme(ThemeName.HighContrastLight));
+                outputInstallation.SetTheme(_Options.LoadTheme(ThemeName.HighContrastLight));
             }
         };
     }
@@ -47,10 +47,10 @@ public partial class ConvertFilesPageView : UserControl
 
         if (string.IsNullOrEmpty(extension)) return;
 
-        var language = _options?.GetLanguageByExtension(extension);
+        var language = _Options?.GetLanguageByExtension(extension);
 
         installation?.SetGrammar(language is not null
-            ? _options?.GetScopeByLanguageId(language.Id)
-            : _options?.GetScopeByLanguageId("plaintext"));
+            ? _Options?.GetScopeByLanguageId(language.Id)
+            : _Options?.GetScopeByLanguageId("plaintext"));
     }
 }
