@@ -19,7 +19,7 @@
                 <xamlInteractivity:BehaviorCollectionTemplate>
                     <xamlInteractivity:BehaviorCollection>
                         <xamlResponsive:AdaptiveBehavior
-                            SourceControl="{Binding RelativeSource={RelativeSource AncestorType=Window}}">
+                            SourceControl="{ReflectionBinding #Window}">
                             <xamlResponsive:AdaptiveClassSetter MinWidth="0" MaxWidth="1000" ClassName="Small" />
                             <xamlResponsive:AdaptiveClassSetter MinWidth="1000" MaxWidth="1400" ClassName="Medium" />
                             <xamlResponsive:AdaptiveClassSetter MinWidth="1400" MaxWidth="Infinity" ClassName="Wide" />
