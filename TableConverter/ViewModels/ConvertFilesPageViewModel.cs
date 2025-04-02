@@ -301,13 +301,13 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                 Name = $"Copy-{file.Name}",
                 InputConverter = file.InputConverter,
                 OutputConverter = file.OutputConverter,
-                InputFileText = new TextDocument(new StringTextSource(file.InputFileText.Text))
+                InputFileText = new TextDocument(file.InputFileText.Text)
                 {
                     FileName = $"Copy-{file.InputFileText.FileName}",
                 },
                 EditHeaders = new ObservableCollection<string>(file.EditHeaders),
                 EditRows = new ObservableCollection<string[]>(file.EditRows),
-                OutputFileText = new TextDocument(new StringTextSource(file.OutputFileText.Text))
+                OutputFileText = new TextDocument(file.OutputFileText.Text)
                 {
                     FileName = $"Copy-{file.OutputFileText.FileName}",
                 }
@@ -375,9 +375,9 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
 
         if (data.IsSuccess)
         {
-            doc.OutputFileText = new TextDocument(new StringTextSource(data.Value))
+            doc.OutputFileText = new TextDocument(data.Value)
             {
-                FileName = $"{doc.Name}{doc.OutputConverter.Extensions[0]}",
+                FileName = $"{doc.Name}{doc.OutputConverter.Extensions[0]}"
             };
 
             doc.IsBusy = false;
@@ -446,7 +446,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
 
                     if (data.IsSuccess)
                     {
-                        loadingDoc.InputFileText = new TextDocument(new StringTextSource(data.Value))
+                        loadingDoc.InputFileText = new TextDocument(data.Value)
                         {
                             FileName = $"{loadingDoc.Name}{loadingDoc.InputConverter.Extensions[0]}"
                         };
@@ -524,7 +524,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
             Name = name,
             InputConverter = converter,
             Id = Guid.NewGuid().ToString(),
-            InputFileText = new TextDocument(new StringTextSource(
+            InputFileText = new TextDocument(
                 "FIRST_NAME,LAST_NAME,GENDER,COUNTRY_CODE" +
                 Environment.NewLine +
                 "Luxeena,Binoy,F,GB" + Environment.NewLine +
@@ -540,7 +540,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
                 "Calissa,Noonan,F,GB" + Environment.NewLine +
                 "Andrew,Connors,M,GB" + Environment.NewLine +
                 "Siann,Tynan,F,GB" + Environment.NewLine +
-                "Olivia,Parry,F,GB" + Environment.NewLine))
+                "Olivia,Parry,F,GB" + Environment.NewLine)
             {
                 FileName = $"{name}{converter.Extensions[0]}"
             }

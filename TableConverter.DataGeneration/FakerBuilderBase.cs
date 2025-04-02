@@ -40,7 +40,7 @@ public abstract class FakerBuilderBase<TFaker>(TFaker fakerInstance) : IFakerBui
     public IFakerBuilder<TFaker> Add(string columnName, Func<TFaker, string> valueGenerator, int blanksPercentage = 0)
     {
         if (string.IsNullOrWhiteSpace(columnName))
-            columnName = $"Column-{_actions.SelectMany(kvp => kvp.Value).Count() + 1}";
+            columnName = $"Column_{_actions.SelectMany(kvp => kvp.Value).Count() + 1}";
 
         if (valueGenerator is null)
             throw new ArgumentNullException(nameof(valueGenerator));
