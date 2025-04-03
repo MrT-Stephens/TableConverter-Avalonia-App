@@ -6,11 +6,10 @@
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
         <OutputType>Exe</OutputType>
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
-        <PublishSingleFile>true</PublishSingleFile>
+        <SelfContained>true</SelfContained>
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <AssemblyVersion>0.1.0</AssemblyVersion>
     </PropertyGroup>
-
 
     <ItemGroup>
         <AvaloniaResource Include="Assets\**"/>
@@ -31,7 +30,7 @@
         <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.6" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0-preview.1.25080.5" />
         <PackageReference Include="SukiUI" Version="6.0.1" />
-        <PackageReference Include="Dotnet.Bundle" Version="*" />
+        <PackageReference Include="Dotnet.Bundle" Version="0.9.13" />
     </ItemGroup>
 
     <ItemGroup>
