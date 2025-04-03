@@ -49,6 +49,8 @@ public partial class MainWindowViewModel : ObservableObject
     private void ToggleBaseTheme()
     {
         Theme.SwitchBaseTheme();
+        
+        SelectedBaseTheme = Theme.ActiveBaseTheme;
     }
 
     #endregion

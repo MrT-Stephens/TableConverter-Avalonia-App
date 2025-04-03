@@ -18,9 +18,10 @@ public class ConverterHandlerCsvInput : ConverterHandlerInputAbstract<ConverterH
             using var csvReader = new CsvReader(new StringReader(text),
                 new CsvConfiguration(CultureInfo.InvariantCulture)
                 {
+                    DetectDelimiter = true,
                     Delimiter = Options!.Delimiter,
                     DetectColumnCountChanges = true,
-                    TrimOptions = TrimOptions.Trim
+                    TrimOptions = TrimOptions.Trim,
                 });
 
             foreach (var row in csvReader.GetRecords<dynamic>())
