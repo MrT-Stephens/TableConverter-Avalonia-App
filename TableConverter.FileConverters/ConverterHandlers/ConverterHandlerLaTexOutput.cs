@@ -5,6 +5,8 @@ namespace TableConverter.FileConverters.ConverterHandlers;
 
 public class ConverterHandlerLaTexOutput : ConverterHandlerOutputAbstract<ConverterHandlerLaTexOutputOptions>
 {
+    private readonly char[] _EscapeChars = ['&', '%', '$', '#', '_', '{', '}'];
+
     public override Result<string> Convert(string[] headers, string[][] rows)
     {
         var stringWriter = new StringWriter();
@@ -113,7 +115,7 @@ public class ConverterHandlerLaTexOutput : ConverterHandlerOutputAbstract<Conver
         return Result<string>.Success(stringWriter.ToString());
     }
 
-    private static string GenerateTableRow(string[] items, bool boldHeader, bool boldColumn)
+    private string GenerateTableRow(string[] items, bool boldHeader, bool boldColumn)
     {
         var stringWriter = new StringWriter();
 
@@ -122,9 +124,9 @@ public class ConverterHandlerLaTexOutput : ConverterHandlerOutputAbstract<Conver
         for (long i = 0; i < items.LongLength; i++)
         {
             if ((i == 0 && boldColumn) || boldHeader)
-                stringWriter.Write("\\textbf{" + items[i] + "}");
+                stringWriter.Write("\\textbf{" + EscapeLaTexString(items[i]) + "}");
             else
-                stringWriter.Write(items[i] + "");
+                stringWriter.Write(EscapeLaTexString(items[i]) + "");
 
             if (i != items.Length - 1) stringWriter.Write(" & ");
         }
@@ -132,5 +134,18 @@ public class ConverterHandlerLaTexOutput : ConverterHandlerOutputAbstract<Conver
         stringWriter.Write(" \\\\");
 
         return stringWriter.ToString();
+    }
+
+    private string EscapeLaTexString(string text)
+    {
+        foreach (var character in _EscapeChars)
+        {
+            if (text.Contains(character))
+            {
+                text = text.Replace(character.ToString(), "\\" + character);
+            }
+        }
+        
+        return text;
     }
 }
