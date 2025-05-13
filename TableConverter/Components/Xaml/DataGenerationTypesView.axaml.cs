@@ -2,6 +2,7 @@ using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.VisualTree;
+using AvaloniaEdit.Utils;
 
 namespace TableConverter.Components.Xaml;
 
