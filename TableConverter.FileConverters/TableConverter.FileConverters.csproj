@@ -7,10 +7,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="CsvHelper" Version="33.0.1"/>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
-        <PackageReference Include="NPOI" Version="2.7.3" />
-        <PackageReference Include="QuestPDF" Version="2025.4.4" />
+        <PackageReference Include="CsvHelper" Version="33.1.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+        <PackageReference Include="NPOI" Version="2.7.4" />
+        <PackageReference Include="QuestPDF" Version="2025.7.0" />
     </ItemGroup>
 
 </Project>

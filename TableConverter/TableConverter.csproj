@@ -12,30 +12,30 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <AvaloniaResource Include="Assets\**"/>
+        <AvaloniaResource Include="Assets\**" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="11.3.0" />
+        <PackageReference Include="Avalonia" Version="11.3.2" />
         <PackageReference Include="Avalonia.AvaloniaEdit" Version="11.3.0" />
-        <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.0" />
-        <PackageReference Include="Avalonia.Desktop" Version="11.3.0" />
-        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.0" />
-        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.0" />
-        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.3.0" />
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.2" />
+        <PackageReference Include="Avalonia.Desktop" Version="11.3.2" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.2" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.2" />
+        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.3.0.6" />
         <PackageReference Include="AvaloniaEdit.TextMate" Version="11.3.0" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.0" />
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.2" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0-preview.1.25080.5" />
-        <PackageReference Include="SukiUI" Version="6.0.2" />
+        <PackageReference Include="SukiUI" Version="6.0.3-nightly20250628" />
         <PackageReference Include="Dotnet.Bundle" Version="0.9.13" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\TableConverter.DataGeneration\TableConverter.DataGeneration.csproj"/>
-        <ProjectReference Include="..\TableConverter.FileConverters\TableConverter.FileConverters.csproj"/>
+        <ProjectReference Include="..\TableConverter.DataGeneration\TableConverter.DataGeneration.csproj" />
+        <ProjectReference Include="..\TableConverter.FileConverters\TableConverter.FileConverters.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -52,6 +52,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <UpToDateCheckInput Remove="Views\DataGenerationPageView.axaml"/>
+        <UpToDateCheckInput Remove="Views\DataGenerationPageView.axaml" />
     </ItemGroup>
 </Project>
