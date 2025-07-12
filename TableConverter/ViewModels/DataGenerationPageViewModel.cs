@@ -77,95 +77,116 @@ public partial class DataGenerationPageViewModel : BasePageViewModel
     [RelayCommand]
     private void ChooseTypeButtonClicked(DataGenerationFieldViewModel field)
     {
-        DialogManager.CreateDialog()
-            .WithViewModel(dialog => new DataGenerationTypesViewModel(dialog, _DataGenerationTypesService)
-            {
-                OnOkClicked = type =>
+        Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+            DialogManager.CreateDialog()
+                .WithViewModel(dialog => new DataGenerationTypesViewModel(dialog, _DataGenerationTypesService)
                 {
-                    field.SetDataGenerationMethod(type);
-
-                    return Task.FromResult(Task.CompletedTask);
-                }
-            })
-            .ShowCardBackground(false)
-            .Dismiss()
-            .ByClickingBackground()
-            .TryShow();
+                    OnOkClicked = type =>
+                    {
+                        field.SetDataGenerationMethod(type);
+                        return Task.FromResult(Task.CompletedTask);
+                    }
+                })
+                .ShowCardBackground(false)
+                .Dismiss()
+                .ByClickingBackground()
+                .TryShow()
+        );
     }
 
     [RelayCommand]
     private void AddFieldButtonClicked(DataGenerationFieldViewModel field)
     {
-        if (DataGenerationFields.Last() == field)
-            DataGenerationFields.Add(new DataGenerationFieldViewModel());
-        else
-            DataGenerationFields.Insert(DataGenerationFields.IndexOf(field) + 1, new DataGenerationFieldViewModel());
+        Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            if (DataGenerationFields.Last() == field)
+                DataGenerationFields.Add(new DataGenerationFieldViewModel());
+            else
+                DataGenerationFields.Insert(DataGenerationFields.IndexOf(field) + 1, new DataGenerationFieldViewModel());
+        });
     }
 
     [RelayCommand]
     private void RemoveFieldButtonClicked(DataGenerationFieldViewModel field)
     {
-        if (DataGenerationFields.Count > 1) DataGenerationFields.Remove(field);
+        Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            if (DataGenerationFields.Count > 1)
+                DataGenerationFields.Remove(field);
+        });
     }
 
     [RelayCommand]
     private async Task GenerateDataButtonClicked()
     {
-        if (DataGenerationFields.Select((field, index) => (field, index))
-                .Where(field => string.IsNullOrEmpty(field.field.Key)).ToArray() is { Length: > 0 } fields)
+        var fields = DataGenerationFields.Select((field, index) => (field, index))
+            .Where(f => string.IsNullOrEmpty(f.field.Key)).ToArray();
+
+        if (fields.Length > 0)
         {
-            DialogManager.CreateDialog()
-                .WithTitle("Something went wrong")
-                .WithContent(
-                    $"Some of the data generation fields could not be generated. Please try again.\n{string.Join("\n", fields.Select(field => $"At row {field.index} the field is null or empty."))}")
-                .OfType(NotificationType.Error)
-                .WithActionButton("Ok", _ => { }, true)
-                .TryShow();
+            await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                DialogManager.CreateDialog()
+                    .WithTitle("Something went wrong")
+                    .WithContent(
+                        $"Some of the data generation fields could not be generated. Please try again.\n{string.Join("\n", fields.Select(field => $"At row {field.index} the field is null or empty."))}")
+                    .OfType(NotificationType.Error)
+                    .WithActionButton("Ok", _ => { }, true)
+                    .TryShow()
+            );
 
             return;
         }
 
-        IsLoading = true;
+        await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => IsLoading = true);
 
-        _DataGenerationTypesService.SetLocale(SelectedLocale);
-
-        _DataGenerationTypesService.SetSeed(Seed);
-
-        var name = string.IsNullOrWhiteSpace(GeneratedDocumentName)
-            ? $"Generated-Data-{DateTime.Now.ToFileTime()}"
-            : GeneratedDocumentName;
-
-        var data = await _DataGenerationTypesService.GenerateData(DataGenerationFields.ToArray(), NumberOfRows);
-
-        if (data.IsSuccess)
+        try
         {
-            _FilesManager.Files.Add(new ConvertDocumentViewModel
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = name,
-                IsGenerated = true,
-                ProgressStepIndex = 1,
-                EditHeaders = new ObservableCollection<string>(data.Value.Headers),
-                EditRows = new ObservableCollection<string[]>(data.Value.Rows)
-            });
+            _DataGenerationTypesService.SetLocale(SelectedLocale);
+            _DataGenerationTypesService.SetSeed(Seed);
 
-            _PageNavigation.RequestNavigation<ConvertFilesPageViewModel>(viewModel =>
+            var name = string.IsNullOrWhiteSpace(GeneratedDocumentName)
+                ? $"Generated-Data-{DateTime.Now.ToFileTime()}"
+                : GeneratedDocumentName;
+
+            var data = await _DataGenerationTypesService.GenerateData(DataGenerationFields.ToArray(), NumberOfRows);
+
+            if (data.IsSuccess)
             {
-                if (viewModel is ConvertFilesPageViewModel view)
-                    view.SelectedConvertDocument = _FilesManager.Files.Last();
-            });
+                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    _FilesManager.Files.Add(new ConvertDocumentViewModel
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = name,
+                        IsGenerated = true,
+                        ProgressStepIndex = 1,
+                        EditHeaders = new ObservableCollection<string>(data.Value.Headers),
+                        EditRows = new ObservableCollection<string[]>(data.Value.Rows)
+                    });
+
+                    _PageNavigation.RequestNavigation<ConvertFilesPageViewModel>(viewModel =>
+                    {
+                        if (viewModel is ConvertFilesPageViewModel view)
+                            view.SelectedConvertDocument = _FilesManager.Files.Last();
+                    });
+                });
+            }
+            else
+            {
+                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                    DialogManager.CreateDialog()
+                        .WithTitle("Something went wrong")
+                        .WithContent(data.Error!)
+                        .OfType(NotificationType.Error)
+                        .WithActionButton("Ok", _ => { }, true)
+                        .TryShow()
+                );
+            }
         }
-        else
+        finally
         {
-            DialogManager.CreateDialog()
-                .WithTitle("Something went wrong")
-                .WithContent(data.Error!)
-                .OfType(NotificationType.Error)
-                .WithActionButton("Ok", _ => { }, true)
-                .TryShow();
+            await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => IsLoading = false);
         }
-
-        IsLoading = false;
     }
 
     #endregion

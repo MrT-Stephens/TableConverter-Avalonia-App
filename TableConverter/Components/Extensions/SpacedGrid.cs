@@ -11,10 +11,10 @@ namespace TableConverter.Components.Extensions;
 
 public class SpacedGrid : Grid
 {
-    public static readonly StyledProperty<double> RowSpacingProperty =
+    public new static readonly StyledProperty<double> RowSpacingProperty =
         AvaloniaProperty.Register<SpacedGrid, double>(nameof(RowSpacing), 5);
 
-    public static readonly StyledProperty<double> ColumnSpacingProperty =
+    public new static readonly StyledProperty<double> ColumnSpacingProperty =
         AvaloniaProperty.Register<SpacedGrid, double>(nameof(ColumnSpacing), 5);
 
     public SpacedGrid()
@@ -22,13 +22,13 @@ public class SpacedGrid : Grid
         Children.CollectionChanged += ChildrenCollectionChanged!;
     }
 
-    public double RowSpacing
+    public new double RowSpacing
     {
         get => GetValue(RowSpacingProperty);
         set => SetValue(RowSpacingProperty, value);
     }
 
-    public double ColumnSpacing
+    public new double ColumnSpacing
     {
         get => GetValue(ColumnSpacingProperty);
         set => SetValue(ColumnSpacingProperty, value);
