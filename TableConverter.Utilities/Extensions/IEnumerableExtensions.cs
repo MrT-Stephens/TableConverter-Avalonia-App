@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
-
-namespace TableConverter.Extensions;
+namespace TableConverter.Utilities.Extensions;
 
 public static class IEnumerableExtensions
 {

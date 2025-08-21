@@ -21,8 +21,7 @@ public class AddFileCommandHandler(IFilesDialogManager filesDialogManager,
 
         var dialog = dialogManager.CreateDialog()
             .WithTitle("Please select a file type to input")
-            .WithSelection(converterTypes.InputTypes.Select(x => x.Name),
-                item => selectedItem = item)
+            .WithSelection(converterTypes.InputTypes.Select(x => x.Name), item => selectedItem = item)
             .WithYesNoResult("Ok", "Cancel")
             .Dismiss().ByClickingBackground();
 

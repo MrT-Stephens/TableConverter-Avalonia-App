@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -17,6 +18,7 @@ public abstract partial class BasePageViewModel : ObservableValidator
     [ObservableProperty] private string _DisplayName;
     [ObservableProperty] private object _Icon;
     [ObservableProperty] private int _Index;
+    [ObservableProperty] private bool _IsLoading;
 
     public ICommandManager CommandManager { get; }
 
