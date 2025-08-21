@@ -17,6 +17,7 @@ using TableConverter.Commands.Services;
 using TableConverter.Common;
 using TableConverter.Components.Xaml;
 using TableConverter.DataModels;
+using TableConverter.Extensions;
 using TableConverter.Interfaces;
 using TableConverter.Services;
 using TableConverter.ViewModels;
@@ -96,9 +97,12 @@ public class App : Application
     {
         var manager = provider.GetRequiredService<ICommandManager>();
         
-        foreach (var handler in provider.GetServices<ICommandHandlerAsync>())
-        {
-            manager.RegisterCommandAsync("AddFile", handler);
-        }
+        // Register all command handlers
+        provider.GetServices<ICommandHandler>()
+            .ForEach(handler => manager.RegisterCommand(handler.CommandMetadata.Name, handler));
+
+        // Register all async command handlers
+        provider.GetServices<ICommandHandlerAsync>()
+            .ForEach(handler => manager.RegisterCommandAsync(handler.CommandMetadata.Name, handler));
     }
 }
