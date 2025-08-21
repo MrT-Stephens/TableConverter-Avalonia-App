@@ -4,6 +4,9 @@ namespace TableConverter.Commands.Interfaces;
 
 public interface ICommandHandlerAsync
 {
+    /// <summary>
+    /// Represents the metadata for the command, including its name, description, and other relevant information.
+    /// </summary>
     public ICommandMetadata CommandMetadata { get; }
     
     /// <summary>

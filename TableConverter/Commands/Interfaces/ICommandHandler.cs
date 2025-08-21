@@ -3,6 +3,11 @@ namespace TableConverter.Commands.Interfaces;
 public interface ICommandHandler
 {
     /// <summary>
+    /// Represents the metadata for the command, including its name, description, and other relevant information.
+    /// </summary>
+    public ICommandMetadata CommandMetadata { get; }
+    
+    /// <summary>
     /// Executes the command with the given parameter and context.
     /// </summary>
     /// <param name="parameter">
