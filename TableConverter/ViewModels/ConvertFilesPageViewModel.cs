@@ -16,6 +16,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TableConverter.Commands.Interfaces;
 using TableConverter.Components.Xaml;
 using TableConverter.DataModels;
 using TableConverter.Interfaces;
@@ -33,14 +34,18 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
 
     #region Constructors
 
-    public ConvertFilesPageViewModel(ConverterTypesService converterTypes, ConvertFilesManagerService filesManager,
-        ISukiDialogManager dialogManager, ISukiToastManager toastManager, FilesDialogManagerService filesDialogManager)
-        : base(dialogManager, toastManager, "Convert Files", Application.Current?.Resources["ConvertIcon"], 1)
+    public ConvertFilesPageViewModel(
+        IConverterTypes converterTypes, 
+        ConvertFilesManager filesManager,
+        ICommandManager commandManager,
+        ISukiDialogManager dialogManager, 
+        ISukiToastManager toastManager, 
+        IFilesDialogManager filesDialogManager)
+        : base(commandManager, dialogManager, toastManager, "Convert Files", 
+            Application.Current?.Resources["ConvertIcon"], 1)
     {
         _ConverterTypes = converterTypes;
-
         FilesManager = filesManager;
-
         _FilesDialogManager = filesDialogManager;
 
         // If there are no files, add an example file.
@@ -53,11 +58,11 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
 
     #region Services
 
-    private readonly ConverterTypesService _ConverterTypes;
+    private readonly IConverterTypes _ConverterTypes;
 
-    private readonly FilesDialogManagerService _FilesDialogManager;
+    private readonly IFilesDialogManager _FilesDialogManager;
 
-    public ConvertFilesManagerService FilesManager { get; }
+    public ConvertFilesManager FilesManager { get; }
 
     #endregion
 

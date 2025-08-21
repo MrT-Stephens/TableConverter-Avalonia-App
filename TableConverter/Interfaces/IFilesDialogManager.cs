@@ -6,10 +6,11 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform.Storage;
 using TableConverter.DataModels;
 using TableConverter.FileConverters.DataModels;
+using TableConverter.Utilities;
 
 namespace TableConverter.Interfaces;
 
-public interface IFilesDialogManagerService
+public interface IFilesDialogManager : ITopLevelAware
 {
     public Task<Result<FileDialogManagerFile>?> OpenFileAsync(FilePickerOpenOptions options);
     

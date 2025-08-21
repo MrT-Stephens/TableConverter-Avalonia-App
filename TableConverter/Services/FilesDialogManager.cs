@@ -2,17 +2,17 @@ using System;
 using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
 using TableConverter.DataModels;
-using TableConverter.FileConverters.DataModels;
 using TableConverter.Interfaces;
+using TableConverter.Utilities;
 
 namespace TableConverter.Services;
 
-public class FilesDialogManagerService : IFilesDialogManagerService, ITopLevelAware
+public class FilesDialogManager : IFilesDialogManager
 {
     public async Task<Result<FileDialogManagerFile>?> OpenFileAsync(FilePickerOpenOptions options)
     {
-        var window = ITopLevelAware.GetTopLevel();
-        
+        var window = ((ITopLevelAware)this).GetTopLevel();
+
         if (window is null)
         {
             return Result<FileDialogManagerFile>.Failure("Main window not found");
@@ -33,7 +33,8 @@ public class FilesDialogManagerService : IFilesDialogManagerService, ITopLevelAw
         }
         catch (Exception ex)
         {
-            return Result<FileDialogManagerFile>.Failure($"Error occurred while opening file. (Exception: {ex.Message})");
+            return Result<FileDialogManagerFile>.Failure(
+                $"Error occurred while opening file. (Exception: {ex.Message})");
         }
 
         return null;
@@ -41,13 +42,13 @@ public class FilesDialogManagerService : IFilesDialogManagerService, ITopLevelAw
 
     public async Task<Result<FileDialogManagerFile>?> SaveFileAsync(FilePickerSaveOptions options)
     {
-        var window = ITopLevelAware.GetTopLevel();
-        
+        var window = ((ITopLevelAware)this).GetTopLevel();
+
         if (window is null)
         {
             return Result<FileDialogManagerFile>.Failure("Main window not found");
         }
-
+        
         try
         {
             var result = await window.StorageProvider.SaveFilePickerAsync(options);
@@ -63,7 +64,8 @@ public class FilesDialogManagerService : IFilesDialogManagerService, ITopLevelAw
         }
         catch (Exception ex)
         {
-            return Result<FileDialogManagerFile>.Failure($"Error occurred while saving file. (Exception: {ex.Message})");
+            return Result<FileDialogManagerFile>.Failure(
+                $"Error occurred while saving file. (Exception: {ex.Message})");
         }
 
         return null;

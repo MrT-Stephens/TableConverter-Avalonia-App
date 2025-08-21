@@ -1,11 +1,12 @@
 using System;
+using TableConverter.Interfaces;
 using TableConverter.ViewModels;
 
 namespace TableConverter.Services;
 
-public class PageNavigationService
+public class PageNavigation : IPageNavigation
 {
-    public Action<Type, Action<BasePageViewModel>?>? NavigationRequested { get; set; }
+    public NavigationRequestedEventHandler? NavigationRequested { get; set; }
 
     public void RequestNavigation<T>() where T : BasePageViewModel
     {

@@ -1,6 +1,7 @@
 ﻿using NPOI.XWPF.UserModel;
 using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
+using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.ConverterHandlers;
 

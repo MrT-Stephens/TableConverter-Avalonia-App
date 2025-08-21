@@ -8,6 +8,7 @@ using SukiUI;
 using SukiUI.Dialogs;
 using SukiUI.Models;
 using SukiUI.Toasts;
+using TableConverter.Interfaces;
 using TableConverter.Services;
 
 namespace TableConverter.ViewModels;
@@ -16,7 +17,7 @@ public partial class MainWindowViewModel : ObservableObject
 {
     #region Constructors
 
-    public MainWindowViewModel(IEnumerable<BasePageViewModel> pages, PageNavigationService pageNavigation,
+    public MainWindowViewModel(IEnumerable<BasePageViewModel> pages, IPageNavigation pageNavigation,
         ISukiDialogManager dialogManager, ISukiToastManager toastManager)
     {
         Pages = new AvaloniaList<BasePageViewModel>(pages.OrderBy(val => val.Index).ThenBy(val => val.DisplayName));

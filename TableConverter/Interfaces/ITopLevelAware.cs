@@ -6,7 +6,7 @@ namespace TableConverter.Interfaces;
 
 public interface ITopLevelAware
 {
-    public static TopLevel? GetTopLevel()
+    public TopLevel? GetTopLevel()
     {
         return Application.Current is
             { ApplicationLifetime: IClassicDesktopStyleApplicationLifetime { MainWindow: { } window } }

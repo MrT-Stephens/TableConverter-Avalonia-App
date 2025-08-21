@@ -9,6 +9,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SukiUI.Dialogs;
 using TableConverter.DataModels;
+using TableConverter.Interfaces;
 using TableConverter.Services;
 
 namespace TableConverter.Components.Xaml;
@@ -17,10 +18,10 @@ public partial class DataGenerationTypesViewModel : BaseDialogViewModel
 {
     #region Constructor
 
-    public DataGenerationTypesViewModel(ISukiDialog dialog, DataGenerationTypesService dataGenerationTypesService)
+    public DataGenerationTypesViewModel(ISukiDialog dialog, IDataGenerationTypes dataGenerationTypes)
         : base(dialog)
     {
-        var categories = dataGenerationTypesService.Types.Select(
+        var categories = dataGenerationTypes.Types.Select(
             type => new DataGenerationListTypesViewModel(
                 type.Name,
                 type.Description,
@@ -34,7 +35,7 @@ public partial class DataGenerationTypesViewModel : BaseDialogViewModel
                 "All of the available data generation methods.",
                 Application.Current?.Resources["DataGenerationAllIcon"] ??
                 throw new KeyNotFoundException("Icon not found"),
-                dataGenerationTypesService.Types
+                dataGenerationTypes.Types
                     .SelectMany(type => type.Methods)
                     .ToList()));
 

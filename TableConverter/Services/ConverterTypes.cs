@@ -2,11 +2,12 @@
 using System.Linq;
 using TableConverter.DataModels;
 using TableConverter.FileConverters.ConverterHandlers;
+using TableConverter.Interfaces;
 using TableConverter.Services.ConverterHandlersWithControls;
 
 namespace TableConverter.Services;
 
-public class ConverterTypesService
+public class ConverterTypes : IConverterTypes
 {
     private static readonly IEnumerable<ConverterType> Types =
     [
@@ -129,28 +130,4 @@ public class ConverterTypesService
     {
         return OutputTypes.First(val => val.Name == name);
     }
-
-    //public IConverterHanderInput GetInputHandlerByName(string name)
-    //{
-    //    IConverterHanderInput? handler = (IConverterHanderInput?)Activator.CreateInstance(GetByName(name).InputConverterType!);
-
-    //    if (handler is null)
-    //    {
-    //        throw new Exception($"Handler for {name} not found.");
-    //    }
-
-    //    return handler;
-    //}
-
-    //public IConverterHandlerOutput GetOutputHandlerByName(string name)
-    //{
-    //    IConverterHandlerOutput? handler = (IConverterHandlerOutput?)Activator.CreateInstance(GetByName(name).InputConverterType!);
-
-    //    if (handler is null)
-    //    {
-    //        throw new Exception($"Handler for {name} not found.");
-    //    }
-
-    //    return handler;
-    //}
 }

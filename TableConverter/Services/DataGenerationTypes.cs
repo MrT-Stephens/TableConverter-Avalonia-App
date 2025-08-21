@@ -7,19 +7,19 @@ using Avalonia;
 using TableConverter.DataGeneration;
 using TableConverter.DataGeneration.Exceptions;
 using TableConverter.DataModels;
-using TableConverter.FileConverters.DataModels;
+using TableConverter.Interfaces;
+using TableConverter.Utilities;
 using TableConverter.ViewModels;
-using TableData = TableConverter.DataGeneration.DataModels.TableData;
 
 namespace TableConverter.Services;
 
-public class DataGenerationTypesService
+public class DataGenerationTypes : IDataGenerationTypes
 {
-    private static readonly IReadOnlyList<DataGenerationType> DataGenerationTypes = LoadDataGenerationTypes();
+    private static readonly IReadOnlyList<DataGenerationType> InternalTypes = LoadDataGenerationTypes();
 
     private static readonly FakerWithAttributedModules Faker = new();
 
-    public IReadOnlyList<DataGenerationType> Types => DataGenerationTypes;
+    public IReadOnlyList<DataGenerationType> Types => InternalTypes;
 
     public IReadOnlyList<string> AvailableLocales => LocaleFactory.LoadLocaleNames();
 

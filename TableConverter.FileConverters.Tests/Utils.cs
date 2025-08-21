@@ -1,4 +1,5 @@
 using TableConverter.FileConverters.DataModels;
+using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.Tests;
 

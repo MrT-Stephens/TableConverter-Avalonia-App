@@ -1,5 +1,6 @@
 ﻿using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.Interfaces;
+using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.DataModels;
 

@@ -14,7 +14,7 @@ namespace TableConverter.Common;
 /// </summary>
 public class ViewsCollection : IViewsCollection
 {
-    private readonly Dictionary<Type, Type> _vmToViewMap = new();
+    private readonly Dictionary<Type, Type> _VmToViewMap = new();
 
     /// <inheritdoc />
     public IViewsCollection AddView<
@@ -28,7 +28,7 @@ public class ViewsCollection : IViewsCollection
         var viewType = typeof(TView);
         var viewModelType = typeof(TViewModel);
 
-        _vmToViewMap.Add(viewModelType, viewType);
+        _VmToViewMap.Add(viewModelType, viewType);
 
         if (viewModelType.IsAssignableTo(typeof(BasePageViewModel)))
             services.AddSingleton(typeof(BasePageViewModel), viewModelType);
@@ -57,7 +57,7 @@ public class ViewsCollection : IViewsCollection
 
         var viewModelType = viewModel.GetType();
 
-        if (_vmToViewMap.TryGetValue(viewModelType, out var viewType))
+        if (_VmToViewMap.TryGetValue(viewModelType, out var viewType))
         {
             view = Activator.CreateInstance(viewType) as Control;
 

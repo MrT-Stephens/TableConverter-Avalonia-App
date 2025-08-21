@@ -42,7 +42,7 @@ public partial class FileTypesSelectorViewModel(ISukiDialog dialog) : BaseDialog
 
     [ObservableProperty] private string _SelectedValue = string.Empty;
 
-    public AsyncAction<string>? OnOkClicked { get; set; } = null;
+    public AsyncAction<string>? OnOkClicked { get; set; }
 
     #endregion
 }

@@ -15,15 +15,17 @@ public sealed class ArrayToStringConverter : IValueConverter
     {
         if (value is IEnumerable<object?> enumerable)
         {
-            var count = enumerable.Count();
+            var objects = enumerable as object[] ?? enumerable.ToArray();
+            
+            var count = objects.Length;
 
-            if (!enumerable.Any()) return new BindingNotification("Array to string converter must have elements");
+            if (!objects.Any()) return new BindingNotification("Array to string converter must have elements");
 
-            if (count == 1) return enumerable.First();
+            if (count == 1) return objects.First();
 
-            if (count == 2) return string.Join(" or ", enumerable);
+            if (count == 2) return string.Join(" or ", objects);
 
-            return $"{string.Join(", ", enumerable.Take(count - 1))} or {enumerable.Last()}";
+            return $"{string.Join(", ", objects.Take(count - 1))} or {objects.Last()}";
         }
 
         return new BindingNotification("Array to string converter must be passed an array");

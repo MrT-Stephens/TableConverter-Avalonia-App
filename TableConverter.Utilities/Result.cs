@@ -1,6 +1,4 @@
-using System.Diagnostics.CodeAnalysis;
-
-namespace TableConverter.FileConverters.DataModels;
+namespace TableConverter.Utilities;
 
 /// <summary>
 ///     Represents the result of an operation, including whether it was successful and an optional error message.

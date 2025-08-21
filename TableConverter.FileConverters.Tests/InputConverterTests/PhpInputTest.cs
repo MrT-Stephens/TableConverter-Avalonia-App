@@ -2,6 +2,7 @@ using TableConverter.FileConverters.ConverterHandlers;
 using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
 using TableConverter.FileConverters.Tests.TestBase;
+using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.Tests.InputConverterTests;
 

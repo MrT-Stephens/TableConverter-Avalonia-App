@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace TableConverter.DataGeneration.DataModels;
+namespace TableConverter.Utilities;
 
 /// <summary>
 ///     Represents a table containing headers and rows of data.

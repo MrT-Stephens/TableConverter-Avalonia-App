@@ -32,7 +32,7 @@
                             Orientation="Horizontal"
                             Spacing="5">
                     <!-- New File Button -->
-                    <Button Command="{Binding ConvertFileNewFileButtonClickedCommand}"
+                    <Button Command="{Binding CommandManager[AddFile]}"
                             Classes="Flat Icon">
                         <PathIcon Data="{DynamicResource AddIcon}"
                                   Foreground="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}" />
@@ -75,29 +75,10 @@
                                   IsVisible="{Binding SelectedConvertDocument.ProgressStepIndex, Converter={x:Static converters:IndexToVisibility.Instance}, ConverterParameter=0}">
                     <components:SpacedGrid RowDefinitions="*,Auto"
                                            RowSpacing="10">
-                        <avaloniaEdit:TextEditor Grid.Row="0"
-                                                 Name="InputFileTextEditor"
-                                                 ShowLineNumbers="True"
-                                                 WordWrap="False"
-                                                 Document="{Binding SelectedConvertDocument.InputFileText}"
-                                                 ScrollViewer.HorizontalScrollBarVisibility="Visible"
-                                                 ScrollViewer.VerticalScrollBarVisibility="Visible"
-                                                 FontFamily="{StaticResource SecondaryFontFamily}">
-                            <avaloniaEdit:TextEditor.Options>
-                                <avaloniaEdit:TextEditorOptions AllowScrollBelowDocument="True"
-                                                                HighlightCurrentLine="False"
-                                                                IndentationSize="5"
-                                                                EnableRectangularSelection="True"
-                                                                ShowBoxForControlCharacters="True"
-                                                                ShowEndOfLine="True"
-                                                                ShowSpaces="True"
-                                                                ShowTabs="True"
-                                                                RequireControlModifierForHyperlinkClick="False"
-                                                                EnableEmailHyperlinks="False"
-                                                                EnableHyperlinks="False" />
-                            </avaloniaEdit:TextEditor.Options>
-                        </avaloniaEdit:TextEditor>
-                        <!-- Footer Buttons -->
+                        <components:CodeEditor Grid.Row="0"
+                                    Document="{Binding SelectedConvertDocument.InputFileText}">
+                        </components:CodeEditor>
+                                    <!-- Footer Buttons -->
                         <components:SpacedGrid Grid.Row="1"
                                                ColumnDefinitions="Auto,*,Auto"
                                                ColumnSpacing="10">

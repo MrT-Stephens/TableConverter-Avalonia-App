@@ -2,6 +2,8 @@
 using Avalonia;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
+using TableConverter.Commands.Interfaces;
+using TableConverter.Interfaces;
 using TableConverter.Services;
 
 namespace TableConverter.ViewModels;
@@ -10,12 +12,16 @@ public class WelcomePageViewModel : BasePageViewModel
 {
     #region Constructors
 
-    public WelcomePageViewModel(ConverterTypesService converterTypes, DataGenerationTypesService dataGenerationTypes,
-        ISukiDialogManager dialogManager, ISukiToastManager toastManager)
-        : base(dialogManager, toastManager, "Welcome", Application.Current?.Resources["HandWaveIcon"])
+    public WelcomePageViewModel(
+        IConverterTypes converterTypes, 
+        IDataGenerationTypes dataGenerationTypes,
+        ICommandManager commandManager,
+        ISukiDialogManager dialogManager, 
+        ISukiToastManager toastManager)
+        : base(commandManager, dialogManager, toastManager, "Welcome", 
+            Application.Current?.Resources["HandWaveIcon"])
     {
         ConverterTypes = converterTypes;
-
         DataGenerationTypes = dataGenerationTypes;
     }
 
@@ -23,9 +29,9 @@ public class WelcomePageViewModel : BasePageViewModel
 
     #region Services
 
-    public ConverterTypesService ConverterTypes { get; }
+    public IConverterTypes ConverterTypes { get; }
 
-    public DataGenerationTypesService DataGenerationTypes { get; }
+    public IDataGenerationTypes DataGenerationTypes { get; }
 
     #endregion
 

@@ -1,5 +1,6 @@
 using TableConverter.DataGeneration.DataModels;
 using TableConverter.DataGeneration.Interfaces;
+using TableConverter.Utilities;
 
 namespace TableConverter.DataGeneration;
 
@@ -114,15 +115,15 @@ public abstract class FakerBuilderBase<TFaker>(TFaker fakerInstance) : IFakerBui
     /// <inheritdoc />
     public async Task<TableData> BuildAsync()
     {
-        var rows = await Task.WhenAll(Enumerable.Range(0, _RowCount).Select(_ =>
+        var rows = await Task.WhenAll(Enumerable.Range(0, _RowCount).Select(_ => Task.Run(() =>
         {
             var row = new List<string>();
 
             foreach (var (columnName, actions) in _actions)
                 row.AddRange(actions.Select(action => action(FakerInstance)));
 
-            return Task.FromResult(row.ToArray());
-        }));
+            return row.ToArray();
+        })));
 
         // Flatten the column names to match the number of generators for each column
         var columnHeaders = _actions.SelectMany(pair => pair.Value.Select(_ => pair.Key)).ToList();

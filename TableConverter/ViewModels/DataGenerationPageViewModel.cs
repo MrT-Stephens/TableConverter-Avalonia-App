@@ -9,7 +9,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
+using TableConverter.Commands.Interfaces;
 using TableConverter.Components.Xaml;
+using TableConverter.Interfaces;
 using TableConverter.Services;
 
 namespace TableConverter.ViewModels;
@@ -18,22 +20,25 @@ public partial class DataGenerationPageViewModel : BasePageViewModel
 {
     #region Constructors
 
-    public DataGenerationPageViewModel(DataGenerationTypesService dataGenerationTypes,
-        ConvertFilesManagerService filesManager,
-        PageNavigationService pageNavigation, ISukiDialogManager dialogManager, ISukiToastManager toastManager)
-        : base(dialogManager, toastManager, "Data\nGeneration", Application.Current?.Resources["DataIcon"], 2)
+    public DataGenerationPageViewModel(
+        IDataGenerationTypes dataGenerationTypes,
+        ConvertFilesManager filesManager,
+        ICommandManager commandManager,
+        IPageNavigation pageNavigation, 
+        ISukiDialogManager dialogManager, 
+        ISukiToastManager toastManager)
+        : base(commandManager, dialogManager, toastManager, "Data\nGeneration", 
+            Application.Current?.Resources["DataIcon"], 2)
     {
-        _DataGenerationTypesService = dataGenerationTypes;
-
+        _DataGenerationTypes = dataGenerationTypes;
         _PageNavigation = pageNavigation;
-
         _FilesManager = filesManager;
 
         DataGenerationFields.Add(new DataGenerationFieldViewModel());
 
         IsLoading = false;
 
-        AvailableLocales = new ObservableCollection<string>(_DataGenerationTypesService.AvailableLocales);
+        AvailableLocales = new ObservableCollection<string>(_DataGenerationTypes.AvailableLocales);
 
         SelectedLocale = "en";
 
@@ -44,9 +49,9 @@ public partial class DataGenerationPageViewModel : BasePageViewModel
 
     #region Services
 
-    private readonly DataGenerationTypesService _DataGenerationTypesService;
-    private readonly PageNavigationService _PageNavigation;
-    private readonly ConvertFilesManagerService _FilesManager;
+    private readonly IDataGenerationTypes _DataGenerationTypes;
+    private readonly IPageNavigation _PageNavigation;
+    private readonly ConvertFilesManager _FilesManager;
 
     #endregion
 
@@ -77,9 +82,9 @@ public partial class DataGenerationPageViewModel : BasePageViewModel
     [RelayCommand]
     private void ChooseTypeButtonClicked(DataGenerationFieldViewModel field)
     {
-        Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+        Avalonia.Threading.Dispatcher.UIThread.Invoke(() =>
             DialogManager.CreateDialog()
-                .WithViewModel(dialog => new DataGenerationTypesViewModel(dialog, _DataGenerationTypesService)
+                .WithViewModel(dialog => new DataGenerationTypesViewModel(dialog, _DataGenerationTypes)
                 {
                     OnOkClicked = type =>
                     {
@@ -141,14 +146,14 @@ public partial class DataGenerationPageViewModel : BasePageViewModel
 
         try
         {
-            _DataGenerationTypesService.SetLocale(SelectedLocale);
-            _DataGenerationTypesService.SetSeed(Seed);
+            _DataGenerationTypes.SetLocale(SelectedLocale);
+            _DataGenerationTypes.SetSeed(Seed);
 
             var name = string.IsNullOrWhiteSpace(GeneratedDocumentName)
                 ? $"Generated-Data-{DateTime.Now.ToFileTime()}"
                 : GeneratedDocumentName;
 
-            var data = await _DataGenerationTypesService.GenerateData(DataGenerationFields.ToArray(), NumberOfRows);
+            var data = await _DataGenerationTypes.GenerateData(DataGenerationFields.ToArray(), NumberOfRows);
 
             if (data.IsSuccess)
             {

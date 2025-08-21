@@ -2,6 +2,7 @@
 using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
 using TableConverter.FileConverters.Utilities;
+using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.ConverterHandlers;
 

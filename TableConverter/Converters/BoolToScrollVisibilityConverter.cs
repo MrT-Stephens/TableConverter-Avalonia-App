@@ -10,10 +10,11 @@ public sealed class BoolToScrollVisibilityConverter : IValueConverter
 {
     public static readonly BoolToScrollVisibilityConverter Instance = new();
 
-    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is bool boolean)
             return boolean ? ScrollBarVisibility.Auto : ScrollBarVisibility.Disabled;
+        
         return new BindingNotification("Bool to scroll visibility converter must be passed an boolean");
     }
 
