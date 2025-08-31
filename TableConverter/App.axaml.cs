@@ -85,6 +85,9 @@ public class App : Application
         // Command Manager
         services.AddSingleton<ICommandManager, CommandManager>();
         services.AddSingleton<ICommandHandlerAsync, AddFileCommandHandler>();
+        
+        // Misc Services
+        services.AddSingleton<IEventManager, EventManager>();
 
         return services.BuildServiceProvider();
     }

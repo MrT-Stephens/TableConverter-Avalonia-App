@@ -21,12 +21,12 @@ public class TableData
     /// <summary>
     ///     Gets the headers of the table.
     /// </summary>
-    public IReadOnlyList<string> Headers { get; }
+    public List<string> Headers { get; }
 
     /// <summary>
     ///     Gets the rows of data in the table.
     /// </summary>
-    public IReadOnlyList<string[]> Rows { get; }
+    public List<string[]> Rows { get; }
 
     /// <summary>
     ///     Determines whether the current <see cref="TableData" /> is equal to another object.

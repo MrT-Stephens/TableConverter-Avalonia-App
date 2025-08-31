@@ -8,7 +8,7 @@ namespace TableConverter.Utilities;
 /// </summary>
 public class WeakDelegate
 {
-    private readonly WeakReference _Target;
+    private WeakReference? _Target;
     private readonly MethodInfo _MethodInfo;
     private readonly Type _TargetType;
     
@@ -26,6 +26,17 @@ public class WeakDelegate
     /// </summary>
     public Delegate? Target => TryGetDelegate();
 
+    /// <summary>
+    /// Clears the weak reference to the target.
+    /// </summary>
+    public void Clear()
+    {
+        if (_Target is null) return;
+        
+        _Target.Target = null;
+        _Target = null;
+    }
+
     private Delegate? TryGetDelegate()
     {
         if (_MethodInfo.IsStatic)
@@ -33,7 +44,7 @@ public class WeakDelegate
             return Delegate.CreateDelegate(_TargetType, null, _MethodInfo);
         }
 
-        if (_Target.Target is { } target)
+        if (_Target?.Target is { } target)
         {
             return Delegate.CreateDelegate(_TargetType, target, _MethodInfo);
         }

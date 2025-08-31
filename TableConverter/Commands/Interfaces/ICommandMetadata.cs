@@ -1,3 +1,5 @@
+using Avalonia.Controls.Shapes;
+
 namespace TableConverter.Commands.Interfaces;
 
 public interface ICommandMetadata
@@ -21,4 +23,9 @@ public interface ICommandMetadata
     /// The name of the icon to be used for the command.
     /// </summary>
     public string? IconName { get; }
+    
+    /// <summary>
+    /// Gets the icon path based on the IconName from the application resources.
+    /// </summary>
+    public Path? IconPath { get; }
 }

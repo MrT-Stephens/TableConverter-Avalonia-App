@@ -87,7 +87,7 @@ public partial class ConvertFilesPageViewModel : BasePageViewModel
             return;
 
         var count = currentDoc.ProgressStepValues.Count();
-
+        
         if (pageIndex < 0 || pageIndex > count)
         {
             await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>

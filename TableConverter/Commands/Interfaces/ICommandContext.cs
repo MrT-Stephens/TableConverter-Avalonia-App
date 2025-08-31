@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using TableConverter.Utilities;
 
 namespace TableConverter.Commands.Interfaces;
 
@@ -19,7 +20,7 @@ public interface ICommandContext
     /// <summary>
     /// The result of the command execution, if any.
     /// </summary>
-    public object? Result { get; set; }
+    public Result<object>? Result { get; set; }
 
     /// <summary>
     /// The selected items in the context of the command.
@@ -74,20 +75,31 @@ public interface ICommandContext
     /// Clears all selected items from the context.
     /// </summary>
     public void ClearSelectedItems();
+
+    /// <summary>
+    /// Sets the result of the command execution to the provided object, wrapped in a successful Result.
+    /// </summary>
+    /// <param name="obj">
+    /// The object to set as the result of the command execution.
+    /// </param>
+    /// <typeparam name="TObjectType">
+    /// The type of the object to set as the result of the command execution.
+    /// </typeparam>
+    public void SetResult<TObjectType>(TObjectType obj);
     
     /// <summary>
-    /// Sets the result of the command execution.
+    /// Sets the result of the command execution to an error state with the provided error message.
     /// </summary>
-    /// <param name="result">
-    /// The result to set for the command execution.
+    /// <param name="errorMessage">
+    /// The error message describing the reason for the failure.
     /// </param>
-    public void SetResult(object? result);
+    public void SetErrorResult(string errorMessage);
 
     /// <summary>
     /// Attempts to get the result of the command execution as a specific type.
     /// </summary>
     /// <param name="result">
-    /// The output parameter that will hold the result if the command execution was successful.
+    /// The output parameter that will hold the result if it is of the specified type.
     /// </param>
     /// <typeparam name="TObjectType">
     /// The type of the result to retrieve from the command execution.
@@ -95,5 +107,5 @@ public interface ICommandContext
     /// <returns>
     /// True if the result is successfully retrieved and is of the specified type; otherwise, false.
     /// </returns>
-    public bool TryGetResult<TObjectType>([NotNullWhen(true)] out TObjectType? result);
+    public bool TryGetResult<TObjectType>([NotNullWhen(true)] out Result<TObjectType>? result);
 }
