@@ -17,4 +17,12 @@
       <ProjectReference Include="..\TableConverter.Utilities\TableConverter.Utilities.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Exceptions\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Exceptions\ConverterValidationException.cs" />
+    </ItemGroup>
+
 </Project>
