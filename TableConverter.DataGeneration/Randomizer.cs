@@ -18,7 +18,7 @@ public class Randomizer(int? seed = null)
     private static readonly Lazy<object> Locker = new(() => new object(),
         LazyThreadSafetyMode.ExecutionAndPublication);
 
-    private readonly Random Random = seed.HasValue ? new Random(seed.Value) : new Random();
+    private readonly Random _random = seed.HasValue ? new Random(seed.Value) : new Random();
 
     /// <summary>
     ///     Get an int from 0 to max.
@@ -42,11 +42,11 @@ public class Randomizer(int? seed = null)
             // Adjust the range as needed to make max inclusive. The Random.Next function uses exclusive upper bounds.
 
             // If max can be extended by 1, just do that.
-            if (max < int.MaxValue) return Random.Next(min, max + 1);
+            if (max < int.MaxValue) return _random.Next(min, max + 1);
 
             // If max is exactly int.MaxValue, then check if min can be used to push the range out by one the other way.
             // If so, then we can simply add one to the result to put it back in the correct range.
-            if (min > int.MinValue) return 1 + Random.Next(min - 1, max);
+            if (min > int.MinValue) return 1 + _random.Next(min - 1, max);
 
             // If we hit this line, then min is int.MinValue and max is int.MaxValue, which mean the caller wants a
             // number from a range spanning all possible values of int. The Random class only supports exclusive
@@ -54,8 +54,8 @@ public class Randomizer(int? seed = null)
             // single call is a value in the range (int.MinValue, int.MaxValue - 1). Instead, what we do is get two
             // samples, each of which has just under 31 bits of entropy, and use 16 bits from each to assemble a
             // single 16-bit number.
-            var sample1 = Random.Next();
-            var sample2 = Random.Next();
+            var sample1 = _random.Next();
+            var sample2 = _random.Next();
 
             var topHalf = (sample1 >> 8) & 0xFFFF;
             var bottomHalf = (sample2 >> 8) & 0xFFFF;
@@ -76,9 +76,9 @@ public class Randomizer(int? seed = null)
         {
             if (min == 0.0d && max == 1.0d)
                 //use default implementation
-                return Random.NextDouble();
+                return _random.NextDouble();
 
-            return Random.NextDouble() * (max - min) + min;
+            return _random.NextDouble() * (max - min) + min;
         }
     }
 
@@ -154,7 +154,7 @@ public class Randomizer(int? seed = null)
 
         lock (Locker.Value)
         {
-            Random.NextBytes(arr);
+            _random.NextBytes(arr);
         }
 
         return arr;
@@ -330,12 +330,8 @@ public class Randomizer(int? seed = null)
     {
         var result = new char[pattern.Length];
 
-        char[] digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-
         for (var i = 0; i < result.Length; i++)
-            if (pattern[i] == symbol)
-                result[i] = Number(9).ToString()[0];
-            else if (pattern[i] == '!')
+            if (pattern[i] == symbol || pattern[i] == '!')
                 result[i] = Number(9).ToString()[0];
             else
                 result[i] = pattern[i];

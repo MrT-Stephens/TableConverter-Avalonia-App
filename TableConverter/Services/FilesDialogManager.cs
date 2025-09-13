@@ -9,65 +9,31 @@ namespace TableConverter.Services;
 
 public class FilesDialogManager : IFilesDialogManager
 {
-    public async Task<Result<FileDialogManagerFile>?> OpenFileAsync(FilePickerOpenOptions options)
+    public async Task<IStorageFile?> OpenFileAsync(FilePickerOpenOptions options)
     {
         var window = ((ITopLevelAware)this).GetTopLevel();
 
         if (window is null)
         {
-            return Result<FileDialogManagerFile>.Failure("Main window not found");
-        }
-
-        try
-        {
-            var result = await window.StorageProvider.OpenFilePickerAsync(options);
-
-            if (result.Count > 0)
-            {
-                return Result<FileDialogManagerFile>.Success(new FileDialogManagerFile(
-                    result[0].Name,
-                    result[0].Path,
-                    await result[0].OpenReadAsync()
-                ));
-            }
-        }
-        catch (Exception ex)
-        {
-            return Result<FileDialogManagerFile>.Failure(
-                $"Error occurred while opening file. (Exception: {ex.Message})");
-        }
-
-        return null;
-    }
-
-    public async Task<Result<FileDialogManagerFile>?> SaveFileAsync(FilePickerSaveOptions options)
-    {
-        var window = ((ITopLevelAware)this).GetTopLevel();
-
-        if (window is null)
-        {
-            return Result<FileDialogManagerFile>.Failure("Main window not found");
+            throw new NullReferenceException("Main window not found");
         }
         
-        try
-        {
-            var result = await window.StorageProvider.SaveFilePickerAsync(options);
+        var result = await window.StorageProvider.OpenFilePickerAsync(options);
 
-            if (result is not null)
-            {
-                return Result<FileDialogManagerFile>.Success(new FileDialogManagerFile(
-                    result.Name,
-                    result.Path,
-                    await result.OpenWriteAsync()
-                ));
-            }
-        }
-        catch (Exception ex)
-        {
-            return Result<FileDialogManagerFile>.Failure(
-                $"Error occurred while saving file. (Exception: {ex.Message})");
-        }
+        return result.Count > 0 ? result[0] : null;
+    }
 
-        return null;
+    public async Task<IStorageFile?> SaveFileAsync(FilePickerSaveOptions options)
+    {
+        var window = ((ITopLevelAware)this).GetTopLevel();
+
+        if (window is null)
+        {
+            throw new NullReferenceException("Main window not found");
+        }
+        
+        var result = await window.StorageProvider.SaveFilePickerAsync(options);
+        
+        return result;
     }
 }

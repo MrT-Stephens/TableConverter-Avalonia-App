@@ -14,7 +14,7 @@ namespace TableConverter.Common;
 /// </summary>
 public class ViewsCollection : IViewsCollection
 {
-    private readonly Dictionary<Type, Type> _VmToViewMap = new();
+    private readonly Dictionary<Type, Type> _vmToViewMap = new();
 
     /// <inheritdoc />
     public IViewsCollection AddView<
@@ -28,10 +28,10 @@ public class ViewsCollection : IViewsCollection
         var viewType = typeof(TView);
         var viewModelType = typeof(TViewModel);
 
-        _VmToViewMap.Add(viewModelType, viewType);
+        _vmToViewMap.Add(viewModelType, viewType);
 
-        if (viewModelType.IsAssignableTo(typeof(BasePageViewModel)))
-            services.AddSingleton(typeof(BasePageViewModel), viewModelType);
+        if (viewModelType.IsAssignableTo(typeof(BaseViewModel)))
+            services.AddSingleton(typeof(BaseViewModel), viewModelType);
         else
             services.AddSingleton(viewModelType);
 
@@ -57,7 +57,7 @@ public class ViewsCollection : IViewsCollection
 
         var viewModelType = viewModel.GetType();
 
-        if (_VmToViewMap.TryGetValue(viewModelType, out var viewType))
+        if (_vmToViewMap.TryGetValue(viewModelType, out var viewType))
         {
             view = Activator.CreateInstance(viewType) as Control;
 
@@ -72,8 +72,8 @@ public class ViewsCollection : IViewsCollection
     {
         var viewModelType = typeof(TViewModel);
 
-        if (TryCreateView(provider, viewModelType, out var view)) return view;
-
-        throw new InvalidOperationException($"Failed to create view for ViewModel type {viewModelType.FullName}.");
+        return TryCreateView(provider, viewModelType, out var view) 
+            ? view 
+            : throw new InvalidOperationException($"Failed to create view for ViewModel type {viewModelType.FullName}.");
     }
 }

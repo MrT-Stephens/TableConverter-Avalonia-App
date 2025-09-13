@@ -10,7 +10,7 @@ namespace TableConverter.DataGeneration.DataModels;
 public class TemplatedValueBuilder<TFaker, TDataset> : ITemplatedValueBuilder<TFaker, TDataset>
 {
     private readonly Dictionary<string, Func<TFaker, TDataset, Randomizer, string>> _placeholders = new();
-    private string _template = "";
+    private string _Template = "";
 
     /// <summary>
     ///     Sets the template string containing placeholders to be resolved.
@@ -19,7 +19,7 @@ public class TemplatedValueBuilder<TFaker, TDataset> : ITemplatedValueBuilder<TF
     /// <returns>The builder instance for method chaining.</returns>
     public ITemplatedValueBuilder<TFaker, TDataset> SetTemplate(string template)
     {
-        _template = template;
+        _Template = template;
         return this;
     }
 
@@ -59,7 +59,7 @@ public class TemplatedValueBuilder<TFaker, TDataset> : ITemplatedValueBuilder<TF
     /// <returns>The resolved template string.</returns>
     public string Build(TFaker faker, TDataset dataset, Randomizer random)
     {
-        var result = _template;
+        var result = _Template;
 
         foreach (var placeholder in _placeholders)
         {

@@ -20,6 +20,11 @@ public interface ICommandManager
     /// Raised when a command has been executed.
     /// </summary>
     public event EventHandler<ICommandContext> OnExecuted;
+    
+    /// <summary>
+    /// Raised when an error occurs during command execution.
+    /// </summary>
+    public event EventHandler<Exception> OnError;
 
     /// <summary>
     /// Registers a command with a name and a handler.

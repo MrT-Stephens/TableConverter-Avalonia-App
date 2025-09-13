@@ -4,7 +4,7 @@ using TableConverter.ViewModels;
 namespace TableConverter.Interfaces;
 
 public delegate void NavigationRequestedEventHandler(
-    Type viewModelType, Action<BasePageViewModel>? setupAction);
+    Type viewModelType, Action<BaseViewModel>? setupAction);
 
 public interface IPageNavigation
 {
@@ -19,7 +19,7 @@ public interface IPageNavigation
     /// <typeparam name="T">
     /// The type of the page view model to navigate to.
     /// </typeparam>
-    public void RequestNavigation<T>() where T : BasePageViewModel;
+    public void RequestNavigation<T>() where T : BaseViewModel;
     
     /// <summary>
     /// Requests navigation to a specific page view model type with a setup action.
@@ -30,5 +30,5 @@ public interface IPageNavigation
     /// <typeparam name="T">
     /// The type of the page view model to navigate to.
     /// </typeparam>
-    public void RequestNavigation<T>(Action<BasePageViewModel> setupAction) where T : BasePageViewModel;
+    public void RequestNavigation<T>(Action<BaseViewModel> setupAction) where T : BaseViewModel;
 }

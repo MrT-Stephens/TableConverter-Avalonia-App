@@ -1,18 +1,12 @@
-using System.IO;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform.Storage;
-using TableConverter.DataModels;
-using TableConverter.FileConverters.DataModels;
-using TableConverter.Utilities;
 
 namespace TableConverter.Interfaces;
 
 public interface IFilesDialogManager : ITopLevelAware
 {
-    public Task<Result<FileDialogManagerFile>?> OpenFileAsync(FilePickerOpenOptions options);
+    public Task<IStorageFile?> OpenFileAsync(FilePickerOpenOptions options);
     
-    public Task<Result<FileDialogManagerFile>?> SaveFileAsync(FilePickerSaveOptions options);
+    public Task<IStorageFile?> SaveFileAsync(FilePickerSaveOptions options);
 }

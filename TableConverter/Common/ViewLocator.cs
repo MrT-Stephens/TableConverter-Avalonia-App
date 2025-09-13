@@ -8,12 +8,12 @@ namespace TableConverter.Common;
 
 public class ViewLocator : IDataTemplate
 {
-    private readonly Dictionary<object, Control> _ControlCache = [];
-    private readonly IViewsCollection _Views;
+    private readonly Dictionary<object, Control> _controlCache = [];
+    private readonly IViewsCollection _views;
 
     public ViewLocator(IViewsCollection views)
     {
-        _Views = views;
+        _views = views;
     }
 
     public Control Build(object? param)
@@ -23,17 +23,17 @@ public class ViewLocator : IDataTemplate
             return CreateText("Data is null.");
         }
 
-        if (_ControlCache.TryGetValue(param, out var control))
+        if (_controlCache.TryGetValue(param, out var control))
         {
             return control;
         }
 
-        if (!_Views.TryCreateView(param, out var view))
+        if (!_views.TryCreateView(param, out var view))
         {
             return CreateText($"No View For {param.GetType().Name}.");
         }
 
-        _ControlCache.Add(param, view);
+        _controlCache.Add(param, view);
 
         return view;
 

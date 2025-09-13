@@ -61,11 +61,11 @@ public class TableData
         sb.AppendJoin(',', Headers);
         sb.AppendLine();
 
-        foreach (var row in Rows)
+        Rows.ForEach(row =>
         {
             sb.AppendJoin(',', row);
             sb.AppendLine();
-        }
+        });
 
         return sb.ToString();
     }

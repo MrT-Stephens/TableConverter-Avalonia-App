@@ -7,17 +7,16 @@ namespace TableConverter.Services;
 
 public class EventManager : IEventManager
 {
-    private readonly ConcurrentDictionary<Type, IEventHandler> _EventHandlers = new();
-
+    private readonly ConcurrentDictionary<Type, IEventHandler> _eventHandlers = new();
 
     public TEventType GetEvent<TEventType>() where TEventType : IEventHandler
     {
-        return (TEventType)_EventHandlers.GetOrAdd(typeof(TEventType), CreateEventInstance);
+        return (TEventType)_eventHandlers.GetOrAdd(typeof(TEventType), CreateEventInstance);
     }
 
     public void UnregisterAllEvents(object subscriber)
     {
-        _EventHandlers.Values
+        _eventHandlers.Values
             .ForEach(handler => handler.UnsubscribeAll(subscriber));
     }
 

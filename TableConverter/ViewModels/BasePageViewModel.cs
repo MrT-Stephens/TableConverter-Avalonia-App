@@ -1,61 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using SukiUI.Dialogs;
-using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Interfaces;
 
 namespace TableConverter.ViewModels;
 
-public abstract partial class BasePageViewModel : ObservableValidator
+public partial class BasePageViewModel : BaseViewModel
 {
-    protected readonly ISukiDialogManager DialogManager;
-    protected readonly ISukiToastManager ToastManager;
+    #region Constructors
 
-    [ObservableProperty] private string _DisplayName;
-    [ObservableProperty] private object _Icon;
-    [ObservableProperty] private int _Index;
-    [ObservableProperty] private bool _IsLoading;
-
-    public ICommandManager CommandManager { get; }
-
-    protected BasePageViewModel(
-        ICommandManager commandManager,
-        ISukiDialogManager dialogManager,
-        ISukiToastManager toastManager,
-        string displayName,
-        object? icon,
-        int index = 0)
+    public BasePageViewModel(ICommandManager commandManager, IEventManager eventManager) 
+        : base(commandManager, eventManager)
     {
-        ArgumentNullException.ThrowIfNull(icon, nameof(icon));
-
-        DialogManager = dialogManager;
-        ToastManager = toastManager;
-        DisplayName = displayName;
-        CommandManager = commandManager;
-        Icon = icon;
-        Index = index;
-
-        CommandManager.OnCanExecute += OnCommandCanExecute;
-        CommandManager.OnExecute += OnCommandExecute;
-        CommandManager.OnExecuted += OnCommandExecuted;
-    }
-
-    protected virtual void OnCommandExecute(object? sender, ICommandContext context)
-    {
-        // Do nothing, for override in derived classes if needed
+        Title = string.Empty;
     }
     
-    protected virtual void OnCommandExecuted(object? sender, ICommandContext context)
+    public BasePageViewModel(string title, ICommandManager commandManager, IEventManager eventManager) 
+        : this(commandManager, eventManager)
     {
-        // Do nothing, for override in derived classes if needed
+        Title = title;
     }
+
+    #endregion
     
-    protected virtual void OnCommandCanExecute(object? sender, ICommandContext context)
-    {
-        // Do nothing, for override in derived classes if needed
-    }
+    #region Properties
+
+    [ObservableProperty] private string _Title;
+    [ObservableProperty] private bool _IsBusy;
+    
+    #endregion
 }

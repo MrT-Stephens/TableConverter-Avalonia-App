@@ -13,11 +13,15 @@ public partial class DataGenerationParameterViewModel : ObservableObject
         Type = type;
 
         if (defaultValue is not null)
+        {
             Value = defaultValue;
+        }
         else
+        {
             Value = type.IsValueType
                 ? Activator.CreateInstance(type)
                 : Convert.ChangeType(null, type);
+        }
     }
 
     partial void OnValueChanged(object? oldValue, object? newValue)

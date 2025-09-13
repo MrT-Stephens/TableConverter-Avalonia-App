@@ -5,14 +5,10 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
-using SukiUI.Dialogs;
-using SukiUI.Toasts;
 using TableConverter.Commands;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Commands.Services;
 using TableConverter.Common;
-using TableConverter.Components.Xaml;
-using TableConverter.Extensions;
 using TableConverter.Interfaces;
 using TableConverter.Services;
 using TableConverter.Utilities.Extensions;
@@ -55,16 +51,7 @@ public class App : Application
     {
         var views = new ViewsCollection()
             // Main Window
-            .AddView<MainWindowView, MainWindowViewModel>(services)
-            // Add Views
-            .AddView<WelcomePageView, WelcomePageViewModel>(services)
-            .AddView<ConvertFilesPageView, ConvertFilesPageViewModel>(services)
-            .AddView<DataGenerationPageView, DataGenerationPageViewModel>(services)
-            .AddView<DataGenerationListTypesView, DataGenerationListTypesViewModel>(services)
-            // Add Dialogs Views
-            .AddView<FileTypesSelectorView, FileTypesSelectorViewModel>(services)
-            .AddView<ConvertFilesOptionsView, ConvertFilesOptionsViewModel>(services)
-            .AddView<DataGenerationTypesView, DataGenerationTypesViewModel>(services);
+            .AddView<MainWindowView, MainWindowViewModel>(services);
 
         return views;
     }
@@ -75,12 +62,7 @@ public class App : Application
         services.AddSingleton<IPageNavigation, PageNavigation>();
         services.AddSingleton<IConverterTypes, ConverterTypes>();
         services.AddSingleton<IDataGenerationTypes, DataGenerationTypes>();
-        services.AddSingleton<ConvertFilesManager>();
         services.AddSingleton<IFilesDialogManager, FilesDialogManager>();
-
-        // SukiUI Services
-        services.AddSingleton<ISukiToastManager, SukiToastManager>();
-        services.AddSingleton<ISukiDialogManager, SukiDialogManager>();
         
         // Command Manager
         services.AddSingleton<ICommandManager, CommandManager>();

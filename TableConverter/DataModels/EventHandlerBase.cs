@@ -12,20 +12,20 @@ public abstract class EventHandlerBase<TEventArgs> : IEventHandler<TEventArgs> w
 {
     public Guid EventId { get; } = Guid.NewGuid();
     
-    private readonly List<WeakDelegate> _Handlers = [];
-    private readonly Lock _HandlersLock = new();
+    private readonly List<WeakDelegate> _handlers = [];
+    private readonly Lock _handlersLock = new();
     
     public void Subscribe(EventHandler<TEventArgs> action)
     {
-        lock (_HandlersLock)
+        lock (_handlersLock)
         {
-            _Handlers.Add(new WeakDelegate(action));
+            _handlers.Add(new WeakDelegate(action));
         }
     }
 
     public void Unsubscribe(EventHandler<TEventArgs> action)
     {
-        lock (_HandlersLock)
+        lock (_handlersLock)
         {
             UnsubscribeWithoutLock(action);
         }
@@ -33,7 +33,7 @@ public abstract class EventHandlerBase<TEventArgs> : IEventHandler<TEventArgs> w
 
     public void Publish(object? sender, TEventArgs args)
     {
-        _Handlers
+        _handlers
             .ForEach(wd =>
             {
                 if (wd.Target is EventHandler<TEventArgs> handler)
@@ -45,16 +45,16 @@ public abstract class EventHandlerBase<TEventArgs> : IEventHandler<TEventArgs> w
     
     public void UnsubscribeAll(object subscriber)
     {
-        lock (_HandlersLock)
+        lock (_handlersLock)
         {
-            _Handlers
+            _handlers
                 .Where(wd => wd.Target is null 
                     || (wd.Target is EventHandler<TEventArgs> handler && handler.Target == subscriber))
                 .ForEach(wd =>
                 {
                     if (wd.Target is not null)
                     {
-                        _Handlers.Remove(wd);
+                        _handlers.Remove(wd);
                     }
                     else
                     {  
@@ -66,12 +66,12 @@ public abstract class EventHandlerBase<TEventArgs> : IEventHandler<TEventArgs> w
 
     private void UnsubscribeWithoutLock(EventHandler<TEventArgs> action)
     {
-        _Handlers
+        _handlers
             .Where(wd => wd.Target is EventHandler<TEventArgs> handler && handler.Equals(action))
             .ForEach(wd =>
             {
                 wd.Clear();
-                _Handlers.Remove(wd);
+                _handlers.Remove(wd);
             });
     }
 }
