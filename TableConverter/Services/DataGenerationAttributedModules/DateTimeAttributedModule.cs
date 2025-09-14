@@ -2,7 +2,7 @@ using System;
 using TableConverter.DataGeneration;
 using TableConverter.DataGeneration.LocaleDataSetsBase;
 using TableConverter.DataGeneration.Modules;
-using TableConverter.DataModels;
+using TableConverter.Contracts;
 
 namespace TableConverter.Services.DataGenerationAttributedModules;
 

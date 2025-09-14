@@ -1,6 +1,6 @@
 using System;
 
-namespace TableConverter.DataModels;
+namespace TableConverter.Contracts;
 
 [AttributeUsage(AttributeTargets.Method)]
 public class DataGenerationModuleMethodAttribute(string name, string description, string helpText = "") : Attribute

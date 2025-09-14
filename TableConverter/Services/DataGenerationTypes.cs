@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using TableConverter.DataGeneration;
 using TableConverter.DataGeneration.Exceptions;
-using TableConverter.DataModels;
+using TableConverter.Contracts;
 using TableConverter.Interfaces;
 using TableConverter.Utilities;
 using TableConverter.ViewModels;

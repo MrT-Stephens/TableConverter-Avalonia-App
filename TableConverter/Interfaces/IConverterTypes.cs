@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using TableConverter.DataModels;
+using TableConverter.Contracts;
 
 namespace TableConverter.Interfaces;
 

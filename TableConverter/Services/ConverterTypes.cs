@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using TableConverter.DataModels;
+using TableConverter.Contracts;
 using TableConverter.FileConverters.ConverterHandlers;
 using TableConverter.Interfaces;
 using TableConverter.Services.ConverterHandlersWithControls;

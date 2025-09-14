@@ -1,6 +1,6 @@
 using System;
 
-namespace TableConverter.DataModels;
+namespace TableConverter.Contracts;
 
 [AttributeUsage(AttributeTargets.Class)]
 public class DataGenerationModuleAttribute(string name, string description, string iconResourceName) : Attribute

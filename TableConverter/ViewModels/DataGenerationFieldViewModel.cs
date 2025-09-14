@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
-using TableConverter.DataModels;
+using TableConverter.Contracts;
 
 namespace TableConverter.ViewModels;
 

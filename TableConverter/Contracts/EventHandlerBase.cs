@@ -6,7 +6,7 @@ using TableConverter.Interfaces;
 using TableConverter.Utilities;
 using TableConverter.Utilities.Extensions;
 
-namespace TableConverter.DataModels;
+namespace TableConverter.Contracts;
 
 public abstract class EventHandlerBase<TEventArgs> : IEventHandler<TEventArgs> where TEventArgs : EventArgs
 {

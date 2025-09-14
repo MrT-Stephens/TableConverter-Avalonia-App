@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace TableConverter.DataModels;
+namespace TableConverter.Contracts;
 
 public record DataGenerationMethod(
     string Key,

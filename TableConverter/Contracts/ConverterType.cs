@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using TableConverter.FileConverters.Interfaces;
 
-namespace TableConverter.DataModels;
+namespace TableConverter.Contracts;
 
 public record ConverterType(
     string Name,

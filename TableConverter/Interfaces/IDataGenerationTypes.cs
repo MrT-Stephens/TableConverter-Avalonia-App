@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using TableConverter.DataModels;
+using TableConverter.Contracts;
 using TableConverter.Utilities;
 using TableConverter.ViewModels;
 
