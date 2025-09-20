@@ -1,8 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using TableConverter.Views.Controls.MessageBox.Enums;
 using TableConverter.Views.Controls.OverlayShared;

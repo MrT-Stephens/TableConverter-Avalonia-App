@@ -41,7 +41,12 @@ public class App : Application
 
             DataTemplates.Add(new ViewLocator(views));
 
-            desktop.MainWindow = views.CreateView<MainWindowViewModel>(provider) as Window;
+            var window = provider.GetRequiredService<MainWindowView>()
+                ?? throw new InvalidOperationException("Failed to create main window");
+
+            window.Content = views.CreateView<MainViewModel>(provider);
+
+            desktop.MainWindow = window;
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -50,14 +55,16 @@ public class App : Application
     private static IViewsCollection ConfigureViews(IServiceCollection services)
     {
         var views = new ViewsCollection()
-            // Main Window
-            .AddView<MainWindowView, MainWindowViewModel>(services);
+            .AddView<MainView, MainViewModel>(services);
 
         return views;
     }
 
     private static IServiceProvider ConfigureServices(IServiceCollection services)
     {
+        // Window
+        services.AddSingleton<MainWindowView>();
+
         // Custom Services
         services.AddSingleton<IPageNavigation, PageNavigation>();
         services.AddSingleton<IConverterTypes, ConverterTypes>();

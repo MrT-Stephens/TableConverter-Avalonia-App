@@ -36,7 +36,6 @@ public class ViewLocator : IDataTemplate
         _controlCache.Add(param, view);
 
         return view;
-
     }
 
     public bool Match(object? data)

@@ -14,24 +14,6 @@ namespace TableConverter.Views.Controls.Dialog;
 
 public static class OverlayDialog
 {
-    public static void Show<TView, TViewModel>(TViewModel vm, string? hostId = null, OverlayDialogOptions? options = null)
-        where TView : Control, new()
-    {
-        var host = OverlayDialogManager.GetHost(hostId, options?.TopLevelHashCode);
-
-        if (host is null) return;
-
-        var t = new DefaultDialogControl()
-        {
-            Content = new TView(),
-            DataContext = vm,
-        };
-
-        ConfigureDefaultDialogControl(t, options);
-
-        host.AddDialog(t);
-    }
-
     public static void Show(Control control, object? vm, string? hostId = null,
         OverlayDialogOptions? options = null)
     {
@@ -71,25 +53,6 @@ public static class OverlayDialog
         };
 
         ConfigureDefaultDialogControl(t, options);
-        host.AddDialog(t);
-    }
-
-    public static void ShowCustom<TView, TViewModel>(TViewModel vm, string? hostId = null,
-        OverlayDialogOptions? options = null)
-        where TView : Control, new()
-    {
-        var host = OverlayDialogManager.GetHost(hostId, options?.TopLevelHashCode);
-
-        if (host is null) 
-            return;
-
-        var t = new CustomDialogControl()
-        {
-            Content = new TView(),
-            DataContext = vm,
-        };
-
-        ConfigureCustomDialogControl(t, options);
         host.AddDialog(t);
     }
 
@@ -137,18 +100,24 @@ public static class OverlayDialog
         host.AddDialog(t);
     }
 
-    public static Task<DialogResult> ShowModal<TView, TViewModel>(TViewModel vm, string? hostId = null,
+    public static Task<DialogResult> ShowModal<TViewModel>(TViewModel vm, string? hostId = null,
         OverlayDialogOptions? options = null, CancellationToken? token = default)
-        where TView : Control, new()
     {
         var host = OverlayDialogManager.GetHost(hostId, options?.TopLevelHashCode);
 
         if (host is null) 
             return Task.FromResult(DialogResult.None);
 
+        var view = host.GetDataTemplate(vm)?.Build(vm);
+
+        if (view is null)
+            view = new ContentControl();
+
+        view.DataContext = vm;
+
         var t = new DefaultDialogControl()
         {
-            Content = new TView(),
+            Content = view,
             DataContext = vm,
             [KeyboardNavigation.TabNavigationProperty] = KeyboardNavigationMode.Cycle
         };
@@ -178,28 +147,6 @@ public static class OverlayDialog
         host.AddModalDialog(t);
 
         return t.ShowAsync<DialogResult>(token);
-    }
-
-    public static Task<TResult?> ShowCustomModal<TView, TViewModel, TResult>(TViewModel vm, string? hostId = null,
-        OverlayDialogOptions? options = null, CancellationToken? token = default)
-        where TView : Control, new()
-    {
-        var host = OverlayDialogManager.GetHost(hostId, options?.TopLevelHashCode);
-
-        if (host is null) 
-            return Task.FromResult(default(TResult));
-
-        var t = new CustomDialogControl()
-        {
-            Content = new TView(),
-            DataContext = vm,
-            [KeyboardNavigation.TabNavigationProperty] = KeyboardNavigationMode.Cycle
-        };
-
-        ConfigureCustomDialogControl(t, options);
-        host.AddModalDialog(t);
-
-        return t.ShowAsync<TResult?>(token);
     }
 
     public static Task<TResult?> ShowCustomModal<TResult>(Control control, object? vm, string? hostId = null,
