@@ -4,5 +4,4 @@ namespace TableConverter.ViewModels;
 
 public class MainWindowViewModel : ObservableObject
 {
-    
 }

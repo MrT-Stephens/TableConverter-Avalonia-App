@@ -75,7 +75,7 @@ public class OverlayDialogOptions
     /// <summary>
     ///     Can the Dialog be resized, Default is false
     /// </summary>
-    public bool CanResize { get; set; }
+    public bool CanResize { get; set; } = true;
 
     /// <summary>
     ///     Extra Style Class for Dialog

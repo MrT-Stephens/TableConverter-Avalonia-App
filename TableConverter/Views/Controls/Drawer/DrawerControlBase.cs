@@ -5,6 +5,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using TableConverter.Extenstions;
 using TableConverter.Views.Controls.OverlayShared;
+using TableConverter.Views.Controls.OverlayShared.Enums;
 using TableConverter.Views.Controls.OverlayShared.Events;
 using TableConverter.Views.Controls.OverlayShared.Interfaces;
 
@@ -15,11 +16,10 @@ public abstract class DrawerControlBase : OverlayFeedbackElement
 {
     public const string PART_CloseButton = "PART_CloseButton";
 
-    protected internal Button? _closeButton;
+    protected internal Button? _CloseButton;
 
     public static readonly StyledProperty<Position> PositionProperty =
-        AvaloniaProperty.Register<DrawerControlBase, Position>(
-            nameof(Position), defaultValue: Position.Right);
+        AvaloniaProperty.Register<DrawerControlBase, Position>(nameof(Position), defaultValue: Position.Right);
 
     public static readonly StyledProperty<bool> CanResizeProperty = 
         AvaloniaProperty.Register<DrawerControlBase, bool>(nameof(CanResize));
@@ -52,9 +52,9 @@ public abstract class DrawerControlBase : OverlayFeedbackElement
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        Button.ClickEvent.RemoveHandler(OnCloseButtonClick, _closeButton);
-        _closeButton = e.NameScope.Find<Button>(PART_CloseButton);
-        Button.ClickEvent.AddHandler(OnCloseButtonClick, _closeButton);
+        Button.ClickEvent.RemoveHandler(OnCloseButtonClick, _CloseButton);
+        _CloseButton = e.NameScope.Find<Button>(PART_CloseButton);
+        Button.ClickEvent.AddHandler(OnCloseButtonClick, _CloseButton);
     }
 
     private void OnCloseButtonClick(object? sender, RoutedEventArgs e) => Close();

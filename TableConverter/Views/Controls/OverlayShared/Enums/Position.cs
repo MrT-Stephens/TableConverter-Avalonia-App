@@ -1,4 +1,4 @@
-﻿namespace TableConverter.Views.Controls;
+﻿namespace TableConverter.Views.Controls.OverlayShared.Enums;
 
 public enum Position
 {
@@ -7,4 +7,3 @@ public enum Position
     Right,
     Bottom,
 }
-

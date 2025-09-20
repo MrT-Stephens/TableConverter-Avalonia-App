@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
@@ -27,8 +28,8 @@ internal static class OverlayDialogManager
             ? Hosts.Keys.Where(k => k.Id == id).ToArray().FirstOrDefault() 
             : Hosts.Keys.FirstOrDefault(k => k.Id == id && k.Hash == hash);
 
-        if (key is null) return null;
-
-        return Hosts.TryGetValue(key.Value, out var host) ? host : null;
+        return key is null 
+            ? null 
+            : Hosts.GetValueOrDefault(key.Value);
     }
 }

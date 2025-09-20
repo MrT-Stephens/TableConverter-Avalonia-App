@@ -1,0 +1,79 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:resizers="clr-namespace:TableConverter.Views.Controls.Resizer"
+                    xmlns:shapes="clr-namespace:TableConverter.Views.Controls.Shapes">
+    <ControlTheme x:Key="{x:Type resizers:DialogResizerThumb}" TargetType="resizers:DialogResizerThumb">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="resizers:DialogResizerThumb">
+                <Panel>
+                    <shapes:PureRectangle
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        Background="{TemplateBinding Background}" />
+                </Panel>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type resizers:DialogResizer}" TargetType="resizers:DialogResizer">
+        <Setter Property="Template">
+            <ControlTemplate TargetType="resizers:DialogResizer">
+                <Grid ColumnDefinitions="Auto, *, Auto" RowDefinitions="Auto, *, Auto">
+                    <resizers:DialogResizerThumb
+                        Name="{x:Static resizers:DialogResizer.PART_TopLeft}"
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Cursor="TopLeftCorner"
+                        ResizeDirection="TopLeft" />
+                    <resizers:DialogResizerThumb
+                        Name="{x:Static resizers:DialogResizer.PART_Top}"
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Height="{DynamicResource ResizerThumbHeight}"
+                        Cursor="TopSide"
+                        ResizeDirection="Top" />
+                    <resizers:DialogResizerThumb
+                        Name="{x:Static resizers:DialogResizer.PART_TopRight}"
+                        Grid.Row="0"
+                        Grid.Column="2"
+                        Cursor="TopRightCorner"
+                        ResizeDirection="TopRight" />
+                    <resizers:DialogResizerThumb
+                        Name="{x:Static resizers:DialogResizer.PART_Left}"
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Width="{DynamicResource ResizerThumbWidth}"
+                        Cursor="LeftSide"
+                        ResizeDirection="Left" />
+                    <resizers:DialogResizerThumb
+                        Name="{x:Static resizers:DialogResizer.PART_Right}"
+                        Grid.Row="1"
+                        Grid.Column="2"
+                        Width="{DynamicResource ResizerThumbWidth}"
+                        Cursor="RightSide"
+                        ResizeDirection="Right" />
+                    <resizers:DialogResizerThumb
+                        Name="{x:Static resizers:DialogResizer.PART_BottomLeft}"
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Cursor="BottomLeftCorner"
+                        ResizeDirection="BottomLeft" />
+                    <resizers:DialogResizerThumb
+                        Name="{x:Static resizers:DialogResizer.PART_Bottom}"
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        Height="{DynamicResource ResizerThumbHeight}"
+                        Cursor="BottomSide"
+                        ResizeDirection="Bottom" />
+                    <resizers:DialogResizerThumb
+                        Name="{x:Static resizers:DialogResizer.PART_BottomRight}"
+                        Grid.Row="2"
+                        Grid.Column="2"
+                        Cursor="BottomRightCorner"
+                        ResizeDirection="BottomRight" />
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+</ResourceDictionary>

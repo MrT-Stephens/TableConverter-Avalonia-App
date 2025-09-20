@@ -12,11 +12,11 @@ public class CustomDialogControl : DialogControlBase
 
         var closeButtonVisible = IsCloseButtonVisible ?? DataContext is IDialogContext;
 
-        IsHitTestVisibleProperty.SetValue(closeButtonVisible, _closeButton);
+        IsHitTestVisibleProperty.SetValue(closeButtonVisible, _CloseButton);
 
         if (!closeButtonVisible)
         {
-            OpacityProperty.SetValue(0, _closeButton);
+            OpacityProperty.SetValue(0, _CloseButton);
         }
     }
 

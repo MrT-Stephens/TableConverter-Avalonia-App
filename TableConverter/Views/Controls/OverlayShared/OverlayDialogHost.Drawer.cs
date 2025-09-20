@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using TableConverter.Helpers;
 using TableConverter.Views.Controls.Dialog;
 using TableConverter.Views.Controls.Drawer;
+using TableConverter.Views.Controls.OverlayShared.Enums;
 using TableConverter.Views.Controls.OverlayShared.Events;
 using TableConverter.Views.Controls.Shapes;
 

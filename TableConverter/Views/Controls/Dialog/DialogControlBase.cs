@@ -31,12 +31,12 @@ public abstract class DialogControlBase : OverlayFeedbackElement
     public static readonly StyledProperty<bool> CanResizeProperty = AvaloniaProperty.Register<DialogControlBase, bool>(
         nameof(CanResize));
 
-    protected internal Button? _closeButton;
+    protected internal Button? _CloseButton;
 
-    private bool _isFullScreen;
-    private Panel? _titleArea;
-    private bool _moveDragging;
-    private Point _moveDragStartPoint;
+    private bool _IsFullScreen;
+    private Panel? _TitleArea;
+    private bool _MoveDragging;
+    private Point _MoveDragStartPoint;
 
 
     static DialogControlBase()
@@ -65,32 +65,32 @@ public abstract class DialogControlBase : OverlayFeedbackElement
 
     public bool IsFullScreen
     {
-        get => _isFullScreen;
-        set => SetAndRaise(IsFullScreenProperty, ref _isFullScreen, value);
+        get => _IsFullScreen;
+        set => SetAndRaise(IsFullScreenProperty, ref _IsFullScreen, value);
     }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _titleArea = e.NameScope.Find<Panel>(PART_TitleArea);
+        _TitleArea = e.NameScope.Find<Panel>(PART_TitleArea);
         if (GetCanDragMove(this))
         {
-            _titleArea?.RemoveHandler(PointerMovedEvent, OnDraggableAreaPointerMove);
-            _titleArea?.RemoveHandler(PointerPressedEvent, OnDraggableAreaPointerPressed);
-            _titleArea?.RemoveHandler(PointerReleasedEvent, OnDraggableAreaPointerRelease);
+            _TitleArea?.RemoveHandler(PointerMovedEvent, OnDraggableAreaPointerMove);
+            _TitleArea?.RemoveHandler(PointerPressedEvent, OnDraggableAreaPointerPressed);
+            _TitleArea?.RemoveHandler(PointerReleasedEvent, OnDraggableAreaPointerRelease);
 
-            _titleArea?.AddHandler(PointerMovedEvent, OnDraggableAreaPointerMove, RoutingStrategies.Bubble);
-            _titleArea?.AddHandler(PointerPressedEvent, OnDraggableAreaPointerPressed, RoutingStrategies.Bubble);
-            _titleArea?.AddHandler(PointerReleasedEvent, OnDraggableAreaPointerRelease, RoutingStrategies.Bubble);
+            _TitleArea?.AddHandler(PointerMovedEvent, OnDraggableAreaPointerMove, RoutingStrategies.Bubble);
+            _TitleArea?.AddHandler(PointerPressedEvent, OnDraggableAreaPointerPressed, RoutingStrategies.Bubble);
+            _TitleArea?.AddHandler(PointerReleasedEvent, OnDraggableAreaPointerRelease, RoutingStrategies.Bubble);
         }
         else
         {
-            if (_titleArea is not null) _titleArea.IsHitTestVisible = false;
+            if (_TitleArea is not null) _TitleArea.IsHitTestVisible = false;
         }
 
-        Button.ClickEvent.RemoveHandler(OnCloseButtonClick, _closeButton);
-        _closeButton = e.NameScope.Find<Button>(PART_CloseButton);
-        Button.ClickEvent.AddHandler(OnCloseButtonClick, _closeButton);
+        Button.ClickEvent.RemoveHandler(OnCloseButtonClick, _CloseButton);
+        _CloseButton = e.NameScope.Find<Button>(PART_CloseButton);
+        Button.ClickEvent.AddHandler(OnCloseButtonClick, _CloseButton);
     }
 
     private void OnDraggableAreaPointerPressed(InputElement sender, PointerPressedEventArgs e)
@@ -115,14 +115,14 @@ public abstract class DialogControlBase : OverlayFeedbackElement
         if (IsFullScreen) 
             return;
 
-        _moveDragging = true;
-        _moveDragStartPoint = e.GetPosition(this);
+        _MoveDragging = true;
+        _MoveDragStartPoint = e.GetPosition(this);
     }
 
     private void OnDraggableAreaPointerMove(InputElement sender, PointerEventArgs e)
     {
         //e.Source = this;
-        if (!_moveDragging) 
+        if (!_MoveDragging) 
             return;
 
         if (ContainerPanel is null) 
@@ -130,8 +130,8 @@ public abstract class DialogControlBase : OverlayFeedbackElement
 
         var p = e.GetPosition(this);
 
-        var left = Canvas.GetLeft(this) + p.X - _moveDragStartPoint.X;
-        var top = Canvas.GetTop(this) + p.Y - _moveDragStartPoint.Y;
+        var left = Canvas.GetLeft(this) + p.X - _MoveDragStartPoint.X;
+        var top = Canvas.GetTop(this) + p.Y - _MoveDragStartPoint.Y;
 
         left = MathHelpers.SafeClamp(left, 0, ContainerPanel.Bounds.Width - Bounds.Width);
         top = MathHelpers.SafeClamp(top, 0, ContainerPanel.Bounds.Height - Bounds.Height);
@@ -143,7 +143,7 @@ public abstract class DialogControlBase : OverlayFeedbackElement
     private void OnDraggableAreaPointerRelease(InputElement sender, PointerReleasedEventArgs e)
     {
         // e.Source = this;
-        _moveDragging = false;
+        _MoveDragging = false;
         AnchorAndUpdatePositionInfo();
     }
 

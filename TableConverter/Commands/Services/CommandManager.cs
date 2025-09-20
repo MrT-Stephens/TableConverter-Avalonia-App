@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
@@ -9,11 +10,13 @@ namespace TableConverter.Commands.Services;
 
 public class CommandManager : ICommandManager
 {
-    private readonly Dictionary<string, ICommand> _commands;
+    private readonly ConcurrentDictionary<string, ICommand> _commands;
+    private readonly ConcurrentDictionary<string, ICommandContext> _contexts;
 
     public CommandManager()
     {
-        _commands = new Dictionary<string, ICommand>();
+        _commands = new ConcurrentDictionary<string, ICommand>();
+        _contexts = new ConcurrentDictionary<string, ICommandContext>();
     }
 
     public event EventHandler<ICommandContext>? OnCanExecute;
@@ -23,11 +26,11 @@ public class CommandManager : ICommandManager
 
     public void RegisterCommand(string name, ICommandHandler handler)
     {
-        var ctx = new CommandContext(name);
-
         var cmd = new RelayCommand<object>(
             param =>
             {
+                var ctx = _contexts.GetOrAdd(name, new CommandContext(name));
+
                 try
                 {
                     // Set the parameter in the context before executing
@@ -35,25 +38,29 @@ public class CommandManager : ICommandManager
 
                     // Notify subscribers that the command is being executed
                     OnExecute?.Invoke(this, ctx);
-                    
+
                     // Execute the command
                     handler.Execute(param, ctx);
-                    
+
                     // Notify subscribers that the command has been executed
                     OnExecuted?.Invoke(this, ctx);
-
-                    // Clear the parameter and selected items after execution
-                    ctx.Parameter = null;
-                    ctx.ClearSelectedItems();
-                    ctx.Result = null;
                 }
                 catch (Exception e)
                 {
                     OnError?.Invoke(this, e);
                 }
+                finally
+                {
+                    // Clear the parameter and selected items after execution
+                    ctx.Parameter = null;
+                    ctx.ClearSelectedItems();
+                    ctx.Result = null;
+                }
             },
             param =>
             {
+                var ctx = _contexts.GetOrAdd(name, new CommandContext(name));
+                
                 try
                 {
                     // Set the parameter in the context before checking can execute
