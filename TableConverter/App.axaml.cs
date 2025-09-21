@@ -10,6 +10,7 @@ using TableConverter.Commands.Interfaces;
 using TableConverter.Commands.Services;
 using TableConverter.Common;
 using TableConverter.Interfaces;
+using TableConverter.Interfaces.OverlayService;
 using TableConverter.Services;
 using TableConverter.Utilities.Extensions;
 using TableConverter.ViewModels;
@@ -70,13 +71,12 @@ public class App : Application
         services.AddSingleton<IConverterTypes, ConverterTypes>();
         services.AddSingleton<IDataGenerationTypes, DataGenerationTypes>();
         services.AddSingleton<IFilesDialogManager, FilesDialogManager>();
-        
+        services.AddSingleton<IEventManager, EventManager>();
+        services.AddSingleton<IOverlayService, OverlayService>();
+
         // Command Manager
         services.AddSingleton<ICommandManager, CommandManager>();
         services.AddSingleton<ICommandHandlerAsync, AddFileCommandHandler>();
-        
-        // Misc Services
-        services.AddSingleton<IEventManager, EventManager>();
 
         return services.BuildServiceProvider();
     }

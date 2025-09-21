@@ -233,5 +233,53 @@ namespace TableConverter.Services
                     return Drawer.ShowModal(_viewModel, _hostId, _options);
             }
         }
+
+        internal class CustomDrawerBuilder : ICustomDrawerBuilder
+        {
+            private Control? _view;
+            private object? _viewModel;
+            private string? _hostId;
+            private DrawerOptions? _options;
+
+            public ICustomDrawerBuilder WithView(Control control)
+            {
+                _view = control;
+                return this;
+            }
+
+            public ICustomDrawerBuilder WithViewModel(object viewModel)
+            {
+                _viewModel = viewModel;
+                return this;
+            }
+
+            public ICustomDrawerBuilder WithHost(string hostId)
+            {
+                _hostId = hostId;
+                return this;
+            }
+
+            public ICustomDrawerBuilder WithOptions(DrawerOptions options)
+            {
+                _options = options;
+                return this;
+            }
+
+            public void Show()
+            {
+                if (_view is not null)
+                    Drawer.ShowCustom(_view, _viewModel, _hostId, _options);
+                else
+                    Drawer.ShowCustom(_viewModel, _hostId, _options);
+            }
+
+            public Task<TResult?> ShowAsync<TResult>()
+            {
+                if (_view is not null)
+                    return Drawer.ShowCustomModal<TResult>(_view, _viewModel, _hostId, _options);
+                else
+                    return Drawer.ShowCustomModal<TResult>(_viewModel, _hostId, _options);
+            }
+        }
     }
 }
