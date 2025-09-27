@@ -7,9 +7,5 @@
         public ICustomDialogBuilder CreateCustomDialog();
 
         public IMessageBoxBuilder CreateMessageBox();
-
-        public IDrawerBuilder CreateDrawer();
-
-        public ICustomDrawerBuilder CreateCustomDrawer();
     }
 }

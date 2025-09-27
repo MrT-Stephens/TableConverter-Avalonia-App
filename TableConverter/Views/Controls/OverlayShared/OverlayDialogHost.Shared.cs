@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TableConverter.Views.Controls.Dialog;
-using TableConverter.Views.Controls.Drawer;
 using TableConverter.Views.Controls.Shapes;
 using TableConverter.Extenstions;
 
@@ -30,7 +29,7 @@ public partial class OverlayDialogHost : Canvas
         internal readonly bool Modal = modal;
     }
 
-    private int _modalCount;
+    private int _ModalCount;
 
     public static readonly AttachedProperty<bool> IsModalStatusScopeProperty =
         AvaloniaProperty.RegisterAttached<OverlayDialogHost, Control, bool>("IsModalStatusScope");
@@ -196,10 +195,6 @@ public partial class OverlayDialogHost : Canvas
             if (_layers[i].Element is DialogControlBase d)
             {
                 ResetDialogPosition(d, e.NewSize);
-            }
-            else if (_layers[i].Element is DrawerControlBase drawer)
-            {
-                ResetDrawerPosition(drawer, e.NewSize);
             }
         }
     }

@@ -16,6 +16,11 @@ public interface ICommandContext
     /// The parameter passed to the command, if any.
     /// </summary>
     public object? Parameter { get; set; }
+    
+    /// <summary>
+    /// The view model associated with the command context, if any.
+    /// </summary>
+    public object? ViewModel { get; set; }
 
     /// <summary>
     /// The result of the command execution, if any.

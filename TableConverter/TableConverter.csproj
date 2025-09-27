@@ -40,8 +40,4 @@
     <ItemGroup>
         <UpToDateCheckInput Remove="Views\DataGenerationPageView.axaml" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Views\Controls\Themes\Light\" />
-    </ItemGroup>
 </Project>

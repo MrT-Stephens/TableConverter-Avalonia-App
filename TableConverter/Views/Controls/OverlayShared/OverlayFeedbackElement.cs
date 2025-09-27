@@ -9,7 +9,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using TableConverter.Helpers;
-using TableConverter.Views.Controls.Drawer;
+using TableConverter.Views.Controls.Dialog;
 using TableConverter.Views.Controls.OverlayShared.Events;
 using TableConverter.Views.Controls.OverlayShared.Interfaces;
 
@@ -17,17 +17,19 @@ namespace TableConverter.Views.Controls.OverlayShared;
 
 public abstract class OverlayFeedbackElement : ContentControl
 {
-    public static readonly StyledProperty<bool> IsClosedProperty = AvaloniaProperty.Register<OverlayFeedbackElement, bool>(nameof(IsClosed), true);
+    public static readonly StyledProperty<bool> IsClosedProperty = 
+        AvaloniaProperty.Register<OverlayFeedbackElement, bool>(nameof(IsClosed), true);
 
-    public static readonly RoutedEvent<OverlayResultEventArgs> ClosedEvent = RoutedEvent.Register<DrawerControlBase, OverlayResultEventArgs>(nameof(Closed), RoutingStrategies.Bubble);
+    public static readonly RoutedEvent<OverlayResultEventArgs> ClosedEvent = 
+        RoutedEvent.Register<DialogControlBase, OverlayResultEventArgs>(nameof(Closed), RoutingStrategies.Bubble);
 
-    private bool _resizeDragging;
+    private bool _ResizeDragging;
 
-    protected Panel? ContainerPanel;
-    private Rect _resizeDragStartBounds;
-    private Point _resizeDragStartPoint;
+    protected Panel? _ContainerPanel;
+    private Rect _ResizeDragStartBounds;
+    private Point _ResizeDragStartPoint;
 
-    private WindowEdge? _windowEdge;
+    private WindowEdge? _WindowEdge;
 
     static OverlayFeedbackElement()
     {
@@ -106,54 +108,54 @@ public abstract class OverlayFeedbackElement : ContentControl
     internal void BeginResizeDrag(WindowEdge windowEdge, PointerPressedEventArgs e)
     {
         if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
-        _resizeDragging = true;
-        _resizeDragStartPoint = e.GetPosition(this);
-        _resizeDragStartBounds = Bounds;
-        _windowEdge = windowEdge;
+        _ResizeDragging = true;
+        _ResizeDragStartPoint = e.GetPosition(this);
+        _ResizeDragStartBounds = Bounds;
+        _WindowEdge = windowEdge;
     }
 
     internal void BeginMoveDrag(PointerPressedEventArgs e)
     {
         if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
-        _resizeDragging = true;
-        _resizeDragStartPoint = e.GetPosition(this);
-        _resizeDragStartBounds = Bounds;
-        _windowEdge = null;
+        _ResizeDragging = true;
+        _ResizeDragStartPoint = e.GetPosition(this);
+        _ResizeDragStartBounds = Bounds;
+        _WindowEdge = null;
     }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
-        ContainerPanel = this.FindAncestorOfType<Panel>();
+        _ContainerPanel = this.FindAncestorOfType<Panel>();
     }
 
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
         base.OnPointerReleased(e);
-        _resizeDragging = false;
+        _ResizeDragging = false;
     }
 
     protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
     {
         base.OnPointerCaptureLost(e);
-        _resizeDragging = false;
+        _ResizeDragging = false;
     }
 
     protected override void OnPointerMoved(PointerEventArgs e)
     {
         base.OnPointerMoved(e);
-        if (!_resizeDragging || _windowEdge is null) return;
+        if (!_ResizeDragging || _WindowEdge is null) return;
         var point = e.GetPosition(this);
-        Vector diff = point - _resizeDragStartPoint;
+        Vector diff = point - _ResizeDragStartPoint;
         var left = Canvas.GetLeft(this);
         var top = Canvas.GetTop(this);
-        var width = _windowEdge is WindowEdge.West or WindowEdge.NorthWest or WindowEdge.SouthWest
+        var width = _WindowEdge is WindowEdge.West or WindowEdge.NorthWest or WindowEdge.SouthWest
             ? Bounds.Width
-            : _resizeDragStartBounds.Width;
-        var height = _windowEdge is WindowEdge.North or WindowEdge.NorthEast or WindowEdge.NorthWest
+            : _ResizeDragStartBounds.Width;
+        var height = _WindowEdge is WindowEdge.North or WindowEdge.NorthEast or WindowEdge.NorthWest
             ? Bounds.Height
-            : _resizeDragStartBounds.Height;
-        var newBounds = CalculateNewBounds(left, top, width, height, diff, ContainerPanel?.Bounds, _windowEdge.Value);
+            : _ResizeDragStartBounds.Height;
+        var newBounds = CalculateNewBounds(left, top, width, height, diff, _ContainerPanel?.Bounds, _WindowEdge.Value);
         Canvas.SetLeft(this, newBounds.Left);
         Canvas.SetTop(this, newBounds.Top);
         SetCurrentValue(WidthProperty, newBounds.Width);

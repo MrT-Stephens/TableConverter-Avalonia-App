@@ -53,7 +53,7 @@ public class App : Application
         base.OnFrameworkInitializationCompleted();
     }
 
-    private static IViewsCollection ConfigureViews(IServiceCollection services)
+    private static IViewsCollection ConfigureViews(ServiceCollection services)
     {
         var views = new ViewsCollection()
             .AddView<MainView, MainViewModel>(services);
@@ -61,7 +61,7 @@ public class App : Application
         return views;
     }
 
-    private static IServiceProvider ConfigureServices(IServiceCollection services)
+    private static ServiceProvider ConfigureServices(ServiceCollection services)
     {
         // Window
         services.AddSingleton<MainWindowView>();
@@ -81,7 +81,7 @@ public class App : Application
         return services.BuildServiceProvider();
     }
 
-    private static void ConfigureCommands(IServiceProvider provider)
+    private static void ConfigureCommands(ServiceProvider provider)
     {
         var manager = provider.GetRequiredService<ICommandManager>();
         

@@ -3,5 +3,8 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceInclude Source="MessageBox.axaml" />
         <ResourceInclude Source="Resizer.axaml" />
+        <ResourceInclude Source="Dialog.axaml" />
+        <ResourceInclude Source="DialogShared.axaml" />
+        <ResourceInclude Source="InnerPathIcon.axaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

@@ -9,6 +9,7 @@
         <ResourceDictionary>
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceInclude x:Key="Dark" Source="Views/Controls/Themes/Dark/Base.axaml" />
+                <ResourceInclude x:Key="Light" Source="Views/Controls/Themes/Light/Base.axaml" />
             </ResourceDictionary.ThemeDictionaries>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceInclude Source="Views/Controls/Themes/Shared/Base.axaml" />

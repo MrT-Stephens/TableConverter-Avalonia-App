@@ -10,13 +10,13 @@ namespace TableConverter.Commands.Services;
 
 public class CommandManager : ICommandManager
 {
-    private readonly ConcurrentDictionary<string, ICommand> _commands;
-    private readonly ConcurrentDictionary<string, ICommandContext> _contexts;
+    private readonly ConcurrentDictionary<(string, object?), ICommand> _commands;
+    private readonly ConcurrentDictionary<(string, object?), ICommandContext> _contexts;
 
     public CommandManager()
     {
-        _commands = new ConcurrentDictionary<string, ICommand>();
-        _contexts = new ConcurrentDictionary<string, ICommandContext>();
+        _commands = new ConcurrentDictionary<(string, object?), ICommand>();
+        _contexts = new ConcurrentDictionary<(string, object?), ICommandContext>();
     }
 
     public event EventHandler<ICommandContext>? OnCanExecute;
@@ -29,7 +29,7 @@ public class CommandManager : ICommandManager
         var cmd = new RelayCommand<object>(
             param =>
             {
-                var ctx = _contexts.GetOrAdd(name, new CommandContext(name));
+                var ctx = _contexts.GetOrAdd((name, null), new CommandContext(name));
 
                 try
                 {
@@ -59,7 +59,7 @@ public class CommandManager : ICommandManager
             },
             param =>
             {
-                var ctx = _contexts.GetOrAdd(name, new CommandContext(name));
+                var ctx = _contexts.GetOrAdd((name, null), new CommandContext(name));
                 
                 try
                 {
@@ -79,42 +79,46 @@ public class CommandManager : ICommandManager
                 }
             });
         
-        _commands[name] = cmd;
+        _commands[(name, null)] = cmd;
     }
 
     public void RegisterCommandAsync(string name, ICommandHandlerAsync handler)
     {
-        var ctx = new CommandContext(name);
-        
         var cmd = new AsyncRelayCommand<object>(
             async param =>
             {
+                var ctx = _contexts.GetOrAdd((name, null), new CommandContext(name));
+
                 try
                 {
                     // Set the parameter in the context before executing
                     ctx.Parameter = param;
-                    
+
                     // Notify subscribers that the command is being executed
                     OnExecute?.Invoke(this, ctx);
-                    
+
                     // Execute the command asynchronously
                     await handler.Execute(param, ctx);
-                    
+
                     // Notify subscribers that the command has been executed
                     OnExecuted?.Invoke(this, ctx);
-                    
-                    // Clear the parameter and selected items after execution
-                    ctx.Parameter = null;
-                    ctx.ClearSelectedItems();
-                    ctx.Result = null;
                 }
                 catch (Exception e)
                 {
                     OnError?.Invoke(this, e);
                 }
+                finally
+                {
+                    // Clear the parameter and selected items after execution
+                    ctx.Parameter = null;
+                    ctx.ClearSelectedItems();
+                    ctx.Result = null;
+                }
             },
             param =>
             {
+                var ctx = _contexts.GetOrAdd((name, null), new CommandContext(name));
+                
                 try
                 {
                     // Set the parameter in the context before checking can execute
@@ -133,15 +137,17 @@ public class CommandManager : ICommandManager
                 }
             });
         
-        _commands[name] = cmd;
+        _commands[(name, null)] = cmd;
     }
 
-    public ICommand GetCommand(string name)
+    public ICommand GetCommand(string name, object? viewModel)
     {
-        return _commands.TryGetValue(name, out var command) 
+        return _commands.TryGetValue((name, viewModel), out var command) 
             ? command 
             : throw new ArgumentException("No command with the specified name is registered.", nameof(name));
     }
 
-    public ICommand this[string name] => GetCommand(name);
+    public ICommand this[string name] => GetCommand(name, null);
+    
+    public ICommand this[string name, object? viewModel] => GetCommand(name, viewModel);
 }

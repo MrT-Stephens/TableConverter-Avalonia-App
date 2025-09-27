@@ -96,7 +96,7 @@ public abstract class DialogControlBase : OverlayFeedbackElement
     private void OnDraggableAreaPointerPressed(InputElement sender, PointerPressedEventArgs e)
     {
         //e.Source = this;
-        if (ContainerPanel is OverlayDialogHost h)
+        if (_ContainerPanel is OverlayDialogHost h)
         {
             if (h.IsTopLevel && IsFullScreen)
             {
@@ -125,7 +125,7 @@ public abstract class DialogControlBase : OverlayFeedbackElement
         if (!_MoveDragging) 
             return;
 
-        if (ContainerPanel is null) 
+        if (_ContainerPanel is null) 
             return;
 
         var p = e.GetPosition(this);
@@ -133,8 +133,8 @@ public abstract class DialogControlBase : OverlayFeedbackElement
         var left = Canvas.GetLeft(this) + p.X - _MoveDragStartPoint.X;
         var top = Canvas.GetTop(this) + p.Y - _MoveDragStartPoint.Y;
 
-        left = MathHelpers.SafeClamp(left, 0, ContainerPanel.Bounds.Width - Bounds.Width);
-        top = MathHelpers.SafeClamp(top, 0, ContainerPanel.Bounds.Height - Bounds.Height);
+        left = MathHelpers.SafeClamp(left, 0, _ContainerPanel.Bounds.Width - Bounds.Width);
+        top = MathHelpers.SafeClamp(top, 0, _ContainerPanel.Bounds.Height - Bounds.Height);
 
         Canvas.SetLeft(this, left);
         Canvas.SetTop(this, top);
@@ -256,7 +256,7 @@ public abstract class DialogControlBase : OverlayFeedbackElement
 
     protected internal override void AnchorAndUpdatePositionInfo()
     {
-        if (ContainerPanel is null) 
+        if (_ContainerPanel is null) 
             return;
 
         ActualHorizontalAnchor = HorizontalPosition.Center;
@@ -265,10 +265,10 @@ public abstract class DialogControlBase : OverlayFeedbackElement
         double left = Canvas.GetLeft(this);
         double top = Canvas.GetTop(this);
 
-        double right = ContainerPanel.Bounds.Width - left - Bounds.Width;
-        double bottom = ContainerPanel.Bounds.Height - top - Bounds.Height;
+        double right = _ContainerPanel.Bounds.Width - left - Bounds.Width;
+        double bottom = _ContainerPanel.Bounds.Height - top - Bounds.Height;
 
-        if (ContainerPanel is OverlayDialogHost h)
+        if (_ContainerPanel is OverlayDialogHost h)
         {
             var snapThickness = h.SnapThickness;
 
@@ -281,7 +281,7 @@ public abstract class DialogControlBase : OverlayFeedbackElement
 
             if (bottom < snapThickness.Bottom)
             {
-                Canvas.SetTop(this, ContainerPanel.Bounds.Height - Bounds.Height);
+                Canvas.SetTop(this, _ContainerPanel.Bounds.Height - Bounds.Height);
                 ActualVerticalAnchor = VerticalPosition.Bottom;
                 VerticalOffsetRatio = 1;
             }
@@ -295,7 +295,7 @@ public abstract class DialogControlBase : OverlayFeedbackElement
 
             if (right < snapThickness.Right)
             {
-                Canvas.SetLeft(this, ContainerPanel.Bounds.Width - this.Bounds.Width);
+                Canvas.SetLeft(this, _ContainerPanel.Bounds.Width - this.Bounds.Width);
                 ActualHorizontalAnchor = HorizontalPosition.Right;
                 HorizontalOffsetRatio = 1;
             }
@@ -304,8 +304,8 @@ public abstract class DialogControlBase : OverlayFeedbackElement
         left = Canvas.GetLeft(this);
         top = Canvas.GetTop(this);
 
-        right = ContainerPanel.Bounds.Width - left - Bounds.Width;
-        bottom = ContainerPanel.Bounds.Height - top - Bounds.Height;
+        right = _ContainerPanel.Bounds.Width - left - Bounds.Width;
+        bottom = _ContainerPanel.Bounds.Height - top - Bounds.Height;
 
         HorizontalOffsetRatio = (left + right) == 0 ? 0 : left / (left + right);
         VerticalOffsetRatio = (top + bottom) == 0 ? 0 : top / (top + bottom);
