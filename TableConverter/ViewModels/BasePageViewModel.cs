@@ -13,12 +13,14 @@ public partial class BasePageViewModel : BaseViewModel
         : base(commandManager, eventManager)
     {
         Title = string.Empty;
+        Id = Guid.NewGuid().ToString();
     }
     
-    public BasePageViewModel(string title, ICommandManager commandManager, IEventManager eventManager) 
+    public BasePageViewModel(string title, string id, ICommandManager commandManager, IEventManager eventManager) 
         : this(commandManager, eventManager)
     {
         Title = title;
+        Id = id;
     }
 
     #endregion
@@ -26,6 +28,7 @@ public partial class BasePageViewModel : BaseViewModel
     #region Properties
 
     [ObservableProperty] private string _Title;
+    [ObservableProperty] private string _Id;
     [ObservableProperty] private bool _IsBusy;
     
     #endregion

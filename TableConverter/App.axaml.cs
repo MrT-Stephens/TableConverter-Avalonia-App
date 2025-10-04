@@ -76,7 +76,9 @@ public class App : Application
 
         // Command Manager
         services.AddSingleton<ICommandManager, CommandManager>();
-        services.AddSingleton<ICommandHandlerAsync, AddFileCommandHandler>();
+        
+        // Command Handlers
+        services.AddSingleton<ICommandHandlerBase, AddFileCommandHandler>();
 
         return services.BuildServiceProvider();
     }
@@ -86,11 +88,7 @@ public class App : Application
         var manager = provider.GetRequiredService<ICommandManager>();
         
         // Register all command handlers
-        provider.GetServices<ICommandHandler>()
+        provider.GetServices<ICommandHandlerBase>()
             .ForEach(handler => manager.RegisterCommand(handler.CommandMetadata.Name, handler));
-
-        // Register all async command handlers
-        provider.GetServices<ICommandHandlerAsync>()
-            .ForEach(handler => manager.RegisterCommandAsync(handler.CommandMetadata.Name, handler));
     }
 }

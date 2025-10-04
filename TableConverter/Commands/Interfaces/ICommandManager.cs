@@ -1,6 +1,5 @@
 using System;
 using System.Windows.Input;
-using TableConverter.Interfaces;
 
 namespace TableConverter.Commands.Interfaces;
 
@@ -25,7 +24,7 @@ public interface ICommandManager
     /// Raised when an error occurs during command execution.
     /// </summary>
     public event EventHandler<Exception> OnError;
-
+    
     /// <summary>
     /// Registers a command with a name and a handler.
     /// </summary>
@@ -33,20 +32,20 @@ public interface ICommandManager
     /// The name of the command. This is used to retrieve the command later.
     /// </param>
     /// <param name="handler">
-    /// The handler that will be called when the command is executed.
+    /// The handler that will be invoked when the command is executed.
     /// </param>
-    public void RegisterCommand(string name, ICommandHandler handler);
+    public void RegisterCommand(string name, ICommandHandlerBase handler);
 
     /// <summary>
-    /// Registers a command with a name and an asynchronous handler.
+    /// Registers a command with a name and a handler.
     /// </summary>
     /// <param name="name">
     /// The name of the command. This is used to retrieve the command later.
     /// </param>
-    /// <param name="handler">
-    /// The asynchronous handler that will be called when the command is executed.
+    /// <param name="viewModel">
+    /// An optional view model associated with the command. This can be used to provide context or state for the command.
     /// </param>
-    public void RegisterCommandAsync(string name, ICommandHandlerAsync handler);
+    public void RegisterCommandInstance(string name, object? viewModel = null);
 
     /// <summary>
     /// Retrieves a command by its name.
@@ -54,13 +53,16 @@ public interface ICommandManager
     /// <param name="name">
     /// The name of the command to retrieve. This should match the name used when registering the command.
     /// </param>
+    /// <param name="viewModel">
+    /// An optional view model associated with the command. This can be used to differentiate commands with the same name but different contexts.
+    /// </param>
     /// <returns>
     /// The command associated with the specified name. If no command is found, the function will throw.
     /// </returns>
     /// <exception cref="ArgumentException">
     /// Thrown when no command with the specified name is registered.
     /// </exception>
-    public ICommand GetCommand(string name);
+    public ICommand GetCommand(string name, object? viewModel);
     
     /// <summary>
     /// Indexer to retrieve a command by its name.
@@ -75,4 +77,15 @@ public interface ICommandManager
     /// Thrown when no command with the specified name is registered.
     /// </exception>
     public ICommand this[string name] { get; }
+    
+    /// <summary>
+    /// Indexer to retrieve a command by its name and associated view model.
+    /// </summary>
+    /// <param name="name">
+    /// The name of the command to retrieve. This should match the name used when registering the command.
+    /// </param>
+    /// <param name="viewModel">
+    /// An optional view model associated with the command. This can be used to differentiate commands with the same name but different contexts.
+    /// </param>
+    public ICommand this[string name, object? viewModel] { get; }
 }
