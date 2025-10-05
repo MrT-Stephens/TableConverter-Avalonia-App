@@ -76,7 +76,7 @@
 
     <Application.Styles>
         <!-- Application Styles -->
-        <semi:SemiTheme Locale="en-GB" />
+        <semi:SemiTheme Locale="en-US" />
         <semiDataGrid:DataGridSemiTheme />
 
         <!-- Custom Styles -->

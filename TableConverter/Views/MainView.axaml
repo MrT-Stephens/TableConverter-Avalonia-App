@@ -7,5 +7,38 @@
                 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
                 x:Class="TableConverter.Views.MainView"
                 x:DataType="viewModels:MainViewModel">
-    
+	<Grid RowDefinitions="Auto,*"
+		  Margin="10">
+		<Border Grid.Row="0"
+				Padding="5"
+				Theme="{StaticResource CardBorder}">
+			<TextBlock Text="TableConverter"
+					   Theme="{StaticResource TitleTextBlock}" />
+		</Border>
+		<Grid Grid.Row="1"
+			  ColumnDefinitions="*,Auto">
+			<TabControl Grid.Column="0"
+						Margin="5"
+						Theme="{StaticResource ScrollCardTabControl}"
+						ItemsSource="{Binding PagePanes}">
+				<TabControl.ItemTemplate>
+					<DataTemplate>
+						<TabItem Header="{Binding Header}">
+							<TabItem.ContentTemplate>
+								<DataTemplate>
+									<Border Padding="5"
+											Theme="{StaticResource CardBorder}"
+											Margin="0"
+											BorderThickness="1,0,1,1"
+											CornerRadius="0,5">
+										<ContentPresenter Content="{Binding Content}" />
+									</Border>
+								</DataTemplate>
+							</TabItem.ContentTemplate>
+						</TabItem>
+					</DataTemplate>
+				</TabControl.ItemTemplate>
+			</TabControl>
+		</Grid>
+	</Grid>
 </views:BaseView>
