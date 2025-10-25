@@ -30,8 +30,8 @@ public class ViewsCollection : IViewsCollection
 
         _vmToViewMap.Add(viewModelType, viewType);
 
-        if (viewModelType.IsAssignableTo(typeof(BasePageViewModel)))
-            services.AddSingleton(typeof(BasePageViewModel), viewModelType);
+        if (viewModelType.IsAssignableTo(typeof(IPane)))
+            services.AddSingleton(typeof(IPane), viewModelType);
         else
             services.AddSingleton(viewModelType);
 

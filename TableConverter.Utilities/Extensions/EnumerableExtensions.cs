@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Text;
 
 namespace TableConverter.Utilities.Extensions;
@@ -68,5 +69,22 @@ public static class EnumerableExtensions
         });
         
         return sb.ToString();
+    }
+
+    /// <summary>
+    /// Converts an IEnumerable to an ObservableCollection.
+    /// </summary>
+    /// <param name="source">
+    /// The source IEnumerable to convert.
+    /// </param>
+    /// <typeparam name="T">
+    /// The type of elements in the source IEnumerable.
+    /// </typeparam>
+    /// <returns>
+    /// An ObservableCollection containing the elements of the source IEnumerable.
+    /// </returns>
+    public static ObservableCollection<T> ToObservableCollection<T>(this IEnumerable<T> source)
+    {
+        return new ObservableCollection<T>(source);
     }
 }

@@ -56,8 +56,9 @@ public class App : Application
     private static IViewsCollection ConfigureViews(ServiceCollection services)
     {
         var views = new ViewsCollection()
-            .AddView<MainView, MainViewModel>(services);
-
+            .AddView<MainView, MainViewModel>(services)
+            .AddView<TableDataView, TableDataViewModel>(services);
+        
         return views;
     }
 

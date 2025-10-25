@@ -4,6 +4,7 @@
                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:interfaces="clr-namespace:TableConverter.Interfaces"
                 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
                 x:Class="TableConverter.Views.MainView"
                 x:DataType="viewModels:MainViewModel">
@@ -23,21 +24,20 @@
 						ItemsSource="{Binding PagePanes}">
 				<TabControl.ItemTemplate>
 					<DataTemplate>
-						<TabItem Header="{Binding Header}">
-							<TabItem.ContentTemplate>
-								<DataTemplate>
-									<Border Padding="5"
-											Theme="{StaticResource CardBorder}"
-											Margin="0"
-											BorderThickness="1,0,1,1"
-											CornerRadius="0,5">
-										<ContentPresenter Content="{Binding Content}" />
-									</Border>
-								</DataTemplate>
-							</TabItem.ContentTemplate>
-						</TabItem>
+						<TextBlock Text="{Binding Header}" />
 					</DataTemplate>
 				</TabControl.ItemTemplate>
+				<TabControl.ContentTemplate>
+					<DataTemplate x:DataType="interfaces:IPane">
+						<Border BorderThickness="1,0,1,1"
+						        BorderBrush="{DynamicResource SemiColorBorder}"
+						        CornerRadius="0,0,5,5"
+						        Padding="10"
+						        Background="{DynamicResource SemiColorBackground1}">
+							<ContentControl Content="{Binding .}" />
+						</Border>
+					</DataTemplate>
+				</TabControl.ContentTemplate>
 			</TabControl>
 		</Grid>
 	</Grid>
