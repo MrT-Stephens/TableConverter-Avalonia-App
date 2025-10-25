@@ -87,4 +87,38 @@ public static class EnumerableExtensions
     {
         return new ObservableCollection<T>(source);
     }
+
+    /// <summary>
+    /// Returns an empty IEnumerable if the source is null; otherwise, returns the source itself.
+    /// </summary>
+    /// <typeparam name="T">
+    /// The type of elements in the source IEnumerable.
+    /// </typeparam>
+    /// <param name="source">
+    /// The source IEnumerable which may be null.
+    /// </param>
+    /// <returns>
+    /// An empty IEnumerable if the source is null; otherwise, the source itself.
+    /// </returns>
+    public static IEnumerable<T> EmptyIfNull<T>(this IEnumerable<T>? source)
+    {
+        return source ?? Enumerable.Empty<T>();
+    }
+
+    /// <summary>
+    /// Determines whether the IEnumerable is null or contains no elements.
+    /// </summary>
+    /// <typeparam name="T">
+    /// The type of elements in the source IEnumerable.
+    /// </typeparam>
+    /// <param name="source">
+    /// The source IEnumerable to check.
+    /// </param>
+    /// <returns>
+    /// True if the source is null or contains no elements; otherwise, false.
+    /// </returns>
+    public static bool IsNullOrEmpty<T>(this IEnumerable<T>? source)
+    {
+        return source == null || !source.Any();
+    }
 }

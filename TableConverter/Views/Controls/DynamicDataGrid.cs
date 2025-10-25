@@ -14,8 +14,8 @@ public class DynamicDataGrid : DataGrid
     public static readonly StyledProperty<ObservableCollection<string>?> HeadersProperty =
         AvaloniaProperty.Register<DynamicDataGrid, ObservableCollection<string>?>(nameof(Headers));
 
-    public static readonly StyledProperty<ObservableCollection<object[]>?> RowsProperty =
-        AvaloniaProperty.Register<DynamicDataGrid, ObservableCollection<object[]>?>(nameof(Rows));
+    public static readonly StyledProperty<ObservableCollection<ObservableCollection<object>>?> RowsProperty =
+        AvaloniaProperty.Register<DynamicDataGrid, ObservableCollection<ObservableCollection<object>>?>(nameof(Rows));
 
     public DynamicDataGrid()
     {
@@ -31,7 +31,7 @@ public class DynamicDataGrid : DataGrid
         set => SetValue(HeadersProperty, value);
     }
 
-    public ObservableCollection<object[]>? Rows
+    public ObservableCollection<ObservableCollection<object>>? Rows
     {
         get => GetValue(RowsProperty);
         set => SetValue(RowsProperty, value);
@@ -76,7 +76,7 @@ public class DynamicDataGrid : DataGrid
         {
             DataGridBoundColumn column;
 
-            if (Rows is { Count: > 0 } && Rows[0].Length > i && Rows[0][i] is bool)
+            if (Rows is { Count: > 0 } && Rows[0].Count > i && Rows[0][i] is bool)
             {
                 column = new DataGridCheckBoxColumn
                 {

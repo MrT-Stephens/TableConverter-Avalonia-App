@@ -1,18 +1,31 @@
 using System.Text;
+using TableConverter.Utilities.Interfaces;
 
 namespace TableConverter.Utilities;
 
 /// <summary>
 ///     Represents a table containing headers and rows of data.
 /// </summary>
-public class TableData
+public class TableData : ITableData
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="TableData" /> class with headers and rows.
     /// </summary>
     /// <param name="headers">The headers of the table.</param>
     /// <param name="rows">The rows of data in the table.</param>
-    public TableData(List<string> headers, List<string[]> rows)
+    public TableData(IEnumerable<string> headers, IEnumerable<IEnumerable<object>> rows)
+    {
+        Headers = [.. headers];
+        Rows = [.. rows.Select(row => row.ToList())];
+    }
+
+    /// <summary>
+    ///    Initializes a new instance of the <see cref="TableData" /> class with headers and rows.
+    /// </summary>
+    /// <param name="headers">
+    /// <param name="headers">The headers of the table.</param>
+    /// <param name="rows">The rows of data in the table.</param>
+    public TableData(List<string> headers, List<List<object>> rows)
     {
         Headers = headers;
         Rows = rows;
@@ -26,7 +39,7 @@ public class TableData
     /// <summary>
     ///     Gets the rows of data in the table.
     /// </summary>
-    public List<string[]> Rows { get; }
+    public List<List<object>> Rows { get; }
 
     /// <summary>
     ///     Determines whether the current <see cref="TableData" /> is equal to another object.
@@ -68,5 +81,78 @@ public class TableData
         });
 
         return sb.ToString();
+    }
+
+    public TCollection GetRows<TCollection>() where TCollection : IEnumerable<IEnumerable<object>>
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    ///    Gets an empty <see cref="TableData" /> instance.
+    /// </summary>
+    public static TableData Empty => new(new List<string>(), new List<object[]>());
+
+    /// <summary>
+    ///     Determines whether two <see cref="TableData" /> instances are equal.
+    /// </summary>
+    /// <param name="left">
+    ///     The first <see cref="TableData" /> instance to compare.
+    /// </param>
+    /// <param name="right">
+    ///     The second <see cref="TableData" /> instance to compare.
+    /// </param>
+    /// <returns>
+    ///     Whether the two <see cref="TableData" /> instances are equal.
+    /// </returns>
+    public static bool operator ==(TableData? left, TableData? right)
+    {
+        if (left is null && right is null) 
+            return true;
+
+        if (left is null || right is null) 
+            return false;
+
+        return left.Equals(right);
+    }
+
+
+    /// <summary>
+    ///     Determines whether two <see cref="TableData" /> instances are not equal.
+    /// </summary>
+    /// <param name="left">
+    ///     The first <see cref="TableData" /> instance to compare.
+    /// </param>
+    /// <param name="right">
+    ///     The second <see cref="TableData" /> instance to compare.
+    /// </param>
+    /// <returns>
+    ///     Whether the two <see cref="TableData" /> instances are not equal.
+    /// </returns>
+    public static bool operator !=(TableData? left, TableData? right)
+    {
+        return !(left == right);
+    }
+
+    /// <summary>
+    ///     Gets the headers of the table.
+    /// </summary>
+    /// <returns>
+    ///     An enumerable collection of header strings.
+    /// </returns>
+    public IEnumerable<string> GetHeaders()
+    {
+        return Headers;
+    }
+
+    /// <summary>
+    ///     Gets the rows of data in the table.
+    /// </summary>
+    /// <returns>
+    ///     An enumerable collection of rows, where each row is an enumerable collection of objects.
+    /// </returns>
+    public IEnumerable<IEnumerable<object>> GetRows()
+    {
+        return Rows;
     }
 }

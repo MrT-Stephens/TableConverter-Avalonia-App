@@ -15,8 +15,8 @@
                                   CanUserSortColumns="True"
                                   Classes.InsetContent="True"
                                   CanUserReorderColumns="True"
-                                  Headers="{Binding Headers, Mode=TwoWay}"
-                                  Rows="{Binding Rows, Mode=TwoWay}"
+                                  Headers="{Binding TableData.Headers, Mode=TwoWay}"
+                                  Rows="{Binding TableData.Rows, Mode=TwoWay}"
                                   ScrollViewer.AllowAutoHide="True"
                                   ScrollViewer.HorizontalScrollBarVisibility="Auto"
                                   ScrollViewer.VerticalScrollBarVisibility="Auto">
