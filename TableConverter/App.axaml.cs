@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Reflection;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using TableConverter.Commands;
+using TableConverter.Commands.Extensions;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Commands.Services;
 using TableConverter.Common;
@@ -36,8 +38,8 @@ public class App : Application
 
             var views = ConfigureViews(services);
             var provider = ConfigureServices(services);
-            
-            ConfigureCommands(provider);
+
+            provider.RegisterCommandHandlers();
 
             DataTemplates.Add(new ViewLocator(views));
 
@@ -63,6 +65,8 @@ public class App : Application
 
     private static ServiceProvider ConfigureServices(ServiceCollection services)
     {
+        var assembly = Assembly.GetExecutingAssembly();
+        
         // Window
         services.AddSingleton<MainWindowView>();
 
@@ -77,18 +81,9 @@ public class App : Application
         // Command Manager
         services.AddSingleton<ICommandManager, CommandManager>();
         
-        // Command Handlers
-        services.AddSingleton<ICommandHandlerBase, AddFileCommandHandler>();
+        // Register Command Handlers
+        services.RegisterCommandHandlers(assembly);
 
         return services.BuildServiceProvider();
-    }
-
-    private static void ConfigureCommands(ServiceProvider provider)
-    {
-        var manager = provider.GetRequiredService<ICommandManager>();
-        
-        // Register all command handlers
-        provider.GetServices<ICommandHandlerBase>()
-            .ForEach(handler => manager.RegisterCommand(handler.CommandMetadata.Name, handler));
     }
 }

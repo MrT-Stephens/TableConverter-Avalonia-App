@@ -13,7 +13,7 @@
                                   AutoGenerateColumns="False"
                                   CanUserResizeColumns="True"
                                   CanUserSortColumns="True"
-                                  Classes.InsetContent="True"
+                                  Classes.InsetContent="False"
                                   CanUserReorderColumns="True"
                                   Headers="{Binding TableData.Headers, Mode=TwoWay}"
                                   Rows="{Binding TableData.Rows, Mode=TwoWay}"

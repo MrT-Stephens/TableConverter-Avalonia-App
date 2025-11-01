@@ -43,11 +43,16 @@ public record CommandMetadata : ICommandMetadata
     /// <param name="iconName">
     /// The name of the icon resource for the command.
     /// </param>
-    public CommandMetadata(string name, string title, string description, string iconName) : this(name)
+    /// <param name="category">
+    /// The category of the command.
+    /// </param>
+    public CommandMetadata(string name, string title, string description, string iconName, string category = "") 
+        : this(name)
     {
         Title = title;
         Description = description;
         IconName = iconName;
+        Category = category;
     }
 
     /// <inheritdoc />
@@ -61,6 +66,9 @@ public record CommandMetadata : ICommandMetadata
 
     /// <inheritdoc />
     public string? IconName { get; }
+    
+    /// <inheritdoc />
+    public string? Category { get; }
 
     /// <inheritdoc />
     public Path? IconPath

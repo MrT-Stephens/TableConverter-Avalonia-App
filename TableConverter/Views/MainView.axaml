@@ -8,20 +8,23 @@
                 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
                 x:Class="TableConverter.Views.MainView"
                 x:DataType="viewModels:MainViewModel">
-	<Grid RowDefinitions="Auto,*"
-		  Margin="10">
-		<Border Grid.Row="0"
-				Padding="5"
+	<DockPanel Margin="5">
+		<Border DockPanel.Dock="Top"
+				Padding="10,5"
 				Theme="{StaticResource CardBorder}">
 			<TextBlock Text="TableConverter"
 					   Theme="{StaticResource TitleTextBlock}" />
 		</Border>
-		<Grid Grid.Row="1"
-			  ColumnDefinitions="*,Auto">
+		<Grid ColumnDefinitions="*,Auto">
 			<TabControl Grid.Column="0"
 						Margin="5"
 						Theme="{StaticResource ScrollCardTabControl}"
 						ItemsSource="{Binding PagePanes}">
+				<TabControl.Styles>
+					<Style Selector="TabItem:selected /template/ ContentPresenter#PART_HeaderPresenter">
+						<Setter Property="Background" Value="{DynamicResource SemiColorBackground1}" />
+					</Style>
+				</TabControl.Styles>
 				<TabControl.ItemTemplate>
 					<DataTemplate>
 						<TextBlock Text="{Binding Header}" />
@@ -31,7 +34,7 @@
 					<DataTemplate x:DataType="interfaces:IPane">
 						<Border BorderThickness="1,0,1,1"
 						        BorderBrush="{DynamicResource SemiColorBorder}"
-						        CornerRadius="0,0,5,5"
+						        CornerRadius="0,0,0,0"
 						        Padding="10"
 						        Background="{DynamicResource SemiColorBackground1}">
 							<ContentControl Content="{Binding .}" />
@@ -40,5 +43,5 @@
 				</TabControl.ContentTemplate>
 			</TabControl>
 		</Grid>
-	</Grid>
+	</DockPanel>
 </views:BaseView>

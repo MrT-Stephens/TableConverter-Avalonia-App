@@ -28,4 +28,9 @@ public interface ICommandMetadata
     /// Gets the icon path based on the IconName from the application resources.
     /// </summary>
     public Path? IconPath { get; }
+    
+    /// <summary>
+    /// Gets the category of the command.
+    /// </summary>
+    public string? Category { get; }
 }
