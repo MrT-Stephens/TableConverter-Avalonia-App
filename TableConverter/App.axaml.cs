@@ -1,19 +1,20 @@
-﻿using System;
-using System.Reflection;
-using Avalonia;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
-using TableConverter.Commands;
+using SukiUI.Controls;
+using SukiUI.Dialogs;
+using SukiUI.Toasts;
+using System;
+using System.Reflection;
 using TableConverter.Commands.Extensions;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Commands.Services;
 using TableConverter.Common;
 using TableConverter.Interfaces;
-using TableConverter.Interfaces.OverlayService;
 using TableConverter.Services;
-using TableConverter.Utilities.Extensions;
 using TableConverter.ViewModels;
 using TableConverter.Views;
 
@@ -48,6 +49,18 @@ public class App : Application
 
             window.Content = views.CreateView<MainViewModel>(provider);
 
+            window.Hosts.Add(new SukiToastHost()
+            {
+                Manager = provider.GetRequiredService<ISukiToastManager>()
+                    ?? throw new InvalidOperationException("Failed to create toast manager"),
+            });
+
+            window.Hosts.Add(new SukiDialogHost()
+            {
+                Manager = provider.GetRequiredService<ISukiDialogManager>()
+                    ?? throw new InvalidOperationException("Failed to create dialog manager"),
+            });
+
             desktop.MainWindow = window;
         }
 
@@ -76,7 +89,10 @@ public class App : Application
         services.AddSingleton<IDataGenerationTypes, DataGenerationTypes>();
         services.AddSingleton<IFilesDialogManager, FilesDialogManager>();
         services.AddSingleton<IEventManager, EventManager>();
-        services.AddSingleton<IOverlayService, OverlayService>();
+
+        // SukiUI Services
+        services.AddSingleton<ISukiToastManager, SukiToastManager>();
+        services.AddSingleton<ISukiDialogManager, SukiDialogManager>();
 
         // Command Manager
         services.AddSingleton<ICommandManager, CommandManager>();

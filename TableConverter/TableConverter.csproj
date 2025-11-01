@@ -28,8 +28,8 @@
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
         <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.8" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.10" />
-        <PackageReference Include="Semi.Avalonia" Version="11.3.7" />
-        <PackageReference Include="Semi.Avalonia.DataGrid" Version="11.3.7" />
+        <PackageReference Include="SukiUI" Version="6.0.4-nightly20251023" />
+        <PackageReference Include="SukiUI.Dock" Version="6.0.4-nightly20251023" />
     </ItemGroup>
 
     <ItemGroup>
@@ -39,5 +39,9 @@
 
     <ItemGroup>
         <UpToDateCheckInput Remove="Views\DataGenerationPageView.axaml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Extenstions\" />
     </ItemGroup>
 </Project>

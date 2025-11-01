@@ -1,47 +1,11 @@
-<views:BaseView xmlns="https://github.com/avaloniaui"
-                xmlns:views="clr-namespace:TableConverter.Views.Controls"
-                xmlns:viewModels="clr-namespace:TableConverter.ViewModels"
-                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                xmlns:interfaces="clr-namespace:TableConverter.Interfaces"
-                mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-                x:Class="TableConverter.Views.MainView"
-                x:DataType="viewModels:MainViewModel">
-	<DockPanel Margin="5">
-		<Border DockPanel.Dock="Top"
-				Padding="10,5"
-				Theme="{StaticResource CardBorder}">
-			<TextBlock Text="TableConverter"
-					   Theme="{StaticResource TitleTextBlock}" />
-		</Border>
-		<Grid ColumnDefinitions="*,Auto">
-			<TabControl Grid.Column="0"
-						Margin="5"
-						Theme="{StaticResource ScrollCardTabControl}"
-						ItemsSource="{Binding PagePanes}">
-				<TabControl.Styles>
-					<Style Selector="TabItem:selected /template/ ContentPresenter#PART_HeaderPresenter">
-						<Setter Property="Background" Value="{DynamicResource SemiColorBackground1}" />
-					</Style>
-				</TabControl.Styles>
-				<TabControl.ItemTemplate>
-					<DataTemplate>
-						<TextBlock Text="{Binding Header}" />
-					</DataTemplate>
-				</TabControl.ItemTemplate>
-				<TabControl.ContentTemplate>
-					<DataTemplate x:DataType="interfaces:IPane">
-						<Border BorderThickness="1,0,1,1"
-						        BorderBrush="{DynamicResource SemiColorBorder}"
-						        CornerRadius="0,0,0,0"
-						        Padding="10"
-						        Background="{DynamicResource SemiColorBackground1}">
-							<ContentControl Content="{Binding .}" />
-						</Border>
-					</DataTemplate>
-				</TabControl.ContentTemplate>
-			</TabControl>
-		</Grid>
-	</DockPanel>
-</views:BaseView>
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:views="clr-namespace:TableConverter.Views.Controls"
+             xmlns:viewModels="clr-namespace:TableConverter.ViewModels"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:interfaces="clr-namespace:TableConverter.Interfaces"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TableConverter.Views.MainView"
+             x:DataType="viewModels:MainViewModel">
+</UserControl>

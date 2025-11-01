@@ -155,4 +155,19 @@ public class TableData : ITableData
     {
         return Rows;
     }
+
+    public bool IsEmpty()
+    {
+        return !Rows.Any() || !Headers.Any();
+    }
+
+    public int GetRowCount()
+    {
+        return Rows.Count;
+    }
+
+    public int GetHeaderCount()
+    {
+        return Headers.Count;
+    }
 }
