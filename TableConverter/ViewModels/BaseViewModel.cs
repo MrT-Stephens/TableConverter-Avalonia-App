@@ -1,6 +1,8 @@
 using System;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
+using SukiUI.Dialogs;
+using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Interfaces;
 
@@ -12,15 +14,23 @@ public class BaseViewModel : ObservableValidator
 
     protected readonly ICommandManager _commandManager;
     protected readonly IEventManager _eventManager;
+    protected readonly ISukiDialogManager _dialogManager;
+    protected readonly ISukiToastManager _toastManager;
 
     #endregion
 
     #region Constructors
 
-    public BaseViewModel(ICommandManager commandManager, IEventManager eventManager)
+    public BaseViewModel(
+        ICommandManager commandManager, 
+        IEventManager eventManager,
+        ISukiDialogManager dialogManager,
+        ISukiToastManager  toastManager)
     {
         _commandManager = commandManager;
         _eventManager = eventManager;
+        _dialogManager = dialogManager;
+        _toastManager = toastManager;
 
         _commandManager.OnCanExecute += OnCanExecuteCommand;
         _commandManager.OnExecute += OnExecuteCommand;

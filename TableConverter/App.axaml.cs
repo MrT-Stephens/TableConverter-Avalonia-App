@@ -70,8 +70,7 @@ public class App : Application
     private static IViewsCollection ConfigureViews(ServiceCollection services)
     {
         var views = new ViewsCollection()
-            .AddView<MainView, MainViewModel>(services)
-            .AddView<TableDataView, TableDataViewModel>(services);
+            .AddView<MainView, MainViewModel>(services);
         
         return views;
     }
@@ -84,7 +83,6 @@ public class App : Application
         services.AddSingleton<MainWindowView>();
 
         // Custom Services
-        services.AddSingleton<IPageNavigation, PageNavigation>();
         services.AddSingleton<IConverterTypes, ConverterTypes>();
         services.AddSingleton<IDataGenerationTypes, DataGenerationTypes>();
         services.AddSingleton<IFilesDialogManager, FilesDialogManager>();

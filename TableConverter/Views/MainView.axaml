@@ -1,11 +1,24 @@
 <UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:views="clr-namespace:TableConverter.Views.Controls"
              xmlns:viewModels="clr-namespace:TableConverter.ViewModels"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:interfaces="clr-namespace:TableConverter.Interfaces"
+             xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="TableConverter.Views.MainView"
              x:DataType="viewModels:MainViewModel">
+    <sukiUi:SukiSideMenu IsSearchEnabled="False"
+                         IsMenuExpanded="False"
+                         ItemsSource="{Binding Workspaces}"
+                         SelectedItem="{Binding SelectedWorkspace}">
+        <sukiUi:SukiSideMenu.ItemTemplate>
+            <DataTemplate>
+                <sukiUi:SukiSideMenuItem Header="{Binding Header}">
+                    <sukiUi:SukiSideMenuItem.Icon>
+                        <PathIcon Data="{Binding Icon}" />
+                    </sukiUi:SukiSideMenuItem.Icon>
+                </sukiUi:SukiSideMenuItem>
+            </DataTemplate>
+        </sukiUi:SukiSideMenu.ItemTemplate>
+    </sukiUi:SukiSideMenu>
 </UserControl>

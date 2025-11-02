@@ -2,12 +2,14 @@ using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
+using SukiUI.Dialogs;
+using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Interfaces;
 
 namespace TableConverter.ViewModels;
 
-public partial class BasePageViewModel : BaseViewModel, IPane
+public partial class BasePaneViewModel : BaseViewModel, IPane
 {
     #region Properties
 
@@ -21,10 +23,13 @@ public partial class BasePageViewModel : BaseViewModel, IPane
     
     #region Constructors
 
-    public BasePageViewModel(string header,
+    public BasePaneViewModel(
+        string header,
         ICommandManager commandManager, 
-        IEventManager eventManager) 
-        : base(commandManager, eventManager)
+        IEventManager eventManager, 
+        ISukiDialogManager dialogManager,
+        ISukiToastManager toastManager) 
+        : base(commandManager, eventManager, dialogManager, toastManager)
     {
         Id = Guid.NewGuid().ToString();
         _Header = header;
