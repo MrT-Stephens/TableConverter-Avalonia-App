@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using CommunityToolkit.Mvvm.ComponentModel;
-using System.Collections.ObjectModel;
 using System.Linq;
 using Avalonia.Collections;
 using SukiUI.Dialogs;
@@ -8,7 +7,7 @@ using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Contracts.Events;
 using TableConverter.Interfaces;
-using TableConverter.Utilities.Extensions;
+using TableConverter.ViewModels.Base;
 
 namespace TableConverter.ViewModels;
 
@@ -35,6 +34,8 @@ public partial class MainViewModel : BaseViewModel
         Workspaces = new AvaloniaList<IWorkspace>(workspaces
             .OrderBy(w => w.Index)
             .ThenBy(w => w.Header));
+
+        SelectedWorkspace = Workspaces.First();
 
         _eventManager
             .GetEvent<PageNavigationRequestedEvent>()

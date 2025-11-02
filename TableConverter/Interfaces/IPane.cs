@@ -1,19 +1,13 @@
-﻿using System.Collections.ObjectModel;
-using TableConverter.Commands.Interfaces;
-using TableConverter.ViewModels;
-
-namespace TableConverter.Interfaces
+﻿namespace TableConverter.Interfaces
 {
     public interface IPane
     {
-        public string Id { get; }
+        public string Title { get; set; }
 
-        public string Header { get; set; }
+        public bool CanClose { get; set; }
+    }
 
-        public bool IsEnabled { get; set; }
-
-        public bool IsVisible { get; set; }
-        
-        public ObservableCollection<ICommandMetadata> ToolbarCommands { get; }
+    public interface IPane<TViewModel> : IPane where TViewModel : IWorkspace
+    {
     }
 }

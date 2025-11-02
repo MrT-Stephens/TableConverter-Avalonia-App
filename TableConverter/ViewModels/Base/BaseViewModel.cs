@@ -6,7 +6,7 @@ using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Interfaces;
 
-namespace TableConverter.ViewModels;
+namespace TableConverter.ViewModels.Base;
 
 public class BaseViewModel : ObservableValidator
 {

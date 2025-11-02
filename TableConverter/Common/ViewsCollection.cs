@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using TableConverter.Interfaces;
-using TableConverter.ViewModels;
 
 namespace TableConverter.Common;
 
@@ -30,9 +30,23 @@ public class ViewsCollection : IViewsCollection
 
         _vmToViewMap.Add(viewModelType, viewType);
 
-        if (viewModelType.IsAssignableTo(typeof(IPane)))
+        // If the view model implements the generic IPane<T>, register that closed generic.
+        var paneGenericInterface = viewModelType
+            .GetInterfaces()
+            .FirstOrDefault(i =>
+            {
+                var generic = i.GetGenericTypeDefinition();
+
+                return i.IsGenericType && (generic == typeof(IPaneDocument<>) || generic == typeof(IPaneTool<>));
+            });
+        
+        if (paneGenericInterface is not null)
         {
-            services.AddSingleton(typeof(IPane), viewModelType);
+            services.AddSingleton(paneGenericInterface, viewModelType);
+        }
+        else if (typeof(IWorkspace).IsAssignableFrom(viewModelType))
+        {
+            services.AddSingleton(typeof(IWorkspace), viewModelType);
         }
         else
         {
