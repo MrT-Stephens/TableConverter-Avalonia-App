@@ -121,4 +121,42 @@ public static class EnumerableExtensions
     {
         return source == null || !source.Any();
     }
+    
+    /// <summary>
+    /// Adds a range of items to the ICollection.
+    /// </summary>
+    /// <param name="collection">
+    /// The ICollection to which items will be added.
+    /// </param>
+    /// <param name="items">
+    /// The items to add to the ICollection.
+    /// </param>
+    /// <typeparam name="T">
+    /// The type of elements in the ICollection.
+    /// </typeparam>
+    public static void AddRange<T>(this ICollection<T> collection, IEnumerable<T> items)
+    {
+        foreach (var item in items)
+        {
+            collection.Add(item);
+        }
+    }
+    
+    /// <summary>
+    /// Clears the ICollection and adds a range of items to it.
+    /// </summary>
+    /// <param name="collection">
+    /// The ICollection to clear and which will receive new items.
+    /// </param>
+    /// <param name="items">
+    /// The items to add to the ICollection after clearing it.
+    /// </param>
+    /// <typeparam name="T">
+    /// The type of elements in the ICollection.
+    /// </typeparam>
+    public static void ClearAndAddRange<T>(this ICollection<T> collection, IEnumerable<T> items)
+    {
+        collection.Clear();
+        collection.AddRange(items);
+    }
 }

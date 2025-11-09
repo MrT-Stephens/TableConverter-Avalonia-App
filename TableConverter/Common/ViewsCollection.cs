@@ -29,20 +29,22 @@ public class ViewsCollection : IViewsCollection
         var viewModelType = typeof(TViewModel);
 
         _vmToViewMap.Add(viewModelType, viewType);
-
-        // If the view model implements the generic IPane<T>, register that closed generic.
-        var paneGenericInterface = viewModelType
-            .GetInterfaces()
-            .FirstOrDefault(i =>
-            {
-                var generic = i.GetGenericTypeDefinition();
-
-                return i.IsGenericType && (generic == typeof(IPaneDocument<>) || generic == typeof(IPaneTool<>));
-            });
         
-        if (paneGenericInterface is not null)
+        var genericInterface = viewModelType.GetInterfaces()
+            .FirstOrDefault(i => i.IsGenericType 
+                && i.GetGenericTypeDefinition() == typeof(IScopedPaneTool<>));
+        
+        if (genericInterface is not null)
         {
-            services.AddSingleton(paneGenericInterface, viewModelType);
+            services.AddTransient(genericInterface, viewModelType);
+        }
+        else if (typeof(IPaneTool).IsAssignableFrom(viewModelType))
+        {
+            services.AddTransient(typeof(IPaneTool), viewModelType);
+        }
+        else if (typeof(IPaneDocument).IsAssignableFrom(viewModelType))
+        {
+            services.AddTransient(viewModelType);
         }
         else if (typeof(IWorkspace).IsAssignableFrom(viewModelType))
         {

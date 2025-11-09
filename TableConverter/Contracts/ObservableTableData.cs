@@ -22,8 +22,8 @@ public partial class ObservableTableData : ObservableObject, ITableData
 
     public ObservableTableData()
     {
-        Headers = new ObservableCollection<string>();
-        Rows = new ObservableCollection<ObservableCollection<object>>();
+        Headers = [];
+        Rows = [];
 
         Rows.CollectionChanged += (_, e) =>
         {

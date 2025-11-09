@@ -3,11 +3,7 @@
     public interface IPane
     {
         public string Title { get; set; }
-
-        public bool CanClose { get; set; }
-    }
-
-    public interface IPane<TViewModel> : IPane where TViewModel : IWorkspace
-    {
+        
+        public bool IsEnabled { get; set; }
     }
 }

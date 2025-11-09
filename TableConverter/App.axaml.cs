@@ -1,5 +1,4 @@
 ﻿using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
@@ -16,7 +15,13 @@ using TableConverter.Common;
 using TableConverter.Interfaces;
 using TableConverter.Services;
 using TableConverter.ViewModels;
+using TableConverter.ViewModels.Tools;
+using TableConverter.ViewModels.Workspaces;
 using TableConverter.Views;
+using TableConverter.Views.Documents;
+using TableConverter.Views.Tools;
+using TableConverter.Views.Workspaces;
+using TableDataViewModel = TableConverter.ViewModels.Documents.TableDataViewModel;
 
 namespace TableConverter;
 
@@ -39,7 +44,7 @@ public class App : Application
 
             var views = ConfigureViews(services);
             var provider = ConfigureServices(services);
-
+            
             provider.RegisterCommandHandlers();
 
             DataTemplates.Add(new ViewLocator(views));
@@ -70,7 +75,13 @@ public class App : Application
     private static IViewsCollection ConfigureViews(ServiceCollection services)
     {
         var views = new ViewsCollection()
-            .AddView<MainView, MainViewModel>(services);
+            .AddView<MainView, MainViewModel>(services)
+            // Workspaces
+            .AddView<BaseWorkspaceEditorView, TableWorkspaceEditorViewModel>(services)
+            // Documents
+            .AddView<TableDataView, TableDataViewModel>(services)
+            // Tools
+            .AddView<TableUtilitiesView, TableUtilitiesViewModel>(services);
         
         return views;
     }

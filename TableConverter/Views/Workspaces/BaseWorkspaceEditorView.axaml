@@ -1,0 +1,74 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:TableConverter.ViewModels.Base"
+             xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+             xmlns:interfaces="clr-namespace:TableConverter.Interfaces"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TableConverter.Views.Workspaces.BaseWorkspaceEditorView"
+             x:DataType="viewModels:BaseWorkspaceEditorViewModel">
+    <UserControl.Styles>
+        <Style Selector="TabItem" x:DataType="interfaces:IPaneDocument">
+            <Setter Property="IsEnabled" Value="{Binding IsEnabled, Mode=OneWay}" />
+        </Style>
+        <Style Selector="TabItem" x:DataType="interfaces:IPaneTool">
+            <Setter Property="IsEnabled" Value="{Binding IsEnabled, Mode=OneWay}" />
+        </Style>
+    </UserControl.Styles>
+    <sukiUi:BusyArea IsBusy="{Binding IsBusy, Mode=OneWay}"
+                     BusyText="{Binding BusyText, Mode=OneWay}">
+        <DockPanel Margin="10">
+            <DockPanel Dock="{Binding ToolsPosition, Mode=OneWay}">
+                <TabControl DockPanel.Dock="{Binding ToolsPosition, Mode=OneWay}"
+                            ItemsSource="{Binding Tools, Mode=TwoWay}"
+                            SelectedItem="{Binding SelectedTool, Mode=TwoWay}">
+                    <TabControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock TextWrapping="NoWrap" 
+                                       Text="{Binding Title, Mode=OneWay}">
+                            </TextBlock>
+                        </DataTemplate>
+                    </TabControl.ItemTemplate>
+                    <TabControl.ContentTemplate>
+                        <DataTemplate DataType="interfaces:IPaneTool">
+                            <sukiUi:GlassCard>
+                                <sukiUi:GroupBox>
+                                    <sukiUi:GroupBox.Header>
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <TextBlock Grid.Column="0" 
+                                                       TextWrapping="NoWrap"
+                                                       Text="{Binding Title, Mode=OneWay}">
+                                            </TextBlock>
+                                            <Button Grid.Column="1">
+                                                <PathIcon Data="{StaticResource GearIcon}" />
+                                            </Button>
+                                        </Grid>
+                                    </sukiUi:GroupBox.Header>
+                                    <sukiUi:GroupBox.Content>
+                                        <ScrollViewer>
+                                            <ContentControl Content="{Binding .,Mode=TwoWay}">
+                                            </ContentControl>
+                                        </ScrollViewer>
+                                    </sukiUi:GroupBox.Content>
+                                </sukiUi:GroupBox>
+                            </sukiUi:GlassCard>
+                        </DataTemplate>
+                    </TabControl.ContentTemplate>
+                </TabControl>
+            </DockPanel>
+            <sukiUi:GlassCard>
+                <TabControl ItemsSource="{Binding Documents, Mode=TwoWay}"
+                            SelectedItem="{Binding SelectedDocument, Mode=TwoWay}">
+                    <TabControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock TextWrapping="NoWrap" 
+                                       Text="{Binding Title, Mode=OneWay}">
+                            </TextBlock>
+                        </DataTemplate>
+                    </TabControl.ItemTemplate>
+                </TabControl>
+            </sukiUi:GlassCard>
+        </DockPanel>
+    </sukiUi:BusyArea>
+</UserControl>

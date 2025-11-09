@@ -33,7 +33,7 @@ public partial class MainViewModel : BaseViewModel
     {
         Workspaces = new AvaloniaList<IWorkspace>(workspaces
             .OrderBy(w => w.Index)
-            .ThenBy(w => w.Header));
+            .ThenBy(w => w.Title));
 
         SelectedWorkspace = Workspaces.First();
 

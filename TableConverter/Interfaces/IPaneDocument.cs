@@ -1,12 +1,9 @@
-﻿using Dock.Model.Controls;
-
-namespace TableConverter.Interfaces
+﻿namespace TableConverter.Interfaces
 {
-    public interface IPaneDocument<TViewModel> : IPane<TViewModel>, IDocument
-        where TViewModel : IWorkspace
+    public interface IPaneDocument : IPane
     {
         public bool IsDirty { get; set; }
 
-        public bool IsReadOnly { get; set; }
+        public bool CanClose { get; }
     }
 }

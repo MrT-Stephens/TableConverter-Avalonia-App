@@ -8,7 +8,7 @@ using TableConverter.Interfaces;
 
 namespace TableConverter.ViewModels.Base;
 
-public class BaseViewModel : ObservableValidator
+public abstract partial class BaseViewModel : ObservableValidator
 {
     #region Fields
 
