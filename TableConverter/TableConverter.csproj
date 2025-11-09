@@ -41,10 +41,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Extenstions\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Compile Update="Views\Workspaces\BaseWorkspaceEditorView.axaml.cs">
         <DependentUpon>BaseWorkspaceEditorView.axaml</DependentUpon>
         <SubType>Code</SubType>

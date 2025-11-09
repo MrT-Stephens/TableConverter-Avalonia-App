@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using Avalonia.Controls;
+using TableConverter.ViewModels.Forms;
 
 namespace TableConverter.Interfaces
 {
@@ -14,7 +15,7 @@ namespace TableConverter.Interfaces
         
         public IPaneTool? SelectedTool { get; set; }
         
-        public Dock ToolsPosition { get; set; }
+        public ToolsSettingsForm ToolsSettings { get; set; }
 
         public void AddNewDocument<TViewModel>(string title, Action<TViewModel>? initializeAction = null)
             where TViewModel : IPaneDocument;

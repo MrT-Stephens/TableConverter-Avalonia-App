@@ -6,11 +6,16 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 using Avalonia.Controls;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using TableConverter.Commands.Interfaces;
+using TableConverter.Extensions;
 using TableConverter.Interfaces;
 using TableConverter.Utilities.Extensions;
+using TableConverter.ViewModels.Forms;
 
 namespace TableConverter.ViewModels.Base;
 
@@ -25,11 +30,11 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
     [ObservableProperty] private int _Index;
     [ObservableProperty] private ObservableCollection<IPaneDocument> _Documents;
     [ObservableProperty] private ObservableCollection<IPaneTool> _Tools;
-    [ObservableProperty] private Dock _ToolsPosition;
     [ObservableProperty] private bool _IsBusy;
     [ObservableProperty] private string _BusyText;
     [ObservableProperty] private IPaneDocument? _SelectedDocument;
     [ObservableProperty] private IPaneTool? _SelectedTool;
+    [ObservableProperty] private ToolsSettingsForm _ToolsSettings;
 
     #endregion
 
@@ -53,10 +58,33 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
             ?? throw new ArgumentNullException(nameof(iconPath), $"Icon resource '{iconPath}' not found.");
         Documents = [];
         Tools = [];
-        ToolsPosition = Dock.Right;
         BusyText = string.Empty;
+        ToolsSettings = new ToolsSettingsForm(Dock.Right, 350);
         
         InitialiseTools();
+        InitialiseTools();
+    }
+
+    #endregion
+
+    #region Commands
+
+    [RelayCommand]
+    private async Task ToolSettingsButtonClicked(object? parameter)
+    {
+        await _dialogManager.CreateDialog()
+            .WithTitle("Tool Pane Settings")
+            .WithForm(ToolsSettings)
+            .WithOkResult("Ok")
+            .Dismiss()
+            .ByClickingBackground()
+            .TryShowAsync(CancellationToken.None);
+    }
+
+    [RelayCommand]
+    private void PinToolButtonClicked(object? parameter)
+    {
+        SelectedTool = null;
     }
 
     #endregion

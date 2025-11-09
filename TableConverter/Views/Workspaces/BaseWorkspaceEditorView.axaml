@@ -5,6 +5,7 @@
              xmlns:viewModels="clr-namespace:TableConverter.ViewModels.Base"
              xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
              xmlns:interfaces="clr-namespace:TableConverter.Interfaces"
+             xmlns:converters="clr-namespace:TableConverter.Converters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="TableConverter.Views.Workspaces.BaseWorkspaceEditorView"
              x:DataType="viewModels:BaseWorkspaceEditorViewModel">
@@ -19,44 +20,61 @@
     <sukiUi:BusyArea IsBusy="{Binding IsBusy, Mode=OneWay}"
                      BusyText="{Binding BusyText, Mode=OneWay}">
         <DockPanel Margin="10">
-            <DockPanel Dock="{Binding ToolsPosition, Mode=OneWay}">
-                <TabControl DockPanel.Dock="{Binding ToolsPosition, Mode=OneWay}"
-                            ItemsSource="{Binding Tools, Mode=TwoWay}"
-                            SelectedItem="{Binding SelectedTool, Mode=TwoWay}">
-                    <TabControl.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock TextWrapping="NoWrap" 
-                                       Text="{Binding Title, Mode=OneWay}">
-                            </TextBlock>
-                        </DataTemplate>
-                    </TabControl.ItemTemplate>
-                    <TabControl.ContentTemplate>
-                        <DataTemplate DataType="interfaces:IPaneTool">
-                            <sukiUi:GlassCard>
-                                <sukiUi:GroupBox>
-                                    <sukiUi:GroupBox.Header>
-                                        <Grid ColumnDefinitions="*,Auto">
-                                            <TextBlock Grid.Column="0" 
-                                                       TextWrapping="NoWrap"
-                                                       Text="{Binding Title, Mode=OneWay}">
-                                            </TextBlock>
-                                            <Button Grid.Column="1">
-                                                <PathIcon Data="{StaticResource GearIcon}" />
+            <TabControl DockPanel.Dock="{Binding ToolsSettings.Position, Mode=OneWay}"
+                        TabStripPlacement="{Binding ToolsSettings.Position, Mode=OneWay}"
+                        ItemsSource="{Binding Tools, Mode=TwoWay}"
+                        SelectedItem="{Binding SelectedTool, Mode=TwoWay}"
+                        Margin="{Binding ToolsSettings.Position, Mode=OneWay, 
+                            Converter={x:Static converters:DockPositionToMarginConverter.Instance}, ConverterParameter=10}">
+                <TabControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock TextWrapping="NoWrap" 
+                                   Text="{Binding Title, Mode=OneWay}">
+                        </TextBlock>
+                    </DataTemplate>
+                </TabControl.ItemTemplate>
+                <TabControl.ContentTemplate>
+                    <DataTemplate DataType="interfaces:IPaneTool">
+                        <sukiUi:GlassCard Width="{Binding ((viewModels:BaseWorkspaceEditorViewModel)DataContext).ToolsSettings, Mode=OneWay, 
+                                              RelativeSource={RelativeSource AncestorType=DockPanel}, Converter={x:Static converters:DockPositionToSizeConverter.Instance}, ConverterParameter='Width'}"
+                                          Height="{Binding ((viewModels:BaseWorkspaceEditorViewModel)DataContext).ToolsSettings, Mode=OneWay, 
+                                              RelativeSource={RelativeSource AncestorType=DockPanel}, Converter={x:Static converters:DockPositionToSizeConverter.Instance}, ConverterParameter='Height'}">
+                            <sukiUi:GroupBox>
+                                <sukiUi:GroupBox.Header>
+                                    <Grid ColumnDefinitions="*,Auto"
+                                          ColumnSpacing="10">
+                                        <TextBlock Grid.Column="0" 
+                                                   TextWrapping="NoWrap"
+                                                   VerticalAlignment="Center"
+                                                   Text="{Binding Title, Mode=OneWay}">
+                                        </TextBlock>
+                                        <StackPanel Grid.Column="1" 
+                                                    Spacing="5"
+                                                    Orientation="Horizontal">
+                                            <Button Classes="WindowControlsButton"
+                                                    VerticalAlignment="Center"
+                                                    Command="{Binding ((viewModels:BaseWorkspaceEditorViewModel)DataContext).ToolSettingsButtonClickedCommand, 
+                                                        RelativeSource={RelativeSource AncestorType=DockPanel}, FallbackValue={x:Null}, Mode=OneWay}">
+                                                <PathIcon Data="{StaticResource GearIcon}"
+                                                          Width="15"
+                                                          Height="15"
+                                                          VerticalAlignment="Center" 
+                                                          HorizontalAlignment="Center">
+                                                </PathIcon>
                                             </Button>
-                                        </Grid>
-                                    </sukiUi:GroupBox.Header>
-                                    <sukiUi:GroupBox.Content>
-                                        <ScrollViewer>
-                                            <ContentControl Content="{Binding .,Mode=TwoWay}">
-                                            </ContentControl>
-                                        </ScrollViewer>
-                                    </sukiUi:GroupBox.Content>
-                                </sukiUi:GroupBox>
-                            </sukiUi:GlassCard>
-                        </DataTemplate>
-                    </TabControl.ContentTemplate>
-                </TabControl>
-            </DockPanel>
+                                        </StackPanel>
+                                    </Grid>
+                                </sukiUi:GroupBox.Header>
+                                <sukiUi:GroupBox.Content>
+                                    <ScrollViewer>
+                                        <ContentControl Content="{Binding .,Mode=TwoWay}" />
+                                    </ScrollViewer>
+                                </sukiUi:GroupBox.Content>
+                            </sukiUi:GroupBox>
+                        </sukiUi:GlassCard>
+                    </DataTemplate>
+                </TabControl.ContentTemplate>
+            </TabControl>
             <sukiUi:GlassCard>
                 <TabControl ItemsSource="{Binding Documents, Mode=TwoWay}"
                             SelectedItem="{Binding SelectedDocument, Mode=TwoWay}">
