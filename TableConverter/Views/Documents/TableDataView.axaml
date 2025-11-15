@@ -7,12 +7,28 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="TableConverter.Views.Documents.TableDataView"
              x:DataType="documents:TableDataViewModel">
-    <controls:DynamicDataGrid SelectionMode="Single"
-                              AutoGenerateColumns="False"
-                              CanUserResizeColumns="True"
-                              MinHeight="200"
-                              MinWidth="200"
-                              Headers="{Binding TableData.Headers}"
-                              Rows="{Binding TableData.Rows}">
-    </controls:DynamicDataGrid>
+    <Grid RowDefinitions="*,Auto"
+          RowSpacing="10">
+        <controls:DynamicDataGrid Grid.Row="0"
+                                  SelectionMode="Extended"
+                                  AutoGenerateColumns="False"
+                                  CanUserResizeColumns="True"
+                                  Headers="{Binding TableData.Headers}"
+                                  Rows="{Binding TableData.Rows}"
+                                  CanUserReorderColumns="True"
+                                  CanUserSortColumns="True"
+                                  ClipboardCopyMode="ExcludeHeader">
+        </controls:DynamicDataGrid>
+        <Grid Grid.Row="1" 
+              ColumnDefinitions="*">
+            <TextBlock HorizontalAlignment="Right">
+                <TextBlock.Text>
+                    <MultiBinding StringFormat="Rows: {0}, Columns: {1}">
+                        <Binding Path="TableData.Rows.Count" />
+                        <Binding Path="TableData.Headers.Count" />
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
+        </Grid>
+    </Grid>
 </UserControl>

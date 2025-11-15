@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Linq;
 using Avalonia.Collections;
+using Avalonia.Controls;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;
@@ -11,19 +13,20 @@ using TableConverter.ViewModels.Base;
 
 namespace TableConverter.ViewModels;
 
-public partial class MainViewModel : BaseViewModel
+public partial class MainWindowViewModel : BaseViewModel
 {
     #region Properties
 
     public IAvaloniaReadOnlyList<IWorkspace> Workspaces { get; }
     
     [ObservableProperty] private IWorkspace _SelectedWorkspace;
+    [ObservableProperty] private ObservableCollection<MenuItem> _MenuItems;
 
     #endregion
 
     #region Constructors
     
-    public MainViewModel(
+    public MainWindowViewModel(
         ICommandManager commandManager, 
         IEventManager eventManager,
         ISukiDialogManager dialogManager,

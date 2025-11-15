@@ -66,7 +66,7 @@ public abstract partial class BaseViewModel : ObservableValidator
 
     #region Misc
 
-    public ICommand this[string commandName] => _commandManager[commandName, this];
+    public ICommand this[string commandName] => _commandManager[commandName, this].Command;
 
     #endregion
 }

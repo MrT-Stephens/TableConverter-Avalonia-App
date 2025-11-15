@@ -59,4 +59,18 @@ public static class StringExtensions
         
         return string.Concat(words);
     }
+
+    /// <summary>
+    /// Converts a string to a unique string by adding time onto the end.
+    /// </summary>
+    /// <param name="input">
+    /// The string to convert.
+    /// </param>
+    /// <returns>
+    /// The unique string.
+    /// </returns>
+    public static string GetUniqueString(this string input)
+    {
+        return "{0}-{1}".Format(input, DateTime.Now.ToFileTime());
+    }
 }

@@ -3,10 +3,43 @@
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+                   xmlns:viewModels="clr-namespace:TableConverter.ViewModels"
                    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
                    x:Class="TableConverter.Views.MainWindowView"
+                   x:DataType="viewModels:MainWindowViewModel"
                    Title="TableConverter"
                    BackgroundStyle="GradientDarker"
                    BackgroundAnimationEnabled="False"
-                   BackgroundTransitionsEnabled="False">
+                   BackgroundTransitionsEnabled="False"
+                   CanFullScreen="True">
+    <sukiUi:SukiWindow.LogoContent>
+        <PathIcon Data="{StaticResource TableIcon}"
+                  Width="15"
+                  Height="15"
+                  VerticalAlignment="Center"
+                  Foreground="{DynamicResource SukiPrimaryColor}">
+            <PathIcon.Transitions>
+                <Transitions>
+                    <BrushTransition Property="Foreground" 
+                                     Duration="{DynamicResource ShortAnimationDuration}" />
+                </Transitions>
+            </PathIcon.Transitions>
+        </PathIcon>
+    </sukiUi:SukiWindow.LogoContent>
+    <sukiUi:SukiSideMenu IsSearchEnabled="False"
+                         IsMenuExpanded="False"
+                         ItemsSource="{Binding Workspaces, Mode=OneWay}"
+                         SelectedItem="{Binding SelectedWorkspace, Mode=TwoWay}">
+        <sukiUi:SukiSideMenu.ItemTemplate>
+            <DataTemplate>
+                <sukiUi:SukiSideMenuItem Header="{Binding Title}"
+                                         ToolTip.Placement="Right"
+                                         ToolTip.Tip="{Binding Title, Mode=OneWay}">
+                    <sukiUi:SukiSideMenuItem.Icon>
+                        <PathIcon Data="{Binding Icon, Mode=OneWay}" />
+                    </sukiUi:SukiSideMenuItem.Icon>
+                </sukiUi:SukiSideMenuItem>
+            </DataTemplate>
+        </sukiUi:SukiSideMenu.ItemTemplate>
+    </sukiUi:SukiSideMenu>
 </sukiUi:SukiWindow>

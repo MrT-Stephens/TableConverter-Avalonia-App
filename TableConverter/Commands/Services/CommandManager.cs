@@ -13,16 +13,8 @@ namespace TableConverter.Commands.Services;
 
 public class CommandManager : ICommandManager
 {
-    private readonly List<ICommandHandlerBase> _commandHandlers;
-    private readonly ConcurrentDictionary<(string, object?), ICommand> _commands;
-    private readonly ConcurrentDictionary<(string, object?), ICommandContext> _contexts;
-
-    public CommandManager()
-    {
-        _commandHandlers = new List<ICommandHandlerBase>();
-        _commands = new ConcurrentDictionary<(string, object?), ICommand>();
-        _contexts = new ConcurrentDictionary<(string, object?), ICommandContext>();
-    }
+    private readonly List<ICommandHandlerBase> _commandHandlers = [];
+    private readonly ConcurrentDictionary<(string, object?), ICommandInstance> _instances = new();
 
     public event EventHandler<ICommandContext>? OnCanExecute;
     public event EventHandler<ICommandContext>? OnExecute;
@@ -33,22 +25,24 @@ public class CommandManager : ICommandManager
 
     public void RegisterCommand(string name, ICommandHandlerBase handler)
     {
+#if DEBUG
         if (_commandHandlers.Any(c => c.CommandMetadata.Name == name))
             throw new ArgumentException("A command with the name '{0}' is already registered.".Format(name), nameof(name));
 
         if (handler.CommandMetadata.Name != name)
             throw new ArgumentException("The command handler's name '{0}' does not match the provided name '{1}'."
                 .Format(handler.CommandMetadata.Name, name), nameof(name));
+#endif
 
         _commandHandlers.Add(handler);
     }
 
-    public void RegisterCommandInstance(string name, object? viewModel = null)
+    public ICommandInstance RegisterCommandInstance(string name, object? viewModel = null)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("Command name cannot be null or whitespace.", nameof(name));
 
-        var cmd = _commands.GetOrAdd((name, viewModel), _ =>
+        var instance = _instances.GetOrAdd((name, viewModel), _ =>
         {
             if (_commandHandlers.FirstOrDefault(c => c.CommandMetadata.Name == name)
                 is not { } handler)
@@ -56,59 +50,60 @@ public class CommandManager : ICommandManager
                 throw new ArgumentException("Command with name '{0}' not found.".Format(name), nameof(name));
             }
 
-            return handler switch
+            var context = new CommandContext(handler.CommandMetadata.Name);
+
+            ICommand command = handler switch
             {
                 ICommandHandlerAsync asyncHandler => new AsyncRelayCommand<object?>(
-                    param => InternalExecute((name, viewModel), param, asyncHandler),
-                    param => InternalCanExecute((name, viewModel), param, asyncHandler)),
+                    param => InternalExecute(param, asyncHandler, context),
+                    param => InternalCanExecute(param, asyncHandler, context)),
                 ICommandHandler syncHandler => new RelayCommand<object?>(
-                    param => InternalExecuteAsync((name, viewModel), param, syncHandler),
-                    param => InternalCanExecute((name, viewModel), param, syncHandler)),
-                _ => throw new ArgumentException(
-                    "Command handler for '{0}' is of an unsupported type."
-                    .Format(name), nameof(name))
+                    param => InternalExecuteAsync(param, syncHandler, context),
+                    param => InternalCanExecute(param, syncHandler, context)),
+                _ => throw new ArgumentException("Command handler for '{0}' is of an unsupported type.".Format(name),
+                    nameof(name))
             };
+
+            return new CommandInstance(command, handler, context);
         });
-        
-        _commands[(name, viewModel)] = cmd;
+
+        return instance;
     }
     
     #endregion
 
     #region Command Retrieval Methods
     
-    public ICommand GetCommand(string name, object? viewModel)
+    public ICommandInstance GetCommandInstance(string name, object? viewModel)
     {
-        return _commands.TryGetValue((name, viewModel), out var command) 
+        return _instances.TryGetValue((name, viewModel), out var command) 
             ? command 
             : throw new ArgumentException("No command with the specified name is registered.", nameof(name));
     }
 
-    public ICommand this[string name] => GetCommand(name, null);
+    public ICommandInstance this[string name] => GetCommandInstance(name, null);
     
-    public ICommand this[string name, object? viewModel] => GetCommand(name, viewModel);
+    public ICommandInstance this[string name, object? viewModel] => GetCommandInstance(name, viewModel);
     
     #endregion
 
     #region Internal Methods
     
-    private async Task InternalExecute((string, object?) key, object? parameter, ICommandHandlerAsync command)
+    private async Task InternalExecute(object? parameter, ICommandHandlerAsync handler, ICommandContext context)
     {
-        var ctx = _contexts.GetOrAdd(key, new CommandContext(command.CommandMetadata.Name));
-        
         try
         {
             // Set the parameter in the context before executing
-            ctx.Parameter = parameter;
+            context.Parameter = parameter;
 
             // Notify subscribers that the command is being executed
-            OnExecute?.Invoke(this, ctx);
+            OnExecute?.Invoke(this, context);
 
             // Execute the command asynchronously
-            await command.Execute(parameter, ctx);
+            await handler.Execute(parameter, context);
 
             // Notify subscribers that the command has been executed
-            OnExecuted?.Invoke(this, ctx);
+            OnExecuted?.Invoke(this, context);
         }
         catch (Exception e)
         {
@@ -117,29 +112,27 @@ public class CommandManager : ICommandManager
         finally
         {
             // Clear the parameter and selected items after execution
-            ctx.Parameter = null;
-            ctx.ClearSelectedItems();
-            ctx.Result = null;
+            context.Parameter = null;
+            context.ClearSelectedItems();
+            context.Result = null;
         }
     }
     
-    private void InternalExecuteAsync((string, object?) key, object? parameter, ICommandHandler command)
+    private void InternalExecuteAsync(object? parameter, ICommandHandler handler, ICommandContext context)
     {
-        var ctx = _contexts.GetOrAdd(key, new CommandContext(command.CommandMetadata.Name));
-        
         try
         {
             // Set the parameter in the context before executing
-            ctx.Parameter = parameter;
+            context.Parameter = parameter;
 
             // Notify subscribers that the command is being executed
-            OnExecute?.Invoke(this, ctx);
+            OnExecute?.Invoke(this, context);
 
             // Execute the command asynchronously
-            command.Execute(parameter, ctx);
+            handler.Execute(parameter, context);
 
             // Notify subscribers that the command has been executed
-            OnExecuted?.Invoke(this, ctx);
+            OnExecuted?.Invoke(this, context);
         }
         catch (Exception e)
         {
@@ -148,26 +141,24 @@ public class CommandManager : ICommandManager
         finally
         {
             // Clear the parameter and selected items after execution
-            ctx.Parameter = null;
-            ctx.ClearSelectedItems();
-            ctx.Result = null;
+            context.Parameter = null;
+            context.ClearSelectedItems();
+            context.Result = null;
         }
     }
     
-    private bool InternalCanExecute((string, object?) key, object? parameter, ICommandHandlerBase command)
+    private bool InternalCanExecute(object? parameter, ICommandHandlerBase handler, ICommandContext context)
     {
-        var ctx = _contexts.GetOrAdd(key, new CommandContext(command.CommandMetadata.Name));
-                
         try
         {
             // Set the parameter in the context before checking can execute
-            ctx.Parameter = parameter;
+            context.Parameter = parameter;
                     
             // Notify subscribers that can execute is being checked
-            OnCanExecute?.Invoke(this, ctx);
+            OnCanExecute?.Invoke(this, context);
                     
             // Return whether the command can execute
-            return command.CanExecute(parameter, ctx);
+            return handler.CanExecute(parameter, context);
         }
         catch (Exception e)
         {

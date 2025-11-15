@@ -2,12 +2,13 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
+using TableConverter.Interfaces;
 
 namespace TableConverter.ViewModels.Forms;
 
 #pragma warning disable CS0657 // Not a valid attribute location for this declaration
 
-public partial class ToolsSettingsForm : ObservableObject
+public partial class ToolsSettingsForm : ObservableObject, IToolSettings
 {
     #region Properties
     

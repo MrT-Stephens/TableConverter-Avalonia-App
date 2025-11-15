@@ -3,9 +3,39 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:TableConverter.ViewModels.Tools"
+             xmlns:sukiExtensions="clr-namespace:SukiUI.Theme;assembly=SukiUI"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="TableConverter.Views.Tools.TableUtilitiesView"
              x:DataType="viewModels:TableUtilitiesViewModel">
-    <TextBlock Classes="h3"
-               Text="{Binding Title}"></TextBlock>
+    <Grid RowDefinitions="Auto, Auto"
+          RowSpacing="10">
+        <Grid Grid.Row="0"
+              ColumnSpacing="5"
+              IsSharedSizeScope="True">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"
+                                  SharedSizeGroup="Numerics" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto"
+                                  SharedSizeGroup="Numerics" />
+            </Grid.ColumnDefinitions>
+            <NumericUpDown Grid.Column="0"
+                           Value="10"
+                           ParsingNumberStyle="Integer"
+                           HorizontalAlignment="Stretch"
+                           sukiExtensions:NumericUpDownExtensions.Unit="Rows">
+            </NumericUpDown>
+            <TextBlock Grid.Column="1" 
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center">
+                X
+            </TextBlock>
+            <NumericUpDown Grid.Column="2"
+                           Value="10"
+                           ParsingNumberStyle="Integer"
+                           HorizontalAlignment="Stretch"
+                           sukiExtensions:NumericUpDownExtensions.Unit="Columns">
+            </NumericUpDown>
+        </Grid>
+    </Grid>
 </UserControl>

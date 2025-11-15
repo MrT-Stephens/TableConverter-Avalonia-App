@@ -45,7 +45,7 @@ public interface ICommandManager
     /// <param name="viewModel">
     /// An optional view model associated with the command. This can be used to provide context or state for the command.
     /// </param>
-    public void RegisterCommandInstance(string name, object? viewModel = null);
+    public ICommandInstance RegisterCommandInstance(string name, object? viewModel = null);
 
     /// <summary>
     /// Retrieves a command by its name.
@@ -62,7 +62,7 @@ public interface ICommandManager
     /// <exception cref="ArgumentException">
     /// Thrown when no command with the specified name is registered.
     /// </exception>
-    public ICommand GetCommand(string name, object? viewModel);
+    public ICommandInstance GetCommandInstance(string name, object? viewModel);
     
     /// <summary>
     /// Indexer to retrieve a command by its name.
@@ -76,7 +76,7 @@ public interface ICommandManager
     /// <exception cref="ArgumentException">
     /// Thrown when no command with the specified name is registered.
     /// </exception>
-    public ICommand this[string name] { get; }
+    public ICommandInstance this[string name] { get; }
     
     /// <summary>
     /// Indexer to retrieve a command by its name and associated view model.
@@ -87,5 +87,5 @@ public interface ICommandManager
     /// <param name="viewModel">
     /// An optional view model associated with the command. This can be used to differentiate commands with the same name but different contexts.
     /// </param>
-    public ICommand this[string name, object? viewModel] { get; }
+    public ICommandInstance this[string name, object? viewModel] { get; }
 }

@@ -15,6 +15,7 @@ using TableConverter.Common;
 using TableConverter.Interfaces;
 using TableConverter.Services;
 using TableConverter.ViewModels;
+using TableConverter.ViewModels.Documents;
 using TableConverter.ViewModels.Tools;
 using TableConverter.ViewModels.Workspaces;
 using TableConverter.Views;
@@ -51,8 +52,11 @@ public class App : Application
 
             var window = provider.GetRequiredService<MainWindowView>()
                 ?? throw new InvalidOperationException("Failed to create main window");
-
-            window.Content = views.CreateView<MainViewModel>(provider);
+            
+            var viewModel = provider.GetRequiredService<MainWindowViewModel>()
+                ?? throw new InvalidOperationException("Failed to create main window view model");
+            
+            window.DataContext = viewModel;
 
             window.Hosts.Add(new SukiToastHost()
             {
@@ -75,11 +79,13 @@ public class App : Application
     private static IViewsCollection ConfigureViews(ServiceCollection services)
     {
         var views = new ViewsCollection()
-            .AddView<MainView, MainViewModel>(services)
             // Workspaces
             .AddView<BaseWorkspaceEditorView, TableWorkspaceEditorViewModel>(services)
+            .AddView<BaseWorkspaceEditorView, DataGenerationWorkspaceViewModel>(services)
             // Documents
             .AddView<TableDataView, TableDataViewModel>(services)
+            .AddView<DataGenerationSchemeView, DataGenerationSchemaViewModel>(services)
+            .AddView<MarkdownView, MarkdownViewModel>(services)
             // Tools
             .AddView<TableUtilitiesView, TableUtilitiesViewModel>(services);
         
@@ -90,8 +96,9 @@ public class App : Application
     {
         var assembly = Assembly.GetExecutingAssembly();
         
-        // Window
+        // Main Display Window
         services.AddSingleton<MainWindowView>();
+        services.AddSingleton<MainWindowViewModel>();
 
         // Custom Services
         services.AddSingleton<IConverterTypes, ConverterTypes>();

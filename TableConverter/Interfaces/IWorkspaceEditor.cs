@@ -17,9 +17,14 @@ namespace TableConverter.Interfaces
         
         public ToolsSettingsForm ToolsSettings { get; set; }
 
-        public void AddNewDocument<TViewModel>(string title, Action<TViewModel>? initializeAction = null)
-            where TViewModel : IPaneDocument;
+        public void Initialise();
         
         public void InitialiseTools();
+        
+        public void InitialiseDocuments();
+
+        public void InitialiseEvents();
+
+        public IPaneDocument CreateNewDocumentInstance();
     }
 }

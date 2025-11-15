@@ -5,7 +5,6 @@ using SukiUI.Toasts;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
@@ -14,7 +13,6 @@ using Microsoft.Extensions.DependencyInjection;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Extensions;
 using TableConverter.Interfaces;
-using TableConverter.Utilities.Extensions;
 using TableConverter.ViewModels.Forms;
 
 namespace TableConverter.ViewModels.Base;
@@ -61,8 +59,7 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
         BusyText = string.Empty;
         ToolsSettings = new ToolsSettingsForm(Dock.Right, 350);
         
-        InitialiseTools();
-        InitialiseTools();
+        Initialise();
     }
 
     #endregion
@@ -81,15 +78,39 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
             .TryShowAsync(CancellationToken.None);
     }
 
-    [RelayCommand]
-    private void PinToolButtonClicked(object? parameter)
-    {
-        SelectedTool = null;
-    }
+    #endregion
 
+    #region Abstract Methods
+
+    public abstract IPaneDocument CreateNewDocumentInstance();
+
+    protected abstract IPaneDocument CreateDefaultDocumentInstance();
+    
     #endregion
 
     #region Methods
+
+    public void Initialise()
+    {
+        InitialiseEvents();
+        InitialiseTools();
+        InitialiseDocuments();
+    }
+
+    public void InitialiseDocuments()
+    {
+        if (Documents.Count > 0)
+            return;
+        
+        var defaultDocument = CreateDefaultDocumentInstance();
+        Documents.Add(defaultDocument);
+        SelectedDocument = defaultDocument;
+    }
+    
+    public void InitialiseEvents()
+    {
+        
+    }
 
     public void InitialiseTools()
     {
@@ -125,16 +146,6 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
     {
         IsBusy = false;
         BusyText = string.Empty;
-    }
-
-    public void AddNewDocument<TViewModel>(string title, Action<TViewModel>? initializeAction = null)
-        where TViewModel : IPaneDocument
-    {
-        var document = _serviceProvider.GetRequiredService<TViewModel>();
-        document.Title = title;
-        initializeAction?.Invoke(document);
-        Documents.Add(document);
-        SelectedDocument = document;
     }
 
     #endregion
