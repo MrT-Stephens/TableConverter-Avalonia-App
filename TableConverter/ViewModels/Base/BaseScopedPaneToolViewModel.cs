@@ -13,8 +13,14 @@ public abstract partial class BaseScopedPaneToolViewModel<TWorkspace> : BaseView
 
     [ObservableProperty] private string _Title;
     [ObservableProperty] private bool _IsEnabled;
-    [ObservableProperty] private object _Workspace;
-    [ObservableProperty] private object? _SelectedItem;
+    
+    public TWorkspace Workspace { get; set; }
+    
+    object IPaneTool.Workspace
+    {
+        get => Workspace!;
+        set => Workspace = (TWorkspace)value;
+    }
 
     #endregion
 
@@ -30,24 +36,14 @@ public abstract partial class BaseScopedPaneToolViewModel<TWorkspace> : BaseView
     {
         Title = title;
         IsEnabled = true;
-        Workspace = null!;
+        Workspace = default!;
     }
 
     #endregion
 
     #region Methods
 
-    public bool TryGetSelectedItem<T>([NotNullWhen(true)] out T? item)
-    {
-        if (SelectedItem is T castItem)
-        {
-            item = castItem;
-            return true;
-        }
-
-        item = default;
-        return false;
-    }
+    public override ICommandInstance this[string commandName] => _commandManager[commandName, Workspace];
 
     #endregion
 }
