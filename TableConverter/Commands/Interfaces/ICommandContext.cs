@@ -20,7 +20,7 @@ public interface ICommandContext
     /// <summary>
     /// The view model associated with the command context, if any.
     /// </summary>
-    public object? ViewModel { get; set; }
+    public object? Parent { get; set; }
 
     /// <summary>
     /// The result of the command execution, if any.

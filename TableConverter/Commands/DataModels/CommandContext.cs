@@ -17,7 +17,7 @@ public class CommandContext : ICommandContext
     public object? Parameter { get; set; }
     
     /// <inheritdoc />
-    public object? ViewModel { get; set; }
+    public object? Parent { get; set; }
 
     /// <inheritdoc />
     public Result<object>? Result { get; set; }

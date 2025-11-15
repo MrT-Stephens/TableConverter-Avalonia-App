@@ -88,7 +88,11 @@
                                         Spacing="5">
                                 <TextBlock TextWrapping="NoWrap" 
                                            VerticalAlignment="Center"
-                                           Text="{Binding Title, Mode=OneWay}">
+                                           TextTrimming="CharacterEllipsis"
+                                           ClipToBounds="True"
+                                           MaxWidth="200"
+                                           Text="{Binding Title, Mode=OneWay}"
+                                           ToolTip.Tip="{Binding Title, Mode=OneWay}">
                                 </TextBlock>
                                 <Button Classes="WindowControlsButton"
                                         VerticalAlignment="Center"

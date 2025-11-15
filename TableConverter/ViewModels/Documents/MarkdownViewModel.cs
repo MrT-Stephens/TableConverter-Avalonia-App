@@ -7,16 +7,13 @@ using TableConverter.ViewModels.Base;
 
 namespace TableConverter.ViewModels.Documents;
 
-public partial class MarkdownViewModel : BaseViewModel, IPaneDocument
+public partial class MarkdownViewModel : BaseDocumentViewModel
 {
     #region Properties
-
-    [ObservableProperty] private string _Title;
-    [ObservableProperty] private bool _IsEnabled;
-    [ObservableProperty] private bool _IsDirty;
+    
     [ObservableProperty] private string _Content;
 
-    public bool CanClose => true;
+    public override bool CanClose => true;
 
     #endregion
 
@@ -29,9 +26,6 @@ public partial class MarkdownViewModel : BaseViewModel, IPaneDocument
         ISukiToastManager toastManager) 
         : base(commandManager, eventManager, dialogManager, toastManager)
     {
-        Title = string.Empty;
-        IsEnabled = true;
-        Content = string.Empty;
     }
 
     #endregion

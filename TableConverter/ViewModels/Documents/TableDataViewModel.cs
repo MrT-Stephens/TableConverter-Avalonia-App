@@ -8,16 +8,13 @@ using TableConverter.ViewModels.Base;
 
 namespace TableConverter.ViewModels.Documents;
 
-public partial class TableDataViewModel : BaseViewModel, IPaneDocument
+public partial class TableDataViewModel : BaseDocumentViewModel
 {
     #region Properties
-
-    [ObservableProperty] private string _Title;
-    [ObservableProperty] private bool _IsEnabled;
-    [ObservableProperty] private bool _IsDirty;
+    
     [ObservableProperty] private ObservableTableData _TableData;
 
-    public bool CanClose => !IsDirty;
+    public override bool CanClose => !IsDirty;
 
     #endregion
 
@@ -30,9 +27,6 @@ public partial class TableDataViewModel : BaseViewModel, IPaneDocument
         ISukiToastManager toastManager) 
         : base(commandManager, eventManager, dialogManager, toastManager)
     {
-        Title = string.Empty;
-        IsEnabled = true;
-        IsDirty = false;
         TableData = new ObservableTableData();
     }
 

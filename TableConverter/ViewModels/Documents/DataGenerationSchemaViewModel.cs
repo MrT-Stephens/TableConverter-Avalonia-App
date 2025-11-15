@@ -7,15 +7,11 @@ using TableConverter.ViewModels.Base;
 
 namespace TableConverter.ViewModels.Documents;
 
-public partial class DataGenerationSchemaViewModel : BaseViewModel, IPaneDocument
+public class DataGenerationSchemaViewModel : BaseDocumentViewModel
 {
     #region Properties
 
-    [ObservableProperty] private string _Title;
-    [ObservableProperty] private bool _IsEnabled;
-    [ObservableProperty] private bool _IsDirty;
-
-    public bool CanClose => false;
+    public override bool CanClose => false;
 
     #endregion
 
@@ -28,9 +24,6 @@ public partial class DataGenerationSchemaViewModel : BaseViewModel, IPaneDocumen
         ISukiToastManager toastManager) 
         : base(commandManager, eventManager, dialogManager, toastManager)
     {
-        Title = string.Empty;
-        IsEnabled = true;
-        IsDirty = false;
     }
 
     #endregion

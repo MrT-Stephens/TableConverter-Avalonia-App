@@ -5,12 +5,14 @@ using SukiUI.Toasts;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using TableConverter.Commands.Interfaces;
+using TableConverter.Contracts.Events;
 using TableConverter.Extensions;
 using TableConverter.Interfaces;
 using TableConverter.ViewModels.Forms;
@@ -86,6 +88,44 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
 
     protected abstract IPaneDocument CreateDefaultDocumentInstance();
     
+    #endregion
+
+    #region Overrides
+
+    partial void OnSelectedDocumentChanged(IPaneDocument? oldValue, IPaneDocument? newValue)
+    {
+        if (oldValue is not null)
+        {
+            oldValue.OnDeactivate();
+        }
+
+        if (newValue is not null)
+        {
+            newValue.OnActivate();
+        }
+        
+        _eventManager.GetEvent<WorkspaceDocumentSelectedEvent>()
+            .Publish(new WorkspaceDocumentSelectedEventArgs
+            {
+                Workspace = this,
+                OldDocument = oldValue,
+                NewDocument = newValue,
+            });
+    }
+
+    partial void OnSelectedToolChanged(IPaneTool? oldValue, IPaneTool? newValue)
+    {
+        if (oldValue is not null)
+        {
+            oldValue.OnDeactivate();
+        }
+
+        if (newValue is not null)
+        {
+            newValue.OnActivate();
+        }
+    }
+
     #endregion
 
     #region Methods

@@ -4,10 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:TableConverter.ViewModels.Tools"
              xmlns:sukiExtensions="clr-namespace:SukiUI.Theme;assembly=SukiUI"
+             xmlns:controls="clr-namespace:TableConverter.Views.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="TableConverter.Views.Tools.TableUtilitiesView"
              x:DataType="viewModels:TableUtilitiesViewModel">
-    <Grid RowDefinitions="Auto, Auto"
+    <Grid RowDefinitions="Auto,Auto"
           RowSpacing="10">
         <Grid Grid.Row="0"
               ColumnSpacing="5"
@@ -20,10 +21,10 @@
                                   SharedSizeGroup="Numerics" />
             </Grid.ColumnDefinitions>
             <NumericUpDown Grid.Column="0"
-                           Value="10"
+                           Value="{Binding HeadersCount, Mode=TwoWay}"
                            ParsingNumberStyle="Integer"
                            HorizontalAlignment="Stretch"
-                           sukiExtensions:NumericUpDownExtensions.Unit="Rows">
+                           sukiExtensions:NumericUpDownExtensions.Unit="Columns">
             </NumericUpDown>
             <TextBlock Grid.Column="1" 
                        VerticalAlignment="Center"
@@ -31,11 +32,20 @@
                 X
             </TextBlock>
             <NumericUpDown Grid.Column="2"
-                           Value="10"
+                           Value="{Binding RowCount, Mode=TwoWay}"
                            ParsingNumberStyle="Integer"
                            HorizontalAlignment="Stretch"
-                           sukiExtensions:NumericUpDownExtensions.Unit="Columns">
+                           sukiExtensions:NumericUpDownExtensions.Unit="Rows">
             </NumericUpDown>
         </Grid>
+        <controls:CommandButtonToolBar Grid.Row="1"
+                                       ItemsSource="{Binding GeneralCommands, Mode=OneWay}">
+            <controls:CommandButtonToolBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid RowSpacing="10" 
+                                 Columns="2" />
+                </ItemsPanelTemplate>
+            </controls:CommandButtonToolBar.ItemsPanel>
+        </controls:CommandButtonToolBar>
     </Grid>
 </UserControl>

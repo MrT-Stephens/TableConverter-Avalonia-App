@@ -39,11 +39,8 @@ public interface IEventHandler<TEventArgs> : IEventHandler where TEventArgs : Ev
     /// <summary>
     /// Publishes the event to all subscribed actions.
     /// </summary>
-    /// <param name="sender">
-    /// The source of the event.
-    /// </param>
     /// <param name="args">
     /// The event data.
     /// </param>
-    public void Publish(object? sender, TEventArgs args);
+    public void Publish(TEventArgs args);
 }

@@ -31,14 +31,14 @@ public abstract class EventHandlerBase<TEventArgs> : IEventHandler<TEventArgs> w
         }
     }
 
-    public void Publish(object? sender, TEventArgs args)
+    public void Publish(TEventArgs args)
     {
         _handlers
             .ForEach(wd =>
             {
                 if (wd.Target is EventHandler<TEventArgs> handler)
                 {
-                    handler(sender, args);
+                    handler(this, args);
                 }
             });
     }
