@@ -1,6 +1,6 @@
 using System;
 using Avalonia;
-using Avalonia.Controls.Shapes;
+using Avalonia.Media;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Utilities.Extensions;
 
@@ -19,13 +19,14 @@ public record CommandMetadata : ICommandMetadata
     /// </exception>
     public CommandMetadata(string name)
     {
-        if (!name.IsOnlyAlphaNumeric())
+        if (!name.IsOnlyAlphaNumeric('.'))
             throw new ArgumentException("Command name must be only alphanumeric.", nameof(name));
 
         Name = name;
         Title = null;
         Description = null;
         IconName = null;
+        KeyGestures = [];
     }
 
     /// <summary>
@@ -46,13 +47,21 @@ public record CommandMetadata : ICommandMetadata
     /// <param name="category">
     /// The category of the command.
     /// </param>
-    public CommandMetadata(string name, string title, string description, string iconName, string category = "") 
+    /// <param name="subCategoryIndex">
+    /// Index which can be used to identify sub categories.
+    /// </param>
+    /// <param name="keyGestures">
+    /// The key gestures which can be used to execute the command.
+    /// </param>
+    public CommandMetadata(string name, string title, string description, string iconName, string category = "", int? subCategoryIndex = null, string[]? keyGestures = null) 
         : this(name)
     {
         Title = title;
         Description = description;
         IconName = iconName;
         Category = category;
+        SubCategoryIndex = subCategoryIndex;
+        KeyGestures = keyGestures ?? [];
     }
 
     /// <inheritdoc />
@@ -71,14 +80,20 @@ public record CommandMetadata : ICommandMetadata
     public string? Category { get; }
 
     /// <inheritdoc />
-    public Path? IconPath
+    public int? SubCategoryIndex { get; }
+
+    /// <inheritdoc />
+    public string[] KeyGestures { get; }
+
+    /// <inheritdoc />
+    public StreamGeometry? IconPath
     {
         get
         {
             if (IconName is null)
                 return null;
 
-            return Application.Current?.Resources[IconName] as Path
+            return Application.Current?.Resources[IconName] as StreamGeometry
                    ?? throw new InvalidOperationException(
                        $"Icon with name '{IconName}' not found in application resources.");
         }

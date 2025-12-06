@@ -5,16 +5,17 @@ using SukiUI.Toasts;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Controls.Notifications;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Contracts.Events;
 using TableConverter.Extensions;
 using TableConverter.Interfaces;
+using TableConverter.Utilities.Extensions;
 using TableConverter.ViewModels.Forms;
 
 namespace TableConverter.ViewModels.Base;
@@ -35,6 +36,7 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
     [ObservableProperty] private IPaneDocument? _SelectedDocument;
     [ObservableProperty] private IPaneTool? _SelectedTool;
     [ObservableProperty] private ToolsSettingsForm _ToolsSettings;
+    [ObservableProperty] private ObservableCollection<ICommandInstance> _MainCommands;
 
     #endregion
 
@@ -58,10 +60,9 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
             ?? throw new ArgumentNullException(nameof(iconPath), $"Icon resource '{iconPath}' not found.");
         Documents = [];
         Tools = [];
+        MainCommands = [];
         BusyText = string.Empty;
         ToolsSettings = new ToolsSettingsForm(Dock.Right, 350);
-        
-        Initialise();
     }
 
     #endregion
@@ -80,6 +81,37 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
             .TryShowAsync(CancellationToken.None);
     }
 
+    [RelayCommand]
+    private async Task RemoveFileButtonClicked(object? parameter)
+    {
+        if (Documents.Count == 0 
+            || parameter is not IPaneDocument document
+            || !document.CanClose)
+        {
+            return;
+        }
+
+        var selectedDoc = document;
+        
+        if (!await _dialogManager.CreateDialog()
+                .WithTitle("Are you sure?")
+                .WithContent($"This will remove the file '{selectedDoc!.Title}'.")
+                .WithYesNoResult("Yes", "No")
+                .TryShowAsync())
+        {
+            return;
+        }
+        
+        SelectedDocument = null;
+        Documents.Remove(selectedDoc);
+
+        _toastManager.CreateSimpleInfoToast()
+            .OfType(NotificationType.Success)
+            .WithTitle("Removed")
+            .WithContent($"The file '{selectedDoc.Title}' has been removed.")
+            .Queue();
+    }
+
     #endregion
 
     #region Abstract Methods
@@ -94,16 +126,13 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
 
     partial void OnSelectedDocumentChanged(IPaneDocument? oldValue, IPaneDocument? newValue)
     {
-        if (oldValue is not null)
-        {
-            oldValue.OnDeactivate();
-        }
+        oldValue?.OnDeactivate();
 
-        if (newValue is not null)
-        {
-            newValue.OnActivate();
-        }
+        newValue?.OnActivate();
         
+        UpdateSelectedItemWith(newValue);
+        SelectedItems.Remove(oldValue);
+
         _eventManager.GetEvent<WorkspaceDocumentSelectedEvent>()
             .Publish(new WorkspaceDocumentSelectedEventArgs
             {
@@ -130,8 +159,10 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
 
     #region Methods
 
-    public void Initialise()
+    public override void Initialise()
     {
+        base.Initialise();
+        
         InitialiseEvents();
         InitialiseTools();
         InitialiseDocuments();
@@ -141,10 +172,8 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
     {
         if (Documents.Count > 0)
             return;
-        
-        var defaultDocument = CreateDefaultDocumentInstance();
-        Documents.Add(defaultDocument);
-        SelectedDocument = defaultDocument;
+
+        AddDocument(CreateDefaultDocumentInstance());
     }
     
     public void InitialiseEvents()
@@ -156,11 +185,7 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
     {
         var globalTools = _serviceProvider.GetRequiredService<IEnumerable<IPaneTool>>();
         
-        foreach (var tool in globalTools)
-        {
-            tool.Workspace = this;
-            Tools.Add(tool);
-        }
+        AddTools(globalTools);
         
         var scopedToolsType = typeof(IScopedPaneTool<>).MakeGenericType(GetType());
         var enumerableScopedToolsType = typeof(IEnumerable<>).MakeGenericType(scopedToolsType);
@@ -169,11 +194,7 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
         if (scopedTools is not IEnumerable<IPaneTool> scopedToolsEnumerable)
             return;
         
-        foreach (var tool in scopedToolsEnumerable)
-        {
-            tool.Workspace = this;
-            Tools.Add(tool);
-        }
+        AddTools(scopedToolsEnumerable);
     }
 
     public void SetBusy(bool isBusy, string busyText = "Loading...")
@@ -186,6 +207,48 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
     {
         IsBusy = false;
         BusyText = string.Empty;
+    }
+
+    public void AddDocument(IPaneDocument document)
+    {
+        document.Workspace = this;
+        
+        if (document is IHasSelectedItems hasSelectedItemsDocument)
+        {
+            hasSelectedItemsDocument.SelectedItems = SelectedItems;
+        }
+        
+        Documents.Add(document);
+    }
+    
+    public void ShowTool<T>() where T : IPaneTool
+    {
+        var tool = Tools.GetSingleOfType<T>();
+        SelectedTool = tool;
+    }
+
+    #endregion
+
+    #region Misc Methods
+
+    private void AddTools(IEnumerable<IPaneTool> tools)
+    {
+        foreach (var tool in tools)
+        {
+            tool.Workspace = this;
+            
+            if (tool is IHasSelectedItems hasSelectedItemsTool)
+            {
+                hasSelectedItemsTool.SelectedItems = SelectedItems;
+            }
+
+            if (tool is IInitialise initialiseTool)
+            {
+                initialiseTool.Initialise();
+            }
+            
+            Tools.Add(tool);
+        }
     }
 
     #endregion

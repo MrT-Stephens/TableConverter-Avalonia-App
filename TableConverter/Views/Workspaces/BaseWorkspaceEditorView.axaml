@@ -6,6 +6,7 @@
              xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
              xmlns:interfaces="clr-namespace:TableConverter.Interfaces"
              xmlns:converters="clr-namespace:TableConverter.Converters"
+             xmlns:behaviors="clr-namespace:TableConverter.Common.Behaviours"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="TableConverter.Views.Workspaces.BaseWorkspaceEditorView"
              x:DataType="viewModels:BaseWorkspaceEditorViewModel">
@@ -19,14 +20,16 @@
     </UserControl.Styles>
     <sukiUi:BusyArea IsBusy="{Binding IsBusy, Mode=OneWay}"
                      BusyText="{Binding BusyText, Mode=OneWay}">
-        <DockPanel Margin="{Binding ToolsSettings.Position, Mode=OneWay, 
+        <DockPanel LastChildFill="True"
+                   Margin="{Binding ToolsSettings.Position, Mode=OneWay, 
                       Converter={x:Static converters:DockPositionToMarginConverter.Instance}, ConverterParameter=10}">
             <TabControl DockPanel.Dock="{Binding ToolsSettings.Position, Mode=OneWay}"
                         TabStripPlacement="{Binding ToolsSettings.Position, Mode=OneWay}"
                         ItemsSource="{Binding Tools, Mode=TwoWay}"
                         SelectedItem="{Binding SelectedTool, Mode=TwoWay}"
                         Margin="{Binding ToolsSettings.Position, Mode=OneWay, 
-                            Converter={x:Static converters:DockPositionToOppositeMarginConverter.Instance}, ConverterParameter=10}">
+                            Converter={x:Static converters:DockPositionToOppositeMarginConverter.Instance}, ConverterParameter=10}"
+                        behaviors:SelectedItemsBehavior.SelectedItems="{Binding SelectedItems, Mode=TwoWay}">
                 <TabControl.ItemTemplate>
                     <DataTemplate>
                         <TextBlock TextWrapping="NoWrap" 
@@ -68,7 +71,7 @@
                                     </Grid>
                                 </sukiUi:GroupBox.Header>
                                 <sukiUi:GroupBox.Content>
-                                    <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                    <ScrollViewer HorizontalScrollBarVisibility="Disabled"
                                                   VerticalScrollBarVisibility="Auto">
                                         <ContentControl Content="{Binding .,Mode=TwoWay}"
                                                         Margin="10" />
@@ -81,7 +84,8 @@
             </TabControl>
             <sukiUi:GlassCard Padding="10">
                 <TabControl ItemsSource="{Binding Documents, Mode=TwoWay}"
-                            SelectedItem="{Binding SelectedDocument, Mode=TwoWay}">
+                            SelectedItem="{Binding SelectedDocument, Mode=TwoWay}"
+                            behaviors:SelectedItemsBehavior.SelectedItems="{Binding SelectedItems, Mode=TwoWay}">
                     <TabControl.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal"
@@ -97,8 +101,9 @@
                                 <Button Classes="WindowControlsButton"
                                         VerticalAlignment="Center"
                                         IsEnabled="{Binding CanClose, Mode=OneWay}"
-                                        Command="{Binding ((viewModels:BaseWorkspaceEditorViewModel)DataContext).ToolSettingsButtonClickedCommand, 
-                                        RelativeSource={RelativeSource AncestorType=DockPanel}, FallbackValue={x:Null}, Mode=OneWay}">
+                                        Command="{Binding ((viewModels:BaseWorkspaceEditorViewModel)DataContext).RemoveFileButtonClickedCommand, 
+                                            RelativeSource={RelativeSource AncestorType=DockPanel}, FallbackValue={x:Null}, Mode=OneWay}"
+                                        CommandParameter="{Binding .}">
                                     <PathIcon Data="{StaticResource TrashIcon}"
                                               Width="12.5"
                                               Height="12.5"

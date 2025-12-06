@@ -1,4 +1,5 @@
 using Avalonia.Controls.Shapes;
+using Avalonia.Media;
 
 namespace TableConverter.Commands.Interfaces;
 
@@ -27,10 +28,20 @@ public interface ICommandMetadata
     /// <summary>
     /// Gets the icon path based on the IconName from the application resources.
     /// </summary>
-    public Path? IconPath { get; }
+    public StreamGeometry? IconPath { get; }
     
     /// <summary>
     /// Gets the category of the command.
     /// </summary>
     public string? Category { get; }
+    
+    /// <summary>
+    /// Index which can be used to identify sub categories.
+    /// </summary>
+    public int? SubCategoryIndex { get; }
+    
+    /// <summary>
+    /// Gets the key gestures which can be used to execute the command.
+    /// </summary>
+    public string[] KeyGestures { get; }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using TableConverter.Commands.Interfaces;
+using TableConverter.Common;
 using TableConverter.Interfaces;
 using TableConverter.Utilities;
 using TableConverter.Utilities.Extensions;
@@ -10,6 +11,8 @@ namespace TableConverter.Commands.DataModels;
 
 public class CommandContext : ICommandContext
 {
+    #region Properties
+    
     /// <inheritdoc />
     public string Name { get; }
     
@@ -21,72 +24,68 @@ public class CommandContext : ICommandContext
 
     /// <inheritdoc />
     public Result<object>? Result { get; set; }
-
+    
     /// <inheritdoc />
-    public Dictionary<Type, object> SelectedItems { get; }
+    public bool Cancelled { get; set; }
+    
+    /// <inheritdoc />
+    public string CancelReason { get; set; }
+    
+    public SelectedItemsCollection SelectedItems { get; set; }
+    
+    #endregion
+
+    #region Constructors
 
     public CommandContext(string commandName)
     {
         Name = commandName;
         Parameter = null;
-        SelectedItems = new Dictionary<Type, object>();
+        SelectedItems = [];
+        Cancelled = false;
+        CancelReason = string.Empty;
     }
 
-    public CommandContext(string commandName, Dictionary<Type, object> selectedItems)
+    public CommandContext(string commandName, SelectedItemsCollection selectedItems)
     {
         Name = commandName;
         Parameter = null;
         SelectedItems = selectedItems;
+        Cancelled = false;
+        CancelReason = string.Empty;
     }
+    
+    #endregion
 
-    /// <inheritdoc />
-    public void UpdateSelectedItems<TObjectType>(TObjectType obj)
+    #region IHasSelectedItems Implementation
+
+    public bool TryGetSelectedItem<T>([NotNullWhen(true)] out T? item)
     {
-        ArgumentNullException.ThrowIfNull(obj, nameof(obj));
-
-        if (SelectedItems.ContainsKey(typeof(TObjectType)))
-        {
-            SelectedItems[typeof(TObjectType)] = obj;
-        }
-        else
-        {
-            SelectedItems.Add(typeof(TObjectType), obj);
-        }
+        item = SelectedItems.GetSingle<T>();
+        return item is not null;
     }
-
-    /// <inheritdoc />
-    public bool HasSelectedItem<TObjectType>()
+    
+    public bool TryGetSelectedItems<T>(out IReadOnlyCollection<T> items)
     {
-        return SelectedItems.ContainsKey(typeof(TObjectType));
+        items = SelectedItems.Get<T>();
+        return items.Count > 0;
     }
-
-    /// <inheritdoc />
-    public bool TryGetSelectedItem<TObjectType>([NotNullWhen(true)] out TObjectType? item)
+    
+    public void UpdateSelectedItemWith<T>(T item)
     {
-        if (SelectedItems.TryGetValue(typeof(TObjectType), out var value) && value is TObjectType typedItem)
-        {
-            item = typedItem;
-            return true;
-        }
-
-        item = default;
-        return false;
+        SelectedItems.RemoveAll<T>();
+        SelectedItems.Add(item);
     }
-
-    /// <inheritdoc />
-    public void ClearSelectedItem<TObjectType>()
+    
+    public void UpdateSelectedItemsWith<T>(IEnumerable<T> items)
     {
-        if (SelectedItems.ContainsKey(typeof(TObjectType)))
-        {
-            SelectedItems.Remove(typeof(TObjectType));
-        }
+        SelectedItems.RemoveAll<T>();
+        items.ForEach(x => SelectedItems.Add(x));
     }
 
-    /// <inheritdoc />
-    public void ClearSelectedItems()
-    {
-        SelectedItems.Clear();
-    }
+    #endregion
+
+    #region Methods
 
     /// <inheritdoc />
     public void SetResult<TObjectType>(TObjectType obj)
@@ -120,4 +119,13 @@ public class CommandContext : ICommandContext
         result = Result<TObjectType>.Failure("Result is not of type {0}".Format(typeof(TObjectType).Name));
         return false;
     }
+
+    /// <inheritdoc />
+    public void Cancel(string reason = "")
+    {
+        Cancelled = true;
+        CancelReason = reason;
+    }
+
+    #endregion
 }

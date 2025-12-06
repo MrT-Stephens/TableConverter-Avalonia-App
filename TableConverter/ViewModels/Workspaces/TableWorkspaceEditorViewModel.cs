@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
+using TableConverter.Commands.Handlers.TableData;
 using TableConverter.Contracts;
 using TableConverter.Interfaces;
 using TableConverter.ViewModels.Base;
@@ -20,6 +21,14 @@ public partial class TableWorkspaceEditorViewModel : BaseWorkspaceEditorViewMode
     #endregion
 
     #region Methods
+
+    public override void Initialise()
+    {
+        base.Initialise();
+        
+        MainCommands.Add(this[TableDataCommandNames.NewFile]);
+        MainCommands.Add(this[TableDataCommandNames.ImportFile]);
+    }
 
     public override IPaneDocument CreateNewDocumentInstance()
     {

@@ -1,7 +1,10 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using Avalonia.Controls.Notifications;
 using Microsoft.Extensions.DependencyInjection;
+using SukiUI.Dialogs;
+using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Utilities.Extensions;
 
@@ -29,5 +32,20 @@ public static class DependencyInjectionExtensions
         {
             commandService.RegisterCommand(handler.CommandMetadata.Name, handler);
         });
+    }
+
+    public static void RegisterCommandError(this IServiceProvider provider)
+    {
+        var commandService = provider.GetRequiredService<ICommandManager>();
+        var toastManger = provider.GetRequiredService<ISukiToastManager>();
+
+        commandService.OnError += (_, args) =>
+        {
+            toastManger.CreateSimpleInfoToast()
+                .OfType(NotificationType.Error)
+                .WithTitle("Command Error Occured")
+                .WithContent($"A command error has occured: {args}")
+                .Queue();
+        };
     }
 }

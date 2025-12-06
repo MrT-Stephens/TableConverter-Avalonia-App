@@ -3,7 +3,7 @@ using System.Windows.Input;
 
 namespace TableConverter.Commands.Interfaces;
 
-public interface ICommandManager
+public interface ICommandManager : IDisposable
 {
     /// <summary>
     /// Raised when the command can execute state changes.

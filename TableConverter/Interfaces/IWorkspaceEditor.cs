@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using Avalonia.Controls;
+﻿using System.Collections.ObjectModel;
 using TableConverter.ViewModels.Forms;
 
 namespace TableConverter.Interfaces
@@ -16,8 +14,6 @@ namespace TableConverter.Interfaces
         public IPaneTool? SelectedTool { get; set; }
         
         public ToolsSettingsForm ToolsSettings { get; set; }
-
-        public void Initialise();
         
         public void InitialiseTools();
         
@@ -26,5 +22,9 @@ namespace TableConverter.Interfaces
         public void InitialiseEvents();
 
         public IPaneDocument CreateNewDocumentInstance();
+        
+        public void AddDocument(IPaneDocument document);
+        
+        public void ShowTool<T>() where T : IPaneTool;
     }
 }

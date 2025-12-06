@@ -5,38 +5,30 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Layout;
+using SukiUI.Theme;
+using TableConverter.Contracts;
 using TableConverter.Converters;
 
 namespace TableConverter.Views.Controls;
 
 public class DynamicDataGrid : DataGrid
 {
-    public static readonly StyledProperty<ObservableCollection<string>?> HeadersProperty =
-        AvaloniaProperty.Register<DynamicDataGrid, ObservableCollection<string>?>(nameof(Headers));
-
-    public static readonly StyledProperty<ObservableCollection<ObservableCollection<object>>?> RowsProperty =
-        AvaloniaProperty.Register<DynamicDataGrid, ObservableCollection<ObservableCollection<object>>?>(nameof(Rows));
+    public static readonly StyledProperty<ObservableTableData?> TableDataProperty =
+        AvaloniaProperty.Register<DynamicDataGrid, ObservableTableData?>(nameof(TableData));
 
     public DynamicDataGrid()
     {
-        Headers = [];
-        Rows = [];
+        TableData = new ObservableTableData();
     }
 
     protected override Type StyleKeyOverride => typeof(DataGrid);
 
-    public ObservableCollection<string>? Headers
+    public ObservableTableData? TableData
     {
-        get => GetValue(HeadersProperty);
-        set => SetValue(HeadersProperty, value);
+        get => GetValue(TableDataProperty);
+        set => SetValue(TableDataProperty, value);
     }
-
-    public ObservableCollection<ObservableCollection<object>>? Rows
-    {
-        get => GetValue(RowsProperty);
-        set => SetValue(RowsProperty, value);
-    }
-
+    
     protected override void OnInitialized()
     {
         base.OnInitialized();
@@ -51,10 +43,10 @@ public class DynamicDataGrid : DataGrid
 
         switch (change.Property.Name)
         {
-            case nameof(Headers):
+            case nameof(TableData.ObservableColumns):
                 UpdateColumns();
                 break;
-            case nameof(Rows):
+            case nameof(TableData.ObservableRows):
                 UpdateRows();
                 break;
         }
@@ -62,21 +54,22 @@ public class DynamicDataGrid : DataGrid
 
     private void UpdateRows()
     {
-        ItemsSource = Rows;
+        ItemsSource = TableData?.ObservableRows;
     }
 
     private void UpdateColumns()
     {
         Columns.Clear();
 
-        if (Headers is null || Headers.Count == 0)
+        if (TableData is null || TableData.ColumnCount == 0)
             return;
 
-        for (var i = 0; i < Headers.Count; ++i)
+        for (var i = 0; i < TableData.ColumnCount; i++)
         {
+            var tableDataColumn = TableData.Columns[i];
             DataGridBoundColumn column;
 
-            if (Rows is { Count: > 0 } && Rows[0].Count > i && Rows[0][i] is bool)
+            if (tableDataColumn.DataType == typeof(bool))
             {
                 column = new DataGridCheckBoxColumn
                 {
@@ -105,14 +98,14 @@ public class DynamicDataGrid : DataGrid
             {
                 [!TextBox.TextProperty] = new Binding
                 {
-                    Path = $"Headers[{i}]",
-                    Source = this,
+                    Path = $"[{i}].Name",
+                    Source = TableData.ObservableColumns,
                     Mode = BindingMode.TwoWay
                 },
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch,
             };
-            
+
             header.Classes.Add("Small");
             column.Header = header;
             column.CanUserSort = true;
@@ -123,10 +116,5 @@ public class DynamicDataGrid : DataGrid
 
             Columns.Add(column);
         }
-    }
-
-    private void OnSort(object? sender, DataGridColumnEventArgs e)
-    {
-        e.Handled = true;
     }
 }

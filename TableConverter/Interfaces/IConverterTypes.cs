@@ -36,4 +36,20 @@ public interface IConverterTypes
     /// The converter type with the specified name.
     /// </returns>
     public ConverterType GetOutputConverter(string name);
+
+    /// <summary>
+    /// Gets all names of the input converters.
+    /// </summary>
+    /// <returns>
+    /// <see cref="IEnumerable{T}"/> of names.
+    /// </returns>
+    public IEnumerable<string> GetInputConverterNames();
+    
+    /// <summary>
+    /// Gets all names of the output converters.
+    /// </summary>
+    /// <returns>
+    /// <see cref="IEnumerable{T}"/> of names.
+    /// </returns>
+    public IEnumerable<string> GetOutputConverterNames();
 }

@@ -18,7 +18,7 @@ public class WeakDelegate
         
         _Target = new WeakReference(method.Target);
         _methodInfo = method.Method;
-        _targetType = method.Target!.GetType();
+        _targetType = method.GetType();
     }
 
     /// <summary>

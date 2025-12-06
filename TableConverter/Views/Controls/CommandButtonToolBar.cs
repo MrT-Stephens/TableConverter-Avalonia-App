@@ -66,7 +66,7 @@ public class CommandButtonToolBar : ItemsControl
     {
         base.OnInitialized();
         
-        ItemsSource ??= Commands;
+        ItemsSource = Commands;
     }
 
     protected override Control CreateContainerForItemOverride(object? item, int index, object? recycleKey)

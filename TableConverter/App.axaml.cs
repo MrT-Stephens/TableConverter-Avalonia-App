@@ -22,7 +22,6 @@ using TableConverter.Views;
 using TableConverter.Views.Documents;
 using TableConverter.Views.Tools;
 using TableConverter.Views.Workspaces;
-using TableDataViewModel = TableConverter.ViewModels.Documents.TableDataViewModel;
 
 namespace TableConverter;
 
@@ -47,6 +46,7 @@ public class App : Application
             var provider = ConfigureServices(services);
             
             provider.RegisterCommandHandlers();
+            provider.RegisterCommandError();
 
             DataTemplates.Add(new ViewLocator(views));
 
@@ -87,7 +87,8 @@ public class App : Application
             .AddView<DataGenerationSchemeView, DataGenerationSchemaViewModel>(services)
             .AddView<MarkdownView, MarkdownViewModel>(services)
             // Tools
-            .AddView<TableUtilitiesView, TableUtilitiesViewModel>(services);
+            .AddView<TableUtilitiesView, TableUtilitiesViewModel>(services)
+            .AddView<TableSearchView, TableSearchViewModel>(services);
         
         return views;
     }
@@ -105,6 +106,7 @@ public class App : Application
         services.AddSingleton<IDataGenerationTypes, DataGenerationTypes>();
         services.AddSingleton<IFilesDialogManager, FilesDialogManager>();
         services.AddSingleton<IEventManager, EventManager>();
+        services.AddSingleton<IUndoRedo, UndoRedo>();
 
         // SukiUI Services
         services.AddSingleton<ISukiToastManager, SukiToastManager>();

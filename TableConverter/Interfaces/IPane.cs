@@ -6,6 +6,8 @@
         
         public bool IsEnabled { get; set; }
         
+        public object Workspace { get; set; }
+        
         public void OnActivate();
         
         public void OnDeactivate();

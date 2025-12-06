@@ -9,6 +9,7 @@ using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Contracts.Events;
 using TableConverter.Interfaces;
+using TableConverter.Utilities.Extensions;
 using TableConverter.ViewModels.Base;
 
 namespace TableConverter.ViewModels;
@@ -34,9 +35,13 @@ public partial class MainWindowViewModel : BaseViewModel
         IEnumerable<IWorkspace> workspaces) 
         : base(commandManager, eventManager, dialogManager, toastManager)
     {
+        MenuItems = [];
+        
         Workspaces = new AvaloniaList<IWorkspace>(workspaces
             .OrderBy(w => w.Index)
             .ThenBy(w => w.Title));
+        
+        Workspaces.Cast<IInitialise>().ForEach(item => item.Initialise());
 
         SelectedWorkspace = Workspaces.First();
 

@@ -14,11 +14,10 @@ public abstract partial class BaseScopedPaneToolViewModel<TWorkspace> : BaseView
 
     [ObservableProperty] private string _Title;
     [ObservableProperty] private bool _IsEnabled;
-    [ObservableProperty] private IPaneDocument? _SelectedDocument;
     
     public TWorkspace Workspace { get; set; }
     
-    object IPaneTool.Workspace
+    object IPane.Workspace
     {
         get => Workspace!;
         set => Workspace = (TWorkspace)value;
@@ -39,14 +38,22 @@ public abstract partial class BaseScopedPaneToolViewModel<TWorkspace> : BaseView
         Title = title;
         IsEnabled = true;
         Workspace = default!;
-        
-        _eventManager.GetEvent<WorkspaceDocumentSelectedEvent>()
-            .Subscribe((_, args) => OnSelectedDocumentChanged(args.Workspace, args.OldDocument, args.NewDocument));
     }
 
     #endregion
 
     #region Methods
+
+    public override void Initialise()
+    {
+        base.Initialise();
+        
+        _eventManager.GetEvent<WorkspaceDocumentSelectedEvent>()
+            .Subscribe((_, args) =>
+            {
+                OnSelectedDocumentChanged(args.Workspace, args.OldDocument, args.NewDocument);
+            });
+    }
 
     public override ICommandInstance this[string commandName] => _commandManager[commandName, Workspace];
 
@@ -63,10 +70,7 @@ public abstract partial class BaseScopedPaneToolViewModel<TWorkspace> : BaseView
     protected virtual void OnSelectedDocumentChanged(IWorkspace workspace, IPaneDocument? oldDocument,
         IPaneDocument? newDocument)
     {
-        if ((IWorkspace)Workspace! == workspace)
-        {
-            SelectedDocument = newDocument;
-        }
+        // Do nothing - Can be overriden
     }
 
     #endregion

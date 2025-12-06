@@ -54,7 +54,7 @@ public class ViewsCollection : IViewsCollection
         {
             services.AddSingleton(viewModelType);
         }
-
+        
         return this;
     }
 

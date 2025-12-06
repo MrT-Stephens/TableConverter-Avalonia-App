@@ -8,15 +8,18 @@ public static class StringExtensions
     /// <param name="input">
     /// The string to check.
     /// </param>
+    /// <param name="ignoreChars">
+    /// Characters to ignore.
+    /// </param>
     /// <returns>
     /// True if the string contains only alphanumeric characters; otherwise, false.
     /// </returns>
-    public static bool IsOnlyAlphaNumeric(this string input)
+    public static bool IsOnlyAlphaNumeric(this string input, params char[] ignoreChars)
     {
         if (string.IsNullOrEmpty(input))
             return false;
 
-        return input.All(char.IsLetterOrDigit);
+        return input.All(c => char.IsLetterOrDigit(c) || ignoreChars.Contains(c));
     }
     
     /// <summary>

@@ -4,7 +4,6 @@ namespace TableConverter.Interfaces
 {
     public interface IPaneTool : IPane
     {
-        public object Workspace { get; set; }
     }
     
     public interface IScopedPaneTool<TWorkspace> : IPaneTool

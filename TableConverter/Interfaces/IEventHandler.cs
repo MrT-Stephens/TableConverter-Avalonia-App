@@ -35,10 +35,13 @@ public interface IEventHandler<TEventArgs> : IEventHandler where TEventArgs : Ev
     /// The action to be removed from the event subscribers.
     /// </param>
     public void Unsubscribe(EventHandler<TEventArgs> action);
-    
+
     /// <summary>
     /// Publishes the event to all subscribed actions.
     /// </summary>
+    /// <param name="sender">
+    /// The sender of the event.
+    /// </param>
     /// <param name="args">
     /// The event data.
     /// </param>

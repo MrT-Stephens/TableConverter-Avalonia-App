@@ -1,16 +1,25 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using TableConverter.Interfaces;
 using TableConverter.Utilities;
 
 namespace TableConverter.Commands.Interfaces;
 
-public interface ICommandContext
+public interface ICommandContext : IHasSelectedItems
 {
     /// <summary>
     /// Name of the command.
     /// </summary>
     public string Name { get; }
+    
+    /// <summary>
+    /// Indicates whether the command execution was cancelled.
+    /// </summary>
+    public bool Cancelled { get; set; }
+    
+    /// <summary>
+    /// Reason for command cancellation, if any.
+    /// </summary>
+    public string CancelReason { get; set; }
 
     /// <summary>
     /// The parameter passed to the command, if any.
@@ -26,60 +35,6 @@ public interface ICommandContext
     /// The result of the command execution, if any.
     /// </summary>
     public Result<object>? Result { get; set; }
-
-    /// <summary>
-    /// The selected items in the context of the command.
-    /// </summary>
-    public Dictionary<Type, object> SelectedItems { get; }
-
-    /// <summary>
-    /// Updates the selected items in the context of the command with the provided object.
-    /// </summary>
-    /// <param name="obj">
-    /// The object to update the selected items with.
-    /// </param>
-    /// <typeparam name="TObjectType">
-    /// The type of the object to update the selected items with.
-    /// </typeparam>
-    public void UpdateSelectedItems<TObjectType>(TObjectType obj);
-
-    /// <summary>
-    /// Checks if the context has a selected item of the specified type.
-    /// </summary>
-    /// <typeparam name="TObjectType">
-    /// The type of the object to check for in the selected items.
-    /// </typeparam>
-    /// <returns>
-    /// True if there is at least one selected item of the specified type; otherwise, false.
-    /// </returns>
-    public bool HasSelectedItem<TObjectType>();
-
-    /// <summary>
-    /// Attempts to get the selected item of the specified type from the context.
-    /// </summary>
-    /// <param name="item">
-    /// The output parameter that will hold the selected item if found.
-    /// </param>
-    /// <typeparam name="TObjectType">
-    /// The type of the object to retrieve from the selected items.
-    /// </typeparam>
-    /// <returns>
-    /// True if a selected item of the specified type is found; otherwise, false.
-    /// </returns>
-    public bool TryGetSelectedItem<TObjectType>([NotNullWhen(true)] out TObjectType? item);
-
-    /// <summary>
-    /// Clears the selected item of the specified type from the context.
-    /// </summary>
-    /// <typeparam name="TObjectType">
-    /// The type of the object to clear from the selected items.
-    /// </typeparam>
-    public void ClearSelectedItem<TObjectType>();
-
-    /// <summary>
-    /// Clears all selected items from the context.
-    /// </summary>
-    public void ClearSelectedItems();
 
     /// <summary>
     /// Sets the result of the command execution to the provided object, wrapped in a successful Result.
@@ -113,4 +68,12 @@ public interface ICommandContext
     /// True if the result is successfully retrieved and is of the specified type; otherwise, false.
     /// </returns>
     public bool TryGetResult<TObjectType>([NotNullWhen(true)] out Result<TObjectType>? result);
+    
+    /// <summary>
+    /// Cancels the command execution with an optional reason.
+    /// </summary>
+    /// <param name="reason">
+    /// The reason for cancelling the command execution.
+    /// </param>
+    public void Cancel(string reason = "");
 }

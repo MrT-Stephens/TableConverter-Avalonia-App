@@ -1,4 +1,7 @@
-﻿namespace TableConverter.Interfaces;
+﻿using System.Collections.ObjectModel;
+using TableConverter.Commands.Interfaces;
+
+namespace TableConverter.Interfaces;
 
 public interface IWorkspace
 {
@@ -11,6 +14,8 @@ public interface IWorkspace
     public bool IsBusy { get; set; }
         
     public string BusyText { get; set; }
+    
+    public ObservableCollection<ICommandInstance> MainCommands { get; set; }
         
     public void SetBusy(bool isBusy, string busyText = "Loading...");
         

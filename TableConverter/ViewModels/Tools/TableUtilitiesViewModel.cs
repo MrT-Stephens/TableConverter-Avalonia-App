@@ -5,6 +5,7 @@ using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Interfaces;
 using TableConverter.ViewModels.Base;
+using TableConverter.ViewModels.Documents;
 using TableConverter.ViewModels.Workspaces;
 
 namespace TableConverter.ViewModels.Tools;
@@ -36,8 +37,18 @@ public partial class TableUtilitiesViewModel : BaseScopedPaneToolViewModel<Table
     #endregion
 
     #region Overrides
-    
-    
+
+    protected override void OnSelectedDocumentChanged(IWorkspace workspace, 
+        IPaneDocument? oldDocument, IPaneDocument? newDocument)
+    {
+        base.OnSelectedDocumentChanged(workspace, oldDocument, newDocument);
+
+        if (Workspace == workspace && newDocument is TableDataViewModel tableDataViewModel)
+        {
+            RowCount = tableDataViewModel.TableData.RowCount;
+            HeadersCount = tableDataViewModel.TableData.ColumnCount;
+        }
+    }
 
     #endregion
 }

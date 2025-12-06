@@ -3,18 +3,22 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using TableConverter.Commands.DataModels;
 using TableConverter.Commands.Interfaces;
+using TableConverter.Common;
+using TableConverter.Extensions;
+using TableConverter.Interfaces;
+using TableConverter.Services;
 using TableConverter.Utilities.Extensions;
 
 namespace TableConverter.Commands.Services;
 
 public class CommandManager : ICommandManager
 {
+    private readonly IEventRegistrar _eventRegistrar = new EventRegistrar();
     private readonly List<ICommandHandlerBase> _commandHandlers = [];
-    private readonly ConcurrentDictionary<(string, object?), ICommandInstance> _instances = new();
+    private readonly ConcurrentDictionary<(string, object?), ICommandInstance> _instances = [];
 
     public event EventHandler<ICommandContext>? OnCanExecute;
     public event EventHandler<ICommandContext>? OnExecute;
@@ -50,9 +54,13 @@ public class CommandManager : ICommandManager
                 throw new ArgumentException("Command with name '{0}' not found.".Format(name), nameof(name));
             }
 
-            var context = new CommandContext(handler.CommandMetadata.Name);
+            var context = viewModel is IHasSelectedItems hasSelectedItems
+                ? new CommandContext(handler.CommandMetadata.Name, hasSelectedItems.SelectedItems)
+                : new CommandContext(handler.CommandMetadata.Name);
+            
+            context.Parent = viewModel;
 
-            ICommand command = handler switch
+            IRelayCommand command = handler switch
             {
                 ICommandHandlerAsync asyncHandler => new AsyncRelayCommand<object?>(
                     param => InternalExecute(param, asyncHandler, context),
@@ -63,6 +71,17 @@ public class CommandManager : ICommandManager
                 _ => throw new ArgumentException("Command handler for '{0}' is of an unsupported type.".Format(name),
                     nameof(name))
             };
+
+            _eventRegistrar.RegisterCollectionChanged(context.SelectedItems, null, 
+                (_, _) => command.NotifyCanExecuteChanged());
+            
+            _eventRegistrar.RegisterEvent<EventHandler<ItemChangedEventArgs>>(
+                func => context.SelectedItems.ItemChanged += func,
+                func => context.SelectedItems.ItemChanged -= func,
+                null, (_, _) =>
+                {
+                    command.NotifyCanExecuteChanged();
+                });
 
             return new CommandInstance(command, handler, context);
         });
@@ -76,9 +95,12 @@ public class CommandManager : ICommandManager
     
     public ICommandInstance GetCommandInstance(string name, object? viewModel)
     {
-        return _instances.TryGetValue((name, viewModel), out var command) 
-            ? command 
-            : throw new ArgumentException("No command with the specified name is registered.", nameof(name));
+        if (!_instances.TryGetValue((name, viewModel), out var command))
+        {
+            command = RegisterCommandInstance(name, viewModel);
+        }
+
+        return command;
     }
 
     public ICommandInstance this[string name] => GetCommandInstance(name, null);
@@ -113,7 +135,6 @@ public class CommandManager : ICommandManager
         {
             // Clear the parameter and selected items after execution
             context.Parameter = null;
-            context.ClearSelectedItems();
             context.Result = null;
         }
     }
@@ -142,7 +163,6 @@ public class CommandManager : ICommandManager
         {
             // Clear the parameter and selected items after execution
             context.Parameter = null;
-            context.ClearSelectedItems();
             context.Result = null;
         }
     }
@@ -168,4 +188,11 @@ public class CommandManager : ICommandManager
     }
     
     #endregion
+
+    public void Dispose()
+    {
+        _eventRegistrar.ClearAll();
+        _commandHandlers.Clear();
+        _instances.Clear();
+    }
 }

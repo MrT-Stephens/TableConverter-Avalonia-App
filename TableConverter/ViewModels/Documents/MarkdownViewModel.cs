@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using NPOI.SS.Formula.Functions;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;
@@ -14,6 +15,8 @@ public partial class MarkdownViewModel : BaseDocumentViewModel
     [ObservableProperty] private string _Content;
 
     public override bool CanClose => true;
+    public override bool CanUndo => false;
+    public override bool CanRedo => false;
 
     #endregion
 
@@ -23,8 +26,9 @@ public partial class MarkdownViewModel : BaseDocumentViewModel
         ICommandManager commandManager, 
         IEventManager eventManager, 
         ISukiDialogManager dialogManager,
-        ISukiToastManager toastManager) 
-        : base(commandManager, eventManager, dialogManager, toastManager)
+        ISukiToastManager toastManager,
+        IUndoRedo undoRedo) 
+        : base(commandManager, eventManager, dialogManager, toastManager, undoRedo)
     {
     }
 

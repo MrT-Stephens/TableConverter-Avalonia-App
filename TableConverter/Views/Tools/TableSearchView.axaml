@@ -1,0 +1,73 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:TableConverter.ViewModels.Tools"
+             xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+             xmlns:controls="clr-namespace:TableConverter.Views.Controls"
+             xmlns:converters="clr-namespace:TableConverter.Converters"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TableConverter.Views.Tools.TableSearchView"
+             x:DataType="viewModels:TableSearchViewModel">
+    <Grid RowDefinitions="Auto,Auto,*">
+        <sukiUi:PropertyGrid Grid.Row="0"
+                             Item="{Binding SearchSettings, Mode=TwoWay}">
+            <sukiUi:PropertyGrid.DataTemplates>
+                <sukiUi:PropertyGridTemplateSelector />
+            </sukiUi:PropertyGrid.DataTemplates>
+        </sukiUi:PropertyGrid>
+        <controls:CommandButtonToolBar Grid.Row="1"
+                                       Margin="0,0,0,15"
+                                       Commands="{Binding SearchCommands, Mode=OneWay}">
+            <controls:CommandButtonToolBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Columns="2"
+                                 ColumnSpacing="10" />
+                </ItemsPanelTemplate>
+            </controls:CommandButtonToolBar.ItemsPanel>
+        </controls:CommandButtonToolBar>
+        <Expander Grid.Row="2" 
+                  Header="Search Results"
+                  IsExpanded="{Binding !!SearchResults.Count, Mode=OneWay}">
+            <ItemsControl Grid.IsSharedSizeScope="True"
+                          ItemsSource="{Binding SearchResults, Mode=OneWay}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition SharedSizeGroup="LabelGroup" Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" 
+                                       TextWrapping="NoWrap" 
+                                       Classes="Caption"
+                                       TextTrimming="CharacterEllipsis">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="Row {0}, Col {1}">
+                                        <Binding Path="Row" Mode="OneWay" />
+                                        <Binding Path="Column" Mode="OneWay" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                            <TextBlock Grid.Column="1" 
+                                       TextWrapping="NoWrap" 
+                                       TextTrimming="CharacterEllipsis">
+                                <TextBlock.Inlines>
+                                    <Binding Path="." 
+                                             Mode="OneWay"
+                                             Converter="{x:Static converters:SearchResultToInlinesConverter.Instance}" />
+                                </TextBlock.Inlines>
+                            </TextBlock>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Spacing="5"
+                                    Orientation="Vertical" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </Expander>
+    </Grid>
+</UserControl>

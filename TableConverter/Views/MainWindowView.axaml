@@ -4,6 +4,7 @@
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
                    xmlns:viewModels="clr-namespace:TableConverter.ViewModels"
+                   xmlns:converters="clr-namespace:TableConverter.Converters"
                    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
                    x:Class="TableConverter.Views.MainWindowView"
                    x:DataType="viewModels:MainWindowViewModel"
@@ -11,7 +12,13 @@
                    BackgroundStyle="GradientDarker"
                    BackgroundAnimationEnabled="False"
                    BackgroundTransitionsEnabled="False"
-                   CanFullScreen="True">
+                   CanFullScreen="True"
+                   IsMenuVisible="{Binding !!SelectedWorkspace.MainCommands.Count, Mode=OneWay}">
+    <sukiUi:SukiWindow.MenuItems>
+        <Binding Path="SelectedWorkspace.MainCommands"
+                 Converter="{x:Static converters:CommandInstancesToMenuItemsConverter.Instance}"
+                 Mode="OneWay" />
+    </sukiUi:SukiWindow.MenuItems>
     <sukiUi:SukiWindow.LogoContent>
         <PathIcon Data="{StaticResource TableIcon}"
                   Width="15"

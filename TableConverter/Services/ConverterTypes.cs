@@ -130,4 +130,14 @@ public class ConverterTypes : IConverterTypes
     {
         return OutputTypes.First(val => val.Name == name);
     }
+
+    public IEnumerable<string> GetInputConverterNames()
+    {
+        return InputTypes.Select(val => val.Name);
+    }
+
+    public IEnumerable<string> GetOutputConverterNames()
+    {
+        return OutputTypes.Select(val => val.Name);
+    }
 }

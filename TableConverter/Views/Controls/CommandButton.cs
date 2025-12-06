@@ -1,9 +1,10 @@
 using System;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Shapes;
 using Avalonia.Data;
 using Avalonia.Layout;
+using Avalonia.Media;
+using SukiUI.Theme;
 using TableConverter.Commands.Interfaces;
 
 namespace TableConverter.Views.Controls
@@ -54,7 +55,7 @@ namespace TableConverter.Views.Controls
         protected override void OnInitialized()
         {
             base.OnInitialized();
-
+            
             this[!CommandProperty] = new Binding
             {
                 Path = string.Join('.', nameof(CommandInstance), 
@@ -62,56 +63,42 @@ namespace TableConverter.Views.Controls
                 Source = this,
                 Mode = BindingMode.OneWay,
             };
-            
-            Content = new StackPanel
-            {
-                Orientation = Orientation,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center,
-                Spacing = 5,
-                Children =
+
+            Content =
+                new TextBlock
                 {
-                    new Path
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Text = CommandInstance?.Metadata.Title,
+                    TextTrimming = TextTrimming.CharacterEllipsis,
+                    TextWrapping = TextWrapping.NoWrap,
+                    [!IsVisibleProperty] = new Binding
                     {
-                        Width = 16,
-                        Height = 16,
-                        Stretch = Avalonia.Media.Stretch.Uniform,
-                        [!Path.DataProperty] = new Binding
-                        {
-                            Path = string.Join('.', nameof(CommandInstance), 
-                                                    nameof(ICommandInstance.Metadata),
-                                                    nameof(ICommandMetadata.IconPath)),
-                            Source = this,
-                            Mode = BindingMode.OneWay,
-                        },
-                        [!IsVisibleProperty] = new Binding
-                        {
-                            Path = nameof(ShowIcon),
-                            Source = this,
-                            Mode = BindingMode.OneWay,
-                        }
-                    },
-                    new TextBlock
-                    {
-                        HorizontalAlignment = HorizontalAlignment.Center,
-                        VerticalAlignment = VerticalAlignment.Center,
-                        [!TextBlock.TextProperty] = new Binding
-                        {
-                            Path = string.Join('.', nameof(CommandInstance), 
-                                                    nameof(ICommandInstance.Metadata),
-                                                    nameof(ICommandMetadata.Title)),
-                            Source = this,
-                            Mode = BindingMode.OneWay,
-                        },
-                        [!IsVisibleProperty] = new Binding
-                        {
-                            Path = nameof(ShowText),
-                            Source = this,
-                            Mode = BindingMode.OneWay,
-                        }
+                        Path = nameof(ShowText),
+                        Source = this,
+                        Mode = BindingMode.OneWay,
                     }
-                }
-            };
+                };
+            
+            ButtonExtensions.SetIcon(this, new PathIcon
+            {
+                Data = CommandInstance?.Metadata.IconPath
+            });
+            
+            ToolTip.SetShowDelay(this, 1000);
+            ToolTip.SetBetweenShowDelay(this, 500);
+            ToolTip.SetTip(this, new ContentControl
+            {
+                Content = new TextBlock
+                {
+                    Text = $"{CommandInstance?.Metadata.Title}: {CommandInstance?.Metadata.Description}",
+                    TextWrapping = TextWrapping.Wrap,
+                },
+                MaxWidth = 300,
+            });
+            
+            Padding = new Thickness(8);
+            Classes.Add("Flat");
         }
     }
 }

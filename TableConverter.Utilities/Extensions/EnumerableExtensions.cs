@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.ObjectModel;
 using System.Text;
 
@@ -158,5 +159,42 @@ public static class EnumerableExtensions
     {
         collection.Clear();
         collection.AddRange(items);
+    }
+    
+    /// <summary>
+    /// Removes a range of items from the ICollection.
+    /// </summary>
+    /// <param name="collection">
+    /// The ICollection from which items will be removed.
+    /// </param>
+    /// <param name="items">
+    /// The items to remove from the ICollection.
+    /// </param>
+    /// <typeparam name="T">
+    /// The type of elements in the ICollection.
+    /// </typeparam>
+    public static void RemoveRange<T>(this ICollection<T> collection, IEnumerable<T> items)
+    {
+        foreach (var item in items)
+        {
+            collection.Remove(item);
+        }
+    }
+    
+    /// <summary>
+    /// Removes all items of type T from the ICollection.
+    /// </summary>
+    /// <param name="source">
+    /// The source ICollection from which items will be removed.
+    /// </param>
+    /// <param name="item">
+    /// The item of type T to remove from the ICollection.
+    /// </param>
+    /// <typeparam name="T">
+    /// The type of elements to remove from the ICollection.
+    /// </typeparam>
+    public static T GetSingleOfType<T>(this IEnumerable source)
+    {
+        return source.OfType<T>().Single();
     }
 }
