@@ -91,12 +91,13 @@ public class ReplaceSearchResultsCommandHandler(
 
         tableDataViewModel.TableData.Columns.ClearAndAddRange(tableData.Columns);
         tableDataViewModel.TableData.Rows.ClearAndAddRange(tableData.Rows);
-        searchViewModel.SearchResults.Clear();
 
         toastManager.CreateSimpleInfoToast()
             .OfType(NotificationType.Success)
             .WithTitle("Replace Success")
             .WithContent($"Replaced {replaceValues.Count} occurrences with '{settings.ReplaceText}'.")
             .Queue();
+
+        searchViewModel.SearchResults.Clear();
     }
 }

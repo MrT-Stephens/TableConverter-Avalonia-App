@@ -2,11 +2,11 @@
 
 public class ConverterHandlerJsonLinesOutputOptions : ConverterHandlerBaseOptions
 {
-    public readonly string[] JsonLinesFormatTypes =
-    [
-        "Objects",
-        "Arrays"
-    ];
+    public enum JsonLinesStyles
+    {
+        Objects,
+        Arrays
+    }
 
-    public string SelectedJsonLinesFormatType { get; set; } = "Objects";
+    public JsonLinesStyles SelectedJsonLinesFormatType { get; set; } = JsonLinesStyles.Objects;
 }

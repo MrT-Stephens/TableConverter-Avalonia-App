@@ -1,37 +1,32 @@
-﻿namespace TableConverter.FileConverters.ConverterHandlersOptions;
+﻿using TableConverter.FileConverters.Utilities;
+
+namespace TableConverter.FileConverters.ConverterHandlersOptions;
 
 public class ConverterHandlerLaTexOutputOptions : ConverterHandlerBaseOptions
 {
-    public readonly string[] Alignments =
-    [
-        "Left",
-        "Center",
-        "Right"
-    ];
+    public enum CaptionAlignments
+    {
+        Top,
+        Bottom,
+    }
 
-    public readonly string[] CaptionAlignments =
-    [
-        "Top",
-        "Bottom"
-    ];
+    public enum TableTypes
+    {
+        All,
+        MySQL,
+        Excel,
+        Horizontal,
+        Markdown,
+        None,
+    }
 
-    public readonly string[] TableTypes =
-    [
-        "All",
-        "MySQL",
-        "Excel",
-        "Horizontal",
-        "Markdown",
-        "None"
-    ];
+    public TableTypes SelectedTableType { get; set; } = TableTypes.All;
 
-    public string SelectedTableType { get; set; } = "All";
+    public TextAlignment SelectedTextAlignment { get; set; } = TextAlignment.Left;
 
-    public string SelectedTextAlignment { get; set; } = "Left";
+    public TextAlignment SelectedTableAlignment { get; set; } = TextAlignment.Left;
 
-    public string SelectedTableAlignment { get; set; } = "Left";
-
-    public string SelectedCaptionAlignment { get; set; } = "Top";
+    public CaptionAlignments SelectedCaptionAlignment { get; set; } = CaptionAlignments.Top;
 
     public string CaptionName { get; set; } = "";
 

@@ -2,15 +2,15 @@
 
 public class ConverterHandlerJsonOutputOptions : ConverterHandlerBaseOptions
 {
-    public readonly string[] JsonFormatTypes =
-    [
-        "Array of Objects",
-        "2D Arrays",
-        "Column Arrays",
-        "Keyed Arrays"
-    ];
+    public enum JsonStyles
+    {
+        ArrayOfObjects,
+        TwoDimensionalArrays,
+        ColumnArrays,
+        KeyedArrays,
+    }
 
-    public string SelectedJsonFormatType { get; set; } = "Array of Objects";
+    public JsonStyles SelectedJsonFormatType { get; set; } = JsonStyles.ArrayOfObjects;
 
     public bool MinifyJson { get; set; } = false;
 }

@@ -37,7 +37,9 @@ public class ImportFileCommandHandler(
     public async Task Execute(object? parameter, ICommandContext context)
     {
         if (context.Parent is not TableWorkspaceEditorViewModel editorViewModel)
-            return;
+        {
+            context.Cancel("Selected workspace is not correct.");
+        }
         
         string? inputConverterName = null;
         

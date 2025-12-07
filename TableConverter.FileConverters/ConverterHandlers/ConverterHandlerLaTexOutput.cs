@@ -1,5 +1,6 @@
 ﻿using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
+using TableConverter.FileConverters.Utilities;
 using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.ConverterHandlers;
@@ -24,9 +25,9 @@ public class ConverterHandlerLaTexOutput : ConverterHandlerOutputAbstract<Conver
         {
             return Options!.SelectedTableAlignment switch
             {
-                "Left" => "\t\\raggedleft",
-                "Center" => "\t\\centering",
-                "Right" => "\t\\raggedright",
+                TextAlignment.Left => "\t\\raggedleft",
+                TextAlignment.Center => "\t\\centering",
+                TextAlignment.Right => "\t\\raggedright",
                 _ => "\t\\raggedleft"
             } + Environment.NewLine;
         }
@@ -35,19 +36,22 @@ public class ConverterHandlerLaTexOutput : ConverterHandlerOutputAbstract<Conver
         {
             var textAlignementChar = Options!.SelectedTextAlignment switch
             {
-                "Left" => "l",
-                "Center" => "c",
-                "Right" => "r",
+                TextAlignment.Left => "l",
+                TextAlignment.Center => "c",
+                TextAlignment.Right => "r",
                 _ => "l"
             };
 
             return "\t\\begin{tabular}{" + Options!.SelectedTableType switch
             {
-                "All" or "MySQL" or "Markdown" => "|" + string.Join("",
+                ConverterHandlerLaTexOutputOptions.TableTypes.All or 
+                ConverterHandlerLaTexOutputOptions.TableTypes.MySQL or 
+                ConverterHandlerLaTexOutputOptions.TableTypes.Markdown => "|" + string.Join("",
                     Enumerable.Repeat($"{textAlignementChar}|", headers.Length)),
-                "Excel" => $"|{textAlignementChar}|" +
+                ConverterHandlerLaTexOutputOptions.TableTypes.Excel => $"|{textAlignementChar}|" +
                            string.Join("", Enumerable.Repeat($"{textAlignementChar}", headers.Length - 1)) + "|",
-                "Horizontal" or "None" or _ => string.Join("",
+                ConverterHandlerLaTexOutputOptions.TableTypes.Horizontal or
+                ConverterHandlerLaTexOutputOptions.TableTypes.None or _ => string.Join("",
                     Enumerable.Repeat($"{textAlignementChar}", headers.Length))
             } + "}" + Environment.NewLine;
         }
@@ -56,8 +60,12 @@ public class ConverterHandlerLaTexOutput : ConverterHandlerOutputAbstract<Conver
         {
             return Options!.SelectedTableType switch
             {
-                "All" or "MySQL" or "Excel" or "Horizontal" => "\t\\hline" + Environment.NewLine,
-                "Markdown" or "None" or _ => string.Empty
+                ConverterHandlerLaTexOutputOptions.TableTypes.All or 
+                ConverterHandlerLaTexOutputOptions.TableTypes.MySQL or 
+                ConverterHandlerLaTexOutputOptions.TableTypes.Excel or
+                ConverterHandlerLaTexOutputOptions.TableTypes.Horizontal => "\t\\hline" + Environment.NewLine,
+                ConverterHandlerLaTexOutputOptions.TableTypes.Markdown or
+                ConverterHandlerLaTexOutputOptions.TableTypes.None or _ => string.Empty
             };
         }
 
@@ -66,8 +74,12 @@ public class ConverterHandlerLaTexOutput : ConverterHandlerOutputAbstract<Conver
             return GenerateTableRow(headers, Options!.BoldHeader, Options!.BoldFirstColumn) +
                    Options!.SelectedTableType switch
                    {
-                       "All" or "MySQL" or "Excel" or "Horizontal" or "Markdown" => " \\hline",
-                       "None" or _ => string.Empty
+                       ConverterHandlerLaTexOutputOptions.TableTypes.All or 
+                       ConverterHandlerLaTexOutputOptions.TableTypes.MySQL or 
+                       ConverterHandlerLaTexOutputOptions.TableTypes.Excel or
+                       ConverterHandlerLaTexOutputOptions.TableTypes.Horizontal or
+                       ConverterHandlerLaTexOutputOptions.TableTypes.Markdown => " \\hline",
+                       ConverterHandlerLaTexOutputOptions.TableTypes.None or _ => string.Empty
                    } + Environment.NewLine;
         }
 
@@ -79,12 +91,19 @@ public class ConverterHandlerLaTexOutput : ConverterHandlerOutputAbstract<Conver
             {
                 rowsStringWriter.Write(GenerateTableRow(rows[i], false, Options!.BoldFirstColumn));
 
-                if (Options!.SelectedTableType == "None")
+                if (Options!.SelectedTableType == ConverterHandlerLaTexOutputOptions.TableTypes.None)
+                {
                     rowsStringWriter.Write(Environment.NewLine);
-                else if (Options!.SelectedTableType == "All" || i == rows.LongLength - 1)
+                }
+                else if (Options!.SelectedTableType == ConverterHandlerLaTexOutputOptions.TableTypes.All 
+                    || i == rows.LongLength - 1)
+                {
                     rowsStringWriter.Write(" \\hline" + Environment.NewLine);
+                }
                 else
+                {
                     rowsStringWriter.Write(Environment.NewLine);
+                }
             }
 
             return rowsStringWriter.ToString();
@@ -92,8 +111,11 @@ public class ConverterHandlerLaTexOutput : ConverterHandlerOutputAbstract<Conver
 
         stringWriter.Write(TableAlignGenerator());
 
-        if (Options!.CaptionName != string.Empty && Options!.SelectedCaptionAlignment == "Top")
+        if (Options!.CaptionName != string.Empty
+            && Options!.SelectedCaptionAlignment == ConverterHandlerLaTexOutputOptions.CaptionAlignments.Top)
+        {
             stringWriter.Write("\t\\caption{" + Options!.CaptionName + "}" + Environment.NewLine);
+        }
 
         stringWriter.Write(BeginTableGenerator());
         stringWriter.Write(AfterBeginTableGenerator());
@@ -102,16 +124,23 @@ public class ConverterHandlerLaTexOutput : ConverterHandlerOutputAbstract<Conver
 
         stringWriter.Write("\t\\end{tabular}" + Environment.NewLine);
 
-        if (Options!.CaptionName != string.Empty && Options!.SelectedCaptionAlignment == "Bottom")
+        if (Options!.CaptionName != string.Empty 
+            && Options!.SelectedCaptionAlignment == ConverterHandlerLaTexOutputOptions.CaptionAlignments.Bottom)
+        {
             stringWriter.Write("\t\\caption{" + Options!.CaptionName + "}" + Environment.NewLine);
+        }
 
         if (Options!.LabelName != string.Empty)
+        {
             stringWriter.Write("\t\\label{" + Options!.LabelName + "}" + Environment.NewLine);
+        }
 
         stringWriter.Write("\\end{table}" + Environment.NewLine);
 
         if (Options!.MinimalWorkingExample)
+        {
             stringWriter.Write(Environment.NewLine + "\\end{document}" + Environment.NewLine);
+        }
 
         return Result<string>.Success(stringWriter.ToString());
     }
@@ -125,11 +154,18 @@ public class ConverterHandlerLaTexOutput : ConverterHandlerOutputAbstract<Conver
         for (long i = 0; i < items.LongLength; i++)
         {
             if ((i == 0 && boldColumn) || boldHeader)
+            {
                 stringWriter.Write("\\textbf{" + EscapeLaTexString(items[i]) + "}");
+            }
             else
+            {
                 stringWriter.Write(EscapeLaTexString(items[i]) + "");
+            }
 
-            if (i != items.Length - 1) stringWriter.Write(" & ");
+            if (i != items.Length - 1)
+            {
+                stringWriter.Write(" & ");
+            }
         }
 
         stringWriter.Write(" \\\\");

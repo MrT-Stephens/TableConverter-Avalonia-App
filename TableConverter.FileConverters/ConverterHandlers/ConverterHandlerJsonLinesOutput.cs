@@ -12,7 +12,7 @@ public class ConverterHandlerJsonLinesOutput : ConverterHandlerOutputAbstract<Co
 
         switch (Options!.SelectedJsonLinesFormatType)
         {
-            case "Objects":
+            case ConverterHandlerJsonLinesOutputOptions.JsonLinesStyles.Objects:
             {
                 for (long i = 0; i < rows.LongLength; i++)
                 {
@@ -32,7 +32,7 @@ public class ConverterHandlerJsonLinesOutput : ConverterHandlerOutputAbstract<Co
 
                 break;
             }
-            case "Arrays":
+            case ConverterHandlerJsonLinesOutputOptions.JsonLinesStyles.Arrays:
             {
                 // Write headers
                 writer.Write("[");

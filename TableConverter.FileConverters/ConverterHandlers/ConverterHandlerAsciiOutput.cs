@@ -37,7 +37,7 @@ public class ConverterHandlerAsciiOutput : ConverterHandlerOutputAbstract<Conver
 
         asciiOutput.AppendLine(comment +
                                DrawDataRow(headers, maxColumnWidths,
-                                   Options!.TextAlignment[Options!.SelectedTextAlignment],
+                                   Options!.SelectedTextAlignment,
                                    tableCharacterConfig.Vertical,
                                    tableCharacterConfig.Vertical,
                                    tableCharacterConfig.Vertical));
@@ -54,7 +54,7 @@ public class ConverterHandlerAsciiOutput : ConverterHandlerOutputAbstract<Conver
         {
             asciiOutput.AppendLine(comment +
                                    DrawDataRow(rows[i], maxColumnWidths,
-                                       Options!.TextAlignment[Options!.SelectedTextAlignment],
+                                       Options!.SelectedTextAlignment,
                                        tableCharacterConfig.Vertical,
                                        tableCharacterConfig.Vertical,
                                        tableCharacterConfig.Vertical));

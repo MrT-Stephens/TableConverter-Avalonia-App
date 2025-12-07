@@ -13,7 +13,7 @@ public class ConverterHandlerJsonOutput : ConverterHandlerOutputAbstract<Convert
         {
             switch (Options!.SelectedJsonFormatType)
             {
-                case "Array of Objects":
+                case ConverterHandlerJsonOutputOptions.JsonStyles.ArrayOfObjects:
                 {
                     var jsonObjects = new Dictionary<string, object>[rows.Length];
 
@@ -28,7 +28,7 @@ public class ConverterHandlerJsonOutput : ConverterHandlerOutputAbstract<Convert
                     return Result<string>.Success(JsonConvert.SerializeObject(jsonObjects,
                         Options!.MinifyJson ? Formatting.None : Formatting.Indented));
                 }
-                case "2D Arrays":
+                case ConverterHandlerJsonOutputOptions.JsonStyles.TwoDimensionalArrays:
                 {
                     var jsonArray = new string[rows.Length + 1][];
 
@@ -39,7 +39,7 @@ public class ConverterHandlerJsonOutput : ConverterHandlerOutputAbstract<Convert
                     return Result<string>.Success(JsonConvert.SerializeObject(jsonArray,
                         Options!.MinifyJson ? Formatting.None : Formatting.Indented));
                 }
-                case "Column Arrays":
+                case ConverterHandlerJsonOutputOptions.JsonStyles.ColumnArrays:
                 {
                     var jsonObjects = new Dictionary<string, string[]>[headers.Length];
 
@@ -52,7 +52,7 @@ public class ConverterHandlerJsonOutput : ConverterHandlerOutputAbstract<Convert
                     return Result<string>.Success(JsonConvert.SerializeObject(jsonObjects,
                         Options!.MinifyJson ? Formatting.None : Formatting.Indented));
                 }
-                case "Keyed Arrays":
+                case ConverterHandlerJsonOutputOptions.JsonStyles.KeyedArrays:
                 {
                     var jsonObjects = new Dictionary<long, string[]>[rows.Length + 1];
 

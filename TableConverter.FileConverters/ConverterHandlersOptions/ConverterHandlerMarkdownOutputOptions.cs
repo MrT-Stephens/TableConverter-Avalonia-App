@@ -4,22 +4,15 @@ namespace TableConverter.FileConverters.ConverterHandlersOptions;
 
 public class ConverterHandlerMarkdownOutputOptions : ConverterHandlerBaseOptions
 {
-    public readonly string[] TableTypes =
-    [
-        "Markdown Table (Normal)",
-        "Markdown Table (Simple)"
-    ];
-
-    public readonly Dictionary<string, TextAlignment> TextAlignment = new()
+    public enum TableStyles
     {
-        { "Left", 0 },
-        { "Center", (TextAlignment)1 },
-        { "Right", (TextAlignment)2 }
-    };
+        Normal,
+        Simple,
+    }
 
-    public string SelectedTableType { get; set; } = "Markdown Table (Normal)";
+    public TableStyles SelectedTableType { get; set; } = TableStyles.Normal;
 
-    public string SelectedTextAlignment { get; set; } = "Left";
+    public TextAlignment SelectedTextAlignment { get; set; } = TextAlignment.Left;
 
     public bool BoldColumnNames { get; set; } = false;
 

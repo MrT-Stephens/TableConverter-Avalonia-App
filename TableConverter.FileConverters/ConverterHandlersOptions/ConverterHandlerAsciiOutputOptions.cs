@@ -20,69 +20,83 @@ public record TableCharacterConfig(
 
 public class ConverterHandlerAsciiOutputOptions : ConverterHandlerBaseOptions
 {
-    public readonly Dictionary<string, string> CommentTypes = new()
+    public enum TableStyles
     {
-        { "None", "" },
-        { "Double-Slash (//)", "//" },
-        { "Hash (#)", "#" },
-        { "Semi-Colon (;)", ";" },
-        { "Double-Dash (--)", "--" },
-        { "Percent (%)", "%" },
-        { "Asterisk (*)", "*" }
+        Single,
+        Double,
+        Bold,
+        Rounded,
+        BoldRounded,
+        Classic,
+    }
+
+    public enum CommentStyles
+    {
+        None,
+        DoubleSlash,
+        HashTag,
+        Semicolon,
+        DoubleDashes,
+        Percent,
+        Asterisk,
+    }
+
+    public readonly Dictionary<CommentStyles, string> CommentTypes = new()
+    {
+        { CommentStyles.None, "" },
+        { CommentStyles.DoubleSlash, "//" },
+        { CommentStyles.HashTag, "#" },
+        { CommentStyles.Semicolon, ";" },
+        { CommentStyles.DoubleDashes, "--" },
+        { CommentStyles.Percent, "%" },
+        { CommentStyles.Asterisk, "*" }
     };
 
-    public readonly Dictionary<string, TableCharacterConfig> TableTypes = new()
+    public readonly Dictionary<TableStyles, TableCharacterConfig> TableTypes = new()
     {
         {
-            "Single",
+            TableStyles.Single,
             new TableCharacterConfig(
                 '┌', '┐', '└', '┘', '└', '┘', '─', '│', '┼', '┬', '┴', '├', '┤'
             )
         },
         {
-            "Double",
+            TableStyles.Double,
             new TableCharacterConfig(
                 '╔', '╗', '╚', '╝', '╚', '╝', '═', '║', '╬', '╦', '╩', '╠', '╣'
             )
         },
         {
-            "Bold",
+            TableStyles.Bold,
             new TableCharacterConfig(
                 '┏', '┓', '┗', '┛', '┗', '┛', '━', '┃', '╋', '┳', '┻', '┣', '┫'
             )
         },
         {
-            "Round",
+            TableStyles.Rounded,
             new TableCharacterConfig(
                 '╭', '╮', '╰', '╯', '╰', '╯', '─', '│', '┼', '┬', '┴', '├', '┤'
             )
         },
         {
-            "Bold Round",
+            TableStyles.BoldRounded,
             new TableCharacterConfig(
                 '╭', '╮', '╰', '╯', '╰', '╯', '━', '┃', '╋', '┳', '┻', '┣', '┫'
             )
         },
         {
-            "Classic",
+            TableStyles.Classic,
             new TableCharacterConfig(
                 '+', '+', '+', '+', '+', '+', '-', '|', '+', '+', '+', '+', '+'
             )
         }
     };
 
-    public readonly Dictionary<string, TextAlignment> TextAlignment = new()
-    {
-        { "Left", 0 },
-        { "Center", (TextAlignment)1 },
-        { "Right", (TextAlignment)2 }
-    };
+    public TableStyles SelectedTableType { get; set; } = TableStyles.Single;
 
-    public string SelectedTableType { get; set; } = "Single";
+    public TextAlignment SelectedTextAlignment { get; set; } = TextAlignment.Left;
 
-    public string SelectedTextAlignment { get; set; } = "Left";
-
-    public string SelectedCommentType { get; set; } = "None";
+    public CommentStyles SelectedCommentType { get; set; } = CommentStyles.None;
 
     public bool ForceRowSeparators { get; set; } = false;
 }

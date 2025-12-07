@@ -53,7 +53,7 @@ public class ConverterHandlerJsonInput : ConverterHandlerInputAbstract<Converter
 
             switch (Options!.SelectedJsonFormatType)
             {
-                case "Array of Objects":
+                case ConverterHandlerJsonInputOptions.JsonStyles.ArrayOfObjects:
                 {
                     var jsonObjects = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(text);
 
@@ -71,7 +71,7 @@ public class ConverterHandlerJsonInput : ConverterHandlerInputAbstract<Converter
 
                     break;
                 }
-                case "2D Arrays":
+                case ConverterHandlerJsonInputOptions.JsonStyles.TwoDimensionalArrays:
                 {
                     var jsonArrays = JsonConvert.DeserializeObject<List<List<object>>>(text);
 
@@ -85,7 +85,7 @@ public class ConverterHandlerJsonInput : ConverterHandlerInputAbstract<Converter
 
                     break;
                 }
-                case "Column Arrays":
+                case ConverterHandlerJsonInputOptions.JsonStyles.ColumnArrays:
                 {
                     var jsonObjects = JsonConvert.DeserializeObject<List<Dictionary<string, string[]>>>(text);
 
@@ -106,7 +106,7 @@ public class ConverterHandlerJsonInput : ConverterHandlerInputAbstract<Converter
 
                     break;
                 }
-                case "Keyed Arrays":
+                case ConverterHandlerJsonInputOptions.JsonStyles.KeyedArrays:
                 {
                     var jsonObjects = JsonConvert.DeserializeObject<List<Dictionary<string, string[]>>>(text);
 

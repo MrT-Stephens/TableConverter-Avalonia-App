@@ -2,15 +2,23 @@
 
 public class ConverterHandlerSQLInputOptions : ConverterHandlerBaseOptions
 {
-    public readonly Dictionary<string, string> QuoteTypes = new()
+    public readonly Dictionary<QuoteStyles, string> QuoteTypes = new()
     {
-        { "No Quotes", "" },
-        { "Double Quotes (\")", "\"" },
-        { "MySQL Quotes (`)", "`" },
-        { "SQL Server Quotes ([])", "[" }
+        { QuoteStyles.None, "" },
+        { QuoteStyles.DoubleQuotes, "\"" },
+        { QuoteStyles.MySqlQuotes, "`" },
+        { QuoteStyles.SqlServerQuotes, "[" }
     };
 
-    public string SelectedQuoteType { get; set; } = "No Quotes";
+    public enum QuoteStyles
+    {
+        None,
+        DoubleQuotes,
+        MySqlQuotes,
+        SqlServerQuotes,
+    }
+
+    public QuoteStyles SelectedQuoteType { get; set; } = QuoteStyles.None;
 
     public bool HasColumnNames { get; set; } = true;
 }

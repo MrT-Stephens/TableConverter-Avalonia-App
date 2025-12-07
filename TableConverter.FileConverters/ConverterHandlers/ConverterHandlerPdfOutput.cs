@@ -36,15 +36,15 @@ public class ConverterHandlerPdfOutput : ConverterHandlerOutputAbstract<Converte
                     for (uint i = 0; i < headers.Length; i++)
                         if (Options!.BoldHeader)
                             table.Cell().Row(1).Column(i + 1).Element(Block).Text(headers[i]).ExtraBold()
-                                .FontColor(Options!.SelectedForegroundColor);
+                                .FontColor(Color.FromHex(ToHex(Options!.SelectedForegroundColor)));
                         else
                             table.Cell().Row(1).Column(i + 1).Element(Block).Text(headers[i])
-                                .FontColor(Options!.SelectedForegroundColor);
+                                .FontColor(Color.FromHex(ToHex(Options!.SelectedForegroundColor)));
 
                     for (uint i = 0; i < rows.Length; i++)
                     for (uint j = 0; j < headers.Length; j++)
                         table.Cell().Row(i + 2).Column(j + 1).Element(Block).Text(rows[i][j])
-                            .FontColor(Options!.SelectedForegroundColor);
+                            .FontColor(Color.FromHex(ToHex(Options!.SelectedForegroundColor)));
                 });
             });
         });
@@ -57,7 +57,7 @@ public class ConverterHandlerPdfOutput : ConverterHandlerOutputAbstract<Converte
     {
         return container
             .Border(Options!.ShowGridLines ? 1 : 0)
-            .Background(Options!.SelectedBackgroundColor)
+            .Background(Color.FromHex(ToHex(Options!.SelectedBackgroundColor)))
             .ShowOnce()
             .AlignCenter()
             .AlignMiddle();
@@ -79,5 +79,12 @@ public class ConverterHandlerPdfOutput : ConverterHandlerOutputAbstract<Converte
         }
 
         return Result.Success();
+    }
+
+    private static string ToHex(System.Drawing.KnownColor knownColor)
+    {
+        var color = System.Drawing.Color.FromKnownColor(knownColor);
+
+        return $"#{color.R:X2}{color.G:X2}{color.B:X2}";
     }
 }

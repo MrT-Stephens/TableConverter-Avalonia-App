@@ -64,7 +64,9 @@ public class ConverterHandlerAspInput : ConverterHandlerInputAbstract<ConverterH
 
             if (columnsCount != 0 && rowsCount != 0 && parsedRows / columnsCount < rowsCount &&
                 parsedRows / rowsCount < columnsCount)
+            {
                 return Result<TableData>.Failure("Incorrect number of rows of data in the file");
+            }
         }
         catch (Exception ex)
         {

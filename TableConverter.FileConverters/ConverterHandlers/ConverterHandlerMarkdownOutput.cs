@@ -42,27 +42,27 @@ public class ConverterHandlerMarkdownOutput : ConverterHandlerOutputAbstract<Con
         // Draw the table.
         switch (Options!.SelectedTableType)
         {
-            case "Markdown Table (Normal)":
+            case ConverterHandlerMarkdownOutputOptions.TableStyles.Normal:
             {
                 asciiOutput.AppendLine("|" + DrawDataRow(headers, maxColumnWidths,
-                    Options!.TextAlignment[Options!.SelectedTextAlignment], '|') + "|");
+                    Options!.SelectedTextAlignment, '|') + "|");
                 asciiOutput.AppendLine("|" + DrawSeparator(maxColumnWidths, '|', '-') + "|");
 
                 foreach (var row in rows)
                     asciiOutput.AppendLine("|" + DrawDataRow(row, maxColumnWidths,
-                        Options!.TextAlignment[Options!.SelectedTextAlignment], '|') + "|");
+                        Options!.SelectedTextAlignment, '|') + "|");
 
                 break;
             }
-            case "Markdown Table (Simple)":
+            case ConverterHandlerMarkdownOutputOptions.TableStyles.Simple:
             {
                 asciiOutput.AppendLine(DrawDataRow(headers, maxColumnWidths,
-                    Options!.TextAlignment[Options!.SelectedTextAlignment], '|'));
+                    Options!.SelectedTextAlignment, '|'));
                 asciiOutput.AppendLine(DrawSeparator(maxColumnWidths, '|', '-'));
 
                 foreach (var row in rows)
                     asciiOutput.AppendLine(DrawDataRow(row, maxColumnWidths,
-                        Options!.TextAlignment[Options!.SelectedTextAlignment], '|'));
+                        Options!.SelectedTextAlignment, '|'));
 
                 break;
             }
