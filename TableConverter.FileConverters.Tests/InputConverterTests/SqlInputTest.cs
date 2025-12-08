@@ -20,7 +20,7 @@ public class SqlInputTestCases : InputConverterTestCasesBase
             "test_input_sql_1.sql",
             new ConverterHandlerSQLInputOptions
             {
-                SelectedQuoteType = "No Quotes",
+                SelectedQuoteType = ConverterHandlerSQLInputOptions.QuoteStyles.None,
                 HasColumnNames = true
             },
             Utils.TestTableData
@@ -30,7 +30,7 @@ public class SqlInputTestCases : InputConverterTestCasesBase
             "test_input_sql_2.sql",
             new ConverterHandlerSQLInputOptions
             {
-                SelectedQuoteType = "Double Quotes (\")",
+                SelectedQuoteType = ConverterHandlerSQLInputOptions.QuoteStyles.DoubleQuotes,
                 HasColumnNames = true
             },
             Utils.TestTableData
@@ -40,7 +40,7 @@ public class SqlInputTestCases : InputConverterTestCasesBase
             "test_input_sql_3.sql",
             new ConverterHandlerSQLInputOptions
             {
-                SelectedQuoteType = "MySQL Quotes (`)",
+                SelectedQuoteType = ConverterHandlerSQLInputOptions.QuoteStyles.MySqlQuotes,
                 HasColumnNames = true
             },
             Utils.TestTableData
@@ -50,7 +50,7 @@ public class SqlInputTestCases : InputConverterTestCasesBase
             "test_input_sql_4.sql",
             new ConverterHandlerSQLInputOptions
             {
-                SelectedQuoteType = "SQL Server Quotes ([])",
+                SelectedQuoteType = ConverterHandlerSQLInputOptions.QuoteStyles.SqlServerQuotes,
                 HasColumnNames = true
             },
             Utils.TestTableData
@@ -67,7 +67,7 @@ public class SqlInputTestCases : InputConverterTestCasesBase
             "test_input_incorrect_sql_1.sql",
             new ConverterHandlerSQLInputOptions
             {
-                SelectedQuoteType = "No Quotes",
+                SelectedQuoteType = ConverterHandlerSQLInputOptions.QuoteStyles.None,
                 HasColumnNames = true
             }
         ),
@@ -75,7 +75,7 @@ public class SqlInputTestCases : InputConverterTestCasesBase
             "test_input_sql_2.sql",
             new ConverterHandlerSQLInputOptions
             {
-                SelectedQuoteType = "No Quotes",
+                SelectedQuoteType = ConverterHandlerSQLInputOptions.QuoteStyles.None,
                 HasColumnNames = true
             }
         )

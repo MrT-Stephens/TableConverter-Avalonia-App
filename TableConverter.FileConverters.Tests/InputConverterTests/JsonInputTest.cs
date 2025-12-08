@@ -20,7 +20,7 @@ public class JsonInputTestCases : InputConverterTestCasesBase
             "test_input_json_1.json",
             new ConverterHandlerJsonInputOptions
             {
-                SelectedJsonFormatType = "Array of Objects"
+                SelectedJsonFormatType = ConverterHandlerJsonInputOptions.JsonStyles.ArrayOfObjects
             },
             Utils.TestTableData
         ),
@@ -29,7 +29,7 @@ public class JsonInputTestCases : InputConverterTestCasesBase
             "test_input_json_2.json",
             new ConverterHandlerJsonInputOptions
             {
-                SelectedJsonFormatType = "Array of Objects"
+                SelectedJsonFormatType = ConverterHandlerJsonInputOptions.JsonStyles.ArrayOfObjects
             },
             Utils.TestTableData
         ),
@@ -38,7 +38,7 @@ public class JsonInputTestCases : InputConverterTestCasesBase
             "test_input_json_3.json",
             new ConverterHandlerJsonInputOptions
             {
-                SelectedJsonFormatType = "2D Arrays"
+                SelectedJsonFormatType = ConverterHandlerJsonInputOptions.JsonStyles.TwoDimensionalArrays
             },
             Utils.TestTableData
         ),
@@ -47,7 +47,7 @@ public class JsonInputTestCases : InputConverterTestCasesBase
             "test_input_json_4.json",
             new ConverterHandlerJsonInputOptions
             {
-                SelectedJsonFormatType = "2D Arrays"
+                SelectedJsonFormatType = ConverterHandlerJsonInputOptions.JsonStyles.TwoDimensionalArrays
             },
             Utils.TestTableData
         ),
@@ -56,7 +56,7 @@ public class JsonInputTestCases : InputConverterTestCasesBase
             "test_input_json_5.json",
             new ConverterHandlerJsonInputOptions
             {
-                SelectedJsonFormatType = "Column Arrays"
+                SelectedJsonFormatType = ConverterHandlerJsonInputOptions.JsonStyles.ColumnArrays
             },
             Utils.TestTableData
         ),
@@ -65,7 +65,7 @@ public class JsonInputTestCases : InputConverterTestCasesBase
             "test_input_json_6.json",
             new ConverterHandlerJsonInputOptions
             {
-                SelectedJsonFormatType = "Column Arrays"
+                SelectedJsonFormatType = ConverterHandlerJsonInputOptions.JsonStyles.ColumnArrays
             },
             Utils.TestTableData
         ),
@@ -74,7 +74,7 @@ public class JsonInputTestCases : InputConverterTestCasesBase
             "test_input_json_7.json",
             new ConverterHandlerJsonInputOptions
             {
-                SelectedJsonFormatType = "Keyed Arrays"
+                SelectedJsonFormatType = ConverterHandlerJsonInputOptions.JsonStyles.KeyedArrays
             },
             Utils.TestTableData
         ),
@@ -83,7 +83,7 @@ public class JsonInputTestCases : InputConverterTestCasesBase
             "test_input_json_8.json",
             new ConverterHandlerJsonInputOptions
             {
-                SelectedJsonFormatType = "Keyed Arrays"
+                SelectedJsonFormatType = ConverterHandlerJsonInputOptions.JsonStyles.KeyedArrays
             },
             Utils.TestTableData
         )
@@ -99,7 +99,7 @@ public class JsonInputTestCases : InputConverterTestCasesBase
             "test_input_json_1.json",
             new ConverterHandlerJsonInputOptions
             {
-                SelectedJsonFormatType = "Invalid Format"
+                SelectedJsonFormatType = (ConverterHandlerJsonInputOptions.JsonStyles)1000
             }
         ),
         (
@@ -107,7 +107,7 @@ public class JsonInputTestCases : InputConverterTestCasesBase
             "test_input_json_1.json",
             new ConverterHandlerJsonInputOptions
             {
-                SelectedJsonFormatType = "Keyed Arrays"
+                SelectedJsonFormatType = ConverterHandlerJsonInputOptions.JsonStyles.KeyedArrays
             }
         ),
         (
@@ -115,7 +115,7 @@ public class JsonInputTestCases : InputConverterTestCasesBase
             "test_input_json_2.json",
             new ConverterHandlerJsonInputOptions
             {
-                SelectedJsonFormatType = "Column Arrays"
+                SelectedJsonFormatType = ConverterHandlerJsonInputOptions.JsonStyles.ColumnArrays
             }
         ),
         (
@@ -123,7 +123,7 @@ public class JsonInputTestCases : InputConverterTestCasesBase
             "test_input_json_3.json",
             new ConverterHandlerJsonInputOptions
             {
-                SelectedJsonFormatType = "Column Arrays"
+                SelectedJsonFormatType = ConverterHandlerJsonInputOptions.JsonStyles.ColumnArrays
             }
         ),
         (
@@ -131,7 +131,7 @@ public class JsonInputTestCases : InputConverterTestCasesBase
             "test_input_json_4.json",
             new ConverterHandlerJsonInputOptions
             {
-                SelectedJsonFormatType = "Keyed Arrays"
+                SelectedJsonFormatType = ConverterHandlerJsonInputOptions.JsonStyles.KeyedArrays
             }
         ),
         (
@@ -139,7 +139,7 @@ public class JsonInputTestCases : InputConverterTestCasesBase
             "test_input_json_5.json",
             new ConverterHandlerJsonInputOptions
             {
-                SelectedJsonFormatType = "2D Arrays"
+                SelectedJsonFormatType = ConverterHandlerJsonInputOptions.JsonStyles.TwoDimensionalArrays
             }
         ),
         (
@@ -147,7 +147,7 @@ public class JsonInputTestCases : InputConverterTestCasesBase
             "test_input_json_6.json",
             new ConverterHandlerJsonInputOptions
             {
-                SelectedJsonFormatType = "Array of Objects"
+                SelectedJsonFormatType = ConverterHandlerJsonInputOptions.JsonStyles.ArrayOfObjects
             }
         ),
         (
@@ -155,7 +155,7 @@ public class JsonInputTestCases : InputConverterTestCasesBase
             "test_input_json_7.json",
             new ConverterHandlerJsonInputOptions
             {
-                SelectedJsonFormatType = "Array of Objects"
+                SelectedJsonFormatType = ConverterHandlerJsonInputOptions.JsonStyles.ArrayOfObjects
             }
         ),
         (
@@ -163,7 +163,7 @@ public class JsonInputTestCases : InputConverterTestCasesBase
             "test_input_json_8.json",
             new ConverterHandlerJsonInputOptions
             {
-                SelectedJsonFormatType = "2D Arrays"
+                SelectedJsonFormatType = ConverterHandlerJsonInputOptions.JsonStyles.TwoDimensionalArrays
             }
         )
     ];

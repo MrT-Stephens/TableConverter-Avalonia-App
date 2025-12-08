@@ -9,7 +9,7 @@ namespace TableConverter.FileConverters.ConverterHandlers;
 
 public class ConverterHandlerPdfOutput : ConverterHandlerOutputAbstract<ConverterHandlerPdfOutputOptions>
 {
-    protected ConverterHandlerPdfOutput()
+    public ConverterHandlerPdfOutput()
     {
         Settings.License = LicenseType.Community;
         Settings.CheckIfAllTextGlyphsAreAvailable = false;

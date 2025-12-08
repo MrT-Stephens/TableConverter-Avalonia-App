@@ -12,6 +12,7 @@ using TableConverter.Commands.Extensions;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Commands.Services;
 using TableConverter.Common;
+using TableConverter.FileConverters.Extensions;
 using TableConverter.Interfaces;
 using TableConverter.Services;
 using TableConverter.ViewModels;
@@ -102,7 +103,6 @@ public class App : Application
         services.AddSingleton<MainWindowViewModel>();
 
         // Custom Services
-        services.AddSingleton<IConverterTypes, ConverterTypes>();
         services.AddSingleton<IDataGenerationTypes, DataGenerationTypes>();
         services.AddSingleton<IFilesDialogManager, FilesDialogManager>();
         services.AddSingleton<IEventManager, EventManager>();
@@ -117,6 +117,9 @@ public class App : Application
         
         // Register Command Handlers
         services.RegisterCommandHandlers(assembly);
+        
+        // Register File Converters
+        services.RegisterFileConverters(assembly);
 
         return services.BuildServiceProvider();
     }
