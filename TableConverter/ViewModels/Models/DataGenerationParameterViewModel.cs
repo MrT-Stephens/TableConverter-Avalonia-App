@@ -1,7 +1,7 @@
 using System;
 using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace TableConverter.ViewModels;
+namespace TableConverter.ViewModels.Models;
 
 public partial class DataGenerationParameterViewModel : ObservableObject
 {

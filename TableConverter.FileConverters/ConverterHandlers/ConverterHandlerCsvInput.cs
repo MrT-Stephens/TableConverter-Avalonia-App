@@ -27,9 +27,9 @@ public class ConverterHandlerCsvInput : ConverterHandlerInputAbstract<ConverterH
 
             foreach (var row in csvReader.GetRecords<dynamic>())
             {
-                if (Options!.Header && headers.Count == 0)
+                if (Options!.IncludeHeader && headers.Count == 0)
                     headers.AddRange(((IDictionary<string, object>)row).Keys.ToList());
-                else if (!Options!.Header && headers.Count == 0)
+                else if (!Options!.IncludeHeader && headers.Count == 0)
                     for (long i = 0; i < ((IDictionary<string, object>)row).Keys.Count; i++)
                         headers.Add($"Column {i}");
 

@@ -121,7 +121,7 @@ public class CommandContext : ICommandContext
     }
 
     /// <inheritdoc />
-    public void Cancel(string reason = "")
+    public void Cancel(string reason = "Cancelled")
     {
         Cancelled = true;
         CancelReason = reason;

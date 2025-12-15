@@ -16,10 +16,12 @@ using TableConverter.FileConverters.Extensions;
 using TableConverter.Interfaces;
 using TableConverter.Services;
 using TableConverter.ViewModels;
+using TableConverter.ViewModels.Dialogs;
 using TableConverter.ViewModels.Documents;
 using TableConverter.ViewModels.Tools;
 using TableConverter.ViewModels.Workspaces;
 using TableConverter.Views;
+using TableConverter.Views.Dialogs;
 using TableConverter.Views.Documents;
 using TableConverter.Views.Tools;
 using TableConverter.Views.Workspaces;
@@ -82,22 +84,24 @@ public class App : Application
         var views = new ViewsCollection()
             // Workspaces
             .AddView<BaseWorkspaceEditorView, TableWorkspaceEditorViewModel>(services)
-            .AddView<BaseWorkspaceEditorView, DataGenerationWorkspaceViewModel>(services)
+            .AddView<BaseWorkspaceEditorView, DataGenerationWorkspaceEditorViewModel>(services)
             // Documents
             .AddView<TableDataView, TableDataViewModel>(services)
             .AddView<DataGenerationSchemeView, DataGenerationSchemaViewModel>(services)
             .AddView<MarkdownView, MarkdownViewModel>(services)
             // Tools
             .AddView<TableUtilitiesView, TableUtilitiesViewModel>(services)
-            .AddView<TableSearchView, TableSearchViewModel>(services);
+            .AddView<TableSearchView, TableSearchViewModel>(services)
+            .AddView<DataGenerationOptionsView, DataGenerationOptionsViewModel>(services)
+            // Misc
+            .AddView<DataGenerationTypesSelectionListView, DataGenerationTypesSelectionListViewModel>(services)
+            .AddView<DataGenerationTypesSelectionView, DataGenerationTypesSelectionViewModel>(services);
         
         return views;
     }
 
     private static ServiceProvider ConfigureServices(ServiceCollection services)
     {
-        var assembly = Assembly.GetExecutingAssembly();
-        
         // Main Display Window
         services.AddSingleton<MainWindowView>();
         services.AddSingleton<MainWindowViewModel>();
@@ -116,10 +120,10 @@ public class App : Application
         services.AddSingleton<ICommandManager, CommandManager>();
         
         // Register Command Handlers
-        services.RegisterCommandHandlers(assembly);
+        services.RegisterCommandHandlers();
         
         // Register File Converters
-        services.RegisterFileConverters(assembly);
+        services.RegisterFileConverters();
 
         return services.BuildServiceProvider();
     }

@@ -12,7 +12,7 @@ public class ConverterProviderLaTex : ConverterProvider
         ["application/x-tex"],
         ["public.latex"],
         "LaTeX is a typesetting and document preparation system that includes features designed for the production of technical and scientific documentation, LaTeX allows typesetting math easily.",
-        ConverterSupport.Input | ConverterSupport.Output);
+        ConverterSupport.Output);
     
     public override IConverterHandlerInput CreateInputHander()
     {

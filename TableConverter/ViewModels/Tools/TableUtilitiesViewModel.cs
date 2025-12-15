@@ -45,8 +45,8 @@ public partial class TableUtilitiesViewModel : BaseScopedPaneToolViewModel<Table
 
         if (Workspace == workspace && newDocument is TableDataViewModel tableDataViewModel)
         {
-            RowCount = tableDataViewModel.TableData.RowCount;
-            HeadersCount = tableDataViewModel.TableData.ColumnCount;
+            RowCount = tableDataViewModel.Rows.Count;
+            HeadersCount = tableDataViewModel.Headers.Count;
         }
     }
 

@@ -6,6 +6,7 @@ using TableConverter.Commands.DataModels;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Contracts;
 using TableConverter.Extensions;
+using TableConverter.Utilities.Extensions;
 using TableConverter.ViewModels.Documents;
 using TableConverter.ViewModels.Forms;
 using TableConverter.ViewModels.Workspaces;
@@ -60,18 +61,19 @@ public class NewFileCommandHandler(ISukiDialogManager dialogManager) : ICommandH
             var headers = Enumerable.Range(1, settings.Headers + 1)
                 .Select(x => x.ToString())
                 .ToList();
-            
-            document.TableData = new ObservableTableData(
-                headers,
-                Enumerable.Repeat(headers, settings.Rows)
-            );
+
+            document.Headers = headers.ToObservableCollection();
+            document.Rows = Enumerable.Repeat(headers, settings.Rows)
+                .Select(x => x.ToArray())
+                .ToObservableCollection();
         }
         else
         {
-            document.TableData = new ObservableTableData(
-                Enumerable.Repeat(string.Empty, settings.Headers),
-                Enumerable.Repeat(Enumerable.Repeat(string.Empty, settings.Headers), settings.Rows)
-            );
+            document.Headers = Enumerable.Repeat(string.Empty, settings.Headers)
+                .ToObservableCollection();
+            document.Rows = Enumerable.Repeat(Enumerable.Repeat(string.Empty, settings.Headers), settings.Rows)
+                .Select(x => x.ToArray())
+                .ToObservableCollection();
         }
         
         editorViewModel.Documents.Add(document);

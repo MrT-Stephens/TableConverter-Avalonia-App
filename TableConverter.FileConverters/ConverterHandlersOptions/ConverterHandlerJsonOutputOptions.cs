@@ -10,7 +10,17 @@ public class ConverterHandlerJsonOutputOptions : ConverterHandlerBaseOptions
         KeyedArrays,
     }
 
-    public JsonStyles SelectedJsonFormatType { get; set; } = JsonStyles.ArrayOfObjects;
+    private JsonStyles _SelectedJsonFormatType = JsonStyles.ArrayOfObjects;
+    public JsonStyles SelectedJsonFormatType
+    {
+        get => _SelectedJsonFormatType;
+        set => SetField(ref _SelectedJsonFormatType, value);
+    }
 
-    public bool MinifyJson { get; set; } = false;
+    private bool _MinifyJson;
+    public bool MinifyJson
+    {
+        get => _MinifyJson;
+        set => SetField(ref _MinifyJson, value);
+    }
 }

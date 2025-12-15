@@ -91,11 +91,9 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
             return;
         }
 
-        var selectedDoc = document;
-        
         if (!await _dialogManager.CreateDialog()
                 .WithTitle("Are you sure?")
-                .WithContent($"This will remove the file '{selectedDoc!.Title}'.")
+                .WithContent($"This will remove the file '{document!.Title}'.")
                 .WithYesNoResult("Yes", "No")
                 .TryShowAsync())
         {
@@ -103,12 +101,12 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
         }
         
         SelectedDocument = null;
-        Documents.Remove(selectedDoc);
+        Documents.Remove(document);
 
         _toastManager.CreateSimpleInfoToast()
             .OfType(NotificationType.Success)
             .WithTitle("Removed")
-            .WithContent($"The file '{selectedDoc.Title}' has been removed.")
+            .WithContent($"The file '{document!.Title}' has been removed.")
             .Queue();
     }
 
@@ -127,11 +125,10 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
     partial void OnSelectedDocumentChanged(IPaneDocument? oldValue, IPaneDocument? newValue)
     {
         oldValue?.OnDeactivate();
-
         newValue?.OnActivate();
         
-        UpdateSelectedItemWith(newValue);
         SelectedItems.Remove(oldValue);
+        SelectedItems.Add(newValue);
 
         _eventManager.GetEvent<WorkspaceDocumentSelectedEvent>()
             .Publish(new WorkspaceDocumentSelectedEventArgs
@@ -144,15 +141,11 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
 
     partial void OnSelectedToolChanged(IPaneTool? oldValue, IPaneTool? newValue)
     {
-        if (oldValue is not null)
-        {
-            oldValue.OnDeactivate();
-        }
+        oldValue?.OnDeactivate();
+        newValue?.OnActivate();
 
-        if (newValue is not null)
-        {
-            newValue.OnActivate();
-        }
+        SelectedItems.Remove(oldValue);
+        SelectedItems.Add(newValue);
     }
 
     #endregion

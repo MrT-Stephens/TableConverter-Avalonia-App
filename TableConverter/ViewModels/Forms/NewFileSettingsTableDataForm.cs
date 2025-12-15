@@ -26,6 +26,18 @@ public partial class NewFileSettingsTableDataForm : ObservableObject
     private bool _FillWithNumbers = true;
 
     #endregion
+
+    #region Partial Methods
+
+    partial void OnRowsChanging(int value)
+    {
+        if (value is < 0 or >= 10000)
+        {
+            throw new ArgumentOutOfRangeException(nameof(value), "Value must be between 0 and 10000.");
+        }
+    }
+
+    #endregion
 }
 
 #pragma warning restore CS0657 // Not a valid attribute location for this declaration

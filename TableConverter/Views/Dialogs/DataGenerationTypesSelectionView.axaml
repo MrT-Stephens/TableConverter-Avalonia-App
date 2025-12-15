@@ -1,0 +1,70 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:TableConverter.ViewModels.Dialogs"
+             xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+             xmlns:sukiUiTheme="clr-namespace:SukiUI.Theme;assembly=SukiUI"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:DataGenerationTypesSelectionViewModel"
+             x:Class="TableConverter.Views.Dialogs.DataGenerationTypesSelectionView">
+    <sukiUi:GlassCard IsAnimated="True"
+                      Padding="0"
+                      IsInteractive="True"
+                      IsOpaque="True">
+        <Grid RowDefinitions="*,Auto">
+            <sukiUi:SukiSideMenu Grid.Row="0"
+                                 ItemsSource="{Binding Categories}"
+                                 SelectedItem="{Binding SelectedCategory}"
+                                 IsSearchEnabled="False">
+                <sukiUi:SukiSideMenu.HeaderContent>
+                    <TextBox Text="{Binding SearchText, Mode=TwoWay}"
+                             Watermark="Search..."
+                             VerticalAlignment="Center"
+                             HorizontalAlignment="Stretch"
+                             Margin="10,10,10,10"
+                             sukiUiTheme:TextBoxExtensions.AddDeleteButton="True">
+                        <TextBox.InnerLeftContent>
+                            <PathIcon Data="{StaticResource SearchIcon}"
+                                      Foreground="{DynamicResource SukiLowText}"
+                                      Margin="5,0"
+                                      Height="17"
+                                      Width="17"
+                                      VerticalAlignment="Center" />
+                        </TextBox.InnerLeftContent>
+                    </TextBox>
+                </sukiUi:SukiSideMenu.HeaderContent>
+                <sukiUi:SukiSideMenu.ItemTemplate>
+                    <DataTemplate>
+                        <sukiUi:SukiSideMenuItem Classes="Compact">
+                            <sukiUi:SukiSideMenuItem.Header>
+                                <MultiBinding StringFormat=" {0}: {1}">
+                                    <Binding Path="DisplayName" />
+                                    <Binding Path="FilteredTypes.Count" />
+                                </MultiBinding>
+                            </sukiUi:SukiSideMenuItem.Header>
+                            <sukiUi:SukiSideMenuItem.Icon>
+                                <PathIcon Data="{Binding Icon}" />
+                            </sukiUi:SukiSideMenuItem.Icon>
+                        </sukiUi:SukiSideMenuItem>
+                    </DataTemplate>
+                </sukiUi:SukiSideMenu.ItemTemplate>
+            </sukiUi:SukiSideMenu>
+            <sukiUi:GlassCard Grid.Row="1"
+                              IsAnimated="False"
+                              CornerRadius="0,0,0,0"
+                              BorderThickness="0"
+                              Padding="10,10,10,10">
+                <ItemsControl ItemsSource="{Binding Dialog.ActionButtons}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel HorizontalAlignment="Right"
+                                        Orientation="Horizontal"
+                                        Spacing="10" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </sukiUi:GlassCard>
+        </Grid>
+    </sukiUi:GlassCard>
+</UserControl>

@@ -91,12 +91,32 @@ public class ConverterHandlerAsciiOutputOptions : ConverterHandlerBaseOptions
             )
         }
     };
+    
+    private TableStyles _SelectedTableType = TableStyles.Single;
+    public TableStyles SelectedTableType
+    {
+        get => _SelectedTableType;
+        set => SetField(ref _SelectedTableType, value);
+    }
+    
+    private TextAlignment _SelectedTextAlignment = TextAlignment.Left;
+    public TextAlignment SelectedTextAlignment
+    {
+        get => _SelectedTextAlignment;
+        set => SetField(ref _SelectedTextAlignment, value);
+    }
+    
+    private CommentStyles _SelectedCommentType = CommentStyles.None;
+    public CommentStyles SelectedCommentType
+    {
+        get => _SelectedCommentType;
+        set => SetField(ref _SelectedCommentType, value);
+    }
 
-    public TableStyles SelectedTableType { get; set; } = TableStyles.Single;
-
-    public TextAlignment SelectedTextAlignment { get; set; } = TextAlignment.Left;
-
-    public CommentStyles SelectedCommentType { get; set; } = CommentStyles.None;
-
-    public bool ForceRowSeparators { get; set; } = false;
+    private bool _ForceRowSeparators;
+    public bool ForceRowSeparators
+    {
+        get => _ForceRowSeparators;
+        set => SetField(ref _ForceRowSeparators, value);
+    }
 }

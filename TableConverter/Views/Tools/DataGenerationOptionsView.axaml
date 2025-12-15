@@ -1,0 +1,86 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:TableConverter.ViewModels.Tools"
+             xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:DataGenerationOptionsViewModel"
+             x:Class="TableConverter.Views.Tools.DataGenerationOptionsView">
+    <UserControl.Styles>
+        <Style Selector="TextBlock.Label">
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Grid.Column" Value="0" />
+            <Setter Property="TextAlignment" Value="Center" />
+        </Style>
+    </UserControl.Styles>
+    <Grid RowDefinitions="*,Auto">
+        <Grid Grid.Row="0"
+              ColumnSpacing="5"
+              RowSpacing="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"
+                                  SharedSizeGroup="Label" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" 
+                       Classes="Label">
+                Number of Rows:
+            </TextBlock>
+            <NumericUpDown Grid.Column="1"
+                           Grid.Row="0" 
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center"
+                           MinWidth="100"
+                           Height="36"
+                           ShowButtonSpinner="True"
+                           Value="{Binding NumberOfRows, Mode=TwoWay}"
+                           ParsingNumberStyle="Integer"
+                           FormatString="N0" />
+            <TextBlock Grid.Row="1" 
+                       Classes="Label">
+                Document Name:
+            </TextBlock>
+            <TextBox Grid.Column="1"
+                     Grid.Row="1" 
+                     HorizontalAlignment="Right"
+                     VerticalAlignment="Center"
+                     MinWidth="100"
+                     Height="36"
+                     Text="{Binding DocumentName, Mode=TwoWay}" />
+            <TextBlock Grid.Row="2"  
+                       Classes="Label">
+                Seed:
+            </TextBlock>
+            <NumericUpDown Grid.Column="1"
+                           Grid.Row="2" 
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center"
+                           MinWidth="100"
+                           Height="36"
+                           ShowButtonSpinner="True"
+                           Value="{Binding Seed, Mode=TwoWay}"
+                           ParsingNumberStyle="Integer"
+                           FormatString="N0" />
+            <TextBlock Grid.Row="3"  
+                       Classes="Label">
+                Locale:
+            </TextBlock>
+            <ComboBox Grid.Column="1"
+                      Grid.Row="3" 
+                      HorizontalAlignment="Right"
+                      MinWidth="100"
+                      VerticalAlignment="Stretch"
+                      ItemsSource="{Binding Locales, Mode=OneWay}"
+                      SelectedItem="{Binding Locale, Mode=TwoWay}" />
+        </Grid>
+    </Grid>
+</UserControl>

@@ -2,5 +2,10 @@
 
 public class ConverterHandlerExcelOutputOptions : ConverterHandlerBaseOptions
 {
-    public string SheetName { get; set; } = string.Empty;
+    private string _SheetName = string.Empty;
+    public string SheetName
+    {
+        get => _SheetName;
+        set => SetField(ref _SheetName, value);
+    }
 }

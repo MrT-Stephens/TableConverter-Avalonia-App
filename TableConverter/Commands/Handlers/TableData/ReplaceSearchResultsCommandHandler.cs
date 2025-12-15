@@ -1,5 +1,4 @@
 using System;
-using System.Data;
 using System.Threading.Tasks;
 using Avalonia.Controls.Notifications;
 using SukiUI.Dialogs;
@@ -7,7 +6,6 @@ using SukiUI.Toasts;
 using TableConverter.Commands.DataModels;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Interfaces;
-using TableConverter.Utilities.Extensions;
 using TableConverter.ViewModels.Documents;
 using TableConverter.ViewModels.Tools;
 
@@ -62,40 +60,44 @@ public class ReplaceSearchResultsCommandHandler(
             return;
         }
 
-        var tableData = tableDataViewModel.TableData.Clone();
+        using var transaction = tableDataViewModel.CreateTransaction();
+        
         var settings = searchViewModel.SearchSettings;
         var replaceValues = searchViewModel.SearchResults;
 
         if (!await dialogManager.CreateDialog()
-                .WithTitle("Are you sure?")
-                .WithContent($"This will replace {replaceValues.Count} occurrences with '{settings.ReplaceText}'.")
-                .WithYesNoResult("Yes", "No")
-                .TryShowAsync())
+            .WithTitle("Are you sure?")
+            .WithContent($"This will replace {replaceValues.Count} occurrences with '{settings.ReplaceText}'.")
+            .WithYesNoResult("Yes", "No")
+            .TryShowAsync())
         {
             return;
         }
-        
+
+        var replaceAmount = 0;
         foreach (var value in replaceValues)
         {
             var newValue = value.Value.Replace(value.FoundValue, settings.ReplaceText);
-            
-            if (value.Row <= 0 && settings.ReplaceInHeaders)
+
+            switch (value.Row)
             {
-                tableData.ReplaceColumn(value.Column, newValue);
-            }
-            else if (settings.ReplaceInRows)
-            {
-                tableData.ReplaceCell(value.Column, value.Row - 1, newValue);
+                case <= 0 when settings.ReplaceInHeaders:
+                    transaction.SetHeader(value.Column, newValue);
+                    replaceAmount++;
+                    break;
+                case > 0 when settings.ReplaceInRows:
+                    transaction.SetCell(value.Row - 1, value.Column, newValue);
+                    replaceAmount++;
+                    break;
             }
         }
 
-        tableDataViewModel.TableData.Columns.ClearAndAddRange(tableData.Columns);
-        tableDataViewModel.TableData.Rows.ClearAndAddRange(tableData.Rows);
+        transaction.Commit();
 
         toastManager.CreateSimpleInfoToast()
             .OfType(NotificationType.Success)
             .WithTitle("Replace Success")
-            .WithContent($"Replaced {replaceValues.Count} occurrences with '{settings.ReplaceText}'.")
+            .WithContent($"Replaced {replaceAmount} occurrences with '{settings.ReplaceText}'.")
             .Queue();
 
         searchViewModel.SearchResults.Clear();

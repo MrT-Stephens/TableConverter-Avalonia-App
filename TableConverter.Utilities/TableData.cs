@@ -1,290 +1,82 @@
-using TableConverter.Utilities.Interfaces;
+using System.Text;
 
 namespace TableConverter.Utilities;
 
-public class TableData : ITableData
+/// <summary>
+///     Represents a table containing headers and rows of data.
+/// </summary>
+public class TableData
 {
-    #region Properties
-    
-    public virtual IList<ITableDataColumn> Columns { get; }
-    
-    public virtual IList<ITableDataRow> Rows { get; }
-
-    public virtual bool IsEmpty => Rows.Count == 0;
-    
-    public virtual int RowCount => Rows.Count;
-    
-    public virtual int ColumnCount => Columns.Count;
-    
-    #endregion
-
-    #region Constructors
-    
-    public TableData()
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="TableData" /> class with headers and rows.
+    /// </summary>
+    /// <param name="headers">The headers of the table.</param>
+    /// <param name="rows">The rows of data in the table.</param>
+    public TableData(IEnumerable<string> headers, IEnumerable<IEnumerable<string>> rows)
     {
-        Columns = new List<ITableDataColumn>();
-        Rows    = new List<ITableDataRow>();
+        Headers = new List<string>(headers);
+        Rows = new List<string[]>(rows.Select(x => x.ToArray()));
     }
 
-    public TableData(int initialColumnCapacity, int initialRowCapacity)
+    /// <summary>
+    ///     Copies a table data from another.
+    /// </summary>
+    /// <param name="other">The table data to copy.</param>
+    public TableData(TableData other)
     {
-        Columns = new List<ITableDataColumn>(initialColumnCapacity);
-        Rows    = new List<ITableDataRow>(initialRowCapacity);
-    }
-    
-    public TableData(IEnumerable<ITableDataColumn> columns, IEnumerable<ITableDataRow> rows)
-    {
-        ArgumentNullException.ThrowIfNull(columns, nameof(columns));
-        ArgumentNullException.ThrowIfNull(rows, nameof(rows));
-        
-        Columns = new List<ITableDataColumn>(columns);
-        Rows    = new List<ITableDataRow>(rows);
+        Headers = new List<string>(other.Headers);
+        Rows = new List<string[]>(other.Rows);
     }
 
-    public TableData(IEnumerable<string> columnNames, IEnumerable<IEnumerable<object>> rows)
-    {
-        ArgumentNullException.ThrowIfNull(columnNames, nameof(columnNames));
-        ArgumentNullException.ThrowIfNull(rows, nameof(rows));
-        
-        Columns = new List<ITableDataColumn>(columnNames.Select(c => new TableDataColumn(c)));
-        Rows    = new List<ITableDataRow>(rows.Select(r => new TableDataRow(r)));
-    }
-    
-    #endregion
-    
-    #region Public Methods
-    
-    public void AddColumn(string name, Type? type = null, object? defaultValue = null)
-    {
-        InsertColumn(Columns.Count, name, type, defaultValue);
-    }
-    
-    public void AddColumn<T>(string name, T? defaultValue = default)
-    {
-        AddColumn(name, typeof(T), defaultValue);
-    }
+    /// <summary>
+    ///     Gets the headers of the table.
+    /// </summary>
+    public List<string> Headers { get; }
 
-    public void InsertColumn(int index, string name, Type? type = null, object? defaultValue = null)
-    {
-        if (index < 0 || index > Columns.Count)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index));
-        }
+    /// <summary>
+    ///     Gets the rows of data in the table.
+    /// </summary>
+    public List<string[]> Rows { get; }
 
-        var column = CreateColumn(name, type, defaultValue);
-        
-        Columns.Insert(index, column);
-        
-        foreach (var row in Rows)
-        {
-            row.Insert(index, column.DefaultValue);
-        }
+    /// <summary>
+    ///     Determines whether the current <see cref="TableData" /> is equal to another object.
+    /// </summary>
+    /// <param name="obj">The object to compare with the current instance.</param>
+    /// <returns>True if the current instance is equal to the specified object; otherwise, false.</returns>
+    public override bool Equals(object? obj)
+    {
+        if (obj is not TableData other) return false;
+
+        return Headers.SequenceEqual(other.Headers) &&
+               !Rows.Where((row, i) => !row.SequenceEqual(other.Rows[i])).Any();
     }
 
-    public void InsertColumn<T>(int index, string name, T? defaultValue = default)
+    /// <summary>
+    ///     Returns a hash code for the current <see cref="TableData" /> instance.
+    /// </summary>
+    /// <returns>A hash code representing the current instance.</returns>
+    public override int GetHashCode()
     {
-        InsertColumn(index, name, typeof(T), defaultValue);
+        return HashCode.Combine(Headers, Rows);
     }
 
-    public bool RemoveColumn(string name)
+    /// <summary>
+    ///     Returns a string representation of the <see cref="TableData" /> instance.
+    /// </summary>
+    /// <returns>A string that represents the table in CSV-like format.</returns>
+    public override string ToString()
     {
-        var index = -1;
+        var sb = new StringBuilder();
 
-        for (var i = 0; i < Columns.Count; i++)
-        {
-            if (string.Equals(Columns[i].Name, name, StringComparison.OrdinalIgnoreCase))
-            {
-                index = i;
-                break;
-            }
-        }
-
-        if (index < 0)
-        {
-            return false;
-        }
-
-        RemoveColumnAt(index);
-        return true;
-    }
-
-    public void RemoveColumnAt(int index)
-    {
-        if (index < 0 || index >= Columns.Count)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index));
-        }
-
-        Columns.RemoveAt(index);
-        
-        foreach (var row in Rows)
-        {
-            row.RemoveAt(index);
-        }
-    }
-
-    public void ReplaceColumn(int index, string name)
-    {
-        if (index < 0 || index >= Columns.Count)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index));
-        }
-        
-        Columns[index].Name = name;
-    }
-
-    public ITableDataRow AddRow()
-    {
-        var row = CreateRow();
-
-        for (var i = 0; i < ColumnCount; i++)
-        {
-            row.Add(Columns[i].DefaultValue);
-        }
-
-        Rows.Add(row);
-        return row;
-    }
-
-    public void AddRow(IEnumerable<object> values)
-    {
-        var counter = 0;
-        var row = CreateRow();
-        
-        foreach (var value in values)
-        {
-            if (counter >= ColumnCount)
-            {
-                throw new InvalidOperationException(
-                    $"Row column count exceeds table column count {ColumnCount}.");
-            }
-
-            row.Add(value);
-            counter++;
-        }
-
-        Rows.Add(row);
-    }
-
-    public ITableDataRow InsertRow(int index)
-    {
-        if (index < 0 || index > Rows.Count)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index));
-        }
-        
-        var row = CreateRow();
-        
-        for (var i = 0; i < ColumnCount; i++)
-        {
-            row.Add(Columns[i].DefaultValue);
-        }
-        
-        Rows.Insert(index, row);
-        return row;
-    }
-    
-    public void InsertRow(int index, IEnumerable<object> values)
-    {
-        if (index < 0 || index > Rows.Count)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index));
-        }
-
-        var counter = 0;
-        var row = CreateRow();
-        
-        foreach (var value in values)
-        {
-            if (counter >= ColumnCount)
-            {
-                throw new InvalidOperationException(
-                    $"Row column count exceeds table column count {ColumnCount}.");
-            }
-
-            row.Add(value);
-            counter++;
-        }
-
-        Rows.Insert(index, row);
-    }
-
-    public bool RemoveRow(ITableDataRow row)
-    {
-        return Rows.Remove(row);
-    }
-
-    public void RemoveRowAt(int index)
-    {
-        if (index < 0 || index >= Rows.Count)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index));
-        }
-
-        Rows.RemoveAt(index);
-    }
-
-    public void ReplaceCell(int columnIndex, int rowIndex, object value)
-    {
-        if (rowIndex < 0 || rowIndex >= Rows.Count)
-        {
-            throw new ArgumentOutOfRangeException(nameof(rowIndex));
-        }
-
-        if (columnIndex < 0 || columnIndex >= Columns.Count)
-        {
-            throw new ArgumentOutOfRangeException(nameof(columnIndex));
-        }
-        
-        Rows[rowIndex][columnIndex] = value;
-    }
-
-    public void Clear()
-    {
-        Columns.Clear();
-        Rows.Clear();
-    }
-
-    public ITableData Clone()
-    {
-        var newTableData = CreateTableData();
-
-        foreach (var column in Columns)
-        {
-            newTableData.AddColumn(column.Name, column.DataType, column.DefaultValue);
-        }
+        sb.AppendJoin(',', Headers);
+        sb.AppendLine();
 
         foreach (var row in Rows)
         {
-            var newRow = newTableData.AddRow();
-            
-            for (var i = 0; i < ColumnCount; i++)
-            {
-                newRow[i] = row[i];
-            }
+            sb.AppendJoin(',', row);
+            sb.AppendLine();
         }
 
-        return newTableData;
+        return sb.ToString();
     }
-
-    #endregion
-
-    #region Miscellaneous
-
-    protected virtual ITableDataColumn CreateColumn(string name, Type? type = null, object? defaultValue = null)
-    {
-        return new TableDataColumn(name, type, defaultValue);
-    }
-
-    protected virtual ITableDataRow CreateRow()
-    {
-        return new TableDataRow(ColumnCount);
-    }
-
-    protected virtual ITableData CreateTableData()
-    {
-        return new TableData();
-    }
-
-    #endregion
 }

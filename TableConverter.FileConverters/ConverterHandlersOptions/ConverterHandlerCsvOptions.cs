@@ -2,7 +2,17 @@
 
 public class ConverterHandlerCsvOptions : ConverterHandlerBaseOptions
 {
-    public string Delimiter { get; set; } = ",";
+    private string _Delimiter = ",";
+    public string Delimiter
+    {
+        get => _Delimiter;
+        set => SetField(ref _Delimiter, value);
+    }
 
-    public bool Header { get; set; } = true;
+    private bool _IncludeHeader = true;
+    public bool IncludeHeader
+    {
+        get => _IncludeHeader;
+        set => SetField(ref _IncludeHeader, value);
+    }
 }

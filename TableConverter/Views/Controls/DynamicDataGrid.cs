@@ -13,20 +13,30 @@ namespace TableConverter.Views.Controls;
 
 public class DynamicDataGrid : DataGrid
 {
-    public static readonly StyledProperty<ObservableTableData?> TableDataProperty =
-        AvaloniaProperty.Register<DynamicDataGrid, ObservableTableData?>(nameof(TableData));
+    public static readonly StyledProperty<ObservableCollection<string>> HeadersProperty =
+        AvaloniaProperty.Register<DynamicDataGrid, ObservableCollection<string>>(nameof(Headers));
+    
+    public static readonly StyledProperty<ObservableCollection<string[]>> RowsProperty =
+        AvaloniaProperty.Register<DynamicDataGrid, ObservableCollection<string[]>>(nameof(Rows));
 
     public DynamicDataGrid()
     {
-        TableData = new ObservableTableData();
+        Headers = [];
+        Rows = [];
     }
 
     protected override Type StyleKeyOverride => typeof(DataGrid);
 
-    public ObservableTableData? TableData
+    public ObservableCollection<string> Headers
     {
-        get => GetValue(TableDataProperty);
-        set => SetValue(TableDataProperty, value);
+        get => GetValue(HeadersProperty);
+        set => SetValue(HeadersProperty, value);
+    }
+
+    public ObservableCollection<string[]> Rows
+    {
+        get => GetValue(RowsProperty);
+        set => SetValue(RowsProperty, value);
     }
     
     protected override void OnInitialized()
@@ -43,10 +53,10 @@ public class DynamicDataGrid : DataGrid
 
         switch (change.Property.Name)
         {
-            case nameof(TableData.ObservableColumns):
+            case nameof(Headers):
                 UpdateColumns();
                 break;
-            case nameof(TableData.ObservableRows):
+            case nameof(Rows):
                 UpdateRows();
                 break;
         }
@@ -54,22 +64,21 @@ public class DynamicDataGrid : DataGrid
 
     private void UpdateRows()
     {
-        ItemsSource = TableData?.ObservableRows;
+        ItemsSource = Rows;
     }
 
     private void UpdateColumns()
     {
         Columns.Clear();
 
-        if (TableData is null || TableData.ColumnCount == 0)
+        if (Headers.Count == 0)
             return;
 
-        for (var i = 0; i < TableData.ColumnCount; i++)
+        for (var i = 0; i < Headers.Count; i++)
         {
-            var tableDataColumn = TableData.Columns[i];
             DataGridBoundColumn column;
 
-            if (tableDataColumn.DataType == typeof(bool))
+            if (false)
             {
                 column = new DataGridCheckBoxColumn
                 {
@@ -89,7 +98,6 @@ public class DynamicDataGrid : DataGrid
                     {
                         Path = $"[{i}]",
                         Mode = BindingMode.TwoWay,
-                        Converter = new FuncValueConverter<string>(x => x?.ToString() ?? string.Empty),
                     },
                 };
             }
@@ -98,8 +106,8 @@ public class DynamicDataGrid : DataGrid
             {
                 [!TextBox.TextProperty] = new Binding
                 {
-                    Path = $"[{i}].Name",
-                    Source = TableData.ObservableColumns,
+                    Path = $"Headers[{i}]",
+                    Source = this,
                     Mode = BindingMode.TwoWay
                 },
                 HorizontalAlignment = HorizontalAlignment.Stretch,

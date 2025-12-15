@@ -20,7 +20,7 @@ public class CsvInputTestCases : InputConverterTestCasesBase
             "test_input_csv_1.csv",
             new ConverterHandlerCsvOptions
             {
-                Header = true,
+                IncludeHeader = true,
                 Delimiter = ","
             },
             Utils.TestTableData
@@ -30,7 +30,7 @@ public class CsvInputTestCases : InputConverterTestCasesBase
             "test_input_csv_2.csv",
             new ConverterHandlerCsvOptions
             {
-                Header = true,
+                IncludeHeader = true,
                 Delimiter = "&"
             },
             Utils.TestTableData
@@ -47,7 +47,7 @@ public class CsvInputTestCases : InputConverterTestCasesBase
             "test_input_incorrect_csv_1.csv",
             new ConverterHandlerCsvOptions
             {
-                Header = true,
+                IncludeHeader = true,
                 Delimiter = ","
             }
         ),
@@ -56,7 +56,7 @@ public class CsvInputTestCases : InputConverterTestCasesBase
             "test_input_incorrect_csv_2.csv",
             new ConverterHandlerCsvOptions
             {
-                Header = true,
+                IncludeHeader = true,
                 Delimiter = ","
             }
         )

@@ -20,7 +20,7 @@ public class ConverterHandlerCsvOutput : ConverterHandlerOutputAbstract<Converte
             {
                 Delimiter = Options!.Delimiter,
                 NewLine = Environment.NewLine,
-                HasHeaderRecord = Options!.Header
+                HasHeaderRecord = Options!.IncludeHeader
             });
             {
                 List<object> records = [];

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
@@ -14,7 +15,7 @@ namespace TableConverter.Extensions;
 public static class SukiDialogBuilderExtensions
 {
     public static SukiDialogBuilder WithForm<TForm>(this SukiDialogBuilder builder, TForm form)
-        where TForm : ObservableObject
+        where TForm : INotifyPropertyChanged
     {
         builder.WithContent(new PropertyGrid
         {
@@ -23,7 +24,7 @@ public static class SukiDialogBuilderExtensions
             {
                 new PropertyGridTemplateSelector
                 {
-                    UseSukiHost = true,
+                    UseSukiHost = false,
                 }
             },
         });

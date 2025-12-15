@@ -69,7 +69,7 @@ public class SelectedItemsBehavior : AvaloniaObject
         switch (control)
         {
             case SelectingItemsControl sic:
-                sic.SelectionChanged += OnSelectingItemsControlSelectionChanged;
+                sic.AddHandler(SelectingItemsControl.SelectionChangedEvent, OnSelectingItemsControlSelectionChanged);
                 break;
 
             case DataGrid dg:
@@ -99,7 +99,7 @@ public class SelectedItemsBehavior : AvaloniaObject
         switch (control)
         {
             case SelectingItemsControl sic:
-                sic.SelectionChanged -= OnSelectingItemsControlSelectionChanged;
+                sic.RemoveHandler(SelectingItemsControl.SelectionChangedEvent, OnSelectingItemsControlSelectionChanged);
                 break;
 
             case DataGrid dg:

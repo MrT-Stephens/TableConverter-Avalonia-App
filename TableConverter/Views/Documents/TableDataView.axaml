@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:TableConverter.Views.Controls"
              xmlns:documents="clr-namespace:TableConverter.ViewModels.Documents"
-             xmlns:behaviours="clr-namespace:TableConverter.Common.Behaviours"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="TableConverter.Views.Documents.TableDataView"
              x:DataType="documents:TableDataViewModel">
@@ -14,20 +13,20 @@
                                   SelectionMode="Extended"
                                   AutoGenerateColumns="False"
                                   CanUserResizeColumns="True"
-                                  TableData="{Binding TableData, Mode=TwoWay}"
+                                  Headers="{Binding Headers, Mode=TwoWay}"
+                                  Rows="{Binding Rows, Mode=TwoWay}"
                                   CanUserReorderColumns="True"
                                   CanUserSortColumns="True"
                                   ClipboardCopyMode="ExcludeHeader"
-                                  GridLinesVisibility="All"
-                                  behaviours:SelectedItemsBehavior.SelectedItems="{Binding SelectedItems}">
+                                  GridLinesVisibility="All">
         </controls:DynamicDataGrid>
         <Grid Grid.Row="1" 
               ColumnDefinitions="*">
             <TextBlock HorizontalAlignment="Right">
                 <TextBlock.Text>
                     <MultiBinding StringFormat="Rows: {0}, Columns: {1}">
-                        <Binding Path="TableData.Rows.Count" />
-                        <Binding Path="TableData.Columns.Count" />
+                        <Binding Path="Rows.Count" />
+                        <Binding Path="Headers.Count" />
                     </MultiBinding>
                 </TextBlock.Text>
             </TextBlock>

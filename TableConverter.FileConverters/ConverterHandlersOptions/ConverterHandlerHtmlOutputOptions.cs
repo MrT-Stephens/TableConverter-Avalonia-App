@@ -2,7 +2,17 @@
 
 public class ConverterHandlerHtmlOutputOptions : ConverterHandlerBaseOptions
 {
-    public bool MinifyHtml { get; set; } = false;
+    private bool _MinifyHtml;
+    public bool MinifyHtml
+    {
+        get => _MinifyHtml;
+        set => SetField(ref _MinifyHtml, value);
+    }
 
-    public bool IncludeTheadTbody { get; set; } = false;
+    private bool _IncludeTheadTbody;
+    public bool IncludeTheadTbody
+    {
+        get => _IncludeTheadTbody;
+        set => SetField(ref _IncludeTheadTbody, value);
+    }
 }

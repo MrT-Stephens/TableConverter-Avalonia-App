@@ -3,7 +3,7 @@ using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using TableConverter.Contracts;
 
-namespace TableConverter.ViewModels;
+namespace TableConverter.ViewModels.Models;
 
 public partial class DataGenerationFieldViewModel : ObservableObject
 {

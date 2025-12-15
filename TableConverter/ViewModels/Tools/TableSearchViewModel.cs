@@ -29,7 +29,7 @@ public partial class TableSearchViewModel : BaseScopedPaneToolViewModel<TableWor
         IEventManager eventManager, 
         ISukiDialogManager dialogManager, 
         ISukiToastManager toastManager) 
-        : base(commandManager, eventManager, dialogManager, toastManager, "Search Table Data")
+        : base(commandManager, eventManager, dialogManager, toastManager, "Search & Replace")
     {
         SearchSettings = new SearchSettingsFrom();
         SearchResults = [];

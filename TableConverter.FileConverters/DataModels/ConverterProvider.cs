@@ -17,7 +17,7 @@ public abstract class ConverterProvider : IConverterProvider
             return null;
         }
 
-        return InputHandler()
+        return CreateInputHander()
             ?? throw new InvalidOperationException("Converter handler supports input conversion. But failed to create a input converter.");
     }
 
@@ -28,7 +28,7 @@ public abstract class ConverterProvider : IConverterProvider
             return null;
         }
 
-        return OutputHandler()
+        return CreateOutputHander()
             ?? throw new InvalidOperationException("Converter handler supports output conversion. But failed to create a output converter.");
     }
 }

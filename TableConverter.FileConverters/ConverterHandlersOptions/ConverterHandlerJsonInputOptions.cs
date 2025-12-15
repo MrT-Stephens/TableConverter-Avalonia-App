@@ -10,5 +10,10 @@ public class ConverterHandlerJsonInputOptions : ConverterHandlerBaseOptions
         KeyedArrays,
     }
 
-    public JsonStyles SelectedJsonFormatType { get; set; } = JsonStyles.ArrayOfObjects;
+    private JsonStyles _SelectedJsonFormatType = JsonStyles.ArrayOfObjects;
+    public JsonStyles SelectedJsonFormatType
+    {
+        get => _SelectedJsonFormatType;
+        set => SetField(ref _SelectedJsonFormatType, value);
+    }
 }

@@ -20,21 +20,66 @@ public class ConverterHandlerLaTexOutputOptions : ConverterHandlerBaseOptions
         None,
     }
 
-    public TableTypes SelectedTableType { get; set; } = TableTypes.All;
+    private TableTypes _SelectedTableType = TableTypes.All;
+    public TableTypes SelectedTableType
+    {
+        get => _SelectedTableType;
+        set => SetField(ref _SelectedTableType, value);
+    }
 
-    public TextAlignment SelectedTextAlignment { get; set; } = TextAlignment.Left;
+    private TextAlignment _SelectedTextAlignment = TextAlignment.Left;
+    public TextAlignment SelectedTextAlignment
+    {
+        get => _SelectedTextAlignment;
+        set => SetField(ref _SelectedTextAlignment, value);
+    }
 
-    public TextAlignment SelectedTableAlignment { get; set; } = TextAlignment.Left;
+    private TextAlignment _SelectedTableAlignment = TextAlignment.Center;
+    public TextAlignment SelectedTableAlignment
+    {
+        get => _SelectedTableAlignment;
+        set => SetField(ref _SelectedTableAlignment, value);
+    }
 
-    public CaptionAlignments SelectedCaptionAlignment { get; set; } = CaptionAlignments.Top;
+    private CaptionAlignments _SelectedCaptionAlignment = CaptionAlignments.Top;
+    public CaptionAlignments SelectedCaptionAlignment
+    {
+        get => _SelectedCaptionAlignment;
+        set => SetField(ref _SelectedCaptionAlignment, value);
+    }
 
-    public string CaptionName { get; set; } = "";
+    private string _CaptionName = string.Empty;
+    public string CaptionName
+    {
+        get => _CaptionName;
+        set => SetField(ref _CaptionName, value);
+    }
 
-    public string LabelName { get; set; } = "";
+    private string _LabelName = string.Empty;
+    public string LabelName
+    {
+        get => _LabelName;
+        set => SetField(ref _LabelName, value);
+    }
 
-    public bool MinimalWorkingExample { get; set; } = false;
+    private bool _MinimalWorkingExample;
+    public bool MinimalWorkingExample
+    {
+        get => _MinimalWorkingExample;
+        set => SetField(ref _MinimalWorkingExample, value);
+    }
 
-    public bool BoldHeader { get; set; } = false;
+    private bool _BoldHeader;
+    public bool BoldHeader
+    {
+        get => _BoldHeader;
+        set => SetField(ref _BoldHeader, value);
+    }
 
-    public bool BoldFirstColumn { get; set; } = false;
+    private bool _BoldFirstColumn;
+    public bool BoldFirstColumn
+    {
+        get => _BoldFirstColumn;
+        set => SetField(ref _BoldFirstColumn, value);
+    }
 }

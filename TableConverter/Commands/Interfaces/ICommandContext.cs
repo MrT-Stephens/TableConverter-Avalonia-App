@@ -75,5 +75,5 @@ public interface ICommandContext : IHasSelectedItems
     /// <param name="reason">
     /// The reason for cancelling the command execution.
     /// </param>
-    public void Cancel(string reason = "");
+    public void Cancel(string reason = "Cancelled");
 }

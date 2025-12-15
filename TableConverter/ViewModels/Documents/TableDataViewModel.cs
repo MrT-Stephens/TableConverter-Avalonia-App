@@ -1,9 +1,11 @@
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Contracts;
 using TableConverter.Interfaces;
+using TableConverter.Utilities;
 using TableConverter.Utilities.Interfaces;
 using TableConverter.ViewModels.Base;
 
@@ -12,8 +14,9 @@ namespace TableConverter.ViewModels.Documents;
 public partial class TableDataViewModel : BaseDocumentViewModel
 {
     #region Properties
-    
-    [ObservableProperty] private ITableData _TableData;
+
+    [ObservableProperty] private ObservableCollection<string> _Headers;
+    [ObservableProperty] private ObservableCollection<string[]> _Rows;
 
     public override bool CanClose => !IsDirty;
     public override bool CanUndo { get; }
@@ -31,7 +34,17 @@ public partial class TableDataViewModel : BaseDocumentViewModel
         IUndoRedo undoRedo)
         : base(commandManager, eventManager, dialogManager, toastManager, undoRedo)
     {
-        TableData = new ObservableTableData();
+        Headers = [];
+        Rows = [];
+    }
+
+    #endregion
+
+    #region Methods
+
+    public ITableDataTransaction CreateTransaction()
+    {
+        return new TableDataTransaction(Headers, Rows);
     }
 
     #endregion

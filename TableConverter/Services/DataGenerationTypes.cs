@@ -10,6 +10,7 @@ using TableConverter.Contracts;
 using TableConverter.Interfaces;
 using TableConverter.Utilities;
 using TableConverter.ViewModels;
+using DataGenerationFieldViewModel = TableConverter.ViewModels.Models.DataGenerationFieldViewModel;
 
 namespace TableConverter.Services;
 

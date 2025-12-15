@@ -7,11 +7,11 @@ using TableConverter.ViewModels.Documents;
 
 namespace TableConverter.ViewModels.Workspaces;
 
-public class DataGenerationWorkspaceViewModel : BaseWorkspaceEditorViewModel
+public class DataGenerationWorkspaceEditorViewModel : BaseWorkspaceEditorViewModel
 {
     #region Constructors
     
-    public DataGenerationWorkspaceViewModel(IServiceProvider serviceProvider) 
+    public DataGenerationWorkspaceEditorViewModel(IServiceProvider serviceProvider) 
         : base(serviceProvider , "Data Generation", "DataAddIcon", 3)
     {
     }

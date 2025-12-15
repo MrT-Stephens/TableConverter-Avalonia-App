@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using TableConverter.Contracts;
 using TableConverter.Utilities;
 using TableConverter.ViewModels;
+using DataGenerationFieldViewModel = TableConverter.ViewModels.Models.DataGenerationFieldViewModel;
 
 namespace TableConverter.Interfaces;
 

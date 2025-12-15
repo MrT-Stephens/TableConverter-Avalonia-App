@@ -8,5 +8,10 @@ public class ConverterHandlerJsonLinesOutputOptions : ConverterHandlerBaseOption
         Arrays
     }
 
-    public JsonLinesStyles SelectedJsonLinesFormatType { get; set; } = JsonLinesStyles.Objects;
+    private JsonLinesStyles _SelectedJsonLinesFormatType = JsonLinesStyles.Arrays;
+    public JsonLinesStyles SelectedJsonLinesFormatType
+    {
+        get => _SelectedJsonLinesFormatType;
+        set => SetField(ref _SelectedJsonLinesFormatType, value);
+    }
 }

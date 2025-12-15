@@ -1,0 +1,95 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:TableConverter.Views.Controls">
+    <Design.PreviewWith>
+        <controls:DockedToolPanel />
+    </Design.PreviewWith>
+    <Style Selector="controls|DockedToolPanel">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid x:Name="PART_Grid">
+                    <ContentPresenter x:Name="PART_Tool"
+                                      Content="{TemplateBinding ToolContent}" />
+                    <GridSplitter x:Name="PART_Splitter"
+                                  Background="Transparent"
+                                  ShowsPreview="True" />
+                    <ContentPresenter x:Name="PART_Main"
+                                      Content="{TemplateBinding MainContent}" />
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <!-- LEFT -->
+    <Style Selector="controls|DockedToolPanel[DockPosition=Left]">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid ColumnDefinitions="1*,10,2*">
+                    <ContentPresenter Grid.Column="0"
+                                      Content="{TemplateBinding ToolContent}" />
+                    <GridSplitter Grid.Column="1"
+                                  ResizeDirection="Columns"
+                                  VerticalAlignment="Stretch"
+                                  HorizontalAlignment="Center"
+                                  Width="5" />
+                    <ContentPresenter Grid.Column="2"
+                                      Content="{TemplateBinding MainContent}" />
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <!-- RIGHT -->
+    <Style Selector="controls|DockedToolPanel[DockPosition=Right]">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid ColumnDefinitions="2*,10,1*">
+                    <ContentPresenter Grid.Column="0"
+                                      Content="{TemplateBinding MainContent}" />
+                    <GridSplitter Grid.Column="1"
+                                  ResizeDirection="Columns"
+                                  VerticalAlignment="Stretch"
+                                  HorizontalAlignment="Center"
+                                  Width="5" />
+                    <ContentPresenter Grid.Column="2"
+                                      Content="{TemplateBinding ToolContent}" />
+
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <!-- TOP -->
+    <Style Selector="controls|DockedToolPanel[DockPosition=Top]">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid RowDefinitions="1*,10,2*">
+                    <ContentPresenter Grid.Row="0"
+                                      Content="{TemplateBinding ToolContent}" />
+                    <GridSplitter Grid.Row="1"
+                                  ResizeDirection="Rows"
+                                  HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Center"
+                                  Height="5" />
+                    <ContentPresenter Grid.Row="2"
+                                      Content="{TemplateBinding MainContent}" />
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <!-- BOTTOM -->
+    <Style Selector="controls|DockedToolPanel[DockPosition=Bottom]">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid RowDefinitions="2*,10,1*">
+                    <ContentPresenter Grid.Row="0"
+                                      Content="{TemplateBinding MainContent}" />
+                    <GridSplitter Grid.Row="1"
+                                  ResizeDirection="Rows"
+                                  HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Center"
+                                  Height="5" />
+                    <ContentPresenter Grid.Row="2"
+                                      Content="{TemplateBinding ToolContent}" />
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>

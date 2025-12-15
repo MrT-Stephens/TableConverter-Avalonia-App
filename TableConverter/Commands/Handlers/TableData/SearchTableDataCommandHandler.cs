@@ -54,7 +54,7 @@ public class SearchTableDataCommandHandler : ICommandHandler
             return;
         }
         
-        if (tableDataViewModel.TableData.IsEmpty)
+        if (tableDataViewModel.Rows.Count == 0 || tableDataViewModel.Headers.Count == 0)
         {
             context.Cancel("No table data document is selected.");
             return;
@@ -92,8 +92,8 @@ public class SearchTableDataCommandHandler : ICommandHandler
             }
         }
 
-        var tableColumns = tableDataViewModel.TableData.Columns;
-        var tableRows = tableDataViewModel.TableData.Rows;
+        var tableColumns = tableDataViewModel.Headers;
+        var tableRows = tableDataViewModel.Rows;
         
         var results = new ConcurrentBag<TableSearchResult>();
 
@@ -101,7 +101,7 @@ public class SearchTableDataCommandHandler : ICommandHandler
         {
             for (var colIndex = 0; colIndex < tableColumns.Count; colIndex++)
             {
-                var cellText = tableColumns[colIndex].Name;
+                var cellText = tableColumns[colIndex];
                 
                 var match = GetFirstMatch(cellText, searchText, settings, regex);
 
@@ -114,13 +114,13 @@ public class SearchTableDataCommandHandler : ICommandHandler
 
         if (settings.SearchInRows)
         {
-            Parallel.For(0, tableRows.Count, rowIndex =>
+            Parallel.For(0, tableRows.Count, (int rowIndex) =>
             {
                 var row = tableRows[rowIndex];
 
-                for (var colIndex = 0; colIndex < row.Count; colIndex++)
+                for (var colIndex = 0; colIndex < row.Length; colIndex++)
                 {
-                    var cellText = row[colIndex]?.ToString() ?? "";
+                    var cellText = row[colIndex];
 
                     var match = GetFirstMatch(cellText, searchText, settings, regex);
 

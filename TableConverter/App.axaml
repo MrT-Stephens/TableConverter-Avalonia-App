@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="TableConverter.App"
              xmlns:sukiUi="clr-namespace:SukiUI;assembly=SukiUI"
+             xmlns:converter="clr-namespace:TableConverter.Converters"
              RequestedThemeVariant="Default">
     <Application.Resources>
         <!-- App Icons -->
@@ -38,6 +39,12 @@
         </StreamGeometry>
         <StreamGeometry x:Key="ArrowReturnIcon">
             M14.5 1.5a.5.5 0 0 1 .5.5v4.8a2.5 2.5 0 0 1-2.5 2.5H2.707l3.347 3.346a.5.5 0 0 1-.708.708l-4.2-4.2a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 8.3H12.5A1.5 1.5 0 0 0 14 6.8V2a.5.5 0 0 1 .5-.5
+        </StreamGeometry>
+        <StreamGeometry x:Key="PlusIcon">
+            M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4
+        </StreamGeometry>
+        <StreamGeometry x:Key="UpDownIcon">
+            M12,18.17L8.83,15L7.42,16.41L12,21L16.59,16.41L15.17,15M12,5.83L15.17,9L16.58,7.59L12,3L7.41,7.59L8.83,9L12,5.83Z
         </StreamGeometry>
         <!-- Data Generation Modules Icons -->
         <StreamGeometry x:Key="DataGenerationInternetIcon">
@@ -98,5 +105,32 @@
     <Application.Styles>
         <!-- Application Styles -->
         <sukiUi:SukiTheme ThemeColor="Green"  />
+        
+        <StyleInclude Source="Views/Controls/DockedToolPanel.axaml" />
+        
+        <Style Selector="DataValidationErrors">
+            <Setter Property="ErrorTemplate">
+                <DataTemplate x:DataType="{x:Type x:Object}">
+                    <Canvas Width="14" 
+                            Height="14" 
+                            Margin="4 0 1 0" 
+                            Background="Transparent"
+                            ToolTip.Placement="Pointer">
+                        <ToolTip.Tip>
+                            <ItemsControl ItemsSource="{Binding}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding ., Converter={x:Static converter:DataErrorObjectToStringConverter.Instance}}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ToolTip.Tip>
+                        <Path Data="M14,7 A7,7 0 0,0 0,7 M0,7 A7,7 0 1,0 14,7 M7,3l0,5 M7,9l0,2" 
+                              Stroke="Red" 
+                              StrokeThickness="2" />
+                    </Canvas>
+                </DataTemplate>
+            </Setter>
+        </Style>
     </Application.Styles>
 </Application>

@@ -6,14 +6,17 @@ using Microsoft.Extensions.DependencyInjection;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;
+using TableConverter.Extensions;
 using TableConverter.Utilities.Extensions;
 
 namespace TableConverter.Commands.Extensions;
 
 public static class DependencyInjectionExtensions
 {
-    public static void RegisterCommandHandlers(this IServiceCollection services, Assembly assembly)
+    public static void RegisterCommandHandlers(this IServiceCollection services)
     {
+        var assembly = Assembly.GetExecutingAssembly();
+        
         var handlerTypes = assembly.GetTypes()
             .Where(t => t is { IsClass: true, IsAbstract: false } && typeof(ICommandHandlerBase).IsAssignableFrom(t));
 
@@ -37,15 +40,14 @@ public static class DependencyInjectionExtensions
     public static void RegisterCommandError(this IServiceProvider provider)
     {
         var commandService = provider.GetRequiredService<ICommandManager>();
-        var toastManger = provider.GetRequiredService<ISukiToastManager>();
+        var dialogManager = provider.GetRequiredService<ISukiDialogManager>();
 
         commandService.OnError += (_, args) =>
         {
-            toastManger.CreateSimpleInfoToast()
-                .OfType(NotificationType.Error)
-                .WithTitle("Command Error Occured")
-                .WithContent($"A command error has occured: {args}")
-                .Queue();
+            dialogManager.CreateDialog()
+                .TryShowErrorDialogAsync(
+                    "Command Error Occured",
+                    $"A command error has occured: {args}");
         };
     }
 }
