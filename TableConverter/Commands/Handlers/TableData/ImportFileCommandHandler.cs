@@ -110,7 +110,7 @@ public class ImportFileCommandHandler(
             return;
         }
 
-        var path = file.Path.ToString();
+        var path = file.Path.LocalPath;
 
         var tableData = await converterService.InputFileAsync(inputConverterName, path);
 

@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using TableConverter.Commands.DataModels;
 using TableConverter.Commands.Interfaces;
@@ -19,7 +22,7 @@ public static partial class TableDataCommandNames
     public const string Search = "TableData.Search";
 }
 
-public class SearchTableDataCommandHandler : ICommandHandler
+public class SearchTableDataCommandHandler : ICommandHandlerAsync
 {
     public ICommandMetadata CommandMetadata => new CommandMetadata(
         TableDataCommandNames.Search,
@@ -35,7 +38,7 @@ public class SearchTableDataCommandHandler : ICommandHandler
         return context.Parent is IWorkspaceEditor;
     }
 
-    public void Execute(object? parameter, ICommandContext context)
+    public async Task Execute(object? parameter, ICommandContext context)
     {
         if (context.Parent is not IWorkspaceEditor workspace)
         {
@@ -75,66 +78,60 @@ public class SearchTableDataCommandHandler : ICommandHandler
             return;
         }
         
-        Regex? regex = null;
-        if (settings.UseRegularExpressions)
+        var headers = tableDataViewModel.Headers.ToArray();
+        var rows = tableDataViewModel.Rows.ToArray();
+        
+        var results = await Task.Run(() =>
         {
-            var pattern = settings.MatchWholeWord ? $"^{searchText}$" : searchText;
-            var options = settings.MatchCase ? RegexOptions.Compiled : (RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
-            try
+            Regex? regex = null;
+            
+            if (settings.UseRegularExpressions)
             {
+                var pattern = settings.MatchWholeWord ? $"^{searchText}$" : searchText;
+                var options = settings.MatchCase
+                    ? RegexOptions.Compiled
+                    : RegexOptions.Compiled | RegexOptions.IgnoreCase;
+
                 regex = new Regex(pattern, options);
             }
-            catch
+
+            var list = new List<TableSearchResult>(1024);
+
+            if (settings.SearchInHeaders)
             {
-                context.Cancel("Search text is invalid.");
-                return;
-            }
-        }
-
-        var tableColumns = tableDataViewModel.Headers;
-        var tableRows = tableDataViewModel.Rows;
-        
-        var results = new ConcurrentBag<TableSearchResult>();
-
-        if (settings.SearchInHeaders)
-        {
-            for (var colIndex = 0; colIndex < tableColumns.Count; colIndex++)
-            {
-                var cellText = tableColumns[colIndex];
-                
-                var match = GetFirstMatch(cellText, searchText, settings, regex);
-
-                if (match is not null)
+                for (int col = 0; col < headers.Length; col++)
                 {
-                    results.Add(new TableSearchResult(colIndex, 0, cellText, match));
+                    var match = GetFirstMatch(headers[col], searchText, settings, regex);
+                    if (match != null)
+                        list.Add(new TableSearchResult(col, 0, headers[col], match));
                 }
             }
-        }
 
-        if (settings.SearchInRows)
-        {
-            Parallel.For(0, tableRows.Count, (int rowIndex) =>
+            if (settings.SearchInRows)
             {
-                var row = tableRows[rowIndex];
-
-                for (var colIndex = 0; colIndex < row.Length; colIndex++)
+                for (int row = 0; row < rows.Length; row++)
                 {
-                    var cellText = row[colIndex];
-
-                    var match = GetFirstMatch(cellText, searchText, settings, regex);
-
-                    if (match is not null)
+                    var cells = rows[row];
+                    for (int col = 0; col < cells.Length; col++)
                     {
-                        results.Add(new TableSearchResult(colIndex, rowIndex + 1, cellText, match));
+                        var match = GetFirstMatch(cells[col], searchText, settings, regex);
+                        if (match != null)
+                            list.Add(new TableSearchResult(col, row + 1, cells[col], match));
                     }
                 }
-            });
-        }
+            }
 
-        searchViewModel.SearchResults.ClearAndAddRange(results
-            .OrderBy(x => x.Row)
-            .ThenBy(x => x.Column));
+            // SORT OFF UI THREAD 🔥
+            list.Sort(static (a, b) =>
+            {
+                var r = a.Row.CompareTo(b.Row);
+                return r != 0 ? r : a.Column.CompareTo(b.Column);
+            });
+
+            return list;
+        });
+
+        searchViewModel.SearchResults = results.ToObservableCollection();
     }
     
     private static string? GetFirstMatch(string cellText, string searchText, SearchSettingsFrom settings, Regex? regex)

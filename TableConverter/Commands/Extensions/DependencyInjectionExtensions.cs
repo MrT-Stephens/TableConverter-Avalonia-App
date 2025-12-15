@@ -40,14 +40,15 @@ public static class DependencyInjectionExtensions
     public static void RegisterCommandError(this IServiceProvider provider)
     {
         var commandService = provider.GetRequiredService<ICommandManager>();
-        var dialogManager = provider.GetRequiredService<ISukiDialogManager>();
+        var toastManager = provider.GetRequiredService<ISukiToastManager>();
 
         commandService.OnError += (_, args) =>
         {
-            dialogManager.CreateDialog()
-                .TryShowErrorDialogAsync(
-                    "Command Error Occured",
-                    $"A command error has occured: {args}");
+            toastManager.CreateSimpleInfoToast()
+                .OfType(NotificationType.Error)
+                .WithTitle("Error")
+                .WithContent($"An error occured during command execution: {args.Message}")
+                .Queue();
         };
     }
 }
