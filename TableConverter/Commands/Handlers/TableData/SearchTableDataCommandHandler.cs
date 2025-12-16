@@ -81,7 +81,7 @@ public class SearchTableDataCommandHandler : ICommandHandlerAsync
         var headers = tableDataViewModel.Headers.ToArray();
         var rows = tableDataViewModel.Rows.ToArray();
         
-        var results = await Task.Run(() =>
+        var results = await Task.Factory.StartNew(() =>
         {
             Regex? regex = null;
             
@@ -129,7 +129,9 @@ public class SearchTableDataCommandHandler : ICommandHandlerAsync
             });
 
             return list;
-        });
+        }, CancellationToken.None,
+        TaskCreationOptions.LongRunning,
+        TaskScheduler.Default);
 
         searchViewModel.SearchResults = results.ToObservableCollection();
     }
