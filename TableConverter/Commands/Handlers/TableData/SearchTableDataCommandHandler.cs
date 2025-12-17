@@ -79,12 +79,12 @@ public class SearchTableDataCommandHandler : ICommandHandlerAsync
         }
         
         var headers = tableDataViewModel.Headers.ToArray();
-        var rows = tableDataViewModel.Rows.ToArray();
-        
-        var results = await Task.Factory.StartNew(() =>
+        var rows = tableDataViewModel.Rows.Select(x => x.ToArray()).ToArray();
+
+        var results = await Task.Run(() =>
         {
             Regex? regex = null;
-            
+
             if (settings.UseRegularExpressions)
             {
                 var pattern = settings.MatchWholeWord ? $"^{searchText}$" : searchText;
@@ -109,10 +109,10 @@ public class SearchTableDataCommandHandler : ICommandHandlerAsync
 
             if (settings.SearchInRows)
             {
-                for (int row = 0; row < rows.Length; row++)
+                for (var row = 0; row < rows.Length; row++)
                 {
                     var cells = rows[row];
-                    for (int col = 0; col < cells.Length; col++)
+                    for (var col = 0; col < cells.Length; col++)
                     {
                         var match = GetFirstMatch(cells[col], searchText, settings, regex);
                         if (match != null)
@@ -120,8 +120,7 @@ public class SearchTableDataCommandHandler : ICommandHandlerAsync
                     }
                 }
             }
-
-            // SORT OFF UI THREAD 🔥
+            
             list.Sort(static (a, b) =>
             {
                 var r = a.Row.CompareTo(b.Row);
@@ -129,9 +128,7 @@ public class SearchTableDataCommandHandler : ICommandHandlerAsync
             });
 
             return list;
-        }, CancellationToken.None,
-        TaskCreationOptions.LongRunning,
-        TaskScheduler.Default);
+        }).ConfigureAwait(false);
 
         searchViewModel.SearchResults = results.ToObservableCollection();
     }
