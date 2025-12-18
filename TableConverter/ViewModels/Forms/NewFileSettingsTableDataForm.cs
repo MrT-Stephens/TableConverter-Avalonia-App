@@ -31,10 +31,6 @@ public partial class NewFileSettingsTableDataForm : ObservableObject
 
     partial void OnRowsChanging(int value)
     {
-        if (value is < 0 or >= 1000000)
-        {
-            throw new ArgumentOutOfRangeException(nameof(value), "Value must be between 0 and 10000.");
-        }
     }
 
     #endregion

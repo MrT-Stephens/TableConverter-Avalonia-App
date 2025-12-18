@@ -59,8 +59,6 @@ public class ReplaceSearchResultsCommandHandler(
             context.Cancel("No search results to replace.");
             return;
         }
-
-        using var transaction = tableDataViewModel.CreateTransaction();
         
         var settings = searchViewModel.SearchSettings;
         var replaceValues = searchViewModel.SearchResults;
@@ -73,25 +71,33 @@ public class ReplaceSearchResultsCommandHandler(
         {
             return;
         }
+        
+        using var transaction = tableDataViewModel.CreateTransaction();
 
-        var replaceAmount = 0;
-        foreach (var value in replaceValues)
+        var replaceAmount = await Task.Run(() =>
         {
-            var newValue = value.Value.Replace(value.FoundValue, settings.ReplaceText);
-
-            switch (value.Row)
+            
+            var amount = 0;
+            foreach (var value in replaceValues)
             {
-                case <= 0 when settings.ReplaceInHeaders:
-                    transaction.SetHeader(value.Column, newValue);
-                    replaceAmount++;
-                    break;
-                case > 0 when settings.ReplaceInRows:
-                    transaction.SetCell(value.Row - 1, value.Column, newValue);
-                    replaceAmount++;
-                    break;
-            }
-        }
+                var newValue = value.Value.Replace(value.FoundValue, settings.ReplaceText);
 
+                switch (value.Row)
+                {
+                    case <= 0 when settings.ReplaceInHeaders:
+                        transaction.SetHeader(value.Column, newValue);
+                        amount++;
+                        break;
+                    case > 0 when settings.ReplaceInRows:
+                        transaction.SetCell(value.Row - 1, value.Column, newValue);
+                        amount++;
+                        break;
+                }
+            }
+            
+            return amount;
+        });
+        
         transaction.Commit();
 
         toastManager.CreateSimpleInfoToast()

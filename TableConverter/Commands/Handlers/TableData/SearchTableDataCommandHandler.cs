@@ -77,9 +77,9 @@ public class SearchTableDataCommandHandler : ICommandHandlerAsync
             context.Cancel("Must at least select rows or columns to search.");
             return;
         }
-        
-        var headers = tableDataViewModel.Headers.ToArray();
-        var rows = tableDataViewModel.Rows.Select(x => x.ToArray()).ToArray();
+
+        var headers = tableDataViewModel.Headers;
+        var rows = tableDataViewModel.Rows;
 
         var results = await Task.Run(() =>
         {
@@ -99,28 +99,35 @@ public class SearchTableDataCommandHandler : ICommandHandlerAsync
 
             if (settings.SearchInHeaders)
             {
-                for (int col = 0; col < headers.Length; col++)
+                for (var col = 0; col < headers.Count; col++)
                 {
                     var match = GetFirstMatch(headers[col], searchText, settings, regex);
+                    
                     if (match != null)
+                    {
                         list.Add(new TableSearchResult(col, 0, headers[col], match));
+                    }
                 }
             }
 
             if (settings.SearchInRows)
             {
-                for (var row = 0; row < rows.Length; row++)
+                for (var row = 0; row < rows.Count; row++)
                 {
                     var cells = rows[row];
+                    
                     for (var col = 0; col < cells.Length; col++)
                     {
                         var match = GetFirstMatch(cells[col], searchText, settings, regex);
+                        
                         if (match != null)
+                        {
                             list.Add(new TableSearchResult(col, row + 1, cells[col], match));
+                        }
                     }
                 }
             }
-            
+
             list.Sort(static (a, b) =>
             {
                 var r = a.Row.CompareTo(b.Row);
@@ -128,7 +135,7 @@ public class SearchTableDataCommandHandler : ICommandHandlerAsync
             });
 
             return list;
-        }).ConfigureAwait(false);
+        });
 
         searchViewModel.SearchResults = results.ToObservableCollection();
     }
