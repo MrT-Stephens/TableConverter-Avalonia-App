@@ -117,13 +117,37 @@ public class VirtualisationCollection<T> : IList<DataWrapper<T>>, IList where T 
             // return requested item
             return _Pages[pageIndex].Items[pageOffset];
         }
-        set => throw new NotSupportedException();
+        set
+        {
+            if (index < 0 || index >= Count)
+                throw new ArgumentOutOfRangeException(nameof(index));
+
+            if (value?.Data == null)
+                throw new ArgumentNullException(nameof(value));
+
+            // Update in the provider
+            ItemsProvider.UpdateItem(index, value.Data);
+
+            // Update in the cached page if it exists
+            var pageIndex = index / PageSize;
+            var pageOffset = index % PageSize;
+            if (_Pages.TryGetValue(pageIndex, out var page))
+            {
+                page.Items[pageOffset] = value;
+            }
+        }
     }
 
     object? IList.this[int index]
     {
         get => this[index];
-        set => throw new NotSupportedException();
+        set
+        {
+            if (value is DataWrapper<T> wrapper)
+                this[index] = wrapper;
+            else
+                throw new ArgumentException("Value must be of type DataWrapper<T>", nameof(value));
+        }
     }
 
     #endregion
@@ -146,15 +170,25 @@ public class VirtualisationCollection<T> : IList<DataWrapper<T>>, IList where T 
     #endregion
 
     #region Add
-    
-    public void Add(DataWrapper<T> item)
+
+    public virtual void Add(DataWrapper<T> item)
     {
-        throw new NotSupportedException();
+        if (item?.Data == null)
+            throw new ArgumentNullException(nameof(item));
+
+        ItemsProvider.InsertItem(Count, item.Data);
+        Count++;
+        EmptyCache();
     }
 
     int IList.Add(object? value)
     {
-        throw new NotSupportedException();
+        if (value is DataWrapper<T> wrapper)
+        {
+            Add(wrapper);
+            return Count - 1;
+        }
+        throw new ArgumentException("Value must be of type DataWrapper<T>", nameof(value));
     }
 
     #endregion
@@ -175,9 +209,11 @@ public class VirtualisationCollection<T> : IList<DataWrapper<T>>, IList where T 
 
     #region Clear
     
-    public void Clear()
+    public virtual void Clear()
     {
-        throw new NotSupportedException();
+        ItemsProvider.ClearItems();
+        Count = 0;
+        EmptyCache();
     }
 
     #endregion
@@ -211,9 +247,14 @@ public class VirtualisationCollection<T> : IList<DataWrapper<T>>, IList where T 
 
     #region Insert
     
-    public void Insert(int index, DataWrapper<T>? item)
+    public virtual void Insert(int index, DataWrapper<T>? item)
     {
-        throw new NotSupportedException();
+        if (item?.Data == null)
+            throw new ArgumentNullException(nameof(item));
+
+        ItemsProvider.InsertItem(index, item.Data);
+        Count++;
+        EmptyCache();
     }
 
     void IList.Insert(int index, object? value)
@@ -225,19 +266,31 @@ public class VirtualisationCollection<T> : IList<DataWrapper<T>>, IList where T 
 
     #region Remove
     
-    public void RemoveAt(int index)
+    public virtual void RemoveAt(int index)
     {
-        throw new NotSupportedException();
+        ItemsProvider.RemoveItem(index);
+        Count--;
+        EmptyCache();
     }
 
     void IList.Remove(object? value)
     {
-        throw new NotSupportedException();
+        if (value is DataWrapper<T> item)
+        {
+            Remove(item);
+        }
     }
     
-    public bool Remove(DataWrapper<T> item)
+    public virtual bool Remove(DataWrapper<T> item)
     {
-        throw new NotSupportedException();
+        var index = IndexOf(item);
+        if (index != -1)
+        {
+            RemoveAt(index);
+            return true;
+        }
+
+        return false;
     }
 
     #endregion
@@ -262,7 +315,7 @@ public class VirtualisationCollection<T> : IList<DataWrapper<T>>, IList where T 
     
     public bool IsSynchronized => false;
     
-    public bool IsReadOnly => true;
+    public bool IsReadOnly => false;
     
     public bool IsFixedSize => false;
 

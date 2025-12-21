@@ -19,7 +19,7 @@ public class DataWrapper<T>(int index) : INotifyPropertyChanged where T : class
     public T? Data
     {
         get => _Data;
-        internal set
+        set
         {
             _Data = value;
             OnPropertyChanged(nameof(Data));

@@ -1,7 +1,11 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using TableConverter.Commands.Handlers.TableData;
 using TableConverter.Interfaces;
+using TableConverter.Utilities.Extensions;
+using TableConverter.Utilities.Virtualisation;
 using TableConverter.ViewModels.Base;
 using TableConverter.ViewModels.Documents;
 
@@ -44,13 +48,14 @@ public partial class TableWorkspaceEditorViewModel : BaseWorkspaceEditorViewMode
         tableData.Title = "Example Table";
         tableData.Headers =
         [
-            "ID", "First Name", "Last Name", "Email", "Age", "Is 18 or Above", "Country", "City", "Occupation",
-            "Salary", "Join Date",
+            "ID", "First Name"
         ];
-        tableData.Rows =
+
+        List<string[]> rows =
         [
             [
-                "1", "Alice", "Johnson", "alice.johnson@example.com", "29", "true", "USA", "New York", "Engineer", "72000",
+                "1", "Alice", "Johnson", "alice.johnson@example.com", "29", "true", "USA", "New York", "Engineer",
+                "72000",
                 new DateTime(2020, 3, 12).ToLongDateString()
             ],
             [
@@ -58,11 +63,13 @@ public partial class TableWorkspaceEditorViewModel : BaseWorkspaceEditorViewMode
                 new DateTime(2019, 7, 25).ToLongDateString()
             ],
             [
-                "3", "Charlie", "Davis", "charlie.davis@example.com", "41", "true", "Canada", "Toronto", "Manager", "85000",
+                "3", "Charlie", "Davis", "charlie.davis@example.com", "41", "true", "Canada", "Toronto", "Manager",
+                "85000",
                 new DateTime(2018, 1, 5).ToLongDateString()
             ],
             [
-                "4", "Diana", "Evans", "diana.evans@example.com", "16", "false", "Germany", "Berlin", "Analyst", "56000",
+                "4", "Diana", "Evans", "diana.evans@example.com", "16", "false", "Germany", "Berlin", "Analyst",
+                "56000",
                 new DateTime(2021, 4, 14).ToLongDateString()
             ],
             [
@@ -70,11 +77,13 @@ public partial class TableWorkspaceEditorViewModel : BaseWorkspaceEditorViewMode
                 new DateTime(2017, 10, 30).ToLongDateString()
             ],
             [
-                "6", "Fiona", "Wilson", "fiona.wilson@example.com", "31", "true", "Australia", "Sydney", "Scientist", "78000",
+                "6", "Fiona", "Wilson", "fiona.wilson@example.com", "31", "true", "Australia", "Sydney", "Scientist",
+                "78000",
                 new DateTime(2019, 2, 19).ToLongDateString()
             ],
             [
-                "7", "George", "Miller", "george.miller@example.com", "10", "false", "USA", "Chicago", "Director", "102000",
+                "7", "George", "Miller", "george.miller@example.com", "10", "false", "USA", "Chicago", "Director",
+                "102000",
                 new DateTime(2016, 8, 9).ToLongDateString()
             ],
             [
@@ -85,11 +94,12 @@ public partial class TableWorkspaceEditorViewModel : BaseWorkspaceEditorViewMode
                 "9", "Ian", "Lopez", "ian.lopez@example.com", "33", "true", "Mexico", "Monterrey", "Developer", "72000",
                 new DateTime(2020, 9, 10).ToLongDateString()
             ],
-            [
-                "10", "Julia", "Taylor", "julia.taylor@example.com", "28", "true", "Italy", "Rome", "Consultant", "64000",
-                new DateTime(2021, 1, 3).ToLongDateString()
-            ]
         ];
+
+        foreach (var wrapper in rows.Select(row => new DataWrapper<string[]>(row.Length) { Data = row }))
+        {
+            tableData.Rows.Add(wrapper);
+        }
 
         return tableData;
     }

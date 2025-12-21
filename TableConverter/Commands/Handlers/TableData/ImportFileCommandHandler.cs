@@ -118,7 +118,7 @@ public class ImportFileCommandHandler(
 
         document.Title = Path.GetFileNameWithoutExtension(path);
         document.Headers = tableData.Headers.ToObservableCollection();
-        document.Rows = tableData.Rows.ToObservableCollection();
+        //document.Rows = tableData.Rows.ToObservableCollection();
         
         editorViewModel.AddDocument(document);
         editorViewModel.SelectedDocument = document;

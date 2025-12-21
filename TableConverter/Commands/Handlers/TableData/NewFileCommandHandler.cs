@@ -56,7 +56,7 @@ public class NewFileCommandHandler(ISukiDialogManager dialogManager) : ICommandH
 
         document.Title = settings.Name;
         
-        if (settings.FillWithNumbers)
+        /*if (settings.FillWithNumbers)
         {
             var headers = Enumerable.Range(1, settings.Headers + 1)
                 .Select(x => x.ToString())
@@ -74,7 +74,7 @@ public class NewFileCommandHandler(ISukiDialogManager dialogManager) : ICommandH
             document.Rows = Enumerable.Repeat(Enumerable.Repeat(string.Empty, settings.Headers), settings.Rows)
                 .Select(x => x.ToArray())
                 .ToObservableCollection();
-        }
+        }*/
         
         editorViewModel.Documents.Add(document);
         editorViewModel.SelectedDocument = document;

@@ -96,7 +96,7 @@ public class DynamicDataGrid : DataGrid
                 {
                     Binding = new Binding
                     {
-                        Path = $"[{i}]",
+                        Path = $"[{i}].Data",
                         Mode = BindingMode.TwoWay,
                     },
                 };

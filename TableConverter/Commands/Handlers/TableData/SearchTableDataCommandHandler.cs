@@ -110,7 +110,7 @@ public class SearchTableDataCommandHandler : ICommandHandlerAsync
                 }
             }
 
-            if (settings.SearchInRows)
+            /*if (settings.SearchInRows)
             {
                 for (var row = 0; row < rows.Count; row++)
                 {
@@ -126,7 +126,7 @@ public class SearchTableDataCommandHandler : ICommandHandlerAsync
                         }
                     }
                 }
-            }
+            }*/
 
             list.Sort(static (a, b) =>
             {

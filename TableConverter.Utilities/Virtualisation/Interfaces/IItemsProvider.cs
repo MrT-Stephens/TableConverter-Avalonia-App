@@ -20,4 +20,29 @@ public interface IItemsProvider<T>
     /// <param name="overallCount">The overall count</param>
     /// <returns>A list of the items.</returns>
     IList<T> FetchRange(int startIndex, int pageCount, out int overallCount);
+
+    /// <summary>
+    /// Updates an item at the specified index.
+    /// </summary>
+    /// <param name="index">The index of the item to update.</param>
+    /// <param name="item">The new item value.</param>
+    void UpdateItem(int index, T item);
+
+    /// <summary>
+    /// Inserts an item at the specified index.
+    /// </summary>
+    /// <param name="index">The index at which to insert the item.</param>
+    /// <param name="item">The item to insert.</param>
+    void InsertItem(int index, T item);
+
+    /// <summary>
+    /// Removes an item at the specified index.
+    /// </summary>
+    /// <param name="index">The index of the item to remove.</param>
+    void RemoveItem(int index);
+
+    /// <summary>
+    /// Removes all items from the collection.
+    /// </summary>
+    void ClearItems();
 }
