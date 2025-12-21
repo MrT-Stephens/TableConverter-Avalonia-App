@@ -18,8 +18,7 @@
                                   CanUserReorderColumns="True"
                                   CanUserSortColumns="True"
                                   ClipboardCopyMode="ExcludeHeader"
-                                  GridLinesVisibility="All"
-                                  ScrollViewer.IsDeferredScrollingEnabled="True">
+                                  GridLinesVisibility="All">
         </controls:DynamicDataGrid>
         <Grid Grid.Row="1" 
               ColumnDefinitions="*">

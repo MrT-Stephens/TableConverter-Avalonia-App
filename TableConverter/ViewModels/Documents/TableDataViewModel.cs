@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using AlphaChiTech.Virtualization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
@@ -16,7 +17,7 @@ public partial class TableDataViewModel : BaseDocumentViewModel
     #region Properties
 
     [ObservableProperty] private ObservableCollection<string> _Headers;
-    [ObservableProperty] private ObservableCollection<string[]> _Rows;
+    [ObservableProperty] private VirtualizingObservableCollection<object[]> _Rows;
 
     public override bool CanClose => !IsDirty;
     public override bool CanUndo { get; }
@@ -35,7 +36,7 @@ public partial class TableDataViewModel : BaseDocumentViewModel
         : base(commandManager, eventManager, dialogManager, toastManager, undoRedo)
     {
         Headers = [];
-        Rows = [];
+        Rows = new VirtualizingObservableCollection<object[]>()
     }
 
     #endregion

@@ -15,6 +15,8 @@ using TableConverter.Common;
 using TableConverter.FileConverters.Extensions;
 using TableConverter.Interfaces;
 using TableConverter.Services;
+using TableConverter.Utilities.Database;
+using TableConverter.Utilities.Database.Extensions;
 using TableConverter.ViewModels;
 using TableConverter.ViewModels.Dialogs;
 using TableConverter.ViewModels.Documents;
@@ -118,6 +120,9 @@ public class App : Application
 
         // Command Manager
         services.AddSingleton<ICommandManager, CommandManager>();
+        
+        // Database
+        services.AddConnectionFactory<TableDataConnectionFactory>("TableData");
         
         // Register Command Handlers
         services.RegisterCommandHandlers();

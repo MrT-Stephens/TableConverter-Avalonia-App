@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using Avalonia.Collections;
 using TableConverter.Extensions;
 using TableConverter.Interfaces;
 using TableConverter.Services;
