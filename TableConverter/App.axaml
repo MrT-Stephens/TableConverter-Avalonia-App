@@ -106,6 +106,7 @@
         <!-- Application Styles -->
         <sukiUi:SukiTheme ThemeColor="Green"  />
         
+        <StyleInclude Source="/Views/Controls/TreeDataGridStyles.axaml" />
         <StyleInclude Source="Views/Controls/DockedToolPanel.axaml" />
         
         <Style Selector="DataValidationErrors">

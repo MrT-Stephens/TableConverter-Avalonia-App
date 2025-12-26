@@ -4,14 +4,16 @@ using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Interfaces;
+using TableConverter.Services;
 
 namespace TableConverter.ViewModels.Base;
 
-public abstract partial class BaseDocumentViewModel : BaseViewModel, IPaneDocument
+public abstract partial class BaseDocumentViewModel : BaseViewModel, IPaneDocument, IDisposable
 {
     #region Properties
     
     protected readonly IUndoRedo _undoRedo;
+    protected readonly IEventRegistrar _eventRegistrar;
     
     public Guid ID { get; } = Guid.NewGuid();
 
@@ -45,6 +47,7 @@ public abstract partial class BaseDocumentViewModel : BaseViewModel, IPaneDocume
         Workspace = null!;
         
         _undoRedo = undoRedo;
+        _eventRegistrar = new EventRegistrar();
     }
 
     #endregion
@@ -61,5 +64,14 @@ public abstract partial class BaseDocumentViewModel : BaseViewModel, IPaneDocume
         // Do nothing - Can be overriden
     }
 
+    #endregion
+    
+    #region IDisposable
+
+    public void Dispose()
+    {
+        _eventRegistrar.Dispose();
+    }
+    
     #endregion
 }

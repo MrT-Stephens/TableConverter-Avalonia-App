@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using TableConverter.Commands.Handlers.TableData;
 using TableConverter.Interfaces;
+using TableConverter.Utilities.Database.Sessions;
 using TableConverter.Utilities.Extensions;
 using TableConverter.Utilities.Virtualisation;
 using TableConverter.ViewModels.Base;
@@ -46,61 +47,7 @@ public partial class TableWorkspaceEditorViewModel : BaseWorkspaceEditorViewMode
         }
         
         tableData.Title = "Example Table";
-        tableData.Headers =
-        [
-            "ID", "First Name"
-        ];
-
-        List<string[]> rows =
-        [
-            [
-                "1", "Alice", "Johnson", "alice.johnson@example.com", "29", "true", "USA", "New York", "Engineer",
-                "72000",
-                new DateTime(2020, 3, 12).ToLongDateString()
-            ],
-            [
-                "2", "Bob", "Smith", "bob.smith@example.com", "34", "true", "UK", "London", "Designer", "65000",
-                new DateTime(2019, 7, 25).ToLongDateString()
-            ],
-            [
-                "3", "Charlie", "Davis", "charlie.davis@example.com", "41", "true", "Canada", "Toronto", "Manager",
-                "85000",
-                new DateTime(2018, 1, 5).ToLongDateString()
-            ],
-            [
-                "4", "Diana", "Evans", "diana.evans@example.com", "16", "false", "Germany", "Berlin", "Analyst",
-                "56000",
-                new DateTime(2021, 4, 14).ToLongDateString()
-            ],
-            [
-                "5", "Ethan", "Brown", "ethan.brown@example.com", "38", "true", "France", "Paris", "Architect", "95000",
-                new DateTime(2017, 10, 30).ToLongDateString()
-            ],
-            [
-                "6", "Fiona", "Wilson", "fiona.wilson@example.com", "31", "true", "Australia", "Sydney", "Scientist",
-                "78000",
-                new DateTime(2019, 2, 19).ToLongDateString()
-            ],
-            [
-                "7", "George", "Miller", "george.miller@example.com", "10", "false", "USA", "Chicago", "Director",
-                "102000",
-                new DateTime(2016, 8, 9).ToLongDateString()
-            ],
-            [
-                "8", "Hannah", "Clark", "hannah.clark@example.com", "25", "true", "Spain", "Madrid", "Intern", "32000",
-                new DateTime(2022, 5, 21).ToLongDateString()
-            ],
-            [
-                "9", "Ian", "Lopez", "ian.lopez@example.com", "33", "true", "Mexico", "Monterrey", "Developer", "72000",
-                new DateTime(2020, 9, 10).ToLongDateString()
-            ],
-        ];
-
-        foreach (var wrapper in rows.Select(row => new DataWrapper<string[]>(row.Length) { Data = row }))
-        {
-            tableData.Rows.Add(wrapper);
-        }
-
+        
         return tableData;
     }
 

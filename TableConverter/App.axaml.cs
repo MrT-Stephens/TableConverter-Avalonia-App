@@ -8,6 +8,8 @@ using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using System;
 using System.Reflection;
+using Avalonia.Threading;
+using ModelFlow.DataVirtualization;
 using TableConverter.Commands.Extensions;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Commands.Services;
@@ -16,7 +18,10 @@ using TableConverter.FileConverters.Extensions;
 using TableConverter.Interfaces;
 using TableConverter.Services;
 using TableConverter.Utilities.Database;
+using TableConverter.Utilities.Database.Contexts;
 using TableConverter.Utilities.Database.Extensions;
+using TableConverter.Utilities.Database.Factories;
+using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.ViewModels;
 using TableConverter.ViewModels.Dialogs;
 using TableConverter.ViewModels.Documents;
@@ -45,6 +50,15 @@ public class App : Application
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            VirtualizationManager.Instance.UiThreadExcecuteAction = a => 
+                Dispatcher.UIThread.InvokeAsync(a).GetTask();
+            
+            DispatcherTimer.Run(() =>
+            {
+                VirtualizationManager.Instance.ProcessActions();
+                return true;
+            }, TimeSpan.FromMilliseconds(10), DispatcherPriority.Background	);
+            
             var services = new ServiceCollection();
 
             var views = ConfigureViews(services);
@@ -121,8 +135,8 @@ public class App : Application
         // Command Manager
         services.AddSingleton<ICommandManager, CommandManager>();
         
-        // Database
-        services.AddConnectionFactory<TableDataConnectionFactory>("TableData");
+        // Database Services
+        services.AddDatabaseFactory<TableStoreDbContext, TableStoreDbContextFactory>();
         
         // Register Command Handlers
         services.RegisterCommandHandlers();

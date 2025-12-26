@@ -1,14 +1,15 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using TableConverter.Utilities.Database.Interfaces;
 
 namespace TableConverter.Utilities.Database.Extensions;
 
 public static class DependencyInjectionExtensions
 {
-    public static IServiceCollection AddConnectionFactory<TImplementation>(this IServiceCollection serviceCollection, string key)
-        where TImplementation : class, IConnectionFactory
+    public static IServiceCollection AddDatabaseFactory<TDbContext, TFactory>(this IServiceCollection services)
+        where TDbContext : DbContext
+        where TFactory : class, Interfaces.IDbContextFactory<TDbContext>
     {
-        serviceCollection.AddKeyedSingleton<IConnectionFactory, TImplementation>(key);
-        return serviceCollection;
+        services.AddSingleton<Interfaces.IDbContextFactory<TDbContext>, TFactory>();
+        return services;
     }
 }

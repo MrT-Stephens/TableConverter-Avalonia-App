@@ -57,11 +57,11 @@ public class SearchTableDataCommandHandler : ICommandHandlerAsync
             return;
         }
         
-        if (tableDataViewModel.Rows.Count == 0 || tableDataViewModel.Headers.Count == 0)
+        /*if (tableDataViewModel.Rows.Count == 0 || tableDataViewModel.Headers.Count == 0)
         {
             context.Cancel("No table data document is selected.");
             return;
-        }
+        }*/
         
         var settings = searchViewModel.SearchSettings;
         var searchText = settings.SearchText;
@@ -77,9 +77,6 @@ public class SearchTableDataCommandHandler : ICommandHandlerAsync
             context.Cancel("Must at least select rows or columns to search.");
             return;
         }
-
-        var headers = tableDataViewModel.Headers;
-        var rows = tableDataViewModel.Rows;
 
         var results = await Task.Run(() =>
         {
@@ -97,7 +94,7 @@ public class SearchTableDataCommandHandler : ICommandHandlerAsync
 
             var list = new List<TableSearchResult>(1024);
 
-            if (settings.SearchInHeaders)
+            /*if (settings.SearchInHeaders)
             {
                 for (var col = 0; col < headers.Count; col++)
                 {
@@ -108,7 +105,7 @@ public class SearchTableDataCommandHandler : ICommandHandlerAsync
                         list.Add(new TableSearchResult(col, 0, headers[col], match));
                     }
                 }
-            }
+            }*/
 
             /*if (settings.SearchInRows)
             {

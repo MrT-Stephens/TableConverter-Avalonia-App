@@ -72,7 +72,7 @@ public class ReplaceSearchResultsCommandHandler(
             return;
         }
         
-        using var transaction = tableDataViewModel.CreateTransaction();
+        /*using var transaction = tableDataViewModel.CreateTransaction();
 
         var replaceAmount = await Task.Run(() =>
         {
@@ -98,12 +98,12 @@ public class ReplaceSearchResultsCommandHandler(
             return amount;
         });
         
-        transaction.Commit();
+        transaction.Commit();*/
 
         toastManager.CreateSimpleInfoToast()
             .OfType(NotificationType.Success)
             .WithTitle("Replace Success")
-            .WithContent($"Replaced {replaceAmount} occurrences with '{settings.ReplaceText}'.")
+            .WithContent($"Replaced {0} occurrences with '{settings.ReplaceText}'.")
             .Queue();
 
         searchViewModel.SearchResults.Clear();

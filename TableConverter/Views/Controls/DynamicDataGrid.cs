@@ -15,14 +15,10 @@ public class DynamicDataGrid : DataGrid
 {
     public static readonly StyledProperty<ObservableCollection<string>> HeadersProperty =
         AvaloniaProperty.Register<DynamicDataGrid, ObservableCollection<string>>(nameof(Headers));
-    
-    public static readonly StyledProperty<ObservableCollection<string[]>> RowsProperty =
-        AvaloniaProperty.Register<DynamicDataGrid, ObservableCollection<string[]>>(nameof(Rows));
 
     public DynamicDataGrid()
     {
         Headers = [];
-        Rows = [];
     }
 
     protected override Type StyleKeyOverride => typeof(DataGrid);
@@ -32,18 +28,10 @@ public class DynamicDataGrid : DataGrid
         get => GetValue(HeadersProperty);
         set => SetValue(HeadersProperty, value);
     }
-
-    public ObservableCollection<string[]> Rows
-    {
-        get => GetValue(RowsProperty);
-        set => SetValue(RowsProperty, value);
-    }
     
     protected override void OnInitialized()
     {
         base.OnInitialized();
-
-        UpdateRows();
         UpdateColumns();
     }
 
@@ -56,15 +44,7 @@ public class DynamicDataGrid : DataGrid
             case nameof(Headers):
                 UpdateColumns();
                 break;
-            case nameof(Rows):
-                UpdateRows();
-                break;
         }
-    }
-
-    private void UpdateRows()
-    {
-        ItemsSource = Rows;
     }
 
     private void UpdateColumns()
@@ -96,7 +76,7 @@ public class DynamicDataGrid : DataGrid
                 {
                     Binding = new Binding
                     {
-                        Path = $"[{i}].Data",
+                        Path = $"Item.Cells[{i}].Value",
                         Mode = BindingMode.TwoWay,
                     },
                 };
@@ -116,7 +96,7 @@ public class DynamicDataGrid : DataGrid
 
             header.Classes.Add("Small");
             column.Header = header;
-            column.CanUserSort = true;
+            column.CanUserSort = false;
             column.CanUserReorder = true;
             column.CanUserResize = true;
             column.DisplayIndex = i;

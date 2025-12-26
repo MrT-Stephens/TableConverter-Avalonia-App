@@ -2,8 +2,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:controls="clr-namespace:TableConverter.Views.Controls"
              xmlns:documents="clr-namespace:TableConverter.ViewModels.Documents"
+             xmlns:controls="clr-namespace:TableConverter.Views.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="TableConverter.Views.Documents.TableDataView"
              x:DataType="documents:TableDataViewModel">
@@ -14,7 +14,7 @@
                                   AutoGenerateColumns="False"
                                   CanUserResizeColumns="True"
                                   Headers="{Binding Headers, Mode=TwoWay}"
-                                  Rows="{Binding Rows, Mode=TwoWay}"
+                                  ItemsSource="{Binding CollectionView, Mode=TwoWay}"
                                   CanUserReorderColumns="True"
                                   CanUserSortColumns="True"
                                   ClipboardCopyMode="ExcludeHeader"
@@ -25,7 +25,7 @@
             <TextBlock HorizontalAlignment="Right">
                 <TextBlock.Text>
                     <MultiBinding StringFormat="Rows: {0}, Columns: {1}">
-                        <Binding Path="Rows.Count" />
+                        <Binding Path="DataSource.Collection.Count" />
                         <Binding Path="Headers.Count" />
                     </MultiBinding>
                 </TextBlock.Text>
