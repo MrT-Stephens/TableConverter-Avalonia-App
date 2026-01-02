@@ -1,19 +1,21 @@
 using System;
+using System.Collections.Generic;
 using CommunityToolkit.Mvvm.ComponentModel;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Interfaces;
 using TableConverter.Services;
+using TableConverter.Utilities.Extensions;
+using TableConverter.Utilities.Interfaces;
 
 namespace TableConverter.ViewModels.Base;
 
-public abstract partial class BaseDocumentViewModel : BaseViewModel, IPaneDocument, IDisposable
+public abstract partial class BaseDocumentViewModel : BaseViewModel, IPaneDocument, ISerialisationData, IIdentifiable, IDisposable
 {
     #region Properties
     
-    protected readonly IUndoRedo _undoRedo;
-    protected readonly IEventRegistrar _eventRegistrar;
+    protected readonly IEventRegistrar _eventRegistrar = new EventRegistrar();
     
     public Guid ID { get; } = Guid.NewGuid();
 
@@ -25,10 +27,6 @@ public abstract partial class BaseDocumentViewModel : BaseViewModel, IPaneDocume
     
     public object Workspace { get; set; }
 
-    public abstract bool CanUndo { get; }
-    
-    public abstract bool CanRedo { get; }
-
     #endregion
 
     #region Constructors
@@ -37,17 +35,13 @@ public abstract partial class BaseDocumentViewModel : BaseViewModel, IPaneDocume
         ICommandManager commandManager, 
         IEventManager eventManager, 
         ISukiDialogManager dialogManager,
-        ISukiToastManager toastManager,
-        IUndoRedo undoRedo) 
+        ISukiToastManager toastManager) 
         : base(commandManager, eventManager, dialogManager, toastManager)
     {
         Title = string.Empty;
         IsEnabled = true;
         IsDirty = false;
         Workspace = null!;
-        
-        _undoRedo = undoRedo;
-        _eventRegistrar = new EventRegistrar();
     }
 
     #endregion
@@ -62,6 +56,20 @@ public abstract partial class BaseDocumentViewModel : BaseViewModel, IPaneDocume
     public void OnDeactivate()
     {
         // Do nothing - Can be overriden
+    }
+
+    public void ExportState(IDictionary<string, object> data)
+    {
+        data[nameof(Title)] = Title;
+        data[nameof(IsEnabled)] = IsEnabled;
+        data[nameof(IsDirty)] = IsDirty;
+    }
+
+    public void ImportState(IDictionary<string, object> data)
+    {
+        Title = data.GetOrThrow<string>(nameof(Title));
+        IsEnabled = data.GetOrThrow<bool>(nameof(IsEnabled));
+        IsDirty = data.GetOrThrow<bool>(nameof(IsDirty));
     }
 
     #endregion

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -17,9 +18,19 @@ public class TableStoreDataSource : DataSource<RowEntity>
 {
     private readonly IFactory _dbContextFactory;
     private readonly string _path;
-    private int? _ColumnCount;
 
-    public TableStoreDataSource(IFactory dbContextFactory, string path) : base(500, 5)
+    private int? _ColumnCount;
+    public int? ColumnCount
+    {
+        get => _ColumnCount;
+        set
+        {
+            _ColumnCount = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public TableStoreDataSource(IFactory dbContextFactory, string path) : base(250, 5)
     {
         _dbContextFactory = dbContextFactory 
             ?? throw new ArgumentNullException(nameof(dbContextFactory));
@@ -101,10 +112,10 @@ public class TableStoreDataSource : DataSource<RowEntity>
 
     protected override RowEntity GetPlaceHolder(int index, int page, int offset)
     {
-        if (_ColumnCount is null)
+        if (ColumnCount is null)
         {
             using var db = CreateDb();
-            _ColumnCount = db.Columns.Count();
+            ColumnCount = db.Columns.Count();
         }
         
         var row = new RowEntity
@@ -112,13 +123,13 @@ public class TableStoreDataSource : DataSource<RowEntity>
             RowId = index,
         };
 
-        for (var i = 0; i < _ColumnCount; i++)
+        for (var i = 0; i < ColumnCount; i++)
         {
             row.Cells.Add(new CellEntity
             {
                 RowId = index,
                 ColumnId = i,
-                Value = "Loading..."
+                Value = "..."
             });
         }
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using CommunityToolkit.Mvvm.ComponentModel;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Common;
 using TableConverter.Interfaces;
@@ -9,29 +10,25 @@ using TableConverter.Utilities.Extensions;
 
 namespace TableConverter.Commands.DataModels;
 
-public class CommandContext : ICommandContext
+public partial class CommandContext : ObservableObject, ICommandContext
 {
     #region Properties
     
-    /// <inheritdoc />
-    public string Name { get; }
-    
-    /// <inheritdoc />
-    public object? Parameter { get; set; }
-    
-    /// <inheritdoc />
-    public object? Parent { get; set; }
+    [ObservableProperty] private string _Name;
 
-    /// <inheritdoc />
-    public Result<object>? Result { get; set; }
-    
-    /// <inheritdoc />
-    public bool Cancelled { get; set; }
-    
-    /// <inheritdoc />
-    public string CancelReason { get; set; }
-    
-    public SelectedItemsCollection SelectedItems { get; set; }
+    [ObservableProperty] private object? _Parameter;
+
+    [ObservableProperty] private object? _Parent;
+
+    [ObservableProperty] private Result<object>? _Result;
+
+    [ObservableProperty] private bool _Cancelled;
+
+    [ObservableProperty] private string _CancelReason;
+
+    [ObservableProperty] private bool _IsLoading;
+
+    [ObservableProperty] private SelectedItemsCollection _SelectedItems;
     
     #endregion
 
@@ -43,6 +40,7 @@ public class CommandContext : ICommandContext
         Parameter = null;
         SelectedItems = [];
         Cancelled = false;
+        IsLoading = false;
         CancelReason = string.Empty;
     }
 
@@ -52,6 +50,7 @@ public class CommandContext : ICommandContext
         Parameter = null;
         SelectedItems = selectedItems;
         Cancelled = false;
+        IsLoading = false;
         CancelReason = string.Empty;
     }
     

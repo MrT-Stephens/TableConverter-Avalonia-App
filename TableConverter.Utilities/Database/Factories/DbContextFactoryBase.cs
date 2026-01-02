@@ -19,12 +19,16 @@ public abstract class DbContextFactoryBase<TDbContext>(Func<DbContextOptions<TDb
             .Options;
         
         var db = factory(options);
-
-        // Ensures tables/indexes exist based on your model:
+        
         db.Database.EnsureCreated();
         
-        // Optional but commonly helpful for SQLite:
-        db.Database.ExecuteSqlRaw("PRAGMA foreign_keys = ON;");
+        db.Database.ExecuteSqlRaw("""
+            PRAGMA foreign_keys = ON;
+            PRAGMA journal_mode = WAL;
+            PRAGMA synchronous = NORMAL;
+            PRAGMA temp_store = MEMORY;
+            PRAGMA busy_timeout = 5000;
+            """);
         
         return db;
     }
@@ -43,12 +47,16 @@ public abstract class DbContextFactoryBase<TDbContext>(Func<DbContextOptions<TDb
             .Options;
 
         var db = factory(options);
-
-        // Ensures tables/indexes exist based on your model.
+        
         await db.Database.EnsureCreatedAsync(cancellationToken);
-
-        // Optional but commonly helpful for SQLite:
-        await db.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys = ON;", cancellationToken);
+        
+        await db.Database.ExecuteSqlRawAsync("""
+            PRAGMA foreign_keys = ON;
+            PRAGMA journal_mode = WAL;
+            PRAGMA synchronous = NORMAL;
+            PRAGMA temp_store = MEMORY;
+            PRAGMA busy_timeout = 5000;
+            """, cancellationToken);
 
         return db;
     }

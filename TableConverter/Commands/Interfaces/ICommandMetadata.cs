@@ -44,4 +44,9 @@ public interface ICommandMetadata
     /// Gets the key gestures which can be used to execute the command.
     /// </summary>
     public string[] KeyGestures { get; }
+    
+    /// <summary>
+    /// Indicates whether the command can set the loading state of the application.
+    /// </summary>
+    public bool CanSetLoadingState { get;  }
 }

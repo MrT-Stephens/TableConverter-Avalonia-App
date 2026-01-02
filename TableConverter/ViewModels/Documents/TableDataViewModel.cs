@@ -1,21 +1,17 @@
 using System;
-using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
-using Avalonia.Collections;
 using Avalonia.Controls;
-using Avalonia.Controls.Selection;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using ModelFlow.DataVirtualization.DataManagement;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;
-using TableConverter.Common;
 using TableConverter.Interfaces;
 using TableConverter.Utilities.Database.Contexts;
 using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.ViewModels.Base;
-using Path = System.IO.Path;
 using TableConverter.Extensions;
 using TableConverter.Services.DataSources;
 using TableConverter.Utilities.Database.Models;
@@ -27,40 +23,58 @@ public partial class TableDataViewModel : BaseDocumentViewModel
 {
     #region Properties
 
-    public override bool CanClose => !IsDirty;
-    public override bool CanUndo { get; }
-    public override bool CanRedo { get; }
+    [ObservableProperty] private string _Path;
     
-    public IDataGridCollectionView CollectionView { get; }
-    public TableStoreDataSource DataSource { get; }
-    public TableStoreDbContext DbContext { get; }
+    [ObservableProperty] private TableStoreDataSource _DataSource;
+    
+    [ObservableProperty] private FlatTreeDataGridSource<DataItem<RowEntity>> _TreeDataSource;
+    
+    public override bool CanClose => !IsDirty;
 
-    [ObservableProperty] private ObservableCollection<string> _Headers;
+    private readonly IDbContextFactory<TableStoreDbContext> _dbContextFactory;
 
     #endregion
 
-    #region  Constructors
+    #region Constructors
 
     public TableDataViewModel(
         ICommandManager commandManager, 
         IEventManager eventManager, 
         ISukiDialogManager dialogManager,
         ISukiToastManager toastManager,
-        IUndoRedo undoRedo,
         IDbContextFactory<TableStoreDbContext> dbContextFactory)
-        : base(commandManager, eventManager, dialogManager, toastManager, undoRedo)
+        : base(commandManager, eventManager, dialogManager, toastManager)
     {
-        var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "TableConverter", "TestData.csv");
+        _dbContextFactory = dbContextFactory;
+        _Path = null!;
+        _DataSource = null!;
+        _TreeDataSource = null!;
+    }
+
+    #endregion
+
+    #region Overrides
+
+    public override void Initialise()
+    {
+        base.Initialise();
         
-        DbContext = dbContextFactory.Create(path);
-        DataSource = new TableStoreDataSource(dbContextFactory, path);
+        var path = System.IO.Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), 
+            "TableConverter", 
+            $"{ID}.tcstore");
 
-        Headers = DbContext.Columns
-            .Select(x => x.Name)
+        Path = path;
+        
+        DataSource = new TableStoreDataSource(_dbContextFactory, path);
+
+        TreeDataSource = new FlatTreeDataGridSource<DataItem<RowEntity>>(DataSource.Collection);
+
+        var dbContext = _dbContextFactory.Create(path);
+        
+        dbContext.Columns
             .AsEnumerable()
-            .ToObservableCollection();
-
-        CollectionView = new VirtualisingCollectionView(DataSource.Collection);
+            .ForEach(column => TreeDataSource.AddAutoColumn(column.Name, column.Ordinal));
         
         Dispatcher.UIThread.Post(async void () =>
         {
@@ -71,6 +85,18 @@ public partial class TableDataViewModel : BaseDocumentViewModel
     #endregion
 
     #region Methods
+    
+    public void InvalidateData()
+    {
+        DataSource.Invalidate();
+        TreeDataSource.Columns.Clear();
+        
+        using var dbContext = _dbContextFactory.Create(Path);
+        
+        dbContext.Columns
+            .AsEnumerable()
+            .ForEach((column, idx) => TreeDataSource.AddAutoColumn(column.Name, idx));
+    }
 
     #endregion
 }

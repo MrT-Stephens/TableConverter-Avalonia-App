@@ -5,6 +5,7 @@ using SukiUI.Toasts;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
@@ -15,16 +16,18 @@ using TableConverter.Commands.Interfaces;
 using TableConverter.Contracts.Events;
 using TableConverter.Extensions;
 using TableConverter.Interfaces;
+using TableConverter.Services;
 using TableConverter.Utilities.Extensions;
 using TableConverter.ViewModels.Forms;
 
 namespace TableConverter.ViewModels.Base;
 
-public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWorkspaceEditor
+public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWorkspaceEditor, IDisposable
 {
     #region Properties
     
     protected readonly IServiceProvider _serviceProvider;
+    protected readonly IEventRegistrar _eventRegistrar = new EventRegistrar();
 
     [ObservableProperty] private string _Title;
     [ObservableProperty] private object _Icon;
@@ -37,6 +40,10 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
     [ObservableProperty] private IPaneTool? _SelectedTool;
     [ObservableProperty] private ToolsSettingsForm _ToolsSettings;
     [ObservableProperty] private ObservableCollection<ICommandInstance> _MainCommands;
+    
+    protected readonly string _storageLocationPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), 
+        "TableConverter");
 
     #endregion
 
@@ -85,8 +92,7 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
     private async Task RemoveFileButtonClicked(object? parameter)
     {
         if (Documents.Count == 0 
-            || parameter is not IPaneDocument document
-            || !document.CanClose)
+            || parameter is not IPaneDocument { CanClose: true } document)
         {
             return;
         }
@@ -102,6 +108,7 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
         
         SelectedDocument = null;
         Documents.Remove(document);
+        OnDocumentRemoved(document);
 
         _toastManager.CreateSimpleInfoToast()
             .OfType(NotificationType.Success)
@@ -146,6 +153,15 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
 
         SelectedItems.Remove(oldValue);
         SelectedItems.Add(newValue);
+    }
+
+    #endregion
+
+    #region Virtual Methods
+
+    protected virtual void OnDocumentRemoved(IPaneDocument document)
+    {
+        // Do nothing - Can be overridden
     }
 
     #endregion
@@ -218,6 +234,11 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
     {
         var tool = Tools.GetSingleOfType<T>();
         SelectedTool = tool;
+    }
+
+    public void Dispose()
+    {
+        _eventRegistrar.Dispose();
     }
 
     #endregion

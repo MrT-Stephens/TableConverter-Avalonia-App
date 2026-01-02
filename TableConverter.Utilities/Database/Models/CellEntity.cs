@@ -5,15 +5,15 @@ namespace TableConverter.Utilities.Database.Models;
 
 public sealed class CellEntity : INotifyPropertyChanged
 {
-    private long _RowId;
-    public long RowId
+    private int _RowId;
+    public int RowId
     {
         get => _RowId;
         set => SetField(ref _RowId, value);
     }
 
-    private long _ColumnId;
-    public long ColumnId
+    private int _ColumnId;
+    public int ColumnId
     {
         get => _ColumnId;
         set => SetField(ref _ColumnId, value);

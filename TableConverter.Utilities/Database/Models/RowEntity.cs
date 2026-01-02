@@ -6,8 +6,8 @@ namespace TableConverter.Utilities.Database.Models;
 
 public sealed class RowEntity : INotifyPropertyChanged
 {
-    private long _RowId;
-    public long RowId
+    private int _RowId;
+    public int RowId
     {
         get => _RowId; 
         set => SetField(ref _RowId, value);

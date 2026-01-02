@@ -1,10 +1,8 @@
-using System;
 using Avalonia.Controls;
 using Avalonia.Controls.Models.TreeDataGrid;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
-using Avalonia.Media;
-using TableConverter.Utilities.Database.Models;
+using Avalonia.Layout;
 
 namespace TableConverter.Extensions;
 
@@ -19,21 +17,28 @@ public static class FlatTreeDataGridSourceExtensions
     {
         source.Columns.Add(new TemplateColumn<TModel>(
             header, 
-            new FuncDataTemplate<RowEntity>((_, _) => new TextBlock
+            new FuncDataTemplate<TModel>((_, _) => new TextBlock
             {
-                Background = Brushes.Red,
-                Foreground = Brushes.Red,
+                VerticalAlignment = VerticalAlignment.Center,
                 [!TextBlock.TextProperty] = new Binding
+                {
+                    Path = $"Item.Cells[{columnIndex}].Value",
+                    Mode = BindingMode.TwoWay
+                },
+            }),
+            new FuncDataTemplate<TModel>((_, _) => new TextBox
+            {
+                VerticalAlignment = VerticalAlignment.Center,
+                [!TextBox.TextProperty] = new Binding
                 {
                     Path = $"Item.Cells[{columnIndex}].Value",
                     Mode = BindingMode.TwoWay
                 }
             }),
-            null,
-            GridLength.Star, 
+            GridLength.Auto, 
             new TemplateColumnOptions<TModel>
             {
-                CanUserSortColumn = false
+                CanUserSortColumn = false,
             }));
 
         return source;

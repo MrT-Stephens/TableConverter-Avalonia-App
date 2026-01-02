@@ -26,6 +26,7 @@ public record CommandMetadata : ICommandMetadata
         Title = null;
         Description = null;
         IconName = null;
+        CanSetLoadingState = false;
         KeyGestures = [];
     }
 
@@ -53,7 +54,10 @@ public record CommandMetadata : ICommandMetadata
     /// <param name="keyGestures">
     /// The key gestures which can be used to execute the command.
     /// </param>
-    public CommandMetadata(string name, string title, string description, string iconName, string category = "", int? subCategoryIndex = null, string[]? keyGestures = null) 
+    /// <param name="canSetLoadingState">
+    /// Indicates whether the command can set the loading state of the application.
+    /// </param>
+    public CommandMetadata(string name, string title, string description, string iconName, string category = "", int? subCategoryIndex = null, string[]? keyGestures = null, bool canSetLoadingState = false) 
         : this(name)
     {
         Title = title;
@@ -62,6 +66,7 @@ public record CommandMetadata : ICommandMetadata
         Category = category;
         SubCategoryIndex = subCategoryIndex;
         KeyGestures = keyGestures ?? [];
+        CanSetLoadingState = canSetLoadingState;
     }
 
     /// <inheritdoc />
@@ -84,6 +89,9 @@ public record CommandMetadata : ICommandMetadata
 
     /// <inheritdoc />
     public string[] KeyGestures { get; }
+    
+    /// <inheritdoc />
+    public bool CanSetLoadingState { get; }
 
     /// <inheritdoc />
     public StreamGeometry? IconPath

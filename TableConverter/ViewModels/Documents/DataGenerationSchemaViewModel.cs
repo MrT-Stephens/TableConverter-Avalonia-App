@@ -23,9 +23,6 @@ public partial class DataGenerationSchemaViewModel : BaseDocumentViewModel
     
     public override bool CanClose => false;
 
-    public override bool CanUndo => _undoRedo.CanUndo(Fields);
-    public override bool CanRedo => _undoRedo.CanRedo(Fields);
-
     private readonly IDataGenerationTypes _dataGenerationTypes;
 
     #endregion
@@ -37,9 +34,8 @@ public partial class DataGenerationSchemaViewModel : BaseDocumentViewModel
         IEventManager eventManager, 
         ISukiDialogManager dialogManager,
         ISukiToastManager toastManager,
-        IUndoRedo undoRedo,
         IDataGenerationTypes dataGenerationTypes)
-        : base(commandManager, eventManager, dialogManager, toastManager, undoRedo)
+        : base(commandManager, eventManager, dialogManager, toastManager)
     {
         Fields = [new DataGenerationFieldViewModel()];
 

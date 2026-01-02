@@ -49,4 +49,36 @@ public static class DictionaryExtensions
 
         return value;
     }
+    
+    /// <summary>
+    /// Gets the value associated with the specified key or throws KeyNotFoundException if the key does not exist.
+    /// </summary>
+    /// <param name="dictionary">
+    /// The dictionary to operate on.
+    /// </param>
+    /// <param name="key">
+    /// The key whose value to get.
+    /// </param>
+    /// <typeparam name="TKey">
+    /// The type of keys in the dictionary.
+    /// </typeparam>
+    /// <typeparam name="TValue">
+    /// The type of values in the dictionary.
+    /// </typeparam>
+    /// <returns>
+    /// The value associated with the specified key.
+    /// </returns>
+    /// <exception cref="KeyNotFoundException">
+    /// Thrown when the key does not exist in the dictionary.
+    /// </exception>
+    public static TValue GetOrThrow<TValue>(this IDictionary<string, object> dictionary, string key)
+    {
+        if (!dictionary.TryGetValue(key, out var value)
+            || value is not TValue typedValue)
+        {
+            throw new KeyNotFoundException($"The given key '{key}' was not present in the dictionary.");
+        }
+
+        return typedValue;
+    }
 }

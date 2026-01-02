@@ -49,8 +49,8 @@ public class TableStoreSession(TableStoreDbContext dbContext) : IDbSession<Table
     }
 
     public async Task SetCellAsync(
-        long rowId,
-        long columnId,
+        int rowId,
+        int columnId,
         string? value,
         bool autoSaveChanges = true,
         CancellationToken ct = default)

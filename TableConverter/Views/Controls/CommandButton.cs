@@ -82,18 +82,33 @@ namespace TableConverter.Views.Controls
             
             ButtonExtensions.SetIcon(this, new PathIcon
             {
-                Data = CommandInstance?.Metadata.IconPath
+                [!PathIcon.DataProperty] = new Binding
+                {
+                    Path = nameof(ICommandMetadata.IconPath),
+                    Source = CommandInstance!.Metadata,
+                    Mode = BindingMode.OneWay,
+                },
+                [!IsVisibleProperty] = new Binding
+                {
+                    Path = nameof(ShowIcon),
+                    Source = this,
+                    Mode = BindingMode.OneWay,
+                }
             });
+            
+            this[!ButtonExtensions.ShowProgressProperty] = new Binding
+            {
+                Path = nameof(ICommandContext.IsLoading),
+                Source = CommandInstance!.Context,
+                Mode = BindingMode.OneWay,
+            };
             
             ToolTip.SetShowDelay(this, 1000);
             ToolTip.SetBetweenShowDelay(this, 500);
-            ToolTip.SetTip(this, new ContentControl
+            ToolTip.SetTip(this, new TextBlock
             {
-                Content = new TextBlock
-                {
-                    Text = $"{CommandInstance?.Metadata.Title}: {CommandInstance?.Metadata.Description}",
-                    TextWrapping = TextWrapping.Wrap,
-                },
+                Text = $"{CommandInstance?.Metadata.Title}: {CommandInstance?.Metadata.Description}",
+                TextWrapping = TextWrapping.Wrap,
                 MaxWidth = 300,
             });
             

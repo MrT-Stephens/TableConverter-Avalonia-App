@@ -8,6 +8,16 @@ namespace TableConverter.ViewModels.Forms;
 
 #pragma warning disable CS0657 // Not a valid attribute location for this declaration
 
+public enum NewFileFillMode
+{
+    Empty,
+    MultiplyRowColumn,
+    SequentialNumbers,
+    RandomNumbers,
+    ColumnNumbers,
+    RowNumbers
+}
+
 public partial class NewFileSettingsTableDataForm : ObservableObject
 {
     #region Properties
@@ -22,8 +32,8 @@ public partial class NewFileSettingsTableDataForm : ObservableObject
     [ObservableProperty] [property: Category("Settings"), DisplayName("Rows")]
     private int _Rows = 10;
     
-    [ObservableProperty] [property: Category("Settings"), DisplayName("Fill with Numbers")]
-    private bool _FillWithNumbers = true;
+    [ObservableProperty] [property: Category("Settings"), DisplayName("Fill Mode")]
+    private NewFileFillMode _FillMode = NewFileFillMode.Empty;
 
     #endregion
 

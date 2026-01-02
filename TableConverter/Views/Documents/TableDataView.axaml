@@ -9,24 +9,16 @@
              x:DataType="documents:TableDataViewModel">
     <Grid RowDefinitions="*,Auto"
           RowSpacing="10">
-        <controls:DynamicDataGrid Grid.Row="0"
-                                  SelectionMode="Extended"
-                                  AutoGenerateColumns="False"
-                                  CanUserResizeColumns="True"
-                                  Headers="{Binding Headers, Mode=TwoWay}"
-                                  ItemsSource="{Binding CollectionView, Mode=TwoWay}"
-                                  CanUserReorderColumns="True"
-                                  CanUserSortColumns="True"
-                                  ClipboardCopyMode="ExcludeHeader"
-                                  GridLinesVisibility="All">
-        </controls:DynamicDataGrid>
+        <TreeDataGrid Grid.Row="0"
+                      Source="{Binding TreeDataSource, Mode=TwoWay}">
+        </TreeDataGrid>
         <Grid Grid.Row="1" 
               ColumnDefinitions="*">
             <TextBlock HorizontalAlignment="Right">
                 <TextBlock.Text>
                     <MultiBinding StringFormat="Rows: {0}, Columns: {1}">
                         <Binding Path="DataSource.Collection.Count" />
-                        <Binding Path="Headers.Count" />
+                        <Binding Path="DataSource.ColumnCount" />
                     </MultiBinding>
                 </TextBlock.Text>
             </TextBlock>

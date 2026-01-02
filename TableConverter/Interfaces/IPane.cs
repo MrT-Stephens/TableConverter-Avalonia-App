@@ -1,4 +1,6 @@
-﻿namespace TableConverter.Interfaces
+﻿using TableConverter.Utilities.Interfaces;
+
+namespace TableConverter.Interfaces
 {
     public interface IPane
     {

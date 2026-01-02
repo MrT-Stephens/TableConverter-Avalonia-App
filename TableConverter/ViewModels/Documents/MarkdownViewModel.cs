@@ -15,8 +15,6 @@ public partial class MarkdownViewModel : BaseDocumentViewModel
     [ObservableProperty] private string _Content;
 
     public override bool CanClose => true;
-    public override bool CanUndo => false;
-    public override bool CanRedo => false;
 
     #endregion
 
@@ -26,9 +24,8 @@ public partial class MarkdownViewModel : BaseDocumentViewModel
         ICommandManager commandManager, 
         IEventManager eventManager, 
         ISukiDialogManager dialogManager,
-        ISukiToastManager toastManager,
-        IUndoRedo undoRedo) 
-        : base(commandManager, eventManager, dialogManager, toastManager, undoRedo)
+        ISukiToastManager toastManager)
+        : base(commandManager, eventManager, dialogManager, toastManager)
     {
     }
 

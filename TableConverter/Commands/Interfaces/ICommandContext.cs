@@ -35,6 +35,11 @@ public interface ICommandContext : IHasSelectedItems
     /// The result of the command execution, if any.
     /// </summary>
     public Result<object>? Result { get; set; }
+    
+    /// <summary>
+    /// Indicates whether the command is currently in a loading state.
+    /// </summary>
+    public bool IsLoading { get; set; }
 
     /// <summary>
     /// Sets the result of the command execution to the provided object, wrapped in a successful Result.

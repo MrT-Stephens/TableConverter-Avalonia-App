@@ -20,15 +20,15 @@ public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> op
             builder.Property(x => x.ColumnId)
                 .HasColumnName("COLUMN_ID")
                 .ValueGeneratedOnAdd();
-
+            
             builder.Property(x => x.Name)
                 .HasColumnName("NAME")
                 .IsRequired();
-
+            
             builder.Property(x => x.DataType)
                 .HasColumnName("DATA_TYPE")
                 .IsRequired();
-
+            
             builder.Property(x => x.Ordinal)
                 .HasColumnName("ORDINAL")
                 .IsRequired();
@@ -52,10 +52,11 @@ public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> op
             // PRIMARY KEY (ROW_ID, COLUMN_ID)
             b.HasKey(x => new { x.RowId, x.ColumnId });
 
+            // COLUMN DEFINITIONS
             b.Property(x => x.RowId)
                 .HasColumnName("ROW_ID")
                 .IsRequired();
-
+            
             b.Property(x => x.ColumnId)
                 .HasColumnName("COLUMN_ID")
                 .IsRequired();
@@ -80,6 +81,9 @@ public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> op
 
             // CREATE INDEX IF NOT EXISTS IDX_CELLS_COL ON CELLS(COLUMN_ID);
             b.HasIndex(x => x.ColumnId).HasDatabaseName("IDX_CELLS_COL");
+            
+            // CREATE INDEX IF NOT EXISTS IDX_CELLS_VALUE ON CELLS(VALUE);
+            b.HasIndex(x => x.Value).HasDatabaseName("IDX_CELLS_VALUE");
         });
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Input;
 using TableConverter.Commands.DataModels;
 using TableConverter.Commands.Interfaces;
@@ -63,24 +64,27 @@ public class CommandManager : ICommandManager
             IRelayCommand command = handler switch
             {
                 ICommandHandlerAsync asyncHandler => new AsyncRelayCommand<object?>(
-                    param => InternalExecute(param, asyncHandler, context),
+                    param => InternalExecute(param, asyncHandler, context, handler.CommandMetadata),
                     param => InternalCanExecute(param, asyncHandler, context)),
                 ICommandHandler syncHandler => new RelayCommand<object?>(
-                    param => InternalExecuteAsync(param, syncHandler, context),
+                    param => InternalExecuteAsync(param, syncHandler, context, handler.CommandMetadata),
                     param => InternalCanExecute(param, syncHandler, context)),
                 _ => throw new ArgumentException("Command handler for '{0}' is of an unsupported type.".Format(name),
                     nameof(name))
             };
 
-            _eventRegistrar.RegisterCollectionChanged(context.SelectedItems, null, 
-                (_, _) => command.NotifyCanExecuteChanged());
+            _eventRegistrar.RegisterCollectionChanged(context.SelectedItems, null,
+                (_, _) =>
+                {
+                    Dispatcher.UIThread.InvokeAsync(() => command.NotifyCanExecuteChanged());
+                });
             
             _eventRegistrar.RegisterEvent<EventHandler<ItemChangedEventArgs>>(
                 func => context.SelectedItems.ItemChanged += func,
                 func => context.SelectedItems.ItemChanged -= func,
                 null, (_, _) =>
                 {
-                    command.NotifyCanExecuteChanged();
+                    Dispatcher.UIThread.InvokeAsync(() => command.NotifyCanExecuteChanged());
                 });
 
             return new CommandInstance(command, handler, context);
@@ -111,10 +115,15 @@ public class CommandManager : ICommandManager
 
     #region Internal Methods
     
-    private async Task InternalExecute(object? parameter, ICommandHandlerAsync handler, ICommandContext context)
+    private async Task InternalExecute(object? parameter, ICommandHandlerAsync handler, ICommandContext context, ICommandMetadata metadata)
     {
         try
         {
+            if (metadata.CanSetLoadingState)
+            {
+                context.IsLoading = true;
+            }
+            
             // Set the parameter in the context before executing
             context.Parameter = parameter;
 
@@ -136,13 +145,23 @@ public class CommandManager : ICommandManager
             // Clear the parameter and selected items after execution
             context.Parameter = null;
             context.Result = null;
+            
+            if (metadata.CanSetLoadingState)
+            {
+                context.IsLoading = false;
+            }
         }
     }
     
-    private void InternalExecuteAsync(object? parameter, ICommandHandler handler, ICommandContext context)
+    private void InternalExecuteAsync(object? parameter, ICommandHandler handler, ICommandContext context, ICommandMetadata metadata)
     {
         try
         {
+            if (metadata.CanSetLoadingState)
+            {
+                context.IsLoading = true;
+            }
+            
             // Set the parameter in the context before executing
             context.Parameter = parameter;
 
@@ -164,6 +183,11 @@ public class CommandManager : ICommandManager
             // Clear the parameter and selected items after execution
             context.Parameter = null;
             context.Result = null;
+            
+            if (metadata.CanSetLoadingState)
+            {
+                context.IsLoading = false;
+            }
         }
     }
     

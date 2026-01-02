@@ -9,9 +9,5 @@ namespace TableConverter.Interfaces
         public bool IsDirty { get; set; }
 
         public bool CanClose { get; }
-        
-        public bool CanUndo { get; }
-        
-        public bool CanRedo { get; }
     }
 }

@@ -1,12 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using Microsoft.Extensions.DependencyInjection;
 using TableConverter.Commands.Handlers.TableData;
 using TableConverter.Interfaces;
-using TableConverter.Utilities.Database.Sessions;
-using TableConverter.Utilities.Extensions;
-using TableConverter.Utilities.Virtualisation;
+using TableConverter.Utilities.Database.Contexts;
+using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.ViewModels.Base;
 using TableConverter.ViewModels.Documents;
 
@@ -36,7 +34,9 @@ public partial class TableWorkspaceEditorViewModel : BaseWorkspaceEditorViewMode
 
     public override IPaneDocument CreateNewDocumentInstance()
     {
-        return _serviceProvider.GetRequiredService<TableDataViewModel>();
+        var document = _serviceProvider.GetRequiredService<TableDataViewModel>();
+        document.Initialise();
+        return document;
     }
 
     protected override IPaneDocument CreateDefaultDocumentInstance()

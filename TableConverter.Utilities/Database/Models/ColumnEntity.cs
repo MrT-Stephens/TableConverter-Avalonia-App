@@ -6,8 +6,8 @@ namespace TableConverter.Utilities.Database.Models;
 
 public sealed class ColumnEntity : INotifyPropertyChanged
 {
-    private long _ColumnId;
-    public long ColumnId
+    private int _ColumnId;
+    public int ColumnId
     {
         get => _ColumnId;
         set => SetField(ref _ColumnId, value);
