@@ -59,15 +59,10 @@ public partial class TableDataViewModel : BaseDocumentViewModel
     {
         base.Initialise();
         
-        var path = System.IO.Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), 
-            "TableConverter", 
-            $"{ID}.tcstore");
+        var path = System.IO.Path.Combine(App.AppStorageDirectory, $"{ID}.tcstore");
 
         Path = path;
-        
         DataSource = new TableStoreDataSource(_dbContextFactory, path);
-
         TreeDataSource = new FlatTreeDataGridSource<DataItem<RowEntity>>(DataSource.Collection);
 
         var dbContext = _dbContextFactory.Create(path);

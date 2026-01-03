@@ -7,6 +7,7 @@ using SukiUI.Controls;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using System;
+using System.IO;
 using System.Reflection;
 using Avalonia.Threading;
 using ModelFlow.DataVirtualization;
@@ -37,6 +38,10 @@ namespace TableConverter;
 
 public class App : Application
 {
+    public static readonly string AppStorageDirectory = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments, Environment.SpecialFolderOption.Create),
+        "TableConverter");
+    
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -57,7 +62,7 @@ public class App : Application
             {
                 VirtualizationManager.Instance.ProcessActions();
                 return true;
-            }, TimeSpan.FromMilliseconds(10), DispatcherPriority.Background	);
+            }, TimeSpan.FromMilliseconds(10), DispatcherPriority.ApplicationIdle);
             
             var services = new ServiceCollection();
 
@@ -77,13 +82,13 @@ public class App : Application
             
             window.DataContext = viewModel;
 
-            window.Hosts.Add(new SukiToastHost()
+            window.Hosts.Add(new SukiToastHost
             {
                 Manager = provider.GetRequiredService<ISukiToastManager>()
                     ?? throw new InvalidOperationException("Failed to create toast manager"),
             });
 
-            window.Hosts.Add(new SukiDialogHost()
+            window.Hosts.Add(new SukiDialogHost
             {
                 Manager = provider.GetRequiredService<ISukiDialogManager>()
                     ?? throw new InvalidOperationException("Failed to create dialog manager"),
@@ -126,7 +131,6 @@ public class App : Application
         services.AddSingleton<IDataGenerationTypes, DataGenerationTypes>();
         services.AddSingleton<IFilesDialogManager, FilesDialogManager>();
         services.AddSingleton<IEventManager, EventManager>();
-        services.AddSingleton<IUndoRedo, UndoRedo>();
 
         // SukiUI Services
         services.AddSingleton<ISukiToastManager, SukiToastManager>();

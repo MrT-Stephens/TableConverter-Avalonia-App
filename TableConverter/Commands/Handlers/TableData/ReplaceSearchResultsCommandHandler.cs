@@ -83,7 +83,7 @@ public class ReplaceSearchResultsCommandHandler(
         
         await using var dbContext = await dbContextFactory.CreateAsync(tableDataViewModel.Path);
 
-        var replacedAmount = await Task.Run(() => ReplaceValuesAsync(dbContext, replaceValues, settings));
+        var replacedAmount = await Task.Run(() => ReplaceValuesAsync(replaceValues, settings, tableDataViewModel.Path));
 
         toastManager.CreateSimpleInfoToast()
             .OfType(NotificationType.Success)
@@ -91,71 +91,66 @@ public class ReplaceSearchResultsCommandHandler(
             .WithContent($"Replaced {replacedAmount} occurrences with '{settings.ReplaceText}'.")
             .Queue();
         
-        tableDataViewModel.DataSource.Invalidate();
+        tableDataViewModel.InvalidateData();
         searchViewModel.SearchResults.Clear();
     }
 
     private async Task<int> ReplaceValuesAsync(
-        TableStoreDbContext db,
-        ICollection<TableSearchResult> replaceValues,
-        SearchSettingsFrom settings)
+        IReadOnlyCollection<TableSearchResult> replaceValues,
+        SearchSettingsFrom settings,
+        string path)
     {
+        if (replaceValues.Count == 0)
+        {
+            return 0;
+        }
+
         var amount = 0;
+        var workers = Math.Min(Environment.ProcessorCount, 8);
         
-        await using var transaction = await db.Database.BeginTransactionAsync();
-
-        try
-        {
-            foreach (var group in replaceValues
-                .GroupBy(rv => rv.Row))
+        var replacements = replaceValues
+            .Select(r => new
             {
-                if (settings.ReplaceInHeaders && group.Key <= 0)
+                r.Row,
+                r.Column,
+                NewValue = r.Value.Replace(r.FoundValue, settings.ReplaceText)
+            })
+            .ToList();
+        
+        var groupedReplacements = replacements
+            .GroupBy(r => r.Row)
+            .ToList();
+        
+        await Parallel.ForEachAsync(
+            groupedReplacements,
+            new ParallelOptions
+            {
+                MaxDegreeOfParallelism = workers
+            },
+            async (group, ct) =>
+            {
+                await using var context = await dbContextFactory.CreateAsync(path, ct);
+
+                foreach (var r in group)
                 {
-                    foreach (var row in group)
+                    if (r.Row <= 0 && settings.ReplaceInHeaders)
                     {
-                        var cell = await db.Columns
-                            .FirstOrDefaultAsync(tc => tc.ColumnId == row.Column);
-                        
-                        if (cell is not null)
-                        {
-                            cell.Name = settings.ReplaceText;
-                            amount++;
-                        }
+                        await context.Columns
+                            .Where(c => c.ColumnId == r.Column)
+                            .ExecuteUpdateAsync(s =>
+                                s.SetProperty(c => c.Name, r.NewValue), ct);
+                    }
+                    else if (r.Row > 0 && settings.ReplaceInRows)
+                    {
+                        await context.Cells
+                            .Where(c => c.RowId == r.Row && c.ColumnId == r.Column)
+                            .ExecuteUpdateAsync(s =>
+                                s.SetProperty(c => c.Value, r.NewValue), ct);
                     }
                 }
-                else if (settings.ReplaceInRows && group.Key > 0)
-                {
-                    var dbRow = await db.Rows
-                        .Include(r => r.Cells)
-                        .FirstOrDefaultAsync(tr => tr.RowId == group.Key);
-
-                    if (dbRow is null)
-                    {
-                        continue;
-                    }
-
-                    foreach (var row in group)
-                    {
-                        var cell = dbRow.Cells
-                            .FirstOrDefault(tc => tc.ColumnId == row.Column);
-
-                        if (cell is not null)
-                        {
-                            cell.Value = settings.ReplaceText;
-                            amount++;
-                        }
-                    }
-                }
-            }
-            
-            await db.SaveChangesAsync();
-            await transaction.CommitAsync();
-        }
-        catch
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
+            });
+        
+        amount = replacements.Count;
 
         return amount;
     }

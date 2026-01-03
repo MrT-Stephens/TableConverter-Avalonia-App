@@ -1,14 +1,14 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
+using Avalonia.Controls.Notifications;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using SukiUI.Dialogs;
+using SukiUI.Toasts;
 using TableConverter.Commands.DataModels;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Extensions;
 using TableConverter.Utilities.Database.Contexts;
-using TableConverter.Utilities.Extensions;
 using TableConverter.ViewModels.Documents;
 using TableConverter.ViewModels.Forms;
 using TableConverter.ViewModels.Workspaces;
@@ -22,6 +22,7 @@ public static partial class TableDataCommandNames
 
 public class NewFileCommandHandler(
     ISukiDialogManager dialogManager,
+    ISukiToastManager toastManager,
     Utilities.Database.Interfaces.IDbContextFactory<TableStoreDbContext> dbContextFactory) 
     : ICommandHandlerAsync
 {
@@ -67,6 +68,22 @@ public class NewFileCommandHandler(
 
         document.Title = settings.Name;
 
+        await using var dbContext = await dbContextFactory.CreateAsync(document.Path);
+
+        await Task.Run(() => GenerateTableData(dbContext, settings));
+
+        document.InvalidateData();
+        editorViewModel.Documents.Add(document);
+        editorViewModel.SelectedDocument = document;
+
+        toastManager.CreateSimpleInfoToast()
+            .WithTitle("Success")
+            .WithContent("The new file has been created successfully.")
+            .Queue();
+    }
+
+    private static async Task GenerateTableData(TableStoreDbContext dbContext, NewFileSettingsTableDataForm settings)
+    {
         const string newFileSql = """
             -- CREATE TEMPORARY NUMBERS TABLE
             CREATE TEMP TABLE IF NOT EXISTS NUMBERS (
@@ -120,8 +137,7 @@ public class NewFileCommandHandler(
             -- CLEAN UP
             DROP TABLE NUMBERS;
             """;
-
-        await using var dbContext = await dbContextFactory.CreateAsync(document.Path);
+        
         await using var transaction = await dbContext.Database.BeginTransactionAsync();
 
         try
@@ -138,9 +154,5 @@ public class NewFileCommandHandler(
             await transaction.RollbackAsync();
             throw;
         }
-        
-        document.InvalidateData();
-        editorViewModel.Documents.Add(document);
-        editorViewModel.SelectedDocument = document;
     }
 }

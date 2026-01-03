@@ -8,7 +8,9 @@ public abstract class DbContextFactoryBase<TDbContext>(Func<DbContextOptions<TDb
     public TDbContext Create(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
+        {
             throw new ArgumentException("SQLite DB path must be provided.", nameof(path));
+        }
 
         var connectionString = $"Data Source={path};";
         
@@ -36,7 +38,9 @@ public abstract class DbContextFactoryBase<TDbContext>(Func<DbContextOptions<TDb
     public async Task<TDbContext> CreateAsync(string path, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(path))
+        {
             throw new ArgumentException("SQLite DB path must be provided.", nameof(path));
+        }
 
         var connectionString = $"Data Source={path};";
 
