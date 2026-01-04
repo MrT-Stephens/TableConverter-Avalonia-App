@@ -1,11 +1,17 @@
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace TableConverter.Utilities.Database.Models;
+namespace TableConverter.Utilities.Database.Models.TableStore;
 
-public sealed class ColumnEntity : INotifyPropertyChanged
+public sealed class CellEntity : INotifyPropertyChanged
 {
+    private int _RowId;
+    public int RowId
+    {
+        get => _RowId;
+        set => SetField(ref _RowId, value);
+    }
+
     private int _ColumnId;
     public int ColumnId
     {
@@ -13,32 +19,25 @@ public sealed class ColumnEntity : INotifyPropertyChanged
         set => SetField(ref _ColumnId, value);
     }
     
-    private string _Name = null!;
-    public string Name
+    private string? _Value;
+    public string? Value
     {
-        get => _Name;
-        set => SetField(ref _Name, value);
+        get => _Value;
+        set => SetField(ref _Value, value);
     }
-
-    private int _DataType;
-    public int DataType
+    
+    private RowEntity? _Row = null!;
+    public RowEntity? Row
     {
-        get => _DataType;
-        set => SetField(ref _DataType, value);
+        get => _Row;
+        set => SetField(ref _Row, value);
     }
-
-    private int _Ordinal;
-    public int Ordinal
+    
+    private ColumnEntity? _Column = null!;
+    public ColumnEntity? Column
     {
-        get => _Ordinal;
-        set => SetField(ref _Ordinal, value);
-    }
-
-    private ObservableCollection<CellEntity> _Cells = [];
-    public ObservableCollection<CellEntity> Cells
-    {
-        get => _Cells;
-        set => SetField(ref _Cells, value);
+        get => _Column;
+        set => SetField(ref _Column, value);
     }
     
     public event PropertyChangedEventHandler? PropertyChanged;

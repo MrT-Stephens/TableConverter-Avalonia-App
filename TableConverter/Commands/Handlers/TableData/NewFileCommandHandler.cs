@@ -77,7 +77,8 @@ public class NewFileCommandHandler(
         editorViewModel.SelectedDocument = document;
 
         toastManager.CreateSimpleInfoToast()
-            .WithTitle("Success")
+            .OfType(NotificationType.Success)
+            .WithTitle("Added New File")
             .WithContent("The new file has been created successfully.")
             .Queue();
     }

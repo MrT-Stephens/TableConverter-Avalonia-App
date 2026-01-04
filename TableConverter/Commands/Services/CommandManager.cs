@@ -119,6 +119,8 @@ public class CommandManager : ICommandManager
     {
         try
         {
+            context.IsProcessing = true;
+            
             if (metadata.CanSetLoadingState)
             {
                 context.IsLoading = true;
@@ -145,6 +147,7 @@ public class CommandManager : ICommandManager
             // Clear the parameter and selected items after execution
             context.Parameter = null;
             context.Result = null;
+            context.IsProcessing = false;
             
             if (metadata.CanSetLoadingState)
             {
@@ -157,6 +160,8 @@ public class CommandManager : ICommandManager
     {
         try
         {
+            context.IsProcessing = true;
+            
             if (metadata.CanSetLoadingState)
             {
                 context.IsLoading = true;
@@ -183,6 +188,7 @@ public class CommandManager : ICommandManager
             // Clear the parameter and selected items after execution
             context.Parameter = null;
             context.Result = null;
+            context.IsProcessing = false;
             
             if (metadata.CanSetLoadingState)
             {

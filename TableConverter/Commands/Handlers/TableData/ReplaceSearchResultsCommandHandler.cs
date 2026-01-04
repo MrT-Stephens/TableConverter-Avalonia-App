@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls.Notifications;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
@@ -83,7 +84,7 @@ public class ReplaceSearchResultsCommandHandler(
         
         await using var dbContext = await dbContextFactory.CreateAsync(tableDataViewModel.Path);
 
-        var replacedAmount = await Task.Run(() => ReplaceValuesAsync(replaceValues, settings, tableDataViewModel.Path));
+        var replacedAmount = await Task.Run(() => ReplaceValuesAsync(dbContext, settings));
 
         toastManager.CreateSimpleInfoToast()
             .OfType(NotificationType.Success)
@@ -91,67 +92,52 @@ public class ReplaceSearchResultsCommandHandler(
             .WithContent($"Replaced {replacedAmount} occurrences with '{settings.ReplaceText}'.")
             .Queue();
         
+        searchViewModel.DataSource.Invalidate();
         tableDataViewModel.InvalidateData();
-        searchViewModel.SearchResults.Clear();
     }
 
-    private async Task<int> ReplaceValuesAsync(
-        IReadOnlyCollection<TableSearchResult> replaceValues,
-        SearchSettingsFrom settings,
-        string path)
+    private async Task<int> ReplaceValuesAsync(TableStoreDbContext context, SearchSettingsFrom settings)
     {
-        if (replaceValues.Count == 0)
+        await using var transaction = await context.Database.BeginTransactionAsync();
+
+        try
         {
-            return 0;
+            var affected = 0;
+
+            if (settings.ReplaceInRows)
+            {
+                affected += await context.Database.ExecuteSqlRawAsync("""
+                    UPDATE CELLS
+                    SET VALUE = REPLACE(CELLS.VALUE, SR.FOUND_VALUE, @REPLACE_TEXT)
+                    FROM SEARCH_RESULT SR
+                    WHERE SR.ROW_ID = CELLS.ROW_ID
+                        AND SR.COLUMN_ID = CELLS.COLUMN_ID
+                        AND SR.ROW_ID > 0;
+                    """,
+                    new SqliteParameter("@REPLACE_TEXT", settings.ReplaceText));
+            }
+
+            if (settings.ReplaceInHeaders)
+            {
+                affected += await context.Database.ExecuteSqlRawAsync("""
+                    UPDATE COLUMNS
+                    SET Name = REPLACE(COLUMNS.NAME, SR.FOUND_VALUE, @REPLACE_TEXT)
+                    FROM SEARCH_RESULT SR
+                    WHERE SR.ROW_ID = 0
+                        AND SR.COLUMN_ID = COLUMNS.COLUMN_ID;
+                    """,
+                    new SqliteParameter("@REPLACE_TEXT", settings.ReplaceText));
+            }
+            
+            await context.Database.ExecuteSqlRawAsync("DELETE FROM SEARCH_RESULT;");
+            await transaction.CommitAsync();
+            
+            return affected;
         }
-
-        var amount = 0;
-        var workers = Math.Min(Environment.ProcessorCount, 8);
-        
-        var replacements = replaceValues
-            .Select(r => new
-            {
-                r.Row,
-                r.Column,
-                NewValue = r.Value.Replace(r.FoundValue, settings.ReplaceText)
-            })
-            .ToList();
-        
-        var groupedReplacements = replacements
-            .GroupBy(r => r.Row)
-            .ToList();
-        
-        await Parallel.ForEachAsync(
-            groupedReplacements,
-            new ParallelOptions
-            {
-                MaxDegreeOfParallelism = workers
-            },
-            async (group, ct) =>
-            {
-                await using var context = await dbContextFactory.CreateAsync(path, ct);
-
-                foreach (var r in group)
-                {
-                    if (r.Row <= 0 && settings.ReplaceInHeaders)
-                    {
-                        await context.Columns
-                            .Where(c => c.ColumnId == r.Column)
-                            .ExecuteUpdateAsync(s =>
-                                s.SetProperty(c => c.Name, r.NewValue), ct);
-                    }
-                    else if (r.Row > 0 && settings.ReplaceInRows)
-                    {
-                        await context.Cells
-                            .Where(c => c.RowId == r.Row && c.ColumnId == r.Column)
-                            .ExecuteUpdateAsync(s =>
-                                s.SetProperty(c => c.Value, r.NewValue), ct);
-                    }
-                }
-            });
-        
-        amount = replacements.Count;
-
-        return amount;
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 }

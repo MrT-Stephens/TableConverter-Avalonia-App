@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TableConverter.Utilities.Database.Models;
+using TableConverter.Utilities.Database.Models.TableStore;
 
 namespace TableConverter.Utilities.Database.Contexts;
 
@@ -8,6 +9,7 @@ public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> op
     public DbSet<ColumnEntity> Columns => Set<ColumnEntity>();
     public DbSet<RowEntity> Rows => Set<RowEntity>();
     public DbSet<CellEntity> Cells => Set<CellEntity>();
+    public DbSet<SearchResult> SearchResults => Set<SearchResult>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -84,6 +86,31 @@ public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> op
             
             // CREATE INDEX IF NOT EXISTS IDX_CELLS_VALUE ON CELLS(VALUE);
             b.HasIndex(x => x.Value).HasDatabaseName("IDX_CELLS_VALUE");
+        });
+
+        modelBuilder.Entity<SearchResult>(b =>
+        {
+            b.ToTable("SEARCH_RESULT");
+
+            // PRIMARY KEY (ROW_ID, COLUMN_ID)
+            b.HasKey(x => new { x.RowId, x.ColumnId });
+
+            // COLUMN DEFINITIONS
+            b.Property(x => x.RowId)
+                .HasColumnName("ROW_ID")
+                .IsRequired();
+
+            b.Property(x => x.ColumnId)
+                .HasColumnName("COLUMN_ID")
+                .IsRequired();
+
+            b.Property(x => x.Value)
+                .HasColumnName("VALUE")
+                .IsRequired();
+
+            b.Property(x => x.FoundValue)
+                .HasColumnName("FOUND_VALUE")
+                .IsRequired();
         });
     }
 }

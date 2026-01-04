@@ -17,6 +17,7 @@
             </sukiUi:PropertyGrid.DataTemplates>
         </sukiUi:PropertyGrid>
         <controls:CommandButtonToolBar Grid.Row="1"
+                                       DisableAllIfProcessing="True"
                                        Margin="0,0,0,15"
                                        Commands="{Binding SearchCommands, Mode=OneWay}">
             <controls:CommandButtonToolBar.ItemsPanel>
@@ -44,8 +45,8 @@
                                        TextTrimming="CharacterEllipsis">
                                 <TextBlock.Text>
                                     <MultiBinding StringFormat="Row {0}, Col {1}">
-                                        <Binding Path="Row" Mode="OneWay" />
-                                        <Binding Path="Column" Mode="OneWay" />
+                                        <Binding Path="Item.RowId" Mode="OneWay" />
+                                        <Binding Path="Item.ColumnId" Mode="OneWay" />
                                     </MultiBinding>
                                 </TextBlock.Text>
                             </TextBlock>
@@ -53,7 +54,7 @@
                                        TextWrapping="NoWrap" 
                                        TextTrimming="CharacterEllipsis">
                                 <TextBlock.Inlines>
-                                    <Binding Path="." 
+                                    <Binding Path="Item" 
                                              Mode="OneWay"
                                              Converter="{x:Static converters:SearchResultToInlinesConverter.Instance}" />
                                 </TextBlock.Inlines>

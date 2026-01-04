@@ -2,15 +2,36 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace TableConverter.Utilities.Database.Models;
+namespace TableConverter.Utilities.Database.Models.TableStore;
 
-public sealed class RowEntity : INotifyPropertyChanged
+public sealed class ColumnEntity : INotifyPropertyChanged
 {
-    private int _RowId;
-    public int RowId
+    private int _ColumnId;
+    public int ColumnId
     {
-        get => _RowId; 
-        set => SetField(ref _RowId, value);
+        get => _ColumnId;
+        set => SetField(ref _ColumnId, value);
+    }
+    
+    private string _Name = null!;
+    public string Name
+    {
+        get => _Name;
+        set => SetField(ref _Name, value);
+    }
+
+    private int _DataType;
+    public int DataType
+    {
+        get => _DataType;
+        set => SetField(ref _DataType, value);
+    }
+
+    private int _Ordinal;
+    public int Ordinal
+    {
+        get => _Ordinal;
+        set => SetField(ref _Ordinal, value);
     }
 
     private ObservableCollection<CellEntity> _Cells = [];

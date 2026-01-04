@@ -40,6 +40,12 @@ public interface ICommandContext : IHasSelectedItems
     /// Indicates whether the command is currently in a loading state.
     /// </summary>
     public bool IsLoading { get; set; }
+    
+    /// <summary>
+    /// Indicates whether the command is currently processing.
+    /// Used internally.
+    /// </summary>
+    public bool IsProcessing { get; set; }
 
     /// <summary>
     /// Sets the result of the command execution to the provided object, wrapped in a successful Result.

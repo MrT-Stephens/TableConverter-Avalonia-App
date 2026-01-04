@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using TableConverter.Utilities.Database.Contexts;
 using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.Utilities.Database.Models;
+using TableConverter.Utilities.Database.Models.TableStore;
 
 namespace TableConverter.Utilities.Database.Sessions;
 

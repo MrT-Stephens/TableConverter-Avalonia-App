@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using ModelFlow.DataVirtualization.DataManagement;
 using TableConverter.Utilities.Database.Contexts;
 using TableConverter.Utilities.Database.Models;
+using TableConverter.Utilities.Database.Models.TableStore;
 using TableConverter.Utilities.Extensions;
 using IFactory = TableConverter.Utilities.Database.Interfaces.IDbContextFactory<
     TableConverter.Utilities.Database.Contexts.TableStoreDbContext>;

@@ -27,6 +27,8 @@ public partial class CommandContext : ObservableObject, ICommandContext
     [ObservableProperty] private string _CancelReason;
 
     [ObservableProperty] private bool _IsLoading;
+    
+    [ObservableProperty] private bool _IsProcessing;
 
     [ObservableProperty] private SelectedItemsCollection _SelectedItems;
     

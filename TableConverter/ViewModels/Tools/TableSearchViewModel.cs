@@ -1,12 +1,22 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
+using ModelFlow.DataVirtualization.DataManagement;
+using ModelFlow.DataVirtualization.Extensions;
+using ModelFlow.DataVirtualization.Interfaces;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using TableConverter.Commands.Handlers.TableData;
 using TableConverter.Commands.Interfaces;
-using TableConverter.Contracts;
 using TableConverter.Interfaces;
+using TableConverter.Services.DataSources;
+using TableConverter.Utilities.Database.Contexts;
+using TableConverter.Utilities.Database.Interfaces;
+using TableConverter.Utilities.Database.Models.TableStore;
 using TableConverter.ViewModels.Base;
+using TableConverter.ViewModels.Documents;
 using TableConverter.ViewModels.Forms;
 using TableConverter.ViewModels.Workspaces;
 
@@ -17,8 +27,10 @@ public partial class TableSearchViewModel : BaseScopedPaneToolViewModel<TableWor
     #region Properties
     
     [ObservableProperty] private SearchSettingsFrom _SearchSettings;
-    [ObservableProperty] private ObservableCollection<TableSearchResult> _SearchResults;
     [ObservableProperty] private ObservableCollection<ICommandInstance> _SearchCommands;
+    [ObservableProperty] private IReadOnlyObservableCollection<DataItem<SearchResult>> _SearchResults;
+
+    public readonly TableStoreSearchResultDataSource DataSource;
     
     #endregion
     
@@ -28,12 +40,24 @@ public partial class TableSearchViewModel : BaseScopedPaneToolViewModel<TableWor
         ICommandManager commandManager, 
         IEventManager eventManager, 
         ISukiDialogManager dialogManager, 
-        ISukiToastManager toastManager) 
+        ISukiToastManager toastManager,
+        IDbContextFactory<TableStoreDbContext> dbContextFactory)
         : base(commandManager, eventManager, dialogManager, toastManager, "Search & Replace")
     {
         SearchSettings = new SearchSettingsFrom();
-        SearchResults = [];
         SearchCommands = [];
+        
+        DataSource = new TableStoreSearchResultDataSource(dbContextFactory);
+        SearchResults = DataSource.Collection;
+
+        DataSource.SetFilterQuery(query => query
+            .OrderBy(x => x.RowId)
+            .ThenBy(x => x.ColumnId), false);
+        
+        Dispatcher.UIThread.Post(async void () =>
+        {
+            await DataSource.EnsureInitialisedAsync();
+        });
     }
     
     #endregion
@@ -55,7 +79,10 @@ public partial class TableSearchViewModel : BaseScopedPaneToolViewModel<TableWor
         if (oldDocument?.ID != newDocument?.ID)
         {
             SearchSettings = new SearchSettingsFrom();
-            SearchResults.Clear();
+            
+            DataSource.Path = newDocument is TableDataViewModel tableData
+                ? tableData.Path
+                : string.Empty;
         }
     }
 

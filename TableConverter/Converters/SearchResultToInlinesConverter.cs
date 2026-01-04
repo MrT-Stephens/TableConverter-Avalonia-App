@@ -4,7 +4,9 @@ using Avalonia.Controls.Documents;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
 using Avalonia.Media;
+using ModelFlow.DataVirtualization.DataManagement;
 using TableConverter.Contracts;
+using TableConverter.Utilities.Database.Models.TableStore;
 
 namespace TableConverter.Converters;
 
@@ -14,7 +16,7 @@ public class SearchResultToInlinesConverter : IValueConverter
     
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is not TableSearchResult data)
+        if (value is not SearchResult data)
             return new BindingNotification("Value is not TableSearchResult");
 
         IBrush brush;

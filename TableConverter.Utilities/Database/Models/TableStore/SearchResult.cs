@@ -1,9 +1,9 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace TableConverter.Utilities.Database.Models;
+namespace TableConverter.Utilities.Database.Models.TableStore;
 
-public sealed class CellEntity : INotifyPropertyChanged
+public sealed class SearchResult : INotifyPropertyChanged
 {
     private int _RowId;
     public int RowId
@@ -19,25 +19,18 @@ public sealed class CellEntity : INotifyPropertyChanged
         set => SetField(ref _ColumnId, value);
     }
     
-    private string? _Value;
-    public string? Value
+    private string _Value = null!;
+    public string Value
     {
         get => _Value;
         set => SetField(ref _Value, value);
     }
-    
-    private RowEntity? _Row = null!;
-    public RowEntity? Row
+
+    private string _FoundValue = null!;
+    public string FoundValue
     {
-        get => _Row;
-        set => SetField(ref _Row, value);
-    }
-    
-    private ColumnEntity? _Column = null!;
-    public ColumnEntity? Column
-    {
-        get => _Column;
-        set => SetField(ref _Column, value);
+        get => _FoundValue;
+        set => SetField(ref _FoundValue, value);
     }
     
     public event PropertyChangedEventHandler? PropertyChanged;
