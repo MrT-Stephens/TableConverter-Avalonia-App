@@ -5,17 +5,36 @@
              xmlns:viewModels="clr-namespace:TableConverter.ViewModels.Tools"
              xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
              xmlns:controls="clr-namespace:TableConverter.Views.Controls"
+             xmlns:property="clr-namespace:TableConverter.Views.Controls.PropertyGrid"
              xmlns:converters="clr-namespace:TableConverter.Converters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="TableConverter.Views.Tools.TableSearchView"
              x:DataType="viewModels:TableSearchViewModel">
     <Grid RowDefinitions="Auto,Auto,*">
-        <sukiUi:PropertyGrid Grid.Row="0"
-                             Item="{Binding SearchSettings, Mode=TwoWay}">
-            <sukiUi:PropertyGrid.DataTemplates>
-                <sukiUi:PropertyGridTemplateSelector />
-            </sukiUi:PropertyGrid.DataTemplates>
-        </sukiUi:PropertyGrid>
+        <property:PropertyGrid Grid.Row="0"
+                               Item="{Binding SearchSettings, Mode=TwoWay}">
+            <property:PropertyGrid.DataTemplates>
+                <sukiUi:PropertyGridTemplateSelector>
+                    <DataTemplate x:Key="RuntimeValuesViewModel" DataType="property:RuntimeValuesViewModel">
+                        <Grid Classes="Row">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="PropertyGridDisplyColumn" />
+                                <ColumnDefinition Width="4" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Classes="Label" />
+                            <ComboBox Grid.Column="2"
+                                      HorizontalAlignment="Right" MinWidth="120"
+                                      VerticalAlignment="Stretch"
+                                      HorizontalContentAlignment="Center"
+                                      IsEnabled="{Binding !IsReadOnly}"
+                                      ItemsSource="{Binding Values}"
+                                      SelectedItem="{Binding Value}" />
+                        </Grid>
+                    </DataTemplate>
+                </sukiUi:PropertyGridTemplateSelector>
+            </property:PropertyGrid.DataTemplates>
+        </property:PropertyGrid>
         <controls:CommandButtonToolBar Grid.Row="1"
                                        DisableAllIfProcessing="True"
                                        Margin="0,0,0,15"

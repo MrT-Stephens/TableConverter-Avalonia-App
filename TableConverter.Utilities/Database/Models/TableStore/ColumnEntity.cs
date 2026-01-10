@@ -34,6 +34,13 @@ public sealed class ColumnEntity : INotifyPropertyChanged
         set => SetField(ref _Ordinal, value);
     }
 
+    private string? _DefaultValueForCell;
+    public string? DefaultValueForCell
+    {
+        get => _DefaultValueForCell;
+        set => SetField(ref _DefaultValueForCell, value);
+    }
+
     private ObservableCollection<CellEntity> _Cells = [];
     public ObservableCollection<CellEntity> Cells
     {

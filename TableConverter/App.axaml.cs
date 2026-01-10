@@ -62,7 +62,7 @@ public class App : Application
             {
                 VirtualizationManager.Instance.ProcessActions();
                 return true;
-            }, TimeSpan.FromMilliseconds(10), DispatcherPriority.ApplicationIdle);
+            }, TimeSpan.FromMilliseconds(10), DispatcherPriority.Background);
             
             var services = new ServiceCollection();
 

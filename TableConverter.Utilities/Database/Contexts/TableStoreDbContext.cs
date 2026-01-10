@@ -13,27 +13,30 @@ public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> op
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<ColumnEntity>(builder =>
+        modelBuilder.Entity<ColumnEntity>(b =>
         {
-            builder.ToTable("COLUMNS");
+            b.ToTable("COLUMNS");
 
-            builder.HasKey(x => x.ColumnId);
+            b.HasKey(x => x.ColumnId);
 
-            builder.Property(x => x.ColumnId)
+            b.Property(x => x.ColumnId)
                 .HasColumnName("COLUMN_ID")
                 .ValueGeneratedOnAdd();
             
-            builder.Property(x => x.Name)
+            b.Property(x => x.Name)
                 .HasColumnName("NAME")
                 .IsRequired();
             
-            builder.Property(x => x.DataType)
+            b.Property(x => x.DataType)
                 .HasColumnName("DATA_TYPE")
                 .IsRequired();
             
-            builder.Property(x => x.Ordinal)
+            b.Property(x => x.Ordinal)
                 .HasColumnName("ORDINAL")
                 .IsRequired();
+
+            b.Property(x => x.DefaultValueForCell)
+                .HasColumnName("DEFAULT_VALUE_FOR_CELL");
         });
 
         modelBuilder.Entity<RowEntity>(b =>

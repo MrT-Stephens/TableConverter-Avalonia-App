@@ -1,5 +1,7 @@
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using TableConverter.Views.Controls.PropertyGrid;
 
 namespace TableConverter.ViewModels.Forms;
 
@@ -27,6 +29,9 @@ public partial class SearchSettingsFrom : ObservableObject
     [ObservableProperty] [property: Category("Search"), DisplayName("Search In Rows")]
     private bool _SearchInRows = true;
     
+    [ObservableProperty] [property: Category("Search"), DisplayName("Search In Column"), RuntimeValues("ColumnNames")]
+    private string _SearchInSpecificColumn = "All";
+    
     [ObservableProperty] [property: Category("Replace"), DisplayName("Replace Text")]
     private string _ReplaceText = string.Empty;
 
@@ -35,6 +40,13 @@ public partial class SearchSettingsFrom : ObservableObject
     
     [ObservableProperty] [property: Category("Replace"), DisplayName("Replace In Rows")]
     private bool _ReplaceInRows = true;
+
+    #endregion
+
+    #region Dynamic Values Getter
+
+    [ObservableProperty] [property: Ignore]
+    private ObservableCollection<string> _ColumnNames = [];
 
     #endregion
 }
