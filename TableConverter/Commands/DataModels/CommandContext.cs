@@ -6,6 +6,7 @@ using TableConverter.Commands.Interfaces;
 using TableConverter.Common;
 using TableConverter.Interfaces;
 using TableConverter.Utilities;
+using TableConverter.Utilities.Collections;
 using TableConverter.Utilities.Extensions;
 
 namespace TableConverter.Commands.DataModels;

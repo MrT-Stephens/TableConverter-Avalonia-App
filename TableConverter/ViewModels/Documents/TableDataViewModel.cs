@@ -17,6 +17,7 @@ using TableConverter.Services.DataSources;
 using TableConverter.Utilities.Database.Models;
 using TableConverter.Utilities.Database.Models.TableStore;
 using TableConverter.Utilities.Extensions;
+using TableConverter.Utilities.Interfaces;
 
 namespace TableConverter.ViewModels.Documents;
 

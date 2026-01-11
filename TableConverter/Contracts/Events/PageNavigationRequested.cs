@@ -1,4 +1,5 @@
 using System;
+using TableConverter.Utilities.Models;
 
 namespace TableConverter.Contracts.Events;
 

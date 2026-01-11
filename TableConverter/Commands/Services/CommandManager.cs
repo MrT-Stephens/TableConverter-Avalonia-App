@@ -7,24 +7,31 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Input;
 using TableConverter.Commands.DataModels;
 using TableConverter.Commands.Interfaces;
-using TableConverter.Common;
-using TableConverter.Extensions;
-using TableConverter.Interfaces;
-using TableConverter.Services;
+using TableConverter.Utilities;
+using TableConverter.Utilities.Collections;
 using TableConverter.Utilities.Extensions;
+using TableConverter.Utilities.Interfaces;
 
 namespace TableConverter.Commands.Services;
 
 public class CommandManager : ICommandManager
 {
+    #region Fields
+    
     private readonly IEventRegistrar _eventRegistrar = new EventRegistrar();
     private readonly List<ICommandHandlerBase> _commandHandlers = [];
     private readonly ConcurrentDictionary<(string, object?), ICommandInstance> _instances = [];
+    
+    #endregion
 
+    #region Events
+    
     public event EventHandler<ICommandContext>? OnCanExecute;
     public event EventHandler<ICommandContext>? OnExecute;
     public event EventHandler<ICommandContext>? OnExecuted;
     public event EventHandler<Exception>? OnError;
+    
+    #endregion
 
     #region Command Registration Methods
 
@@ -219,10 +226,14 @@ public class CommandManager : ICommandManager
     
     #endregion
 
+    #region IDisposable Implementation
+    
     public void Dispose()
     {
         _eventRegistrar.ClearAll();
         _commandHandlers.Clear();
         _instances.Clear();
     }
+    
+    #endregion
 }

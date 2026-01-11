@@ -1,8 +1,6 @@
-using System.Collections.Generic;
-using System.Linq;
-using TableConverter.Interfaces;
+using TableConverter.Utilities.Interfaces;
 
-namespace TableConverter.Services;
+namespace TableConverter.Utilities;
 
 public class EventRegistrar : IEventRegistrar
 {

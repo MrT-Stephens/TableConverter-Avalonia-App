@@ -1,6 +1,4 @@
-using System;
-
-namespace TableConverter.Interfaces;
+namespace TableConverter.Utilities.Interfaces;
 
 public interface IEventRegistrar : IDisposable
 {

@@ -1,17 +1,11 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Linq;
 using System.Reflection;
-using Avalonia.Collections;
-using TableConverter.Extensions;
-using TableConverter.Interfaces;
-using TableConverter.Services;
 using TableConverter.Utilities.Extensions;
+using TableConverter.Utilities.Interfaces;
 
-namespace TableConverter.Common;
+namespace TableConverter.Utilities.Collections;
 
 public class ItemChangedEventArgs(object? item) : EventArgs
 {
@@ -241,14 +235,15 @@ public class SelectedItemsCollection : IList, INotifyCollectionChanged, INotifyP
 
     #region Misc Methods
 
-    private void AttachItemEvents(object item, Type type)
+    private void AttachItemEvents(object item, Type type, params string[] ignoredProperties)
     {
         if (item is not INotifyPropertyChanged basePropertyChanged) 
             return;
 
         string[] ignoreProperties =
         [
-            nameof(IHasSelectedItems.SelectedItems)
+            nameof(IHasSelectedItems.SelectedItems),
+            ..ignoredProperties
         ];
         
         _eventRegistrar.RegisterPropertyChanged(basePropertyChanged, item, OnItemPropertyChanged);

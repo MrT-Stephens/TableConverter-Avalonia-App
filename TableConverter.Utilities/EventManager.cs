@@ -1,9 +1,8 @@
-using System;
 using System.Collections.Concurrent;
-using TableConverter.Interfaces;
 using TableConverter.Utilities.Extensions;
+using TableConverter.Utilities.Interfaces;
 
-namespace TableConverter.Services;
+namespace TableConverter.Utilities;
 
 public class EventManager : IEventManager
 {

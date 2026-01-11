@@ -10,6 +10,7 @@ using TableConverter.Commands.Interfaces;
 using TableConverter.Contracts.Events;
 using TableConverter.Interfaces;
 using TableConverter.Utilities.Extensions;
+using TableConverter.Utilities.Interfaces;
 using TableConverter.ViewModels.Base;
 
 namespace TableConverter.ViewModels;

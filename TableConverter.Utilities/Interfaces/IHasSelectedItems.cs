@@ -1,8 +1,7 @@
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using TableConverter.Common;
+using TableConverter.Utilities.Collections;
 
-namespace TableConverter.Interfaces;
+namespace TableConverter.Utilities.Interfaces;
 
 public interface IHasSelectedItems
 {

@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using TableConverter.Interfaces;
 using TableConverter.Utilities;
+using TableConverter.Utilities.Interfaces;
 
 namespace TableConverter.Commands.Interfaces;
 

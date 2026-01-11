@@ -1,11 +1,8 @@
-using System;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Linq.Expressions;
-using System.Reflection;
-using TableConverter.Interfaces;
+using TableConverter.Utilities.Interfaces;
 
-namespace TableConverter.Extensions;
+namespace TableConverter.Utilities.Extensions;
 
 public static class EventRegistrarExtensions
 {
@@ -61,5 +58,3 @@ public sealed class EventHandle<TDelegate>(Action<TDelegate> add, Action<TDelega
     public void Add() => _add(_handler);
     public void Remove() => _remove(_handler);
 }
-
-

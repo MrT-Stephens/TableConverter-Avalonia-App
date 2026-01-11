@@ -16,8 +16,9 @@ using TableConverter.Commands.Interfaces;
 using TableConverter.Contracts.Events;
 using TableConverter.Extensions;
 using TableConverter.Interfaces;
-using TableConverter.Services;
+using TableConverter.Utilities;
 using TableConverter.Utilities.Extensions;
+using TableConverter.Utilities.Interfaces;
 using TableConverter.ViewModels.Forms;
 
 namespace TableConverter.ViewModels.Base;

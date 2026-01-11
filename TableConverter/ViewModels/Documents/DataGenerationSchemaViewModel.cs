@@ -9,6 +9,7 @@ using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Contracts;
 using TableConverter.Interfaces;
+using TableConverter.Utilities.Interfaces;
 using TableConverter.ViewModels.Base;
 using TableConverter.ViewModels.Dialogs;
 using TableConverter.ViewModels.Models;

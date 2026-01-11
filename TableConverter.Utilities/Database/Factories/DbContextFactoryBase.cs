@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using TableConverter.Utilities.Interfaces;
 
 namespace TableConverter.Utilities.Database.Factories;
 
-public abstract class DbContextFactoryBase<TDbContext>(Func<DbContextOptions<TDbContext>, TDbContext> factory)
+public abstract class DbContextFactoryBase<TDbContext>(Func<DbContextOptions<TDbContext>, IEventManager, TDbContext> factory, IEventManager eventManager)
     : Interfaces.IDbContextFactory<TDbContext> where TDbContext : DbContext
 {
     public TDbContext Create(string path)
@@ -20,7 +21,7 @@ public abstract class DbContextFactoryBase<TDbContext>(Func<DbContextOptions<TDb
             .EnableSensitiveDataLogging(false)
             .Options;
         
-        var db = factory(options);
+        var db = factory(options, eventManager);
         
         db.Database.EnsureCreated();
         
@@ -50,7 +51,7 @@ public abstract class DbContextFactoryBase<TDbContext>(Func<DbContextOptions<TDb
             .EnableSensitiveDataLogging(false)
             .Options;
 
-        var db = factory(options);
+        var db = factory(options, eventManager);
         
         await db.Database.EnsureCreatedAsync(cancellationToken);
         

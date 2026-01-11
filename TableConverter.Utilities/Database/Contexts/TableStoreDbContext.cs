@@ -1,10 +1,14 @@
 using Microsoft.EntityFrameworkCore;
+using TableConverter.Utilities.Database.Events;
 using TableConverter.Utilities.Database.Models;
 using TableConverter.Utilities.Database.Models.TableStore;
+using TableConverter.Utilities.Extensions;
+using TableConverter.Utilities.Interfaces;
 
 namespace TableConverter.Utilities.Database.Contexts;
 
-public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> options) : DbContext(options)
+public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> options, IEventManager eventsManager) 
+    : DbContext(options)
 {
     public DbSet<ColumnEntity> Columns => Set<ColumnEntity>();
     public DbSet<RowEntity> Rows => Set<RowEntity>();
@@ -16,9 +20,11 @@ public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> op
         modelBuilder.Entity<ColumnEntity>(b =>
         {
             b.ToTable("COLUMNS");
-
+            
+            // PRIMARY KEY (COLUMN_ID)
             b.HasKey(x => x.ColumnId);
-
+            
+            // COLUMN DEFINITIONS
             b.Property(x => x.ColumnId)
                 .HasColumnName("COLUMN_ID")
                 .ValueGeneratedOnAdd();
@@ -43,8 +49,10 @@ public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> op
         {
             b.ToTable("ROWS");
 
+            // PRIMARY KEY (ROW_ID)
             b.HasKey(x => x.RowId);
 
+            // COLUMN DEFINITIONS
             b.Property(x => x.RowId)
                 .HasColumnName("ROW_ID")
                 .ValueGeneratedOnAdd();
@@ -115,5 +123,70 @@ public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> op
                 .HasColumnName("FOUND_VALUE")
                 .IsRequired();
         });
+    }
+
+    public override int SaveChanges()
+    {
+        var changes = CollectEntityTypeChanges();
+        
+        var result = base.SaveChanges();
+        
+        if (changes.Count > 0)
+        {
+            eventsManager
+                .GetEvent<DbEntityChangedEvent>()
+                .Publish(new DbEntityChangedEventArgs
+                {
+                    Changes = changes
+                });
+        }
+        
+        return result;
+    }
+
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
+    {
+        var changes = CollectEntityTypeChanges();
+        
+        var result = await base.SaveChangesAsync(cancellationToken);
+
+        if (changes.Count > 0)
+        {
+            eventsManager
+                .GetEvent<DbEntityChangedEvent>()
+                .Publish(new DbEntityChangedEventArgs
+                {
+                    Changes = changes
+                });
+        }
+        
+        return result;
+    }
+    
+    private Dictionary<Type, DbEntityChangeState> CollectEntityTypeChanges()
+    {
+        var result = new Dictionary<Type, DbEntityChangeState>();
+
+        foreach (var entry in ChangeTracker.Entries())
+        {
+            var state = entry.State switch
+            {
+                EntityState.Added    => DbEntityChangeState.Added,
+                EntityState.Modified => DbEntityChangeState.Modified,
+                EntityState.Deleted  => DbEntityChangeState.Deleted,
+                _ => DbEntityChangeState.None
+            };
+
+            if (state == DbEntityChangeState.None)
+                continue;
+
+            var type = entry.Metadata.ClrType;
+
+            result[type] = result.TryGetValue(type, out var existing)
+                ? existing | state
+                : state;
+        }
+
+        return result;
     }
 }

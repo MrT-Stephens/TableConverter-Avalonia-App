@@ -6,6 +6,7 @@ using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Interfaces;
+using TableConverter.Utilities.Interfaces;
 
 namespace TableConverter.ViewModels.Base;
 

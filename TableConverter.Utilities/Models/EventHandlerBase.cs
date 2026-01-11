@@ -1,12 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using TableConverter.Interfaces;
-using TableConverter.Utilities;
 using TableConverter.Utilities.Extensions;
+using TableConverter.Utilities.Interfaces;
 
-namespace TableConverter.Contracts;
+namespace TableConverter.Utilities.Models;
 
 public abstract class EventHandlerBase<TEventArgs> : IEventHandler<TEventArgs> where TEventArgs : EventArgs
 {

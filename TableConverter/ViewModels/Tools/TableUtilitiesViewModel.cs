@@ -4,6 +4,7 @@ using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Interfaces;
+using TableConverter.Utilities.Interfaces;
 using TableConverter.ViewModels.Base;
 using TableConverter.ViewModels.Documents;
 using TableConverter.ViewModels.Workspaces;
