@@ -59,9 +59,6 @@ public static class DictionaryExtensions
     /// <param name="key">
     /// The key whose value to get.
     /// </param>
-    /// <typeparam name="TKey">
-    /// The type of keys in the dictionary.
-    /// </typeparam>
     /// <typeparam name="TValue">
     /// The type of values in the dictionary.
     /// </typeparam>

@@ -8,6 +8,7 @@ using ModelFlow.DataVirtualization.DataManagement;
 using TableConverter.Utilities.Database.Contexts;
 using TableConverter.Utilities.Database.Models.TableStore;
 using TableConverter.Utilities.Extensions;
+using TableConverter.ViewModels.Models;
 using IFactory = TableConverter.Utilities.Database.Interfaces.IDbContextFactory<
     TableConverter.Utilities.Database.Contexts.TableStoreDbContext>;
 
@@ -140,6 +141,11 @@ public class TableStoreColumnsDataSource : DataSource<ColumnEntity>
 
     protected override async Task<bool> DoCreateAsync(ColumnEntity item)
     {
+        if (string.IsNullOrEmpty(Path))
+        {
+            return false;
+        }
+        
         await using var db = await CreateDbAsync().ConfigureAwait(false);
         
         await db.Columns.AddAsync(item).ConfigureAwait(false);
@@ -150,6 +156,11 @@ public class TableStoreColumnsDataSource : DataSource<ColumnEntity>
 
     protected override async Task<bool> DoUpdateAsync(ColumnEntity viewModel)
     {
+        if (string.IsNullOrEmpty(Path))
+        {
+            return false;
+        }
+        
         await using var db = await CreateDbAsync().ConfigureAwait(false);
         
         var entity = await db.Columns
@@ -170,6 +181,11 @@ public class TableStoreColumnsDataSource : DataSource<ColumnEntity>
 
     protected override async Task<bool> DoDeleteAsync(ColumnEntity item)
     {
+        if (string.IsNullOrEmpty(Path))
+        {
+            return false;
+        }
+        
         await using var db = await CreateDbAsync().ConfigureAwait(false);
 
         var entity = await db.Columns

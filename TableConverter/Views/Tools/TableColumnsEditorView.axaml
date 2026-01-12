@@ -1,0 +1,55 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:TableConverter.ViewModels.Tools"
+             xmlns:controls="clr-namespace:TableConverter.Views.Controls"
+             xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:TableColumnsEditorViewModel"
+             x:Class="TableConverter.Views.Tools.TableColumnsEditorView">
+    <DockPanel>
+        <controls:CommandButtonToolBar DockPanel.Dock="Top"
+                                       ShowText="False">
+            <controls:CommandButtonToolBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Right">
+                    </StackPanel>
+                </ItemsPanelTemplate>
+            </controls:CommandButtonToolBar.ItemsPanel>
+        </controls:CommandButtonToolBar>
+        <ListBox Grid.IsSharedSizeScope="True"
+                 SelectionMode="Multiple"
+                 SelectedItem="{Binding SelectedColumn, Mode=TwoWay}"
+                 ItemsSource="{Binding Columns, Mode=TwoWay}">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel Orientation="Vertical" />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid ColumnSpacing="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"
+                                              SharedSizeGroup="IndexGroup" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0"
+                                   VerticalAlignment="Center"
+                                   Text="{Binding Item.Ordinal, Mode=OneWay}">
+                        </TextBlock>
+                        <TextBox Grid.Column="1"
+                                 Text="{Binding Item.Name, Mode=TwoWay}">
+                        </TextBox>
+                        <TextBox Grid.Column="2"
+                                 Text="{Binding Item.DefaultValueForCell, Mode=TwoWay}">
+                        </TextBox>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </DockPanel>
+</UserControl>

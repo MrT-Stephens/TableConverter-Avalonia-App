@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace TableConverter.Utilities.Database.Models.TableStore;
 
-public sealed class ColumnEntity : INotifyPropertyChanged
+public sealed class ColumnEntity : INotifyPropertyChanged 
 {
     private int _ColumnId;
     public int ColumnId
