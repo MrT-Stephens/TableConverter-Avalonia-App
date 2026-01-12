@@ -99,15 +99,19 @@ public class SearchTableDataCommandHandler(
     {
         await using var db = await dbContextFactory.CreateAsync(path);
         await using var tx = await db.Database.BeginTransactionAsync();
-
+        
         try
         {
             await db.Database.ExecuteSqlRawAsync("DELETE FROM SEARCH_RESULT;");
 
+            var searchColumn = settings.SearchInSpecificColumn;
+            var searchAllColumns = searchColumn == "All";
+
             object[] parameters =
             [
                 new SqliteParameter("@SEARCH_TEXT", searchText),
-                new SqliteParameter("@PATTERN", $"%{searchText}%")
+                new SqliteParameter("@PATTERN", $"%{searchText}%"),
+                new SqliteParameter("@COLUMN", searchColumn)
             ];
 
             var inserted = 0;
@@ -118,17 +122,21 @@ public class SearchTableDataCommandHandler(
                 {
                     inserted += await db.Database.ExecuteSqlRawAsync(
                         settings.MatchCase
-                            ? """
+                            ? $"""
                             INSERT INTO SEARCH_RESULT (ROW_ID, COLUMN_ID, VALUE, FOUND_VALUE)
                             SELECT 0, COLUMN_ID, NAME, @SEARCH_TEXT
                             FROM COLUMNS
-                            WHERE NAME = @SEARCH_TEXT;
+                            WHERE 
+                                {(searchAllColumns ? "" : "NAME = @COLUMN AND")} 
+                                NAME = @SEARCH_TEXT;
                             """
-                            : """
+                            : $"""
                             INSERT INTO SEARCH_RESULT (ROW_ID, COLUMN_ID, VALUE, FOUND_VALUE)
                             SELECT 0, COLUMN_ID, NAME, @SEARCH_TEXT
                             FROM COLUMNS
-                            WHERE NAME COLLATE NOCASE = @SEARCH_TEXT;
+                            WHERE 
+                                {(searchAllColumns ? "" : "NAME = @COLUMN AND")} 
+                                NAME COLLATE NOCASE = @SEARCH_TEXT;
                             """,
                         parameters);
                 }
@@ -136,17 +144,21 @@ public class SearchTableDataCommandHandler(
                 {
                     inserted += await db.Database.ExecuteSqlRawAsync(
                         settings.MatchCase
-                            ? """
+                            ? $"""
                             INSERT INTO SEARCH_RESULT (ROW_ID, COLUMN_ID, VALUE, FOUND_VALUE)
                             SELECT 0, COLUMN_ID, NAME, @SEARCH_TEXT
                             FROM COLUMNS
-                            WHERE NAME LIKE @PATTERN;
+                            WHERE 
+                                {(searchAllColumns ? "" : "NAME = @COLUMN AND")} 
+                                NAME LIKE @PATTERN;
                             """
-                            : """
+                            : $"""
                             INSERT INTO SEARCH_RESULT (ROW_ID, COLUMN_ID, VALUE, FOUND_VALUE)
                             SELECT 0, COLUMN_ID, NAME, @SEARCH_TEXT
                             FROM COLUMNS
-                            WHERE NAME COLLATE NOCASE LIKE @PATTERN;
+                            WHERE 
+                                {(searchAllColumns ? "" : "NAME = @COLUMN AND")} 
+                                NAME COLLATE NOCASE LIKE @PATTERN;
                             """,
                         parameters);
                 }
@@ -158,17 +170,25 @@ public class SearchTableDataCommandHandler(
                 {
                     inserted += await db.Database.ExecuteSqlRawAsync(
                         settings.MatchCase
-                            ? """
+                            ? $"""
                             INSERT INTO SEARCH_RESULT (ROW_ID, COLUMN_ID, VALUE, FOUND_VALUE)
-                            SELECT ROW_ID, COLUMN_ID, VALUE, @SEARCH_TEXT
-                            FROM CELLS
-                            WHERE VALUE = @SEARCH_TEXT;
+                            SELECT C.ROW_ID, C.COLUMN_ID, C.VALUE, @SEARCH_TEXT
+                            FROM CELLS C
+                            JOIN COLUMNS COL
+                                ON C.COLUMN_ID = COL.COLUMN_ID
+                            WHERE 
+                                {(searchAllColumns ? "" : "COL.NAME = @COLUMN AND")} 
+                                C.VALUE = @SEARCH_TEXT;
                             """
-                            : """
+                            : $"""
                             INSERT INTO SEARCH_RESULT (ROW_ID, COLUMN_ID, VALUE, FOUND_VALUE)
-                            SELECT ROW_ID, COLUMN_ID, VALUE, @SEARCH_TEXT
-                            FROM CELLS
-                            WHERE VALUE COLLATE NOCASE = @SEARCH_TEXT;
+                            SELECT C.ROW_ID, C.COLUMN_ID, C.VALUE, @SEARCH_TEXT
+                            FROM CELLS C
+                            JOIN COLUMNS COL
+                                ON C.COLUMN_ID = COL.COLUMN_ID
+                            WHERE 
+                                {(searchAllColumns ? "" : "COL.NAME = @COLUMN AND")} 
+                                C.VALUE COLLATE NOCASE = @SEARCH_TEXT;
                             """,
                         parameters);
                 }
@@ -176,17 +196,25 @@ public class SearchTableDataCommandHandler(
                 {
                     inserted += await db.Database.ExecuteSqlRawAsync(
                         settings.MatchCase
-                            ? """
+                            ? $"""
                             INSERT INTO SEARCH_RESULT (ROW_ID, COLUMN_ID, VALUE, FOUND_VALUE)
-                            SELECT ROW_ID, COLUMN_ID, VALUE, @SEARCH_TEXT
-                            FROM CELLS
-                            WHERE VALUE LIKE @PATTERN;
+                            SELECT C.ROW_ID, C.COLUMN_ID, C.VALUE, @SEARCH_TEXT
+                            FROM CELLS C
+                            JOIN COLUMNS COL
+                                ON C.COLUMN_ID = COL.COLUMN_ID
+                            WHERE 
+                                {(searchAllColumns ? "" : "COL.NAME = @COLUMN AND")} 
+                                C.VALUE LIKE @PATTERN;
                             """
-                            : """
+                            : $"""
                             INSERT INTO SEARCH_RESULT (ROW_ID, COLUMN_ID, VALUE, FOUND_VALUE)
-                            SELECT ROW_ID, COLUMN_ID, VALUE, @SEARCH_TEXT
-                            FROM CELLS
-                            WHERE VALUE COLLATE NOCASE LIKE @PATTERN;
+                            SELECT C.ROW_ID, C.COLUMN_ID, C.VALUE, @SEARCH_TEXT
+                            FROM CELLS C
+                            JOIN COLUMNS COL
+                                ON C.COLUMN_ID = COL.COLUMN_ID
+                            WHERE 
+                                {(searchAllColumns ? "" : "COL.NAME = @COLUMN AND")} 
+                                C.VALUE COLLATE NOCASE LIKE @PATTERN;
                             """,
                         parameters);
                 }
@@ -202,6 +230,10 @@ public class SearchTableDataCommandHandler(
         }
     }
 
+    /// <summary>
+    /// Regex search is a lot more inefficient as it needs to load all data
+    /// and then perform the search in parallel.
+    /// </summary>
     private async Task<int> SearchViaRegexAsync(string searchText, SearchSettingsFrom settings, string path)
     {
         await using var sharedContext = await dbContextFactory.CreateAsync(path);
@@ -212,6 +244,8 @@ public class SearchTableDataCommandHandler(
             await sharedContext.Database.ExecuteSqlRawAsync("DELETE FROM SEARCH_RESULT;");
             
             var inserted = 0;
+            var searchColumn = settings.SearchInSpecificColumn;
+            var searchAllColumns = searchColumn == "All";
 
             var workers = Math.Min(Environment.ProcessorCount, 8);
 
@@ -225,11 +259,14 @@ public class SearchTableDataCommandHandler(
             {
                 var columnResults = new List<SearchResult>();
 
-                var headerQuery = sharedContext.Columns
-                    .AsNoTracking()
-                    .AsAsyncEnumerable();
+                var headersQueryable = sharedContext.Columns.AsNoTracking();
 
-                await foreach (var column in headerQuery)
+                if (!searchAllColumns)
+                {
+                    headersQueryable = headersQueryable.Where(c => c.Name == searchColumn);
+                }
+
+                await foreach (var column in headersQueryable.AsAsyncEnumerable())
                 {
                     if (string.IsNullOrEmpty(column.Name))
                     {
@@ -263,9 +300,20 @@ public class SearchTableDataCommandHandler(
             if (settings.SearchInRows)
             {
                 var rowResults = new ConcurrentBag<SearchResult>();
+
+                var minRow = searchAllColumns
+                    ? await sharedContext.Cells.MinAsync(c => c.RowId)
+                    : await sharedContext.Cells
+                        .Include(c => c.Column)
+                        .Where(c => c.Column!.Name == searchColumn)
+                        .MinAsync(c => c.RowId);
                 
-                var minRow = await sharedContext.Cells.MinAsync(c => c.RowId);
-                var maxRow = await sharedContext.Cells.MaxAsync(c => c.RowId);
+                var maxRow = searchAllColumns
+                    ? await sharedContext.Cells.MaxAsync(c => c.RowId)
+                    : await sharedContext.Cells
+                        .Include(c => c.Column)
+                        .Where(c => c.Column!.Name == searchColumn)
+                        .MaxAsync(c => c.RowId);
 
                 var rangeSize = (maxRow - minRow + 1) / workers;
 
@@ -287,9 +335,18 @@ public class SearchTableDataCommandHandler(
 
                         List<SearchResult> localResults = [];
 
-                        await foreach (var cell in db.Cells
-                           .AsNoTracking()
-                           .Where(c => c.RowId >= start && c.RowId <= end)
+                        var rowQueryable = db.Cells
+                            .AsNoTracking()
+                            .Where(c => c.RowId >= start && c.RowId <= end);
+
+                        if (!searchAllColumns)
+                        {
+                            rowQueryable = rowQueryable
+                                .Include(r => r.Column)
+                                .Where(r => r.Column!.Name == searchColumn);
+                        }
+
+                        await foreach (var cell in rowQueryable
                            .AsAsyncEnumerable()
                            .WithCancellation(cancellationToken))
                         {

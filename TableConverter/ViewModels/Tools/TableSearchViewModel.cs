@@ -13,8 +13,10 @@ using TableConverter.Commands.Interfaces;
 using TableConverter.Interfaces;
 using TableConverter.Services.DataSources;
 using TableConverter.Utilities.Database.Contexts;
+using TableConverter.Utilities.Database.Events;
 using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.Utilities.Database.Models.TableStore;
+using TableConverter.Utilities.Extensions;
 using TableConverter.Utilities.Interfaces;
 using TableConverter.ViewModels.Base;
 using TableConverter.ViewModels.Documents;
@@ -33,6 +35,8 @@ public partial class TableSearchViewModel : BaseScopedPaneToolViewModel<TableWor
 
     public readonly TableStoreSearchResultDataSource DataSource;
     
+    private readonly IDbContextFactory<TableStoreDbContext> _dbContextFactory;
+    
     #endregion
     
     #region Constructors
@@ -45,9 +49,9 @@ public partial class TableSearchViewModel : BaseScopedPaneToolViewModel<TableWor
         IDbContextFactory<TableStoreDbContext> dbContextFactory)
         : base(commandManager, eventManager, dialogManager, toastManager, "Search & Replace")
     {
+        _dbContextFactory = dbContextFactory;
         SearchSettings = new SearchSettingsFrom();
         SearchCommands = [];
-        
         DataSource = new TableStoreSearchResultDataSource(dbContextFactory);
         SearchResults = DataSource.Collection;
 
@@ -71,6 +75,17 @@ public partial class TableSearchViewModel : BaseScopedPaneToolViewModel<TableWor
         
         SearchCommands.Add(this[TableDataCommandNames.Search]);
         SearchCommands.Add(this[TableDataCommandNames.Replace]);
+        
+        _eventManager
+            .GetEvent<DbEntityChangedEvent>()
+            .Subscribe((_, args) =>
+            {
+                if (args.Changes.ContainsKey(typeof(ColumnEntity))
+                    && !string.IsNullOrEmpty(DataSource.Path))
+                {
+                    RefreshColumnNames(DataSource.Path);
+                }
+            });
     }
 
     protected override void OnSelectedDocumentChanged(IWorkspace workspace, IPaneDocument? oldDocument, IPaneDocument? newDocument)
@@ -80,11 +95,36 @@ public partial class TableSearchViewModel : BaseScopedPaneToolViewModel<TableWor
         if (oldDocument?.ID != newDocument?.ID)
         {
             SearchSettings = new SearchSettingsFrom();
-            
-            DataSource.Path = newDocument is TableDataViewModel tableData
-                ? tableData.Path
-                : string.Empty;
+
+            if (newDocument is TableDataViewModel tableDataViewModel)
+            {
+                DataSource.Path = tableDataViewModel.Path;
+                
+                RefreshColumnNames(tableDataViewModel.Path);
+            }
+            else
+            {
+                DataSource.Path = string.Empty;
+            }
         }
+    }
+
+    #endregion
+
+    #region Private Methods
+
+    private void RefreshColumnNames(string path)
+    {
+        using var db = _dbContextFactory.Create(path);
+
+        var columnNames = db.Columns
+            .Select(c => c.Name)
+            .OrderBy(c => c)
+            .ToArray();
+        
+        SearchSettings.ColumnNames.Clear();
+        SearchSettings.ColumnNames.Add("All");
+        SearchSettings.ColumnNames.AddRange(columnNames);
     }
 
     #endregion

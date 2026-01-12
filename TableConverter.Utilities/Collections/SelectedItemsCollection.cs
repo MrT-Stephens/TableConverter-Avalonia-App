@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Reflection;
+using FastMember;
 using TableConverter.Utilities.Extensions;
 using TableConverter.Utilities.Interfaces;
 
@@ -240,29 +241,32 @@ public class SelectedItemsCollection : IList, INotifyCollectionChanged, INotifyP
         if (item is not INotifyPropertyChanged basePropertyChanged) 
             return;
 
-        string[] ignoreProperties =
-        [
-            nameof(IHasSelectedItems.SelectedItems),
-            ..ignoredProperties
-        ];
+        var ignoreProperties = new HashSet<string>(
+            [
+                nameof(IHasSelectedItems.SelectedItems),
+                ..ignoredProperties
+            ], StringComparer.Ordinal);
         
         _eventRegistrar.RegisterPropertyChanged(basePropertyChanged, item, OnItemPropertyChanged);
+
+        var itemAccessor = ObjectAccessor.Create(item);
+        var typeAccessor = TypeAccessor.Create(type);
             
-        foreach (var info in item.GetType()
-            .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .Where(p => p.GetIndexParameters().Length == 0 || !ignoreProperties.Contains(p.Name)))
+        foreach (var info in typeAccessor
+            .GetMembers()
+            .Where(x => !ignoreProperties.Contains(x.Name)))
         {
             object? value;
 
             try
             {
-                value = info.GetValue(item);
+                value = itemAccessor[info.Name];
             }
             catch
             {
                 continue;
             }
-
+            
             switch (value)
             {
                 case INotifyPropertyChanged npc:

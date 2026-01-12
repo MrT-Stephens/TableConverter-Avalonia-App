@@ -43,7 +43,7 @@ public partial class SearchSettingsFrom : ObservableObject
 
     #endregion
 
-    #region Dynamic Values Getter
+    #region Dynamic Values
 
     [ObservableProperty] [property: Ignore]
     private ObservableCollection<string> _ColumnNames = [];

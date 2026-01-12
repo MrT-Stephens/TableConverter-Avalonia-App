@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using TableConverter.Utilities.Interfaces;
 
@@ -17,8 +18,11 @@ public abstract class DbContextFactoryBase<TDbContext>(Func<DbContextOptions<TDb
         
         var options = new DbContextOptionsBuilder<TDbContext>()
             .UseSqlite(connectionString)
+#if DEBUG
             .EnableDetailedErrors()
-            .EnableSensitiveDataLogging(false)
+            .EnableSensitiveDataLogging()
+            .LogTo(s => Debug.WriteLine(s))
+#endif
             .Options;
         
         var db = factory(options, eventManager);
@@ -47,8 +51,11 @@ public abstract class DbContextFactoryBase<TDbContext>(Func<DbContextOptions<TDb
 
         var options = new DbContextOptionsBuilder<TDbContext>()
             .UseSqlite(connectionString)
+#if DEBUG
             .EnableDetailedErrors()
-            .EnableSensitiveDataLogging(false)
+            .EnableSensitiveDataLogging()
+            .LogTo(s => Debug.WriteLine(s))
+#endif
             .Options;
 
         var db = factory(options, eventManager);
