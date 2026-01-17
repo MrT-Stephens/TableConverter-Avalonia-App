@@ -22,11 +22,11 @@ public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> op
             b.ToTable("COLUMNS");
             
             // PRIMARY KEY (COLUMN_ID)
-            b.HasKey(x => x.ColumnId);
+            b.HasKey(x => x.Id);
             
             // COLUMN DEFINITIONS
-            b.Property(x => x.ColumnId)
-                .HasColumnName("COLUMN_ID")
+            b.Property(x => x.Id)
+                .HasColumnName("ID")
                 .ValueGeneratedOnAdd();
             
             b.Property(x => x.Name)
@@ -35,10 +35,6 @@ public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> op
             
             b.Property(x => x.DataType)
                 .HasColumnName("DATA_TYPE")
-                .IsRequired();
-            
-            b.Property(x => x.Ordinal)
-                .HasColumnName("ORDINAL")
                 .IsRequired();
 
             b.Property(x => x.DefaultValueForCell)
@@ -50,12 +46,18 @@ public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> op
             b.ToTable("ROWS");
 
             // PRIMARY KEY (ROW_ID)
-            b.HasKey(x => x.RowId);
+            b.HasKey(x => x.Id);
 
             // COLUMN DEFINITIONS
-            b.Property(x => x.RowId)
-                .HasColumnName("ROW_ID")
+            b.Property(x => x.Id)
+                .HasColumnName("ID")
                 .ValueGeneratedOnAdd();
+            
+            // FOREIGN KEY (ID) REFERENCES CELLS(ROW_ID) ON DELETE CASCADE
+            b.HasMany(x => x.Cells)
+                .WithOne(c => c.Row)
+                .HasForeignKey(c => c.RowId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<CellEntity>(b =>
@@ -63,9 +65,13 @@ public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> op
             b.ToTable("CELLS");
 
             // PRIMARY KEY (ROW_ID, COLUMN_ID)
-            b.HasKey(x => new { x.RowId, x.ColumnId });
+            b.HasKey(x => x.Id);
 
             // COLUMN DEFINITIONS
+            b.Property(x => x.Id)
+                .HasColumnName("ID")
+                .ValueGeneratedOnAdd();
+            
             b.Property(x => x.RowId)
                 .HasColumnName("ROW_ID")
                 .IsRequired();
@@ -104,9 +110,13 @@ public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> op
             b.ToTable("SEARCH_RESULT");
 
             // PRIMARY KEY (ROW_ID, COLUMN_ID)
-            b.HasKey(x => new { x.RowId, x.ColumnId });
+            b.HasKey(x => x.Id);
 
             // COLUMN DEFINITIONS
+            b.Property(x => x.Id)
+                .HasColumnName("ID")
+                .ValueGeneratedOnAdd();
+            
             b.Property(x => x.RowId)
                 .HasColumnName("ROW_ID")
                 .IsRequired();

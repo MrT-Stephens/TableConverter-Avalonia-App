@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using TableConverter.Views.Controls.PropertyGrid;
+using TableConverter.Views.Controls.PropertyGrid.ViewModels.Attributes;
 
 namespace TableConverter.ViewModels.Forms;
 

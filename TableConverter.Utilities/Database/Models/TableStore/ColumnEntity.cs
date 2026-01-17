@@ -4,15 +4,8 @@ using System.Runtime.CompilerServices;
 
 namespace TableConverter.Utilities.Database.Models.TableStore;
 
-public sealed class ColumnEntity : INotifyPropertyChanged 
+public sealed class ColumnEntity : EntityBase<int> 
 {
-    private int _ColumnId;
-    public int ColumnId
-    {
-        get => _ColumnId;
-        set => SetField(ref _ColumnId, value);
-    }
-    
     private string _Name = null!;
     public string Name
     {
@@ -27,13 +20,6 @@ public sealed class ColumnEntity : INotifyPropertyChanged
         set => SetField(ref _DataType, value);
     }
 
-    private int _Ordinal;
-    public int Ordinal
-    {
-        get => _Ordinal;
-        set => SetField(ref _Ordinal, value);
-    }
-
     private string? _DefaultValueForCell;
     public string? DefaultValueForCell
     {
@@ -46,20 +32,5 @@ public sealed class ColumnEntity : INotifyPropertyChanged
     {
         get => _Cells;
         set => SetField(ref _Cells, value);
-    }
-    
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
-    private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
-    {
-        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-        field = value;
-        OnPropertyChanged(propertyName);
-        return true;
     }
 }

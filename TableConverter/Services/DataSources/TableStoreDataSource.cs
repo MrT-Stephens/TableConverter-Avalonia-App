@@ -54,7 +54,7 @@ public class TableStoreDataSource : DataSource<RowEntity>
 
     protected override async Task<bool> ContainsAsync(RowEntity item)
     {
-        if (item is null || item.RowId <= 0)
+        if (item is null || item.Id <= 0)
         {
             return false;
         }
@@ -63,7 +63,7 @@ public class TableStoreDataSource : DataSource<RowEntity>
 
         return await db.Rows
             .AsNoTracking()
-            .AnyAsync(r => r.RowId == item.RowId)
+            .AnyAsync(r => r.Id == item.Id)
             .ConfigureAwait(false);
     }
 
@@ -121,7 +121,7 @@ public class TableStoreDataSource : DataSource<RowEntity>
         
         var row = new RowEntity
         {
-            RowId = index,
+            Id = index + 1,
         };
 
         for (var i = 0; i < ColumnCount; i++)
@@ -129,7 +129,7 @@ public class TableStoreDataSource : DataSource<RowEntity>
             row.Cells.Add(new CellEntity
             {
                 RowId = index,
-                ColumnId = i,
+                ColumnId = i + 1,
                 Value = "..."
             });
         }
@@ -138,7 +138,7 @@ public class TableStoreDataSource : DataSource<RowEntity>
     }
 
     protected override bool ModelsEqual(RowEntity a, RowEntity b)
-        => a.RowId == b.RowId;
+        => a.Id == b.Id;
 
     protected override async Task<bool> DoCreateAsync(RowEntity item)
     {
@@ -156,7 +156,7 @@ public class TableStoreDataSource : DataSource<RowEntity>
         
         var entity = await db.Rows
             .Include(r => r.Cells)
-            .FirstOrDefaultAsync(r => r.RowId == viewModel.RowId)
+            .FirstOrDefaultAsync(r => r.Id == viewModel.Id)
             .ConfigureAwait(false);
         
         if (entity is null)
@@ -164,7 +164,7 @@ public class TableStoreDataSource : DataSource<RowEntity>
             return false;
         }
         
-        entity.RowId = viewModel.RowId;
+        entity.Id = viewModel.Id;
         
         entity.Cells.Clear();
         entity.Cells.AddRange(viewModel.Cells);
@@ -180,7 +180,7 @@ public class TableStoreDataSource : DataSource<RowEntity>
         
         var entity = await db.Rows
             .Include(r => r.Cells)
-            .FirstOrDefaultAsync(r => r.RowId == item.RowId)
+            .FirstOrDefaultAsync(r => r.Id == item.Id)
             .ConfigureAwait(false);
         
         if (entity is null)

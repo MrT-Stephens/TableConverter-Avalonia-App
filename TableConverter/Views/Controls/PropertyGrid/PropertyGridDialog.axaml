@@ -1,0 +1,41 @@
+<UserControl x:Class="TableConverter.Views.Controls.PropertyGrid.PropertyGridDialog"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:suki="https://github.com/kikipoulet/SukiUI"
+             xmlns:propertyGrid="clr-namespace:TableConverter.Views.Controls.PropertyGrid"
+             d:DesignHeight="450"
+             d:DesignWidth="800"
+             x:DataType="propertyGrid:InstanceViewModel"
+             Background="{DynamicResource SukiBackground}"
+             mc:Ignorable="d">
+
+    <Border Padding="0" Background="{DynamicResource SukiBackground}">
+        <Panel>
+            <ScrollViewer>
+                <propertyGrid:PropertyGrid Item="{Binding}">
+                    <propertyGrid:PropertyGrid.DataTemplates>
+
+                        <DataTemplate DataType="propertyGrid:CategoryViewModel">
+                            <suki:GlassCard Padding="15,15,15,5" Margin="0,10">
+                                <Expander Grid.IsSharedSizeScope="True"
+                                          Header="{Binding DisplayName}"
+                                          IsExpanded="True">
+                                    <ItemsControl Margin="7,0,0,20" ItemsSource="{Binding Properties}" />
+                                </Expander>
+                            </suki:GlassCard>
+                        </DataTemplate>
+                        
+                        <!--
+                            replace the PropertyGridTemplateSelector with your own type or subclass it,
+                            if you want to customize the datatemplates being used
+                        -->
+
+                        <propertyGrid:PropertyGridTemplateSelector />
+                    </propertyGrid:PropertyGrid.DataTemplates>
+                </propertyGrid:PropertyGrid>
+            </ScrollViewer>
+        </Panel>
+    </Border>
+</UserControl>

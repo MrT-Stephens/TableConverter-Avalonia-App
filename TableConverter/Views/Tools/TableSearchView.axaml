@@ -3,7 +3,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:TableConverter.ViewModels.Tools"
-             xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
              xmlns:controls="clr-namespace:TableConverter.Views.Controls"
              xmlns:property="clr-namespace:TableConverter.Views.Controls.PropertyGrid"
              xmlns:converters="clr-namespace:TableConverter.Converters"
@@ -14,25 +13,7 @@
         <property:PropertyGrid Grid.Row="0"
                                Item="{Binding SearchSettings, Mode=TwoWay}">
             <property:PropertyGrid.DataTemplates>
-                <sukiUi:PropertyGridTemplateSelector>
-                    <DataTemplate x:Key="RuntimeValuesViewModel" DataType="property:RuntimeValuesViewModel">
-                        <Grid Classes="Row">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" SharedSizeGroup="PropertyGridDisplyColumn" />
-                                <ColumnDefinition Width="4" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Classes="Label" />
-                            <ComboBox Grid.Column="2"
-                                      HorizontalAlignment="Right" MinWidth="120"
-                                      VerticalAlignment="Stretch"
-                                      HorizontalContentAlignment="Center"
-                                      IsEnabled="{Binding !IsReadOnly}"
-                                      ItemsSource="{Binding Values}"
-                                      SelectedItem="{Binding Value}" />
-                        </Grid>
-                    </DataTemplate>
-                </sukiUi:PropertyGridTemplateSelector>
+                <property:PropertyGridTemplateSelector />
             </property:PropertyGrid.DataTemplates>
         </property:PropertyGrid>
         <controls:CommandButtonToolBar Grid.Row="1"

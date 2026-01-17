@@ -71,7 +71,7 @@ public partial class TableDataViewModel : BaseDocumentViewModel
         
         dbContext.Columns
             .AsEnumerable()
-            .ForEach(column => TreeDataSource.AddAutoColumn(column.Name, column.Ordinal));
+            .ForEach(column => TreeDataSource.AddAutoColumn(column.Name, column.Id));
         
         Dispatcher.UIThread.Post(async void () =>
         {

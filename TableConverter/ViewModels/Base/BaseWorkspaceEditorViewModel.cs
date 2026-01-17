@@ -149,11 +149,11 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
 
     partial void OnSelectedToolChanged(IPaneTool? oldValue, IPaneTool? newValue)
     {
-        oldValue?.OnDeactivate();
-        newValue?.OnActivate();
-
         SelectedItems.Remove(oldValue);
         SelectedItems.Add(newValue);
+        
+        oldValue?.OnDeactivate();
+        newValue?.OnActivate();
     }
 
     #endregion
@@ -252,14 +252,14 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
         {
             tool.Workspace = this;
             
-            if (tool is IHasSelectedItems hasSelectedItemsTool)
-            {
-                hasSelectedItemsTool.SelectedItems = SelectedItems;
-            }
-
             if (tool is IInitialise initialiseTool)
             {
                 initialiseTool.Initialise();
+            }
+            
+            if (tool is IHasSelectedItems hasSelectedItemsTool)
+            {
+                hasSelectedItemsTool.SelectedItems = SelectedItems;
             }
             
             Tools.Add(tool);

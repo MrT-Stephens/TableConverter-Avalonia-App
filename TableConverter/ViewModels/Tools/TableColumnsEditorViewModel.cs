@@ -6,6 +6,7 @@ using ModelFlow.DataVirtualization.DataManagement;
 using ModelFlow.DataVirtualization.Interfaces;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
+using TableConverter.Commands.Handlers.TableData;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Interfaces;
 using TableConverter.Services.DataSources;
@@ -23,7 +24,7 @@ public partial class TableColumnsEditorViewModel : BaseScopedPaneToolViewModel<T
 {
     #region Properties
 
-    [ObservableProperty] private ColumnEntity? _SelectedColumn;
+    [ObservableProperty] private ObservableCollection<DataItem<ColumnEntity>> _SelectedColumns;
     [ObservableProperty] private ObservableCollection<ICommandInstance> _ColumnCommands;
     [ObservableProperty] private IReadOnlyObservableCollection<DataItem<ColumnEntity>> _Columns;
 
@@ -41,13 +42,13 @@ public partial class TableColumnsEditorViewModel : BaseScopedPaneToolViewModel<T
         IDbContextFactory<TableStoreDbContext> dbContextFactory) 
         : base(commandManager, eventManager, dialogManager, toastManager, "Columns Editor")
     {
-        SelectedColumn = null;
+        SelectedColumns = [];
         ColumnCommands = [];
         DataSource = new TableStoreColumnsDataSource(dbContextFactory);
         Columns = DataSource.Collection;
 
         DataSource.SetFilterQuery(query => query
-            .OrderBy(x => x.ColumnId));
+            .OrderBy(x => x.Id));
         
         Dispatcher.UIThread.Post(async void () =>
         {
@@ -58,7 +59,14 @@ public partial class TableColumnsEditorViewModel : BaseScopedPaneToolViewModel<T
     #endregion
 
     #region Overrides
-    
+
+    public override void Initialise()
+    {
+        base.Initialise();
+        
+        ColumnCommands.Add(this[TableDataCommandNames.EditColumn]);
+    }
+
     protected override void OnSelectedDocumentChanged(IWorkspace workspace, IPaneDocument? oldDocument, IPaneDocument? newDocument)
     {
         base.OnSelectedDocumentChanged(workspace, oldDocument, newDocument);

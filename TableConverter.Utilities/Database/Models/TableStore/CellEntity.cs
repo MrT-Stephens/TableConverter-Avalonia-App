@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace TableConverter.Utilities.Database.Models.TableStore;
 
-public sealed class CellEntity : INotifyPropertyChanged
+public sealed class CellEntity : EntityBase<int>
 {
     private int _RowId;
     public int RowId
@@ -26,32 +26,17 @@ public sealed class CellEntity : INotifyPropertyChanged
         set => SetField(ref _Value, value);
     }
     
-    private RowEntity? _Row = null!;
+    private RowEntity? _Row;
     public RowEntity? Row
     {
         get => _Row;
         set => SetField(ref _Row, value);
     }
     
-    private ColumnEntity? _Column = null!;
+    private ColumnEntity? _Column;
     public ColumnEntity? Column
     {
         get => _Column;
         set => SetField(ref _Column, value);
-    }
-    
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
-    private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
-    {
-        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-        field = value;
-        OnPropertyChanged(propertyName);
-        return true;
     }
 }

@@ -6,28 +6,30 @@ using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
-using CommunityToolkit.Mvvm.ComponentModel;
-using SukiUI.Controls;
 using SukiUI.Dialogs;
+using TableConverter.Views.Controls.PropertyGrid;
 
 namespace TableConverter.Extensions;
 
 public static class SukiDialogBuilderExtensions
 {
-    public static SukiDialogBuilder WithForm<TForm>(this SukiDialogBuilder builder, TForm form)
+    public static SukiDialogBuilder WithForm<TForm>(this SukiDialogBuilder builder, 
+        TForm form, params string[] excludeProperties)
         where TForm : INotifyPropertyChanged
     {
-        builder.WithContent(new PropertyGrid
+        var propertyGrid = new PropertyGrid
         {
-            Item = form,
             DataTemplates =
             {
                 new PropertyGridTemplateSelector
                 {
-                    UseSukiHost = false,
+                    UseSukiHost = true,
                 }
             },
-        });
+        };
+        
+        propertyGrid.SetItem(form, excludeProperties);
+        builder.WithContent(propertyGrid);
 
         return builder;
     }

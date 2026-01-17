@@ -52,7 +52,7 @@ public class TableStoreColumnsDataSource : DataSource<ColumnEntity>
             return false;
         }
         
-        if (item is null || item.ColumnId < 0)
+        if (item is null || item.Id < 0)
         {
             return false;
         }
@@ -61,7 +61,7 @@ public class TableStoreColumnsDataSource : DataSource<ColumnEntity>
         
         return await db.Columns
             .AsNoTracking()
-            .AnyAsync(col => col.ColumnId == item.ColumnId)
+            .AnyAsync(col => col.Id == item.Id)
             .ConfigureAwait(false);
     }
 
@@ -123,20 +123,15 @@ public class TableStoreColumnsDataSource : DataSource<ColumnEntity>
     {
         return new ColumnEntity
         {
-            ColumnId = index,
+            Id = index + 1,
             Name = "...",
-            Ordinal = index + 1,
             DefaultValueForCell = string.Empty
         };
     }
 
     protected override bool ModelsEqual(ColumnEntity a, ColumnEntity b)
     {
-        return a.ColumnId == b.ColumnId 
-               && a.Name.Equals(b.Name) 
-               && a.Ordinal == b.Ordinal 
-               && a.DataType == b.DataType
-               && a.DefaultValueForCell == b.DefaultValueForCell;
+        return a.Id == b.Id;
     }
 
     protected override async Task<bool> DoCreateAsync(ColumnEntity item)
@@ -164,7 +159,7 @@ public class TableStoreColumnsDataSource : DataSource<ColumnEntity>
         await using var db = await CreateDbAsync().ConfigureAwait(false);
         
         var entity = await db.Columns
-            .FirstOrDefaultAsync(r => r.ColumnId == viewModel.ColumnId)
+            .FirstOrDefaultAsync(r => r.Id == viewModel.Id)
             .ConfigureAwait(false);
         
         if (entity is null)
@@ -172,7 +167,7 @@ public class TableStoreColumnsDataSource : DataSource<ColumnEntity>
             return false;
         }
 
-        entity.MapTo(viewModel, nameof(ColumnEntity.ColumnId));
+        entity.MapTo(viewModel, nameof(ColumnEntity.Id));
 
         await db.SaveChangesAsync().ConfigureAwait(false);
 
@@ -189,7 +184,7 @@ public class TableStoreColumnsDataSource : DataSource<ColumnEntity>
         await using var db = await CreateDbAsync().ConfigureAwait(false);
 
         var entity = await db.Columns
-            .FirstOrDefaultAsync(c => c.ColumnId == item.ColumnId)
+            .FirstOrDefaultAsync(c => c.Id == item.Id)
             .ConfigureAwait(false);
 
         if (entity is null)

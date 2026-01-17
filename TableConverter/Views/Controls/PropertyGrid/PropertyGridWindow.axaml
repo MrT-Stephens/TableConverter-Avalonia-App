@@ -1,0 +1,40 @@
+<suki:SukiWindow x:Class="TableConverter.Views.Controls.PropertyGrid.PropertyGridWindow"
+                 xmlns="https://github.com/avaloniaui"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:suki="https://github.com/kikipoulet/SukiUI"
+                 xmlns:propertyGrid="clr-namespace:TableConverter.Views.Controls.PropertyGrid"
+                 xmlns:viewModels="clr-namespace:TableConverter.Views.Controls.PropertyGrid.ViewModels"
+                 Width="400"
+                 Height="500"
+                 d:DesignHeight="400" d:DesignWidth="500" mc:Ignorable="d"
+                 x:DataType="viewModels:ComplexTypeViewModel"
+                 Background="{DynamicResource SukiBackground}">
+
+    <Border Padding="18" Background="{DynamicResource SukiBackground}">
+        <ScrollViewer>
+            <propertyGrid:PropertyGrid Item="{Binding}">
+                <propertyGrid:PropertyGrid.DataTemplates>
+
+                    <DataTemplate DataType="propertyGrid:CategoryViewModel">
+                        <suki:GlassCard Padding="15,15,15,5" Margin="10">
+                            <Expander   Grid.IsSharedSizeScope="True"
+                                        Header="{Binding DisplayName}"
+                                        IsExpanded="True">
+                                <ItemsControl Margin="7,0,0,20" ItemsSource="{Binding Properties}" />
+                            </Expander>
+                        </suki:GlassCard>
+                    </DataTemplate>
+                    
+                    <!--
+                        replace the PropertyGridTemplateSelector with your own type or subclass it,
+                        if you want to customize the datatemplates being used
+                    -->
+
+                    <propertyGrid:PropertyGridTemplateSelector />
+                </propertyGrid:PropertyGrid.DataTemplates>
+            </propertyGrid:PropertyGrid>
+        </ScrollViewer>
+    </Border>
+</suki:SukiWindow>

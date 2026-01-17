@@ -124,7 +124,7 @@ public class SearchTableDataCommandHandler(
                         settings.MatchCase
                             ? $"""
                             INSERT INTO SEARCH_RESULT (ROW_ID, COLUMN_ID, VALUE, FOUND_VALUE)
-                            SELECT 0, COLUMN_ID, NAME, @SEARCH_TEXT
+                            SELECT 0, ID, NAME, @SEARCH_TEXT
                             FROM COLUMNS
                             WHERE 
                                 {(searchAllColumns ? "" : "NAME = @COLUMN AND")} 
@@ -132,7 +132,7 @@ public class SearchTableDataCommandHandler(
                             """
                             : $"""
                             INSERT INTO SEARCH_RESULT (ROW_ID, COLUMN_ID, VALUE, FOUND_VALUE)
-                            SELECT 0, COLUMN_ID, NAME, @SEARCH_TEXT
+                            SELECT 0, ID, NAME, @SEARCH_TEXT
                             FROM COLUMNS
                             WHERE 
                                 {(searchAllColumns ? "" : "NAME = @COLUMN AND")} 
@@ -146,7 +146,7 @@ public class SearchTableDataCommandHandler(
                         settings.MatchCase
                             ? $"""
                             INSERT INTO SEARCH_RESULT (ROW_ID, COLUMN_ID, VALUE, FOUND_VALUE)
-                            SELECT 0, COLUMN_ID, NAME, @SEARCH_TEXT
+                            SELECT 0, ID, NAME, @SEARCH_TEXT
                             FROM COLUMNS
                             WHERE 
                                 {(searchAllColumns ? "" : "NAME = @COLUMN AND")} 
@@ -154,7 +154,7 @@ public class SearchTableDataCommandHandler(
                             """
                             : $"""
                             INSERT INTO SEARCH_RESULT (ROW_ID, COLUMN_ID, VALUE, FOUND_VALUE)
-                            SELECT 0, COLUMN_ID, NAME, @SEARCH_TEXT
+                            SELECT 0, ID, NAME, @SEARCH_TEXT
                             FROM COLUMNS
                             WHERE 
                                 {(searchAllColumns ? "" : "NAME = @COLUMN AND")} 
@@ -175,7 +175,7 @@ public class SearchTableDataCommandHandler(
                             SELECT C.ROW_ID, C.COLUMN_ID, C.VALUE, @SEARCH_TEXT
                             FROM CELLS C
                             JOIN COLUMNS COL
-                                ON C.COLUMN_ID = COL.COLUMN_ID
+                                ON C.COLUMN_ID = COL.ID
                             WHERE 
                                 {(searchAllColumns ? "" : "COL.NAME = @COLUMN AND")} 
                                 C.VALUE = @SEARCH_TEXT;
@@ -185,7 +185,7 @@ public class SearchTableDataCommandHandler(
                             SELECT C.ROW_ID, C.COLUMN_ID, C.VALUE, @SEARCH_TEXT
                             FROM CELLS C
                             JOIN COLUMNS COL
-                                ON C.COLUMN_ID = COL.COLUMN_ID
+                                ON C.COLUMN_ID = COL.ID
                             WHERE 
                                 {(searchAllColumns ? "" : "COL.NAME = @COLUMN AND")} 
                                 C.VALUE COLLATE NOCASE = @SEARCH_TEXT;
@@ -201,7 +201,7 @@ public class SearchTableDataCommandHandler(
                             SELECT C.ROW_ID, C.COLUMN_ID, C.VALUE, @SEARCH_TEXT
                             FROM CELLS C
                             JOIN COLUMNS COL
-                                ON C.COLUMN_ID = COL.COLUMN_ID
+                                ON C.COLUMN_ID = COL.ID
                             WHERE 
                                 {(searchAllColumns ? "" : "COL.NAME = @COLUMN AND")} 
                                 C.VALUE LIKE @PATTERN;
@@ -211,7 +211,7 @@ public class SearchTableDataCommandHandler(
                             SELECT C.ROW_ID, C.COLUMN_ID, C.VALUE, @SEARCH_TEXT
                             FROM CELLS C
                             JOIN COLUMNS COL
-                                ON C.COLUMN_ID = COL.COLUMN_ID
+                                ON C.COLUMN_ID = COL.ID
                             WHERE 
                                 {(searchAllColumns ? "" : "COL.NAME = @COLUMN AND")} 
                                 C.VALUE COLLATE NOCASE LIKE @PATTERN;
@@ -282,7 +282,7 @@ public class SearchTableDataCommandHandler(
 
                     columnResults.Add(new SearchResult
                     {
-                        ColumnId = column.ColumnId,
+                        ColumnId = column.Id,
                         RowId = 0,
                         Value = column.Name,
                         FoundValue = match.Value

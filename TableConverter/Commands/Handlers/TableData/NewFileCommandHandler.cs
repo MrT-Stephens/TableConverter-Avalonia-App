@@ -104,16 +104,15 @@ public class NewFileCommandHandler(
             FROM SEQ;
             
             -- INSERT COLUMNS
-            INSERT INTO COLUMNS (NAME, DATA_TYPE, ORDINAL)
+            INSERT INTO COLUMNS (NAME, DATA_TYPE)
             SELECT
                 'Column ' || N,
-                0,
-                N
+                0
             FROM NUMBERS
             WHERE N <= @HEADERS;
             
             -- INSERT ROWS
-            INSERT INTO ROWS (ROW_ID)
+            INSERT INTO ROWS (ID)
             SELECT N
             FROM NUMBERS
             WHERE N <= @ROWS;

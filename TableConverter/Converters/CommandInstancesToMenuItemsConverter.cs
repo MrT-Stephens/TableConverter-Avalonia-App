@@ -65,7 +65,20 @@ public class CommandInstancesToMenuItemsConverter : IValueConverter
                     .OrderBy(x => x.Metadata.Title)
                     .Select(cmd =>
                     {
-                        var gesture = KeyGesture.Parse(cmd.Metadata.KeyGestures.First());
+                        var keyGesture = cmd.Metadata.KeyGestures.First();
+                        
+                        if (OperatingSystem.IsMacOS())
+                        {
+                            // Convert Ctrl to Cmd on macOS
+                            keyGesture = keyGesture.Replace("Ctrl", "Cmd");
+                        }
+                        else if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
+                        {
+                            // Convert Cmd to Ctrl on Windows/Linux
+                            keyGesture = keyGesture.Replace("Cmd", "Ctrl");
+                        }
+                        
+                        var gesture = KeyGesture.Parse(keyGesture);
 
                         var item = new MenuItem
                         {

@@ -2,27 +2,21 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Reflection;
-using SukiUI.Controls;
+using FastMember;
 
-namespace TableConverter.Views.Controls.PropertyGrid;
+namespace TableConverter.Views.Controls.PropertyGrid.ViewModels;
 
 public sealed class RuntimeValuesViewModel : PropertyViewModelBase<string?>
 {
     public RuntimeValuesViewModel(
         INotifyPropertyChanged viewmodel, 
         string displayName, 
-        PropertyInfo propertyInfo,
-        string valuePath) : base(viewmodel, displayName, propertyInfo)
+        string valuePath,
+        Member propertyInfo,
+        ObjectAccessor viewModelAccessor) 
+        : base(viewmodel, displayName, propertyInfo, viewModelAccessor)
     {
-        var sourceProp = viewmodel.GetType().GetProperty(valuePath,
-            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-
-        if (sourceProp == null)
-            throw new InvalidOperationException($"Property '{valuePath}' not found");
-
-        var value = sourceProp.GetValue(viewmodel);
+        var value = viewModelAccessor[valuePath];
 
         if (value is not IEnumerable enumerable)
             throw new InvalidOperationException($"Property '{valuePath}' must be IEnumerable");
