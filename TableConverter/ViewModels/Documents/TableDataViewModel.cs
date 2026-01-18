@@ -26,9 +26,7 @@ public partial class TableDataViewModel : BaseDocumentViewModel
     #region Properties
 
     [ObservableProperty] private string _Path;
-    
     [ObservableProperty] private TableStoreDataSource _DataSource;
-    
     [ObservableProperty] private FlatTreeDataGridSource<DataItem<RowEntity>> _TreeDataSource;
     
     public override bool CanClose => !IsDirty;

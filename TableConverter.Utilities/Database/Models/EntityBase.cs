@@ -6,7 +6,7 @@ using TableConverter.Utilities.Database.Interfaces;
 
 namespace TableConverter.Utilities.Database.Models;
 
-public class EntityBase<T> : IEntityWithId<T>, IAutoSynchronize
+public class EntityBase<T> : IEntityWithId<T>
 {
     #region IEntityWithId Implementation
 
@@ -41,18 +41,5 @@ public class EntityBase<T> : IEntityWithId<T>, IAutoSynchronize
         return true;
     }
     
-    #endregion
-
-    #region IAutoSynchronize Implementation
-
-    [NotMapped]
-    public bool CanSave { get; set; } = true;
-    
-    [NotMapped]
-    public IDataManager? DataManager { get; set; }
-
-    [NotMapped]
-    public bool IsManaged { get; set; } = false;
-
     #endregion
 }

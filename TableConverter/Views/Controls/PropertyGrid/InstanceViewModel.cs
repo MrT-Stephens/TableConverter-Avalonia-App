@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Avalonia.Collections;
 using FastMember;
@@ -51,6 +52,7 @@ public sealed class InstanceViewModel : SukiObservableObject, IDisposable
         var properties = typeAccessor.GetMembers()
             .Where(m => m.CanRead 
                 && m.GetAttribute(typeof(IgnoreAttribute), false) is null
+                && m.GetAttribute(typeof(NotMappedAttribute), true) is null
                 && !IgnoreProperties.Contains(m.Name))
             .ToList();
 

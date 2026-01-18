@@ -1,18 +1,22 @@
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Avalonia.Controls;
+using Avalonia.Controls.Selection;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using ModelFlow.DataVirtualization.DataManagement;
-using ModelFlow.DataVirtualization.Interfaces;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using TableConverter.Commands.Handlers.TableData;
 using TableConverter.Commands.Interfaces;
+using TableConverter.Extensions;
 using TableConverter.Interfaces;
 using TableConverter.Services.DataSources;
 using TableConverter.Utilities.Database.Contexts;
 using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.Utilities.Database.Models.TableStore;
+using TableConverter.Utilities.Extensions;
 using TableConverter.Utilities.Interfaces;
 using TableConverter.ViewModels.Base;
 using TableConverter.ViewModels.Documents;
@@ -23,10 +27,9 @@ namespace TableConverter.ViewModels.Tools;
 public partial class TableColumnsEditorViewModel : BaseScopedPaneToolViewModel<TableWorkspaceEditorViewModel>
 {
     #region Properties
-
-    [ObservableProperty] private ObservableCollection<DataItem<ColumnEntity>> _SelectedColumns;
+    
     [ObservableProperty] private ObservableCollection<ICommandInstance> _ColumnCommands;
-    [ObservableProperty] private IReadOnlyObservableCollection<DataItem<ColumnEntity>> _Columns;
+    [ObservableProperty] private FlatTreeDataGridSource<DataItem<ColumnEntity>> _TreeDataSource;
 
     public readonly TableStoreColumnsDataSource DataSource;
 
@@ -42,10 +45,25 @@ public partial class TableColumnsEditorViewModel : BaseScopedPaneToolViewModel<T
         IDbContextFactory<TableStoreDbContext> dbContextFactory) 
         : base(commandManager, eventManager, dialogManager, toastManager, "Columns Editor")
     {
-        SelectedColumns = [];
         ColumnCommands = [];
         DataSource = new TableStoreColumnsDataSource(dbContextFactory);
-        Columns = DataSource.Collection;
+        TreeDataSource = new FlatTreeDataGridSource<DataItem<ColumnEntity>>(DataSource.Collection);
+        TreeDataSource.RowSelection!.SingleSelect = false; 
+        
+        _eventRegistrar.RegisterEvent<EventHandler<TreeSelectionModelSelectionChangedEventArgs<DataItem<ColumnEntity>>>>(
+            action => TreeDataSource.RowSelection!.SelectionChanged += action,
+            action => TreeDataSource.RowSelection!.SelectionChanged -= action, 
+            null, (_, args) =>
+            {
+                args.DeselectedItems.ForEach(item => SelectedItems.Remove(item));
+                args.SelectedItems.ForEach(item => SelectedItems.Add(item));
+            });
+        
+        TreeDataSource
+            .AddAutoColumn("ID", "Item.Id", true)
+            .AddAutoColumn("Name", "Item.Name")
+            .AddAutoColumn("Data Type", "Item.DataType")
+            .AddAutoColumn("Default Value", "Item.DefaultValueForCell");
 
         DataSource.SetFilterQuery(query => query
             .OrderBy(x => x.Id));
@@ -65,6 +83,7 @@ public partial class TableColumnsEditorViewModel : BaseScopedPaneToolViewModel<T
         base.Initialise();
         
         ColumnCommands.Add(this[TableDataCommandNames.EditColumn]);
+        ColumnCommands.Add(this[TableDataCommandNames.DeleteColumn]);
     }
 
     protected override void OnSelectedDocumentChanged(IWorkspace workspace, IPaneDocument? oldDocument, IPaneDocument? newDocument)
@@ -81,6 +100,8 @@ public partial class TableColumnsEditorViewModel : BaseScopedPaneToolViewModel<T
             {
                 DataSource.Path = string.Empty;
             }
+            
+            SelectedItems.RemoveAll<DataItem<ColumnEntity>>();
         }
     }
 

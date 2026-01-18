@@ -1,18 +1,21 @@
-using System.Diagnostics.CodeAnalysis;
+using System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Contracts.Events;
 using TableConverter.Interfaces;
+using TableConverter.Utilities;
 using TableConverter.Utilities.Interfaces;
 
 namespace TableConverter.ViewModels.Base;
 
-public abstract partial class BaseScopedPaneToolViewModel<TWorkspace> : BaseViewModel, IScopedPaneTool<TWorkspace>
+public abstract partial class BaseScopedPaneToolViewModel<TWorkspace> : BaseViewModel, IScopedPaneTool<TWorkspace>, IDisposable
 {
     #region Properties
 
+    protected readonly IEventRegistrar _eventRegistrar = new EventRegistrar();
+    
     [ObservableProperty] private string _Title;
     [ObservableProperty] private bool _IsEnabled;
     
@@ -72,6 +75,11 @@ public abstract partial class BaseScopedPaneToolViewModel<TWorkspace> : BaseView
         IPaneDocument? newDocument)
     {
         // Do nothing - Can be overriden
+    }
+    
+    public void Dispose()
+    {
+        _eventRegistrar.Dispose();
     }
 
     #endregion

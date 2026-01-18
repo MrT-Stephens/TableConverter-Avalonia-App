@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace TableConverter.Utilities.Database.Models.TableStore;
 
-public sealed class ColumnEntity : EntityBase<int> 
+public sealed class ColumnEntity : EntityBaseWithAutoSynchronize<int> 
 {
     private string _Name = null!;
     public string Name

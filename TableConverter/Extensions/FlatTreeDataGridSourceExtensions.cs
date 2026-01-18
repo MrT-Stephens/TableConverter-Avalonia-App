@@ -43,4 +43,41 @@ public static class FlatTreeDataGridSourceExtensions
 
         return source;
     }
+
+    public static FlatTreeDataGridSource<TModel> AddAutoColumn<TModel>(
+        this FlatTreeDataGridSource<TModel> source,
+        object header,
+        string bindingPath,
+        bool isReadOnly = false,
+        GridLength? gridLength = null)
+        where TModel : class
+    {
+        source.Columns.Add(new TemplateColumn<TModel>(
+            header,
+            new FuncDataTemplate<TModel>((_, _) => new TextBlock
+            {
+                VerticalAlignment = VerticalAlignment.Center,
+                [!TextBlock.TextProperty] = new Binding
+                {
+                    Path = bindingPath,
+                    Mode = BindingMode.OneWay
+                },
+            }),
+            isReadOnly ? null : new FuncDataTemplate<TModel>((_, _) => new TextBox
+            {
+                VerticalAlignment = VerticalAlignment.Center,
+                [!TextBox.TextProperty] = new Binding
+                {
+                    Path = bindingPath,
+                    Mode = BindingMode.TwoWay
+                }
+            }),
+            gridLength ?? GridLength.Auto,
+            new TemplateColumnOptions<TModel>
+            {
+                CanUserSortColumn = false,
+            }));
+        
+        return source;
+    }
 }
