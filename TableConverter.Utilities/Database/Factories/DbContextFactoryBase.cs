@@ -1,10 +1,11 @@
 using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
+using TableConverter.Utilities.Database.Extensions;
 using TableConverter.Utilities.Interfaces;
 
 namespace TableConverter.Utilities.Database.Factories;
 
-public abstract class DbContextFactoryBase<TDbContext>(Func<DbContextOptions<TDbContext>, IEventManager, TDbContext> factory, IEventManager eventManager)
+public abstract class DbContextFactoryBase<TDbContext>(Func<DbContextOptions<TDbContext>, IEventManager, Guid, TDbContext> factory, IEventManager eventManager)
     : Interfaces.IDbContextFactory<TDbContext> where TDbContext : DbContext
 {
     public TDbContext Create(string path)
@@ -24,8 +25,11 @@ public abstract class DbContextFactoryBase<TDbContext>(Func<DbContextOptions<TDb
             .LogTo(s => Debug.WriteLine(s))
 #endif
             .Options;
+
+        // Generate unique ID for the source database path (used for tracking).
+        var sourceId = GuidUtility.Create(GuidUtility.UrlNamespace, path);
         
-        var db = factory(options, eventManager);
+        var db = factory(options, eventManager, sourceId);
         
         db.Database.EnsureCreated();
         
@@ -57,8 +61,11 @@ public abstract class DbContextFactoryBase<TDbContext>(Func<DbContextOptions<TDb
             .LogTo(s => Debug.WriteLine(s))
 #endif
             .Options;
+        
+        // Generate unique ID for the source database path (used for tracking).
+        var sourceId = GuidUtility.Create(GuidUtility.UrlNamespace, path);
 
-        var db = factory(options, eventManager);
+        var db = factory(options, eventManager, sourceId);
         
         await db.Database.EnsureCreatedAsync(cancellationToken);
         

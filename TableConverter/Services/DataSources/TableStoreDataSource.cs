@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using ModelFlow.DataVirtualization.DataManagement;
+using TableConverter.Services.DataSources.Base;
 using TableConverter.Utilities.Database.Contexts;
-using TableConverter.Utilities.Database.Models;
 using TableConverter.Utilities.Database.Models.TableStore;
 using TableConverter.Utilities.Extensions;
 using IFactory = TableConverter.Utilities.Database.Interfaces.IDbContextFactory<
@@ -15,11 +13,9 @@ using IFactory = TableConverter.Utilities.Database.Interfaces.IDbContextFactory<
 
 namespace TableConverter.Services.DataSources;
 
-public class TableStoreDataSource : DataSource<RowEntity>
+public class TableStoreDataSource(IFactory dbContextFactory)
+    : DataSourceFromPath<RowEntity, TableStoreDbContext>(dbContextFactory, 250, 5)
 {
-    private readonly IFactory _dbContextFactory;
-    private readonly string _path;
-
     private int? _ColumnCount;
     public int? ColumnCount
     {
@@ -31,29 +27,13 @@ public class TableStoreDataSource : DataSource<RowEntity>
         }
     }
 
-    public TableStoreDataSource(IFactory dbContextFactory, string path) : base(250, 5)
-    {
-        _dbContextFactory = dbContextFactory 
-            ?? throw new ArgumentNullException(nameof(dbContextFactory));
-        
-        _path = string.IsNullOrWhiteSpace(path) 
-            ? throw new ArgumentException("Path must be provided.", nameof(path)) 
-            : path;
-    }
-
-    private async Task<TableStoreDbContext> CreateDbAsync()
-    {
-        var db = await _dbContextFactory.CreateAsync(_path);
-        return db;
-    }
-    
-    private TableStoreDbContext CreateDb()
-    {
-        return _dbContextFactory.Create(_path);
-    }
-
     protected override async Task<bool> ContainsAsync(RowEntity item)
     {
+        if (string.IsNullOrEmpty(Path))
+        {
+            return false;
+        }
+        
         if (item is null || item.Id <= 0)
         {
             return false;
@@ -69,7 +49,14 @@ public class TableStoreDataSource : DataSource<RowEntity>
 
     protected override async Task<int> GetCountAsync(Func<IQueryable<RowEntity>, IQueryable<RowEntity>> filterQuery)
     {
+        if (string.IsNullOrEmpty(Path))
+        {
+            return 0;
+        }
+        
         await using var db = await CreateDbAsync().ConfigureAwait(false);
+        
+        ColumnCount = await db.Columns.CountAsync().ConfigureAwait(false);
         
         var query = db.Rows.AsNoTracking();
 
@@ -83,6 +70,11 @@ public class TableStoreDataSource : DataSource<RowEntity>
         int count,
         Func<IQueryable<RowEntity>, IQueryable<RowEntity>> filterSortQuery)
     {
+        if (string.IsNullOrEmpty(Path))
+        {
+            return [];
+        }
+        
         await using var db = await CreateDbAsync().ConfigureAwait(false);
 
         IQueryable<RowEntity> query = db.Rows
@@ -101,6 +93,11 @@ public class TableStoreDataSource : DataSource<RowEntity>
 
     public override async Task<RowEntity?> GetItemAsync(Expression<Func<RowEntity, bool>> predicate)
     {
+        if (string.IsNullOrEmpty(Path))
+        {
+            return null;
+        }
+        
         await using var db = await CreateDbAsync().ConfigureAwait(false);
         
         return await db.Rows
@@ -113,10 +110,9 @@ public class TableStoreDataSource : DataSource<RowEntity>
 
     protected override RowEntity GetPlaceHolder(int index, int page, int offset)
     {
-        if (ColumnCount is null)
+        if (string.IsNullOrEmpty(Path))
         {
-            using var db = CreateDb();
-            ColumnCount = db.Columns.Count();
+            return new RowEntity();
         }
         
         var row = new RowEntity
@@ -137,11 +133,15 @@ public class TableStoreDataSource : DataSource<RowEntity>
         return row;
     }
 
-    protected override bool ModelsEqual(RowEntity a, RowEntity b)
-        => a.Id == b.Id;
+    protected override bool ModelsEqual(RowEntity a, RowEntity b) => a.Id == b.Id;
 
     protected override async Task<bool> DoCreateAsync(RowEntity item)
     {
+        if (string.IsNullOrEmpty(Path))
+        {
+            return false;
+        }
+        
         await using var db = await CreateDbAsync().ConfigureAwait(false);
         
         await db.Rows.AddAsync(item).ConfigureAwait(false);
@@ -152,6 +152,11 @@ public class TableStoreDataSource : DataSource<RowEntity>
 
     protected override async Task<bool> DoUpdateAsync(RowEntity viewModel)
     {
+        if (string.IsNullOrEmpty(Path))
+        {
+            return false;
+        }
+        
         await using var db = await CreateDbAsync().ConfigureAwait(false);
         
         var entity = await db.Rows
@@ -176,6 +181,11 @@ public class TableStoreDataSource : DataSource<RowEntity>
 
     protected override async Task<bool> DoDeleteAsync(RowEntity item)
     {
+        if (string.IsNullOrEmpty(Path))
+        {
+            return false;
+        }
+        
         await using var db = await CreateDbAsync().ConfigureAwait(false);
         
         var entity = await db.Rows

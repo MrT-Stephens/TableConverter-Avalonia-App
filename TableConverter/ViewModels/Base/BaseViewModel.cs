@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
@@ -8,6 +9,7 @@ using TableConverter.Commands.Interfaces;
 using TableConverter.Common;
 using TableConverter.Interfaces;
 using TableConverter.Utilities.Collections;
+using TableConverter.Utilities.Database.Models.TableStore;
 using TableConverter.Utilities.Extensions;
 using TableConverter.Utilities.Interfaces;
 

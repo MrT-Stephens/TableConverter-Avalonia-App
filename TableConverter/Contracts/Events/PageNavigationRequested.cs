@@ -10,6 +10,6 @@ public class PageNavigationRequestedEventArgs : EventArgs
     public Action<object?>?  Action { get; set; }
 }
 
-public class PageNavigationRequestedEvent : EventHandlerBase<PageNavigationRequestedEventArgs>
+public sealed class PageNavigationRequestedEvent : EventHandlerBase<PageNavigationRequestedEventArgs>
 {
 }

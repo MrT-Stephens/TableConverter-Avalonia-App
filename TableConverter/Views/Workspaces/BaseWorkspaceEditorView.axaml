@@ -68,7 +68,8 @@
                                     </sukiUi:GroupBox.Header>
                                     <sukiUi:GroupBox.Content>
                                         <ScrollViewer HorizontalScrollBarVisibility="Disabled"
-                                                      VerticalScrollBarVisibility="Auto">
+                                                      VerticalScrollBarVisibility="{Binding UseAutoScroll, Mode=OneWay,
+                                                          Converter={x:Static converters:BoolToScrollBarVisibilityConverter.Instance}}">
                                             <ContentControl Content="{Binding .,Mode=TwoWay}"
                                                             Margin="10" />
                                         </ScrollViewer>

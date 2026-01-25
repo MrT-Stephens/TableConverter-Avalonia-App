@@ -7,6 +7,7 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Input;
 using TableConverter.Commands.DataModels;
 using TableConverter.Commands.Interfaces;
+using TableConverter.Interfaces;
 using TableConverter.Utilities;
 using TableConverter.Utilities.Collections;
 using TableConverter.Utilities.Extensions;
@@ -133,6 +134,11 @@ public class CommandManager : ICommandManager
                 context.IsLoading = true;
             }
             
+            if (metadata.CanSetLoadingOnWorkspace && context.Parent is IWorkspace workspace)
+            {
+                workspace.SetBusy(true);
+            }
+            
             // Set the parameter in the context before executing
             context.Parameter = parameter;
 
@@ -160,6 +166,11 @@ public class CommandManager : ICommandManager
             {
                 context.IsLoading = false;
             }
+
+            if (metadata.CanSetLoadingOnWorkspace && context.Parent is IWorkspace workspace)
+            {
+                workspace.SetBusy(false);
+            }
         }
     }
     
@@ -172,6 +183,11 @@ public class CommandManager : ICommandManager
             if (metadata.CanSetLoadingState)
             {
                 context.IsLoading = true;
+            }
+            
+            if (metadata.CanSetLoadingOnWorkspace && context.Parent is IWorkspace workspace)
+            {
+                workspace.SetBusy(true);
             }
             
             // Set the parameter in the context before executing
@@ -200,6 +216,11 @@ public class CommandManager : ICommandManager
             if (metadata.CanSetLoadingState)
             {
                 context.IsLoading = false;
+            }
+            
+            if (metadata.CanSetLoadingOnWorkspace && context.Parent is IWorkspace workspace)
+            {
+                workspace.SetBusy(false);
             }
         }
     }

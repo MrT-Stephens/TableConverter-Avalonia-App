@@ -4,47 +4,17 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using ModelFlow.DataVirtualization.DataManagement;
+using TableConverter.Services.DataSources.Base;
 using TableConverter.Utilities.Database.Contexts;
 using TableConverter.Utilities.Database.Models.TableStore;
-using TableConverter.Utilities.Extensions;
-using TableConverter.ViewModels.Models;
 using IFactory = TableConverter.Utilities.Database.Interfaces.IDbContextFactory<
     TableConverter.Utilities.Database.Contexts.TableStoreDbContext>;
 
 namespace TableConverter.Services.DataSources;
 
-public class TableStoreColumnsDataSource : DataSource<ColumnEntity>
+public class TableStoreColumnsDataSource(IFactory dbContextFactory)
+    : DataSourceFromPath<ColumnEntity, TableStoreDbContext>(dbContextFactory, 250, 5)
 {
-    private readonly IFactory _dbContextFactory;
-
-    private string _Path;
-
-    public string Path
-    {
-        get => _Path;
-        set
-        {
-            _Path = value;
-            Invalidate();
-            OnPropertyChanged();
-        }
-    }
-
-    public TableStoreColumnsDataSource(IFactory dbContextFactory)
-        : base(250, 5)
-    {
-        _dbContextFactory = dbContextFactory
-            ?? throw new ArgumentNullException(nameof(dbContextFactory));
-
-        Path = string.Empty;
-    }
-
-    private Task<TableStoreDbContext> CreateDbAsync()
-    {
-        return _dbContextFactory.CreateAsync(Path);
-    }
-
     protected override async Task<bool> ContainsAsync(ColumnEntity item)
     {
         if (string.IsNullOrEmpty(Path))
@@ -167,7 +137,10 @@ public class TableStoreColumnsDataSource : DataSource<ColumnEntity>
             return false;
         }
 
-        entity.MapTo(viewModel, nameof(ColumnEntity.Id));
+        entity.Name = viewModel.Name;
+        entity.DefaultValueForCell = viewModel.DefaultValueForCell;
+        entity.Cells = viewModel.Cells;
+        entity.DataType = viewModel.DataType;
 
         await db.SaveChangesAsync().ConfigureAwait(false);
 

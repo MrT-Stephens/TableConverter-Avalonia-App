@@ -16,27 +16,27 @@ namespace TableConverter.Services;
 
 public class DataGenerationTypes : IDataGenerationTypes
 {
-    private static readonly IReadOnlyList<DataGenerationType> InternalTypes = LoadDataGenerationTypes();
+    private static readonly Lazy<IReadOnlyList<DataGenerationType>> InternalTypes = new(LoadDataGenerationTypes);
 
-    private static readonly FakerWithAttributedModules Faker = new();
+    private static readonly Lazy<FakerWithAttributedModules> Faker = new(() => new FakerWithAttributedModules());
 
-    public IReadOnlyList<DataGenerationType> Types => InternalTypes;
+    public IReadOnlyList<DataGenerationType> Types => InternalTypes.Value;
 
     public IReadOnlyList<string> AvailableLocales => LocaleFactory.LoadLocaleNames();
 
     public void SetLocale(string locale)
     {
-        Faker.LocaleType = locale;
+        Faker.Value.LocaleType = locale;
     }
 
     public void SetSeed(int seed)
     {
-        Faker.Seed(seed);
+        Faker.Value.Seed(seed);
     }
 
     public async Task<Result<TableData>> GenerateData(DataGenerationFieldViewModel[] fields, int rowCount = 0)
     {
-        var builder = FakerWithAttributedModules.Create(Faker);
+        var builder = FakerWithAttributedModules.Create(Faker.Value);
 
         foreach (var field in fields)
             builder.AddKeyed(

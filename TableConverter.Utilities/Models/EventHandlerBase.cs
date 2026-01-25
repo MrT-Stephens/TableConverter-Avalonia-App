@@ -28,14 +28,13 @@ public abstract class EventHandlerBase<TEventArgs> : IEventHandler<TEventArgs> w
 
     public void Publish(TEventArgs args)
     {
-        _handlers
-            .ForEach(wd =>
+        foreach (var wd in _handlers)
+        {
+            if (wd.Target is EventHandler<TEventArgs> handler)
             {
-                if (wd.Target is EventHandler<TEventArgs> handler)
-                {
-                    handler(this, args);
-                }
-            });
+                handler(this, args);
+            }
+        }
     }
     
     public void UnsubscribeAll(object subscriber)

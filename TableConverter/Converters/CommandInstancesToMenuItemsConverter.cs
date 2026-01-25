@@ -40,6 +40,7 @@ public class CommandInstancesToMenuItemsConverter : IValueConverter
         
         var categories = commandInstances
             .GroupBy(x => x.Metadata.Category)
+            .Where(x => !string.IsNullOrEmpty(x.Key))
             .OrderBy(g => g.Key);
 
         foreach (var category in categories)

@@ -5,7 +5,7 @@ namespace TableConverter.Utilities.Database.Factories;
 
 public sealed class TableStoreDbContextFactory(IEventManager eventManager) 
     : DbContextFactoryBase<TableStoreDbContext>(
-        (options, events) => new TableStoreDbContext(options, events), 
+        (options, events, sourceId) => new TableStoreDbContext(options, events, sourceId), 
         eventManager)
 {
 }

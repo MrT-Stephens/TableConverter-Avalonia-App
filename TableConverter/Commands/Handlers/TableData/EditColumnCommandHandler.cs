@@ -23,7 +23,7 @@ public class EditColumnCommandHandler(ISukiDialogManager dialogManager) : IComma
         TableDataCommandNames.EditColumn,
         "Edit Column",
         "Edit the selected column's properties.",
-        "DataAddIcon",
+        "EditIcon",
         "",
         0,
         ["Ctrl+Shift+E"]);

@@ -18,6 +18,7 @@ public abstract partial class BaseScopedPaneToolViewModel<TWorkspace> : BaseView
     
     [ObservableProperty] private string _Title;
     [ObservableProperty] private bool _IsEnabled;
+    [ObservableProperty] private bool _UseAutoScroll;
     
     public TWorkspace Workspace { get; set; }
     
@@ -36,12 +37,14 @@ public abstract partial class BaseScopedPaneToolViewModel<TWorkspace> : BaseView
         IEventManager eventManager,
         ISukiDialogManager dialogManager,
         ISukiToastManager  toastManager,
-        string title)
+        string title,
+        bool useAutoScroll = true)
         : base(commandManager, eventManager, dialogManager, toastManager)
     {
         Title = title;
         IsEnabled = true;
         Workspace = default!;
+        UseAutoScroll = useAutoScroll;
     }
 
     #endregion

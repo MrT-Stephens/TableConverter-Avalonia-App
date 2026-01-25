@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Avalonia.Collections;
+using CommunityToolkit.Mvvm.ComponentModel;
 using FastMember;
 using SukiUI.Helpers;
 using TableConverter.Views.Controls.PropertyGrid.ViewModels;
@@ -10,13 +13,17 @@ using TableConverter.Views.Controls.PropertyGrid.ViewModels.Attributes;
 
 namespace TableConverter.Views.Controls.PropertyGrid;
 
-public sealed class InstanceViewModel : SukiObservableObject, IDisposable
+public sealed class InstanceViewModel : ObservableObject, IDisposable
 {
     public INotifyPropertyChanged ViewModel { get; }
 
     public IAvaloniaReadOnlyList<CategoryViewModel> Categories { get; }
     
     public string[] IgnoreProperties { get; }
+    
+    public bool HasErrors => Categories
+        .SelectMany(c => c.Properties)
+        .Any(p => p.HasErrors);
 
     public InstanceViewModel(INotifyPropertyChanged viewModel)
     {

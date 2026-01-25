@@ -13,6 +13,6 @@ public class WorkspaceDocumentSelectedEventArgs : EventArgs
     public required IPaneDocument? NewDocument { get; set; }
 }
 
-public class WorkspaceDocumentSelectedEvent : EventHandlerBase<WorkspaceDocumentSelectedEventArgs>
+public sealed class WorkspaceDocumentSelectedEvent : EventHandlerBase<WorkspaceDocumentSelectedEventArgs>
 {
 }

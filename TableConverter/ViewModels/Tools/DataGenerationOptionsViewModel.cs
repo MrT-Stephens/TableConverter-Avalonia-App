@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
@@ -9,6 +10,7 @@ using TableConverter.Interfaces;
 using TableConverter.Utilities.Extensions;
 using TableConverter.Utilities.Interfaces;
 using TableConverter.ViewModels.Base;
+using TableConverter.ViewModels.Forms;
 using TableConverter.ViewModels.Workspaces;
 
 namespace TableConverter.ViewModels.Tools;
@@ -17,15 +19,7 @@ public partial class DataGenerationOptionsViewModel : BaseScopedPaneToolViewMode
 {
     #region Properties
 
-    [ObservableProperty] [Range(0, 100000)] private int _NumberOfRows;
-
-    [ObservableProperty] private string _DocumentName;
-
-    [ObservableProperty] private int _Seed;
-    
-    [ObservableProperty] private string _Locale = string.Empty;
-    
-    [ObservableProperty] private ObservableCollection<string> _Locales;
+    [ObservableProperty] private DataGenerationOptionsForm _Options;
 
     #endregion
     
@@ -37,12 +31,11 @@ public partial class DataGenerationOptionsViewModel : BaseScopedPaneToolViewMode
         ISukiDialogManager dialogManager, 
         ISukiToastManager toastManager,
         IDataGenerationTypes generationTypes) 
-        : base(commandManager, eventManager, dialogManager, toastManager, "Generation Options")
+        : base(commandManager, eventManager, dialogManager, toastManager, "Generation Options", false)
     {
-        NumberOfRows = 1000;
-        DocumentName = string.Empty;
-        Seed = Guid.NewGuid().GetHashCode() ^ DateTime.UtcNow.Ticks.GetHashCode() ^ Environment.TickCount.GetHashCode();
-        Locales = generationTypes.AvailableLocales.ToObservableCollection();
+        Options = new DataGenerationOptionsForm();
+        Options.Locales = generationTypes.AvailableLocales.ToObservableCollection();
+        Options.Locale = Options.Locales.First(x => x.Equals("en_GB", StringComparison.OrdinalIgnoreCase));
     }
     
     #endregion

@@ -12,8 +12,10 @@ using TableConverter.Commands.Handlers.TableData;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Interfaces;
 using TableConverter.Services.DataSources;
+using TableConverter.Utilities;
 using TableConverter.Utilities.Database.Contexts;
 using TableConverter.Utilities.Database.Events;
+using TableConverter.Utilities.Database.Extensions;
 using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.Utilities.Database.Models.TableStore;
 using TableConverter.Utilities.Extensions;
@@ -75,17 +77,9 @@ public partial class TableSearchViewModel : BaseScopedPaneToolViewModel<TableWor
         
         SearchCommands.Add(this[TableDataCommandNames.Search]);
         SearchCommands.Add(this[TableDataCommandNames.Replace]);
-        
-        _eventManager
-            .GetEvent<DbEntityChangedEvent>()
-            .Subscribe((_, args) =>
-            {
-                if (args.Changes.ContainsKey(typeof(ColumnEntity))
-                    && !string.IsNullOrEmpty(DataSource.Path))
-                {
-                    RefreshColumnNames(DataSource.Path);
-                }
-            });
+
+        _eventManager.GetEvent<DbEntityChangedEvent>()
+            .Subscribe(OnEntityChanged);
     }
 
     protected override void OnSelectedDocumentChanged(IWorkspace workspace, IPaneDocument? oldDocument, IPaneDocument? newDocument)
@@ -125,6 +119,17 @@ public partial class TableSearchViewModel : BaseScopedPaneToolViewModel<TableWor
         SearchSettings.ColumnNames.Clear();
         SearchSettings.ColumnNames.Add("All");
         SearchSettings.ColumnNames.AddRange(columnNames);
+    }
+
+    private void OnEntityChanged(object? sender, DbEntityChangedEventArgs args)
+    {
+        if (args.Type != typeof(ColumnEntity)
+            || string.IsNullOrEmpty(DataSource.Path))
+        {
+            return;
+        }
+        
+        RefreshColumnNames(DataSource.Path);
     }
 
     #endregion

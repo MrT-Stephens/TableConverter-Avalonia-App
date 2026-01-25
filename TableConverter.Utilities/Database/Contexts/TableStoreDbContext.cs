@@ -7,9 +7,10 @@ using TableConverter.Utilities.Interfaces;
 
 namespace TableConverter.Utilities.Database.Contexts;
 
-public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> options, IEventManager eventsManager) 
+public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> options, IEventManager eventsManager, Guid sourceId) 
     : DbContext(options)
 {
+    public Guid SourceId { get; } = sourceId;
     public DbSet<ColumnEntity> Columns => Set<ColumnEntity>();
     public DbSet<RowEntity> Rows => Set<RowEntity>();
     public DbSet<CellEntity> Cells => Set<CellEntity>();
@@ -143,12 +144,17 @@ public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> op
         
         if (changes.Count > 0)
         {
-            eventsManager
-                .GetEvent<DbEntityChangedEvent>()
-                .Publish(new DbEntityChangedEventArgs
-                {
-                    Changes = changes
-                });
+            changes.ForEach(change =>
+            {
+                eventsManager
+                    .GetEvent<DbEntityChangedEvent>()
+                    .Publish(new DbEntityChangedEventArgs
+                    {
+                        SourceId = SourceId,
+                        Type = change.Key,
+                        Changes = change.Value.ToArray()
+                    });
+            });
         }
         
         return result;
@@ -162,20 +168,25 @@ public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> op
 
         if (changes.Count > 0)
         {
-            eventsManager
-                .GetEvent<DbEntityChangedEvent>()
-                .Publish(new DbEntityChangedEventArgs
-                {
-                    Changes = changes
-                });
+            foreach (var change in  changes)
+            {
+                eventsManager
+                    .GetEvent<DbEntityChangedEvent>()
+                    .Publish(new DbEntityChangedEventArgs
+                    {
+                        SourceId = SourceId,
+                        Type = change.Key,
+                        Changes = change.Value.ToArray()
+                    });
+            }
         }
         
         return result;
     }
     
-    private Dictionary<Type, DbEntityChangeState> CollectEntityTypeChanges()
+    private Dictionary<Type, List<DbEntityChange>> CollectEntityTypeChanges()
     {
-        var result = new Dictionary<Type, DbEntityChangeState>();
+        var result = new Dictionary<Type, List<DbEntityChange>>();
 
         foreach (var entry in ChangeTracker.Entries())
         {
@@ -187,14 +198,21 @@ public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> op
                 _ => DbEntityChangeState.None
             };
 
-            if (state == DbEntityChangeState.None)
+            if (state is DbEntityChangeState.None)
+            {
                 continue;
+            }
 
             var type = entry.Metadata.ClrType;
 
-            result[type] = result.TryGetValue(type, out var existing)
-                ? existing | state
-                : state;
+            if (result.TryGetValue(type, out var list))
+            {
+                list.Add(new DbEntityChange(entry.Entity, state));
+            }
+            else
+            {
+                result[type] = [new DbEntityChange(entry.Entity, state)];
+            }
         }
 
         return result;

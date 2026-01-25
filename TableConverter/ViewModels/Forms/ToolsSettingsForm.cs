@@ -15,7 +15,11 @@ public partial class ToolsSettingsForm : ObservableObject, IToolSettings
     [ObservableProperty] [property: Category("Display"), DisplayName("Position")]
     private Dock _Position;
     
-    [ObservableProperty] [property: Category("Display"), DisplayName("Size")]
+    [ObservableProperty] [property: 
+        Category("Display"), 
+        DisplayName("Size"),
+        Required(ErrorMessage = "Size is required."),
+        Range(0, double.MaxValue, ErrorMessage = "Size must be non-negative.")]
     private double _Size;
     
     #endregion

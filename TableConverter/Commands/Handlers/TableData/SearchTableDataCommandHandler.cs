@@ -42,7 +42,8 @@ public class SearchTableDataCommandHandler(
         "View",
         0,
         ["Ctrl+F"],
-        canSetLoadingState: true);
+        canSetLoadingState: true,
+        canSetLoadingOnWorkspace: true);
 
     public bool CanExecute(object? parameter, ICommandContext context)
     {

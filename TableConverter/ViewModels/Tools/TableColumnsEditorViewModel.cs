@@ -43,21 +43,12 @@ public partial class TableColumnsEditorViewModel : BaseScopedPaneToolViewModel<T
         ISukiDialogManager dialogManager, 
         ISukiToastManager toastManager,
         IDbContextFactory<TableStoreDbContext> dbContextFactory) 
-        : base(commandManager, eventManager, dialogManager, toastManager, "Columns Editor")
+        : base(commandManager, eventManager, dialogManager, toastManager, "Columns Editor", false)
     {
         ColumnCommands = [];
         DataSource = new TableStoreColumnsDataSource(dbContextFactory);
         TreeDataSource = new FlatTreeDataGridSource<DataItem<ColumnEntity>>(DataSource.Collection);
         TreeDataSource.RowSelection!.SingleSelect = false; 
-        
-        _eventRegistrar.RegisterEvent<EventHandler<TreeSelectionModelSelectionChangedEventArgs<DataItem<ColumnEntity>>>>(
-            action => TreeDataSource.RowSelection!.SelectionChanged += action,
-            action => TreeDataSource.RowSelection!.SelectionChanged -= action, 
-            null, (_, args) =>
-            {
-                args.DeselectedItems.ForEach(item => SelectedItems.Remove(item));
-                args.SelectedItems.ForEach(item => SelectedItems.Add(item));
-            });
         
         TreeDataSource
             .AddAutoColumn("ID", "Item.Id", true)
@@ -84,6 +75,15 @@ public partial class TableColumnsEditorViewModel : BaseScopedPaneToolViewModel<T
         
         ColumnCommands.Add(this[TableDataCommandNames.EditColumn]);
         ColumnCommands.Add(this[TableDataCommandNames.DeleteColumn]);
+        
+        _eventRegistrar.RegisterEvent<EventHandler<TreeSelectionModelSelectionChangedEventArgs<DataItem<ColumnEntity>>>>(
+            action => TreeDataSource.RowSelection!.SelectionChanged += action,
+            action => TreeDataSource.RowSelection!.SelectionChanged -= action, 
+            null, (_, args) =>
+            {
+                args.DeselectedItems.ForEach(item => SelectedItems.Remove(item));
+                args.SelectedItems.ForEach(item => SelectedItems.Add(item));
+            });
     }
 
     protected override void OnSelectedDocumentChanged(IWorkspace workspace, IPaneDocument? oldDocument, IPaneDocument? newDocument)

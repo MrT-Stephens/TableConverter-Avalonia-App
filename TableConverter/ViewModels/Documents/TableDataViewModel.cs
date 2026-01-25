@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Threading;
@@ -8,13 +7,12 @@ using ModelFlow.DataVirtualization.DataManagement;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;
-using TableConverter.Interfaces;
 using TableConverter.Utilities.Database.Contexts;
 using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.ViewModels.Base;
 using TableConverter.Extensions;
 using TableConverter.Services.DataSources;
-using TableConverter.Utilities.Database.Models;
+using TableConverter.Utilities.Database.Events;
 using TableConverter.Utilities.Database.Models.TableStore;
 using TableConverter.Utilities.Extensions;
 using TableConverter.Utilities.Interfaces;
@@ -46,9 +44,14 @@ public partial class TableDataViewModel : BaseDocumentViewModel
         : base(commandManager, eventManager, dialogManager, toastManager)
     {
         _dbContextFactory = dbContextFactory;
-        _Path = null!;
-        _DataSource = null!;
-        _TreeDataSource = null!;
+        Path = System.IO.Path.Combine(App.AppStorageDirectory, $"{DateTime.Now.ToFileTime()}.tcstore");
+        DataSource = new TableStoreDataSource(_dbContextFactory);
+        TreeDataSource = new FlatTreeDataGridSource<DataItem<RowEntity>>(DataSource.Collection);
+        
+        Dispatcher.UIThread.Post(async void () =>
+        {
+            await DataSource.EnsureInitialisedAsync();
+        });
     }
 
     #endregion
@@ -59,22 +62,8 @@ public partial class TableDataViewModel : BaseDocumentViewModel
     {
         base.Initialise();
         
-        var path = System.IO.Path.Combine(App.AppStorageDirectory, $"{ID}.tcstore");
-
-        Path = path;
-        DataSource = new TableStoreDataSource(_dbContextFactory, path);
-        TreeDataSource = new FlatTreeDataGridSource<DataItem<RowEntity>>(DataSource.Collection);
-
-        var dbContext = _dbContextFactory.Create(path);
-        
-        dbContext.Columns
-            .AsEnumerable()
-            .ForEach(column => TreeDataSource.AddAutoColumn(column.Name, column.Id));
-        
-        Dispatcher.UIThread.Post(async void () =>
-        {
-            await DataSource.EnsureInitialisedAsync();
-        });
+        _eventManager.GetEvent<DbEntityChangedEvent>()
+            .Subscribe(OnEntityChanged);
     }
 
     #endregion
@@ -91,6 +80,18 @@ public partial class TableDataViewModel : BaseDocumentViewModel
         dbContext.Columns
             .AsEnumerable()
             .ForEach((column, idx) => TreeDataSource.AddAutoColumn(column.Name, idx));
+    }
+
+    private void OnEntityChanged(object? sender, DbEntityChangedEventArgs args)
+    {
+        if (args.Type != typeof(ColumnEntity)
+            || string.IsNullOrEmpty(DataSource.Path)
+            || DataSource.SourceId != args.SourceId)
+        {
+            return;
+        }
+        
+        InvalidateData();
     }
 
     #endregion

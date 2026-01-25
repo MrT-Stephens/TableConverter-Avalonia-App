@@ -51,5 +51,16 @@ public partial class TableWorkspaceEditorViewModel : BaseWorkspaceEditorViewMode
         return tableData;
     }
 
+    protected override void OnDocumentRemoved(IPaneDocument document)
+    {
+        base.OnDocumentRemoved(document);
+
+        if (document is TableDataViewModel tableDataViewModel
+            && !string.IsNullOrEmpty(tableDataViewModel.Path))
+        {
+            File.Delete(tableDataViewModel.Path);
+        }
+    }
+
     #endregion
 }

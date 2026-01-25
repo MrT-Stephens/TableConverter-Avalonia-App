@@ -49,4 +49,10 @@ public interface ICommandMetadata
     /// Indicates whether the command can set the loading state of the application.
     /// </summary>
     public bool CanSetLoadingState { get;  }
+    
+    /// <summary>
+    /// Indicates whether the command can set the loading state of the workspace.
+    /// Only works if the parent is a workspace view model.
+    /// </summary>
+    public bool CanSetLoadingOnWorkspace { get; }
 }

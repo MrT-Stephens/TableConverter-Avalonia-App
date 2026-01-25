@@ -37,7 +37,8 @@ public class ReplaceSearchResultsCommandHandler(
         "View",
         0,
         ["Ctrl+R"],
-        canSetLoadingState: true);
+        canSetLoadingState: true,
+        canSetLoadingOnWorkspace: true);
 
     public bool CanExecute(object? parameter, ICommandContext context)
     {
@@ -124,7 +125,7 @@ public class ReplaceSearchResultsCommandHandler(
                     SET Name = REPLACE(COLUMNS.NAME, SR.FOUND_VALUE, @REPLACE_TEXT)
                     FROM SEARCH_RESULT SR
                     WHERE SR.ROW_ID = 0
-                        AND SR.COLUMN_ID = COLUMNS.COLUMN_ID;
+                        AND SR.COLUMN_ID = COLUMNS.ID;
                     """,
                     new SqliteParameter("@REPLACE_TEXT", settings.ReplaceText));
             }

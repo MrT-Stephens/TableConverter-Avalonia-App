@@ -1,4 +1,4 @@
-﻿using TableConverter.Utilities.Interfaces;
+﻿using System.Runtime.Serialization;
 
 namespace TableConverter.Interfaces
 {

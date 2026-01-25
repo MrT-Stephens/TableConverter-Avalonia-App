@@ -24,12 +24,13 @@ public class DeleteColumnCommandHandler(
     public ICommandMetadata CommandMetadata => new CommandMetadata(
         TableDataCommandNames.DeleteColumn,
         "Delete Column",
-        "Delete the selected column's.",
-        "DataAddIcon",
+        "Delete the selected column(s).",
+        "DeleteIcon",
         "",
         0,
         ["Ctrl+Shift+D"],
-        canSetLoadingState: true);
+        canSetLoadingState: true,
+        canSetLoadingOnWorkspace: true);
 
     public bool CanExecute(object? parameter, ICommandContext context)
     {

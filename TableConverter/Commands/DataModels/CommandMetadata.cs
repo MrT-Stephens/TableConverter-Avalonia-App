@@ -27,6 +27,7 @@ public record CommandMetadata : ICommandMetadata
         Description = null;
         IconName = null;
         CanSetLoadingState = false;
+        CanSetLoadingOnWorkspace = false;
         KeyGestures = [];
     }
 
@@ -57,7 +58,20 @@ public record CommandMetadata : ICommandMetadata
     /// <param name="canSetLoadingState">
     /// Indicates whether the command can set the loading state of the application.
     /// </param>
-    public CommandMetadata(string name, string title, string description, string iconName, string category = "", int? subCategoryIndex = null, string[]? keyGestures = null, bool canSetLoadingState = false) 
+    /// <param name="canSetLoadingOnWorkspace">
+    /// Indicates whether the command can set the loading state of the workspace.
+    /// Only works if the parent is a workspace view model.
+    /// </param>
+    public CommandMetadata(
+        string name, 
+        string title, 
+        string description, 
+        string iconName, 
+        string category = "", 
+        int? subCategoryIndex = null, 
+        string[]? keyGestures = null, 
+        bool canSetLoadingState = false,
+        bool canSetLoadingOnWorkspace = false)
         : this(name)
     {
         Title = title;
@@ -67,6 +81,7 @@ public record CommandMetadata : ICommandMetadata
         SubCategoryIndex = subCategoryIndex;
         KeyGestures = keyGestures ?? [];
         CanSetLoadingState = canSetLoadingState;
+        CanSetLoadingOnWorkspace = canSetLoadingOnWorkspace;
     }
 
     /// <inheritdoc />
@@ -92,6 +107,9 @@ public record CommandMetadata : ICommandMetadata
     
     /// <inheritdoc />
     public bool CanSetLoadingState { get; }
+    
+    /// <inheritdoc />
+    public bool CanSetLoadingOnWorkspace { get; }
 
     /// <inheritdoc />
     public StreamGeometry? IconPath
