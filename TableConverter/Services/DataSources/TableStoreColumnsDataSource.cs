@@ -7,13 +7,13 @@ using Microsoft.EntityFrameworkCore;
 using TableConverter.Services.DataSources.Base;
 using TableConverter.Utilities.Database.Contexts;
 using TableConverter.Utilities.Database.Models.TableStore;
-using IFactory = TableConverter.Utilities.Database.Interfaces.IDbContextFactory<
+using IFactory = TableConverter.Utilities.Database.Interfaces.IDatabaseContextFactory<
     TableConverter.Utilities.Database.Contexts.TableStoreDbContext>;
 
 namespace TableConverter.Services.DataSources;
 
-public class TableStoreColumnsDataSource(IFactory dbContextFactory)
-    : DataSourceFromPath<ColumnEntity, TableStoreDbContext>(dbContextFactory, 250, 5)
+public class TableStoreColumnsDataSource(IFactory databaseContextFactory)
+    : DataSourceFromPath<ColumnEntity, TableStoreDbContext>(databaseContextFactory, 250, 5)
 {
     protected override async Task<bool> ContainsAsync(ColumnEntity item)
     {

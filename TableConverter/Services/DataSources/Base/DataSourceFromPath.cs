@@ -12,7 +12,7 @@ public abstract class DataSourceFromPath<TModel, TContext> : DataSource<TModel>
 {
     #region Properties
 
-    protected readonly Utilities.Database.Interfaces.IDbContextFactory<TContext> _dbContextFactory;
+    protected readonly Utilities.Database.Interfaces.IDatabaseContextFactory<TContext> _databaseContextFactory;
 
     private Guid? _SourceId = null;
     public Guid? SourceId
@@ -51,13 +51,13 @@ public abstract class DataSourceFromPath<TModel, TContext> : DataSource<TModel>
     #region Constructors
     
     protected DataSourceFromPath(
-        Utilities.Database.Interfaces.IDbContextFactory<TContext> factory, 
+        Utilities.Database.Interfaces.IDatabaseContextFactory<TContext> factory, 
         int pageSize, 
         int maxPages, 
         bool autoSync = true) 
         : base(pageSize, maxPages, autoSync)
     {
-        _dbContextFactory = factory;
+        _databaseContextFactory = factory;
     }
     
     #endregion
@@ -66,7 +66,7 @@ public abstract class DataSourceFromPath<TModel, TContext> : DataSource<TModel>
 
     protected Task<TContext> CreateDbAsync()
     {
-        return _dbContextFactory.CreateAsync(Path);
+        return _databaseContextFactory.CreateAsync(Path);
     }
 
     #endregion

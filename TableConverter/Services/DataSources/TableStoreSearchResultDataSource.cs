@@ -4,17 +4,16 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using ModelFlow.DataVirtualization.DataManagement;
 using TableConverter.Services.DataSources.Base;
 using TableConverter.Utilities.Database.Contexts;
 using TableConverter.Utilities.Database.Models.TableStore;
-using IFactory = TableConverter.Utilities.Database.Interfaces.IDbContextFactory<
+using IFactory = TableConverter.Utilities.Database.Interfaces.IDatabaseContextFactory<
     TableConverter.Utilities.Database.Contexts.TableStoreDbContext>;
 
 namespace TableConverter.Services.DataSources;
 
-public class TableStoreSearchResultDataSource(IFactory dbContextFactory)
-    : DataSourceFromPath<SearchResult, TableStoreDbContext>(dbContextFactory, 250, 5)
+public class TableStoreSearchResultDataSource(IFactory databaseContextFactory)
+    : DataSourceFromPath<SearchResult, TableStoreDbContext>(databaseContextFactory, 250, 5)
 {
     protected override async Task<bool> ContainsAsync(SearchResult item)
     {

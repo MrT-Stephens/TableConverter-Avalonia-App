@@ -7,9 +7,9 @@ public static class DependencyInjectionExtensions
 {
     public static IServiceCollection AddDatabaseFactory<TDbContext, TFactory>(this IServiceCollection services)
         where TDbContext : DbContext
-        where TFactory : class, Interfaces.IDbContextFactory<TDbContext>
+        where TFactory : class, Interfaces.IDatabaseContextFactory<TDbContext>
     {
-        services.AddSingleton<Interfaces.IDbContextFactory<TDbContext>, TFactory>();
+        services.AddSingleton<Interfaces.IDatabaseContextFactory<TDbContext>, TFactory>();
         return services;
     }
 }

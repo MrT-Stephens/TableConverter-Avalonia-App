@@ -31,7 +31,7 @@ public static partial class TableDataCommandNames
 
 public class SearchTableDataCommandHandler(
     ISukiToastManager toastManager,
-    Utilities.Database.Interfaces.IDbContextFactory<TableStoreDbContext> dbContextFactory)
+    Utilities.Database.Interfaces.IDatabaseContextFactory<TableStoreDbContext> databaseContextFactory)
     : ICommandHandlerAsync
 {
     public ICommandMetadata CommandMetadata => new CommandMetadata(
@@ -98,7 +98,7 @@ public class SearchTableDataCommandHandler(
 
     private async Task<int> SearchAsync(string searchText, SearchSettingsFrom settings, string path)
     {
-        await using var db = await dbContextFactory.CreateAsync(path);
+        await using var db = await databaseContextFactory.CreateAsync(path);
         await using var tx = await db.Database.BeginTransactionAsync();
         
         try
@@ -237,7 +237,7 @@ public class SearchTableDataCommandHandler(
     /// </summary>
     private async Task<int> SearchViaRegexAsync(string searchText, SearchSettingsFrom settings, string path)
     {
-        await using var sharedContext = await dbContextFactory.CreateAsync(path);
+        await using var sharedContext = await databaseContextFactory.CreateAsync(path);
         await using var transaction = await sharedContext.Database.BeginTransactionAsync();
 
         try
@@ -326,7 +326,7 @@ public class SearchTableDataCommandHandler(
                     },
                     async (worker, cancellationToken) =>
                     {
-                        await using var db = await dbContextFactory.CreateAsync(path, cancellationToken);
+                        await using var db = await databaseContextFactory.CreateAsync(path, cancellationToken);
 
                         var start = minRow + worker * rangeSize;
 

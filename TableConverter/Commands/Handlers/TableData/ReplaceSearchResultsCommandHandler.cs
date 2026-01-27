@@ -26,7 +26,7 @@ public static partial class TableDataCommandNames
 public class ReplaceSearchResultsCommandHandler(
     ISukiDialogManager dialogManager,
     ISukiToastManager toastManager,
-    Utilities.Database.Interfaces.IDbContextFactory<TableStoreDbContext> dbContextFactory) 
+    Utilities.Database.Interfaces.IDatabaseContextFactory<TableStoreDbContext> databaseContextFactory) 
     : ICommandHandlerAsync
 {
     public ICommandMetadata CommandMetadata => new CommandMetadata(
@@ -83,7 +83,7 @@ public class ReplaceSearchResultsCommandHandler(
             return;
         }
         
-        await using var dbContext = await dbContextFactory.CreateAsync(tableDataViewModel.Path);
+        await using var dbContext = await databaseContextFactory.CreateAsync(tableDataViewModel.Path);
 
         var replacedAmount = await Task.Run(() => ReplaceValuesAsync(dbContext, settings));
 

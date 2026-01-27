@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Controls.Selection;
+using Avalonia.Data;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using ModelFlow.DataVirtualization.DataManagement;
@@ -42,19 +43,19 @@ public partial class TableColumnsEditorViewModel : BaseScopedPaneToolViewModel<T
         IEventManager eventManager, 
         ISukiDialogManager dialogManager, 
         ISukiToastManager toastManager,
-        IDbContextFactory<TableStoreDbContext> dbContextFactory) 
+        IDatabaseContextFactory<TableStoreDbContext> databaseContextFactory) 
         : base(commandManager, eventManager, dialogManager, toastManager, "Columns Editor", false)
     {
         ColumnCommands = [];
-        DataSource = new TableStoreColumnsDataSource(dbContextFactory);
+        DataSource = new TableStoreColumnsDataSource(databaseContextFactory);
         TreeDataSource = new FlatTreeDataGridSource<DataItem<ColumnEntity>>(DataSource.Collection);
         TreeDataSource.RowSelection!.SingleSelect = false; 
         
         TreeDataSource
-            .AddAutoColumn("ID", "Item.Id", true)
-            .AddAutoColumn("Name", "Item.Name")
-            .AddAutoColumn("Data Type", "Item.DataType")
-            .AddAutoColumn("Default Value", "Item.DefaultValueForCell");
+            .AddAutoColumn("ID", "Item.Id", true, sourceTrigger: UpdateSourceTrigger.LostFocus)
+            .AddAutoColumn("Name", "Item.Name", sourceTrigger: UpdateSourceTrigger.LostFocus)
+            .AddAutoColumn("Data Type", "Item.DataType", sourceTrigger: UpdateSourceTrigger.LostFocus)
+            .AddAutoColumn("Default Value", "Item.DefaultValueForCell", sourceTrigger: UpdateSourceTrigger.LostFocus);
 
         DataSource.SetFilterQuery(query => query
             .OrderBy(x => x.Id));

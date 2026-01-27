@@ -5,8 +5,8 @@ using TableConverter.Utilities.Interfaces;
 
 namespace TableConverter.Utilities.Database.Factories;
 
-public abstract class DbContextFactoryBase<TDbContext>(Func<DbContextOptions<TDbContext>, IEventManager, Guid, TDbContext> factory, IEventManager eventManager)
-    : Interfaces.IDbContextFactory<TDbContext> where TDbContext : DbContext
+public abstract class DatabaseContextFactoryBase<TDbContext>(Func<DbContextOptions<TDbContext>, IEventManager, Guid, TDbContext> factory, IEventManager eventManager)
+    : Interfaces.IDatabaseContextFactory<TDbContext> where TDbContext : DbContext
 {
     public TDbContext Create(string path)
     {

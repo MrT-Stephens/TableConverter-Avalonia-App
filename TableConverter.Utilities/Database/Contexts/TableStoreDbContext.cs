@@ -37,6 +37,10 @@ public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> op
             b.Property(x => x.DataType)
                 .HasColumnName("DATA_TYPE")
                 .IsRequired();
+            
+            b.Property(x => x.OrdinalPosition)
+                .HasColumnName("ORDINAL_POSITION")
+                .IsRequired();
 
             b.Property(x => x.DefaultValueForCell)
                 .HasColumnName("DEFAULT_VALUE_FOR_CELL");

@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace TableConverter.Utilities.Database.Interfaces;
 
-public interface IDbContextFactory<TDbContext> where TDbContext : DbContext
+public interface IDatabaseContextFactory<TDbContext> where TDbContext : DbContext
 {
     public TDbContext Create(string path);
     

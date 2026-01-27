@@ -1,18 +1,20 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.EntityFrameworkCore;
 using ModelFlow.DataVirtualization.DataManagement;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Utilities.Database.Contexts;
-using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.ViewModels.Base;
 using TableConverter.Extensions;
 using TableConverter.Services.DataSources;
 using TableConverter.Utilities.Database.Events;
+using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.Utilities.Database.Models.TableStore;
 using TableConverter.Utilities.Extensions;
 using TableConverter.Utilities.Interfaces;
@@ -29,7 +31,7 @@ public partial class TableDataViewModel : BaseDocumentViewModel
     
     public override bool CanClose => !IsDirty;
 
-    private readonly IDbContextFactory<TableStoreDbContext> _dbContextFactory;
+    private readonly IDatabaseContextFactory<TableStoreDbContext> _dbContextFactory;
 
     #endregion
 
@@ -40,13 +42,14 @@ public partial class TableDataViewModel : BaseDocumentViewModel
         IEventManager eventManager, 
         ISukiDialogManager dialogManager,
         ISukiToastManager toastManager,
-        IDbContextFactory<TableStoreDbContext> dbContextFactory)
+        IDatabaseContextFactory<TableStoreDbContext> dbContextFactory)
         : base(commandManager, eventManager, dialogManager, toastManager)
     {
         _dbContextFactory = dbContextFactory;
         Path = System.IO.Path.Combine(App.AppStorageDirectory, $"{DateTime.Now.ToFileTime()}.tcstore");
         DataSource = new TableStoreDataSource(_dbContextFactory);
         TreeDataSource = new FlatTreeDataGridSource<DataItem<RowEntity>>(DataSource.Collection);
+        DataSource.Path = Path;
         
         Dispatcher.UIThread.Post(async void () =>
         {
@@ -72,7 +75,6 @@ public partial class TableDataViewModel : BaseDocumentViewModel
     
     public void InvalidateData()
     {
-        DataSource.Invalidate();
         TreeDataSource.Columns.Clear();
         
         using var dbContext = _dbContextFactory.Create(Path);
@@ -80,6 +82,8 @@ public partial class TableDataViewModel : BaseDocumentViewModel
         dbContext.Columns
             .AsEnumerable()
             .ForEach((column, idx) => TreeDataSource.AddAutoColumn(column.Name, idx));
+        
+        DataSource.Invalidate();
     }
 
     private void OnEntityChanged(object? sender, DbEntityChangedEventArgs args)
@@ -91,7 +95,22 @@ public partial class TableDataViewModel : BaseDocumentViewModel
             return;
         }
         
-        InvalidateData();
+        RefreshDataAsync(args.Changes).FireAndForget();
+    }
+
+    private async Task RefreshDataAsync(DbEntityChange[] changes)
+    {
+        var dataSource = new FlatTreeDataGridSource<DataItem<RowEntity>>(DataSource.Collection);
+
+        await using var dbContext = await _dbContextFactory.CreateAsync(Path);
+
+        var columns = await dbContext.Columns
+            .AsNoTracking()
+            .ToListAsync();
+            
+        columns.ForEach((column, idx) => dataSource.AddAutoColumn(column.Name, idx));
+        
+        TreeDataSource = dataSource;
     }
 
     #endregion

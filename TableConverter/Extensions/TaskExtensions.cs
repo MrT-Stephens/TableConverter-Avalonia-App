@@ -1,4 +1,9 @@
-namespace TableConverter.Utilities.Extensions;
+using System.Threading;
+using System.Threading.Tasks;
+using Avalonia.Threading;
+using TableConverter.Utilities.Extensions;
+
+namespace TableConverter.Extensions;
 
 public static class TaskExtensions
 {
@@ -8,7 +13,10 @@ public static class TaskExtensions
         
         _ = task.ContinueWith(t =>
         {
-            t.Exception?.CaptureAndThrow();
+            Dispatcher.UIThread.Invoke(() =>
+            {
+                t.Exception?.CaptureAndThrow();
+            });
         }, CancellationToken.None, TaskContinuationOptions.OnlyOnFaulted, currentContext);
     }
 }

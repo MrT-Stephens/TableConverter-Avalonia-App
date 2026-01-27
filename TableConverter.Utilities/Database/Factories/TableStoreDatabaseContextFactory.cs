@@ -3,8 +3,8 @@ using TableConverter.Utilities.Interfaces;
 
 namespace TableConverter.Utilities.Database.Factories;
 
-public sealed class TableStoreDbContextFactory(IEventManager eventManager) 
-    : DbContextFactoryBase<TableStoreDbContext>(
+public sealed class TableStoreDatabaseContextFactory(IEventManager eventManager) 
+    : DatabaseContextFactoryBase<TableStoreDbContext>(
         (options, events, sourceId) => new TableStoreDbContext(options, events, sourceId), 
         eventManager)
 {

@@ -37,7 +37,7 @@ public partial class TableSearchViewModel : BaseScopedPaneToolViewModel<TableWor
 
     public readonly TableStoreSearchResultDataSource DataSource;
     
-    private readonly IDbContextFactory<TableStoreDbContext> _dbContextFactory;
+    private readonly IDatabaseContextFactory<TableStoreDbContext> _databaseContextFactory;
     
     #endregion
     
@@ -48,13 +48,13 @@ public partial class TableSearchViewModel : BaseScopedPaneToolViewModel<TableWor
         IEventManager eventManager, 
         ISukiDialogManager dialogManager, 
         ISukiToastManager toastManager,
-        IDbContextFactory<TableStoreDbContext> dbContextFactory)
+        IDatabaseContextFactory<TableStoreDbContext> databaseContextFactory)
         : base(commandManager, eventManager, dialogManager, toastManager, "Search & Replace")
     {
-        _dbContextFactory = dbContextFactory;
+        _databaseContextFactory = databaseContextFactory;
         SearchSettings = new SearchSettingsFrom();
         SearchCommands = [];
-        DataSource = new TableStoreSearchResultDataSource(dbContextFactory);
+        DataSource = new TableStoreSearchResultDataSource(databaseContextFactory);
         SearchResults = DataSource.Collection;
 
         DataSource.SetFilterQuery(query => query
@@ -109,7 +109,7 @@ public partial class TableSearchViewModel : BaseScopedPaneToolViewModel<TableWor
 
     private void RefreshColumnNames(string path)
     {
-        using var db = _dbContextFactory.Create(path);
+        using var db = _databaseContextFactory.Create(path);
 
         var columnNames = db.Columns
             .Select(c => c.Name)

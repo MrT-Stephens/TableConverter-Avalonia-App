@@ -118,5 +118,6 @@
         
         <StyleInclude Source="/Views/Controls/TreeDataGridStyles.axaml" />
         <StyleInclude Source="Views/Controls/DockedToolPanel.axaml" />
+        <StyleInclude Source="Views/Controls/Spreadsheet/Spreadsheet.axaml" />
     </Application.Styles>
 </Application>

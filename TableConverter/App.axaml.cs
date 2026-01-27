@@ -143,7 +143,7 @@ public class App : Application
         services.AddSingleton<ICommandManager, CommandManager>();
         
         // Database Services
-        services.AddDatabaseFactory<TableStoreDbContext, TableStoreDbContextFactory>();
+        services.AddDatabaseFactory<TableStoreDbContext, TableStoreDatabaseContextFactory>();
         
         // Register Command Handlers
         services.RegisterCommandHandlers();

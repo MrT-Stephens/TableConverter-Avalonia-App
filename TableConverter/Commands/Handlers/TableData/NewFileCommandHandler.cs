@@ -23,7 +23,7 @@ public static partial class TableDataCommandNames
 public class NewFileCommandHandler(
     ISukiDialogManager dialogManager,
     ISukiToastManager toastManager,
-    Utilities.Database.Interfaces.IDbContextFactory<TableStoreDbContext> dbContextFactory) 
+    Utilities.Database.Interfaces.IDatabaseContextFactory<TableStoreDbContext> databaseContextFactory) 
     : ICommandHandlerAsync
 {
     public ICommandMetadata CommandMetadata => new CommandMetadata(
@@ -68,13 +68,13 @@ public class NewFileCommandHandler(
 
         document.Title = settings.Name;
 
-        await using var dbContext = await dbContextFactory.CreateAsync(document.Path);
+        await using var dbContext = await databaseContextFactory.CreateAsync(document.Path);
 
         await Task.Run(() => GenerateTableData(dbContext, settings));
-
-        document.InvalidateData();
+        
         editorViewModel.Documents.Add(document);
         editorViewModel.SelectedDocument = document;
+        document.InvalidateData();
 
         toastManager.CreateSimpleInfoToast()
             .OfType(NotificationType.Success)
@@ -104,10 +104,11 @@ public class NewFileCommandHandler(
             FROM SEQ;
             
             -- INSERT COLUMNS
-            INSERT INTO COLUMNS (NAME, DATA_TYPE)
+            INSERT INTO COLUMNS (NAME, DATA_TYPE, ORDINAL_POSITION)
             SELECT
                 'Column ' || N,
-                0
+                0,
+                N
             FROM NUMBERS
             WHERE N <= @HEADERS;
             

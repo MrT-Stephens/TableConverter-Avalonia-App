@@ -27,6 +27,13 @@ public sealed class ColumnEntity : EntityBaseWithAutoSynchronize<int>
         get => _DefaultValueForCell;
         set => SetField(ref _DefaultValueForCell, value);
     }
+    
+    private int _OrdinalPosition;
+    public int OrdinalPosition
+    {
+        get => _OrdinalPosition;
+        set => SetField(ref _OrdinalPosition, value);
+    }
 
     private ObservableCollection<CellEntity> _Cells = [];
     public ObservableCollection<CellEntity> Cells

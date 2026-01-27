@@ -49,7 +49,8 @@ public static class FlatTreeDataGridSourceExtensions
         object header,
         string bindingPath,
         bool isReadOnly = false,
-        GridLength? gridLength = null)
+        GridLength? gridLength = null,
+        UpdateSourceTrigger sourceTrigger = UpdateSourceTrigger.PropertyChanged)
         where TModel : class
     {
         source.Columns.Add(new TemplateColumn<TModel>(
@@ -69,7 +70,8 @@ public static class FlatTreeDataGridSourceExtensions
                 [!TextBox.TextProperty] = new Binding
                 {
                     Path = bindingPath,
-                    Mode = BindingMode.TwoWay
+                    Mode = BindingMode.TwoWay,
+                    UpdateSourceTrigger = sourceTrigger
                 }
             }),
             gridLength ?? GridLength.Auto,
