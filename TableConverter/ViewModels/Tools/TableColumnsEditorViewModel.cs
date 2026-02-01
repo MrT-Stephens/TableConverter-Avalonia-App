@@ -92,8 +92,6 @@ public partial class TableColumnsEditorViewModel : BaseScopedPaneToolViewModel<T
                 args.DeselectedItems.ForEach(item => SelectedItems.Remove(item));
                 args.SelectedItems.ForEach(item => SelectedItems.Add(item));
             });
-        
-        _eventManager.GetEvent<DbEntityChangedEvent>().Subscribe(OnEntityChanged);
     }
 
     protected override void OnSelectedDocumentChanged(IWorkspace workspace, IPaneDocument? oldDocument, IPaneDocument? newDocument)
@@ -118,18 +116,6 @@ public partial class TableColumnsEditorViewModel : BaseScopedPaneToolViewModel<T
     #endregion
 
     #region Private Methods
-    
-    private void OnEntityChanged(object? sender, DbEntityChangedEventArgs args)
-    {
-        if (args.Type != typeof(ColumnEntity)
-            || string.IsNullOrEmpty(DataSource.Path)
-            || DataSource.SourceId != args.SourceId)
-        {
-            return;
-        }
-        
-        DataSource.Invalidate();
-    }
 
     #endregion
 }

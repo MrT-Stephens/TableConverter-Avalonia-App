@@ -180,7 +180,7 @@ public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> op
                     {
                         SourceId = SourceId,
                         Type = change.Key,
-                        Changes = change.Value.ToArray()
+                        Changes = [.. change.Value]
                     });
             }
         }
