@@ -1,11 +1,13 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Controls.Selection;
 using Avalonia.Data;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.EntityFrameworkCore;
 using ModelFlow.DataVirtualization.DataManagement;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
@@ -15,6 +17,7 @@ using TableConverter.Extensions;
 using TableConverter.Interfaces;
 using TableConverter.Services.DataSources;
 using TableConverter.Utilities.Database.Contexts;
+using TableConverter.Utilities.Database.Events;
 using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.Utilities.Database.Models.TableStore;
 using TableConverter.Utilities.Extensions;
@@ -33,6 +36,8 @@ public partial class TableColumnsEditorViewModel : BaseScopedPaneToolViewModel<T
     [ObservableProperty] private FlatTreeDataGridSource<DataItem<ColumnEntity>> _TreeDataSource;
 
     public readonly TableStoreColumnsDataSource DataSource;
+    
+    private readonly IDatabaseContextFactory<TableStoreDbContext> _dbContextFactory;
 
     #endregion
     
@@ -46,19 +51,21 @@ public partial class TableColumnsEditorViewModel : BaseScopedPaneToolViewModel<T
         IDatabaseContextFactory<TableStoreDbContext> databaseContextFactory) 
         : base(commandManager, eventManager, dialogManager, toastManager, "Columns Editor", false)
     {
+        _dbContextFactory = databaseContextFactory;
         ColumnCommands = [];
         DataSource = new TableStoreColumnsDataSource(databaseContextFactory);
         TreeDataSource = new FlatTreeDataGridSource<DataItem<ColumnEntity>>(DataSource.Collection);
         TreeDataSource.RowSelection!.SingleSelect = false; 
         
         TreeDataSource
-            .AddAutoColumn("ID", "Item.Id", true, sourceTrigger: UpdateSourceTrigger.LostFocus)
+            .AddAutoColumn("ID", "Item.Id", true)
+            .AddAutoColumn("Ordinal", "Item.OrdinalPosition", true)
             .AddAutoColumn("Name", "Item.Name", sourceTrigger: UpdateSourceTrigger.LostFocus)
             .AddAutoColumn("Data Type", "Item.DataType", sourceTrigger: UpdateSourceTrigger.LostFocus)
             .AddAutoColumn("Default Value", "Item.DefaultValueForCell", sourceTrigger: UpdateSourceTrigger.LostFocus);
 
         DataSource.SetFilterQuery(query => query
-            .OrderBy(x => x.Id));
+            .OrderBy(x => x.OrdinalPosition));
         
         Dispatcher.UIThread.Post(async void () =>
         {
@@ -85,6 +92,8 @@ public partial class TableColumnsEditorViewModel : BaseScopedPaneToolViewModel<T
                 args.DeselectedItems.ForEach(item => SelectedItems.Remove(item));
                 args.SelectedItems.ForEach(item => SelectedItems.Add(item));
             });
+        
+        _eventManager.GetEvent<DbEntityChangedEvent>().Subscribe(OnEntityChanged);
     }
 
     protected override void OnSelectedDocumentChanged(IWorkspace workspace, IPaneDocument? oldDocument, IPaneDocument? newDocument)
@@ -104,6 +113,22 @@ public partial class TableColumnsEditorViewModel : BaseScopedPaneToolViewModel<T
             
             SelectedItems.RemoveAll<DataItem<ColumnEntity>>();
         }
+    }
+
+    #endregion
+
+    #region Private Methods
+    
+    private void OnEntityChanged(object? sender, DbEntityChangedEventArgs args)
+    {
+        if (args.Type != typeof(ColumnEntity)
+            || string.IsNullOrEmpty(DataSource.Path)
+            || DataSource.SourceId != args.SourceId)
+        {
+            return;
+        }
+        
+        DataSource.Invalidate();
     }
 
     #endregion

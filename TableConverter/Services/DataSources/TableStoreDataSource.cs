@@ -56,7 +56,10 @@ public class TableStoreDataSource(IFactory databaseContextFactory)
         
         await using var db = await CreateDbAsync().ConfigureAwait(false);
         
-        ColumnCount = await db.Columns.CountAsync().ConfigureAwait(false);
+        ColumnCount = await db.Columns
+            .AsNoTracking()
+            .CountAsync()
+            .ConfigureAwait(false);
         
         var query = db.Rows.AsNoTracking();
 
@@ -143,10 +146,21 @@ public class TableStoreDataSource(IFactory databaseContextFactory)
         }
         
         await using var db = await CreateDbAsync().ConfigureAwait(false);
-        
-        await db.Rows.AddAsync(item).ConfigureAwait(false);
-        await db.SaveChangesAsync().ConfigureAwait(false);
-        
+        await using var transaction = await db.Database.BeginTransactionAsync().ConfigureAwait(false);
+
+        try
+        {
+            await db.Rows.AddAsync(item).ConfigureAwait(false);
+            
+            await db.SaveChangesAsync().ConfigureAwait(false);
+            await transaction.CommitAsync().ConfigureAwait(false);
+        }
+        catch
+        {
+            await transaction.RollbackAsync().ConfigureAwait(false);
+            throw;
+        }
+
         return true;
     }
 
@@ -158,24 +172,34 @@ public class TableStoreDataSource(IFactory databaseContextFactory)
         }
         
         await using var db = await CreateDbAsync().ConfigureAwait(false);
-        
-        var entity = await db.Rows
-            .Include(r => r.Cells)
-            .FirstOrDefaultAsync(r => r.Id == viewModel.Id)
-            .ConfigureAwait(false);
-        
-        if (entity is null)
+        await using var transaction = await db.Database.BeginTransactionAsync().ConfigureAwait(false);
+
+        try
         {
-            return false;
+            var entity = await db.Rows
+                .Include(r => r.Cells)
+                .FirstOrDefaultAsync(r => r.Id == viewModel.Id)
+                .ConfigureAwait(false);
+
+            if (entity is null)
+            {
+                return false;
+            }
+
+            entity.Id = viewModel.Id;
+
+            entity.Cells.Clear();
+            entity.Cells.AddRange(viewModel.Cells);
+
+            await db.SaveChangesAsync().ConfigureAwait(false);
+            await transaction.CommitAsync().ConfigureAwait(false);
         }
-        
-        entity.Id = viewModel.Id;
-        
-        entity.Cells.Clear();
-        entity.Cells.AddRange(viewModel.Cells);
-        
-        await db.SaveChangesAsync().ConfigureAwait(false);
-        
+        catch
+        {
+            await transaction.RollbackAsync().ConfigureAwait(false);
+            throw;
+        }
+
         return true;
     }
 
@@ -187,20 +211,31 @@ public class TableStoreDataSource(IFactory databaseContextFactory)
         }
         
         await using var db = await CreateDbAsync().ConfigureAwait(false);
-        
-        var entity = await db.Rows
-            .Include(r => r.Cells)
-            .FirstOrDefaultAsync(r => r.Id == item.Id)
-            .ConfigureAwait(false);
-        
-        if (entity is null)
+        await using var transaction = await db.Database.BeginTransactionAsync().ConfigureAwait(false);
+
+        try
         {
-            return false;
+            var entity = await db.Rows
+                .Include(r => r.Cells)
+                .FirstOrDefaultAsync(r => r.Id == item.Id)
+                .ConfigureAwait(false);
+
+            if (entity is null)
+            {
+                return false;
+            }
+
+            db.Rows.Remove(entity);
+            
+            await db.SaveChangesAsync().ConfigureAwait(false);
+            await transaction.CommitAsync().ConfigureAwait(false);
+        }
+        catch
+        {
+            await transaction.RollbackAsync().ConfigureAwait(false);
+            throw;
         }
 
-        db.Rows.Remove(entity);
-        await db.SaveChangesAsync().ConfigureAwait(false);
-        
         return true;
     }
 }

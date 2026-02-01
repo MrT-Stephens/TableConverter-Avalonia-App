@@ -80,6 +80,7 @@ public partial class TableDataViewModel : BaseDocumentViewModel
         using var dbContext = _dbContextFactory.Create(Path);
         
         dbContext.Columns
+            .AsNoTracking()
             .AsEnumerable()
             .ForEach((column, idx) => TreeDataSource.AddAutoColumn(column.Name, idx));
         
@@ -106,6 +107,7 @@ public partial class TableDataViewModel : BaseDocumentViewModel
 
         var columns = await dbContext.Columns
             .AsNoTracking()
+            .OrderBy(x => x.OrdinalPosition)
             .ToListAsync();
             
         columns.ForEach((column, idx) => dataSource.AddAutoColumn(column.Name, idx));

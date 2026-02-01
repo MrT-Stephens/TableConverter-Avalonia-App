@@ -99,10 +99,7 @@ public class TableStoreSearchResultDataSource(IFactory databaseContextFactory)
         };
     }
 
-    protected override bool ModelsEqual(SearchResult a, SearchResult b)
-    {
-        return a.RowId == b.RowId && a.ColumnId == b.ColumnId && a.Value == b.Value && a.FoundValue == b.FoundValue;
-    }
+    protected override bool ModelsEqual(SearchResult a, SearchResult b) => a.Id == b.Id;
 
     protected override Task<bool> DoCreateAsync(SearchResult item)
     {

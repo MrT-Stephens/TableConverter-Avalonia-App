@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using TableConverter.Services.DataSources.Base;
 using TableConverter.Utilities.Database.Contexts;
@@ -99,10 +100,7 @@ public class TableStoreColumnsDataSource(IFactory databaseContextFactory)
         };
     }
 
-    protected override bool ModelsEqual(ColumnEntity a, ColumnEntity b)
-    {
-        return a.Id == b.Id;
-    }
+    protected override bool ModelsEqual(ColumnEntity a, ColumnEntity b) => a.Id == b.Id;
 
     protected override async Task<bool> DoCreateAsync(ColumnEntity item)
     {
@@ -110,12 +108,20 @@ public class TableStoreColumnsDataSource(IFactory databaseContextFactory)
         {
             return false;
         }
-        
+
         await using var db = await CreateDbAsync().ConfigureAwait(false);
-        
+
+        var max = await db.Columns
+            .AsNoTracking()
+            .MaxAsync(c => c.OrdinalPosition)
+            .ConfigureAwait(false);
+
+        item.OrdinalPosition = max + 1;
+
         await db.Columns.AddAsync(item).ConfigureAwait(false);
+
         await db.SaveChangesAsync().ConfigureAwait(false);
-        
+
         return true;
     }
 
@@ -125,13 +131,13 @@ public class TableStoreColumnsDataSource(IFactory databaseContextFactory)
         {
             return false;
         }
-        
+
         await using var db = await CreateDbAsync().ConfigureAwait(false);
-        
+
         var entity = await db.Columns
             .FirstOrDefaultAsync(r => r.Id == viewModel.Id)
             .ConfigureAwait(false);
-        
+
         if (entity is null)
         {
             return false;
@@ -153,19 +159,33 @@ public class TableStoreColumnsDataSource(IFactory databaseContextFactory)
         {
             return false;
         }
-        
+
         await using var db = await CreateDbAsync().ConfigureAwait(false);
 
-        var entity = await db.Columns
+        var column = await db.Columns
+            .Include(c => c.Cells)
             .FirstOrDefaultAsync(c => c.Id == item.Id)
             .ConfigureAwait(false);
 
-        if (entity is null)
+        if (column is null)
         {
             return false;
         }
 
-        db.Columns.Remove(entity);
+        db.Columns.Remove(column);
+
+        await db.Database.ExecuteSqlRawAsync(
+            """
+            WITH ORDERED AS (
+                SELECT ROWID AS ROW_ID, ROW_NUMBER() OVER (ORDER BY NAME) AS RN
+                FROM COLUMNS
+            )
+            UPDATE COLUMNS
+            SET ORDINAL_POSITION = (
+                SELECT RN FROM ORDERED WHERE ORDERED.ROW_ID = COLUMNS.ROWID
+            );
+            """).ConfigureAwait(false);
+
         await db.SaveChangesAsync().ConfigureAwait(false);
 
         return true;

@@ -9,8 +9,10 @@ using SukiUI.Toasts;
 using System;
 using System.IO;
 using System.Reflection;
+using Avalonia.Controls.Notifications;
 using Avalonia.Threading;
 using ModelFlow.DataVirtualization;
+using ModelFlow.DataVirtualization.DataManagement;
 using TableConverter.Commands.Extensions;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Commands.Services;
@@ -152,5 +154,16 @@ public class App : Application
         services.RegisterFileConverters();
 
         return services.BuildServiceProvider();
+    }
+
+    private void OnException(IServiceProvider provider)
+    {
+        var toastManager = provider.GetRequiredService<ISukiToastManager>();
+        
+        toastManager.CreateSimpleInfoToast()
+            .OfType(NotificationType.Error)
+            .WithTitle("Error")
+            .WithContent($"An error occured during command execution:")
+            .Queue();
     }
 }

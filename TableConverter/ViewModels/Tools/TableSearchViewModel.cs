@@ -1,8 +1,10 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.EntityFrameworkCore;
 using ModelFlow.DataVirtualization.DataManagement;
 using ModelFlow.DataVirtualization.Extensions;
 using ModelFlow.DataVirtualization.Interfaces;
@@ -10,6 +12,7 @@ using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using TableConverter.Commands.Handlers.TableData;
 using TableConverter.Commands.Interfaces;
+using TableConverter.Extensions;
 using TableConverter.Interfaces;
 using TableConverter.Services.DataSources;
 using TableConverter.Utilities;
@@ -94,7 +97,7 @@ public partial class TableSearchViewModel : BaseScopedPaneToolViewModel<TableWor
             {
                 DataSource.Path = tableDataViewModel.Path;
                 
-                RefreshColumnNames(tableDataViewModel.Path);
+                RefreshColumnNames(tableDataViewModel.Path).FireAndForget();
             }
             else
             {
@@ -107,14 +110,15 @@ public partial class TableSearchViewModel : BaseScopedPaneToolViewModel<TableWor
 
     #region Private Methods
 
-    private void RefreshColumnNames(string path)
+    private async Task RefreshColumnNames(string path)
     {
-        using var db = _databaseContextFactory.Create(path);
+        await using var db = await _databaseContextFactory.CreateAsync(path);
 
-        var columnNames = db.Columns
+        var columnNames = await db.Columns
+            .AsNoTracking()
+            .OrderBy(c => c.OrdinalPosition)
             .Select(c => c.Name)
-            .OrderBy(c => c)
-            .ToArray();
+            .ToListAsync();
         
         SearchSettings.ColumnNames.Clear();
         SearchSettings.ColumnNames.Add("All");
@@ -129,7 +133,7 @@ public partial class TableSearchViewModel : BaseScopedPaneToolViewModel<TableWor
             return;
         }
         
-        RefreshColumnNames(DataSource.Path);
+        RefreshColumnNames(DataSource.Path).FireAndForget();
     }
 
     #endregion
