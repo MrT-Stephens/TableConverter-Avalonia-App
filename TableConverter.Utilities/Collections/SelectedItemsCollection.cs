@@ -127,7 +127,7 @@ public class SelectedItemsCollection : IList, INotifyCollectionChanged, INotifyP
         if (!_typeCache.TryGetValue(type, out var list) || list.Count == 0)
             return;
         
-        list.ForEach(Remove);
+        list.ToArray().ForEach(Remove);
     }
 
     #endregion

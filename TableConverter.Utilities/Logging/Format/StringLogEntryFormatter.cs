@@ -1,7 +1,9 @@
 using System.Buffers;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Microsoft.Extensions.Logging;
 
+[assembly: InternalsVisibleTo("TableConverter.Utilities.Tests")]
 namespace TableConverter.Utilities.Logging.Format;
 
 /// <summary>
