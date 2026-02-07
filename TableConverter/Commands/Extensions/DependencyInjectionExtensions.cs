@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using Avalonia.Controls.Notifications;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using TableConverter.Interfaces;
 
 namespace TableConverter.Common;
@@ -64,6 +65,9 @@ public class ViewsCollection : IViewsCollection
         view = null;
 
         var viewModel = provider.GetRequiredService(viewModelType);
+        var logger = provider.GetRequiredService<ILogger<ViewsCollection>>();
+        
+        logger.LogDebug("Creating view for ViewModel type {0}.", viewModelType.FullName);
 
         return TryCreateView(viewModel, out view);
     }

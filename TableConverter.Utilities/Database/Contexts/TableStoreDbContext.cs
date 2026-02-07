@@ -202,21 +202,25 @@ public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> op
                 _ => DbEntityChangeState.None
             };
 
-            if (state is DbEntityChangeState.None)
-            {
+            if (state == DbEntityChangeState.None)
                 continue;
-            }
+
+            var modifiedProperties = entry.Properties
+                .Where(p => p.IsModified)
+                .ToDictionary(
+                    p => p.Metadata.Name,
+                    p => (p.OriginalValue, p.CurrentValue)
+                );
 
             var type = entry.Metadata.ClrType;
 
-            if (result.TryGetValue(type, out var list))
+            if (!result.TryGetValue(type, out var list))
             {
-                list.Add(new DbEntityChange(entry.Entity, state));
+                list = [];
+                result[type] = list;
             }
-            else
-            {
-                result[type] = [new DbEntityChange(entry.Entity, state)];
-            }
+
+            list.Add(new DbEntityChange(entry.Entity, state, modifiedProperties));
         }
 
         return result;

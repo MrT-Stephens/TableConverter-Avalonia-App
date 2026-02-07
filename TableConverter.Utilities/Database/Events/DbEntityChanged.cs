@@ -12,11 +12,13 @@ public enum DbEntityChangeState
     Deleted  = 3
 }
 
-public readonly struct DbEntityChange(object entity, DbEntityChangeState state)
+public readonly struct DbEntityChange(object entity, DbEntityChangeState state, Dictionary<string, (object?, object?)> modifiedProperties)
 {
     public object Entity { get; } = entity;
     
     public DbEntityChangeState State { get; } = state;
+
+    public IDictionary<string, (object? Original, object? Current)> ModifiedProperties { get; } = modifiedProperties;
 }
 
 public sealed class DbEntityChangedEventArgs : EventArgs 

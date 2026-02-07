@@ -7,26 +7,24 @@ using SukiUI.Controls;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using System;
-using System.IO;
-using System.Reflection;
-using Avalonia.Controls.Notifications;
+using Avalonia.Controls.Templates;
 using Avalonia.Threading;
+using Microsoft.Extensions.Configuration;
 using ModelFlow.DataVirtualization;
-using ModelFlow.DataVirtualization.DataManagement;
 using TableConverter.Commands.Extensions;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Commands.Services;
 using TableConverter.Common;
+using TableConverter.Configuration;
 using TableConverter.FileConverters.Extensions;
 using TableConverter.Interfaces;
 using TableConverter.Services;
 using TableConverter.Utilities;
-using TableConverter.Utilities.Database;
 using TableConverter.Utilities.Database.Contexts;
 using TableConverter.Utilities.Database.Extensions;
 using TableConverter.Utilities.Database.Factories;
-using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.Utilities.Interfaces;
+using TableConverter.Utilities.Logging;
 using TableConverter.ViewModels;
 using TableConverter.ViewModels.Dialogs;
 using TableConverter.ViewModels.Documents;
@@ -42,10 +40,6 @@ namespace TableConverter;
 
 public class App : Application
 {
-    public static readonly string AppStorageDirectory = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments, Environment.SpecialFolderOption.Create),
-        "TableConverter");
-    
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -69,14 +63,15 @@ public class App : Application
             }, TimeSpan.FromMilliseconds(10), DispatcherPriority.Background);
             
             var services = new ServiceCollection();
-
-            var views = ConfigureViews(services);
+            
+            ConfigureViews(services);
+            
             var provider = ConfigureServices(services);
             
             provider.RegisterCommandHandlers();
             provider.RegisterCommandError();
 
-            DataTemplates.Add(new ViewLocator(views));
+            DataTemplates.Add(provider.GetRequiredService<IDataTemplate>());
 
             var window = provider.GetRequiredService<MainWindowView>()
                 ?? throw new InvalidOperationException("Failed to create main window");
@@ -104,30 +99,48 @@ public class App : Application
         base.OnFrameworkInitializationCompleted();
     }
 
-    private static IViewsCollection ConfigureViews(ServiceCollection services)
+    private static void ConfigureViews(ServiceCollection services)
     {
-        var views = new ViewsCollection()
-            // Workspaces
-            .AddView<BaseWorkspaceEditorView, TableWorkspaceEditorViewModel>(services)
-            .AddView<BaseWorkspaceEditorView, DataGenerationWorkspaceEditorViewModel>(services)
-            // Documents
-            .AddView<TableDataView, TableDataViewModel>(services)
-            .AddView<DataGenerationSchemeView, DataGenerationSchemaViewModel>(services)
-            .AddView<MarkdownView, MarkdownViewModel>(services)
-            // Tools
-            .AddView<TableUtilitiesView, TableUtilitiesViewModel>(services)
-            .AddView<TableSearchView, TableSearchViewModel>(services)
-            .AddView<DataGenerationOptionsView, DataGenerationOptionsViewModel>(services)
-            .AddView<TableColumnsEditorView, TableColumnsEditorViewModel>(services)
-            // Misc
-            .AddView<DataGenerationTypesSelectionListView, DataGenerationTypesSelectionListViewModel>(services)
-            .AddView<DataGenerationTypesSelectionView, DataGenerationTypesSelectionViewModel>(services);
+        var views = new ViewsCollection();
         
-        return views;
+        // Workspaces
+        views.AddView<BaseWorkspaceEditorView, TableWorkspaceEditorViewModel>(services);
+        views.AddView<BaseWorkspaceEditorView, DataGenerationWorkspaceEditorViewModel>(services);
+        // Documents
+        views.AddView<TableDataView, TableDataViewModel>(services);
+        views.AddView<DataGenerationSchemeView, DataGenerationSchemaViewModel>(services);
+        views.AddView<MarkdownView, MarkdownViewModel>(services);
+        // Tools
+        views.AddView<TableUtilitiesView, TableUtilitiesViewModel>(services);
+        views.AddView<TableSearchView, TableSearchViewModel>(services);
+        views.AddView<DataGenerationOptionsView, DataGenerationOptionsViewModel>(services);
+        views.AddView<TableColumnsEditorView, TableColumnsEditorViewModel>(services);
+        // Misc
+        views.AddView<DataGenerationTypesSelectionListView, DataGenerationTypesSelectionListViewModel>(services);
+        views.AddView<DataGenerationTypesSelectionView, DataGenerationTypesSelectionViewModel>(services);
+        
+        // Register Views Collection
+        services.AddSingleton<IViewsCollection, ViewsCollection>(_ => views);
+        
+        // Register Data Templates
+        services.AddSingleton<IDataTemplate, ViewLocator>();
     }
 
     private static ServiceProvider ConfigureServices(ServiceCollection services)
     {
+        // Register Configuration
+        IConfiguration configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", false, true)
+            .Build();
+        
+        services.AddSingleton(configuration);
+
+        services.AddOptions<AppOptions>().Bind(configuration.GetSection(nameof(AppOptions)));
+        
+        // Register Logging
+        services.AddLogging(builder => builder.AddFile(configuration, options =>
+            options.FormatLogFileName = name => string.Format(name, DateTime.UtcNow)));
+        
         // Main Display Window
         services.AddSingleton<MainWindowView>();
         services.AddSingleton<MainWindowViewModel>();
@@ -154,16 +167,5 @@ public class App : Application
         services.RegisterFileConverters();
 
         return services.BuildServiceProvider();
-    }
-
-    private void OnException(IServiceProvider provider)
-    {
-        var toastManager = provider.GetRequiredService<ISukiToastManager>();
-        
-        toastManager.CreateSimpleInfoToast()
-            .OfType(NotificationType.Error)
-            .WithTitle("Error")
-            .WithContent($"An error occured during command execution:")
-            .Queue();
     }
 }

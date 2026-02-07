@@ -110,17 +110,27 @@ public class TableStoreColumnsDataSource(IFactory databaseContextFactory)
         }
 
         await using var db = await CreateDbAsync().ConfigureAwait(false);
+        await using var transaction = await db.Database.BeginTransactionAsync().ConfigureAwait(false);
 
-        var max = await db.Columns
-            .AsNoTracking()
-            .MaxAsync(c => c.OrdinalPosition)
-            .ConfigureAwait(false);
+        try
+        {
+            var max = await db.Columns
+                .AsNoTracking()
+                .MaxAsync(c => c.OrdinalPosition)
+                .ConfigureAwait(false);
 
-        item.OrdinalPosition = max + 1;
+            item.OrdinalPosition = max + 1;
 
-        await db.Columns.AddAsync(item).ConfigureAwait(false);
+            await db.Columns.AddAsync(item).ConfigureAwait(false);
 
-        await db.SaveChangesAsync().ConfigureAwait(false);
+            await db.SaveChangesAsync().ConfigureAwait(false);
+            await transaction.CommitAsync().ConfigureAwait(false);
+        }
+        catch
+        {
+            await transaction.RollbackAsync().ConfigureAwait(false);
+            throw;
+        }
 
         return true;
     }
@@ -133,22 +143,32 @@ public class TableStoreColumnsDataSource(IFactory databaseContextFactory)
         }
 
         await using var db = await CreateDbAsync().ConfigureAwait(false);
+        await using var transaction = await db.Database.BeginTransactionAsync().ConfigureAwait(false);
 
-        var entity = await db.Columns
-            .FirstOrDefaultAsync(r => r.Id == viewModel.Id)
-            .ConfigureAwait(false);
-
-        if (entity is null)
+        try
         {
-            return false;
+            var entity = await db.Columns
+                .FirstOrDefaultAsync(r => r.Id == viewModel.Id)
+                .ConfigureAwait(false);
+
+            if (entity is null)
+            {
+                return false;
+            }
+
+            entity.Name = viewModel.Name;
+            entity.DefaultValueForCell = viewModel.DefaultValueForCell;
+            entity.Cells = viewModel.Cells;
+            entity.DataType = viewModel.DataType;
+
+            await db.SaveChangesAsync().ConfigureAwait(false);
+            await transaction.CommitAsync().ConfigureAwait(false);
         }
-
-        entity.Name = viewModel.Name;
-        entity.DefaultValueForCell = viewModel.DefaultValueForCell;
-        entity.Cells = viewModel.Cells;
-        entity.DataType = viewModel.DataType;
-
-        await db.SaveChangesAsync().ConfigureAwait(false);
+        catch
+        {
+            await transaction.RollbackAsync().ConfigureAwait(false);
+            throw;
+        }
 
         return true;
     }
@@ -161,32 +181,44 @@ public class TableStoreColumnsDataSource(IFactory databaseContextFactory)
         }
 
         await using var db = await CreateDbAsync().ConfigureAwait(false);
+        await using var transaction = await db.Database.BeginTransactionAsync().ConfigureAwait(false);
 
-        var column = await db.Columns
-            .Include(c => c.Cells)
-            .FirstOrDefaultAsync(c => c.Id == item.Id)
-            .ConfigureAwait(false);
-
-        if (column is null)
+        try
         {
-            return false;
+            var column = await db.Columns
+                .FirstOrDefaultAsync(c => c.Id == item.Id)
+                .ConfigureAwait(false);
+
+            if (column is null)
+            {
+                return false;
+            }
+
+            db.Columns.Remove(column);
+
+            await db.Database.ExecuteSqlRawAsync(
+                """
+                WITH ORDERED AS (
+                    SELECT ID,
+                        ROW_NUMBER() OVER (ORDER BY NAME, ID) AS RN
+                    FROM COLUMNS
+                )
+                UPDATE COLUMNS
+                SET ORDINAL_POSITION = (
+                    SELECT RN
+                    FROM ORDERED
+                    WHERE ORDERED.ID = COLUMNS.ID
+                );
+                """).ConfigureAwait(false);
+
+            await db.SaveChangesAsync().ConfigureAwait(false);
+            await transaction.CommitAsync().ConfigureAwait(false);
         }
-
-        db.Columns.Remove(column);
-
-        await db.Database.ExecuteSqlRawAsync(
-            """
-            WITH ORDERED AS (
-                SELECT ROWID AS ROW_ID, ROW_NUMBER() OVER (ORDER BY NAME) AS RN
-                FROM COLUMNS
-            )
-            UPDATE COLUMNS
-            SET ORDINAL_POSITION = (
-                SELECT RN FROM ORDERED WHERE ORDERED.ROW_ID = COLUMNS.ROWID
-            );
-            """).ConfigureAwait(false);
-
-        await db.SaveChangesAsync().ConfigureAwait(false);
+        catch
+        {
+            await transaction.RollbackAsync().ConfigureAwait(false);
+            throw;
+        }
 
         return true;
     }

@@ -5,10 +5,12 @@ using Avalonia.Controls;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using ModelFlow.DataVirtualization.DataManagement;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;
+using TableConverter.Configuration;
 using TableConverter.Utilities.Database.Contexts;
 using TableConverter.ViewModels.Base;
 using TableConverter.Extensions;
@@ -42,11 +44,12 @@ public partial class TableDataViewModel : BaseDocumentViewModel
         IEventManager eventManager, 
         ISukiDialogManager dialogManager,
         ISukiToastManager toastManager,
-        IDatabaseContextFactory<TableStoreDbContext> dbContextFactory)
+        IDatabaseContextFactory<TableStoreDbContext> dbContextFactory,
+        IOptions<AppOptions> options)
         : base(commandManager, eventManager, dialogManager, toastManager)
     {
         _dbContextFactory = dbContextFactory;
-        Path = System.IO.Path.Combine(App.AppStorageDirectory, $"{DateTime.Now.ToFileTime()}.tcstore");
+        Path = System.IO.Path.Combine(options.Value.BaseContentPath, $"{DateTime.Now.ToFileTime()}.tcstore");
         DataSource = new TableStoreDataSource(_dbContextFactory);
         TreeDataSource = new FlatTreeDataGridSource<DataItem<RowEntity>>(DataSource.Collection);
         DataSource.Path = Path;
@@ -96,23 +99,26 @@ public partial class TableDataViewModel : BaseDocumentViewModel
             return;
         }
         
-        RefreshDataAsync(args.Changes).FireAndForget();
+        RefreshDataAsync().FireAndForget();
     }
 
-    private async Task RefreshDataAsync(DbEntityChange[] changes)
+    private async Task RefreshDataAsync()
     {
-        var dataSource = new FlatTreeDataGridSource<DataItem<RowEntity>>(DataSource.Collection);
-
         await using var dbContext = await _dbContextFactory.CreateAsync(Path);
+
+        TreeDataSource = new FlatTreeDataGridSource<DataItem<RowEntity>>(DataSource.Collection);
 
         var columns = await dbContext.Columns
             .AsNoTracking()
-            .OrderBy(x => x.OrdinalPosition)
+            .OrderBy(c => c.OrdinalPosition)
             .ToListAsync();
-            
-        columns.ForEach((column, idx) => dataSource.AddAutoColumn(column.Name, idx));
+
+        for (var i = 0; i < columns.Count; i++)
+        {
+            TreeDataSource.AddAutoColumn(columns[i].Name, i);
+        }
         
-        TreeDataSource = dataSource;
+        DataSource.Invalidate();
     }
 
     #endregion
