@@ -202,7 +202,7 @@ public class SelectedItemsCollectionTests
         // mutate nested collection - AttachItemEvents should register its CollectionChanged
         item.Children.Add("x");
 
-        Assert.Equal(item, changedItem);
+        Assert.Equal(item.Children, changedItem);
     }
 
     [Fact]

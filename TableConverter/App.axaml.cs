@@ -13,6 +13,7 @@ using Avalonia.Threading;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using ModelFlow.DataVirtualization;
+using SukiUI.Enums;
 using TableConverter.Commands.Extensions;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Commands.Services;
@@ -72,10 +73,6 @@ public class App : Application
             
             provider.RegisterCommandHandlers();
             provider.RegisterCommandError();
-            
-            var logger = provider.GetRequiredService<ILogger<App>>();
-            
-            logger.LogInformation("Application Starting");
 
             DataTemplates.Add(provider.GetRequiredService<IDataTemplate>());
 

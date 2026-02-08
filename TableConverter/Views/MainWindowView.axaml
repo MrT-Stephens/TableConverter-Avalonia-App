@@ -8,10 +8,10 @@
                    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
                    x:Class="TableConverter.Views.MainWindowView"
                    x:DataType="viewModels:MainWindowViewModel"
-                   Title="TableConverter"
-                   BackgroundStyle="GradientDarker"
-                   BackgroundAnimationEnabled="False"
-                   BackgroundTransitionsEnabled="False"
+                   Title="{Binding AppOptions.AppName, Mode=OneWay}"
+                   BackgroundStyle="{Binding AppOptions.BackgroundStyle, Mode=OneWay}"
+                   BackgroundAnimationEnabled="{Binding AppOptions.BackgroundAnimationEnabled, Mode=OneWay}"
+                   BackgroundTransitionsEnabled="{Binding AppOptions.BackgroundTransitionEnabled, Mode=OneWay}"
                    CanFullScreen="True"
                    IsMenuVisible="{Binding !!SelectedWorkspace.MainCommands.Count, Mode=OneWay}">
     <sukiUi:SukiWindow.MenuItems>

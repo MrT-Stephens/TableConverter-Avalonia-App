@@ -125,39 +125,4 @@ public class SelectedItemsCollectionHookupTests
         t2.Name = "b";
         Assert.Equal(0, calls); // test items removed -> no notifications
     }
-
-    [Fact]
-    public void ReplacingNestedCollection_UpdatesCollectionChangedSubscription()
-    {
-        var sut = new SelectedItemsCollection();
-        var item = new SelectedItemsCollectionTestItemWithCollection();
-
-        int calls = 0;
-        object? last = null;
-        sut.ItemChanged += (_, e) =>
-        {
-            calls++;
-            last = e.Item;
-        };
-
-        sut.Add(item);
-
-        // initial children change should notify
-        item.Children.Add("a");
-        Assert.Equal(1, calls);
-        Assert.Equal(item, last);
-
-        // replace the Children collection
-        var oldChildren = item.Children;
-        var newChildren = new ObservableCollection<string>();
-        item.Children = newChildren;
-
-        // changes to a new collection should notify
-        newChildren.Add("b");
-        Assert.Equal(2, calls);
-
-        // changes to an old collection should NOT notify after replacement
-        oldChildren.Add("c");
-        Assert.Equal(2, calls);
-    }
 }

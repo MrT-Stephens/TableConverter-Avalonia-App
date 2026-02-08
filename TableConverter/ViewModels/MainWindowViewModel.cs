@@ -1,12 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Linq;
 using Avalonia.Collections;
 using Avalonia.Controls;
+using Microsoft.Extensions.Options;
+using SukiUI;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;
+using TableConverter.Configuration;
 using TableConverter.Contracts.Events;
 using TableConverter.Interfaces;
 using TableConverter.Utilities.Extensions;
@@ -23,6 +27,7 @@ public partial class MainWindowViewModel : BaseViewModel
     
     [ObservableProperty] private IWorkspace _SelectedWorkspace;
     [ObservableProperty] private ObservableCollection<MenuItem> _MenuItems;
+    [ObservableProperty] private AppOptions _AppOptions;
 
     #endregion
 
@@ -33,10 +38,12 @@ public partial class MainWindowViewModel : BaseViewModel
         IEventManager eventManager,
         ISukiDialogManager dialogManager,
         ISukiToastManager toastManager,
-        IEnumerable<IWorkspace> workspaces) 
+        IEnumerable<IWorkspace> workspaces,
+        IOptions<AppOptions> appOptions) 
         : base(commandManager, eventManager, dialogManager, toastManager)
     {
         MenuItems = [];
+        AppOptions = appOptions.Value;
         
         Workspaces = new AvaloniaList<IWorkspace>(workspaces
             .OrderBy(w => w.Index)
@@ -61,6 +68,10 @@ public partial class MainWindowViewModel : BaseViewModel
 
                 args.Action?.Invoke(workspace);
             });
+        
+        // Ensure all directories exist
+        AppOptions.BaseDocumentsPath.EnsureDirectoryExists();
+        AppOptions.BaseConfigPath.EnsureDirectoryExists();
     }
     
     #endregion
