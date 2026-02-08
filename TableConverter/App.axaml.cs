@@ -7,9 +7,11 @@ using SukiUI.Controls;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using System;
+using System.IO;
 using Avalonia.Controls.Templates;
 using Avalonia.Threading;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using ModelFlow.DataVirtualization;
 using TableConverter.Commands.Extensions;
 using TableConverter.Commands.Interfaces;
@@ -70,6 +72,10 @@ public class App : Application
             
             provider.RegisterCommandHandlers();
             provider.RegisterCommandError();
+            
+            var logger = provider.GetRequiredService<ILogger<App>>();
+            
+            logger.LogInformation("Application Starting");
 
             DataTemplates.Add(provider.GetRequiredService<IDataTemplate>());
 
@@ -135,11 +141,19 @@ public class App : Application
         
         services.AddSingleton(configuration);
 
+        // Configure App Options
         services.AddOptions<AppOptions>().Bind(configuration.GetSection(nameof(AppOptions)));
         
         // Register Logging
-        services.AddLogging(builder => builder.AddFile(configuration, options =>
-            options.FormatLogFileName = name => string.Format(name, DateTime.UtcNow)));
+        var baseDirectory = configuration.GetSection(nameof(AppOptions))
+            .Get<AppOptions>()!.BaseContentPath;
+        
+        services.AddLogging(builder => builder.AddFile(configuration.GetSection("Logging"),
+            options =>
+            {
+                options.FormatLogFileName = name => Path.Combine(
+                    baseDirectory, string.Format(name, DateTime.UtcNow));
+            }));
         
         // Main Display Window
         services.AddSingleton<MainWindowView>();

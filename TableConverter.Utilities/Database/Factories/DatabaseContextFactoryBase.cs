@@ -1,11 +1,15 @@
 using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using TableConverter.Utilities.Database.Extensions;
 using TableConverter.Utilities.Interfaces;
 
 namespace TableConverter.Utilities.Database.Factories;
 
-public abstract class DatabaseContextFactoryBase<TDbContext>(Func<DbContextOptions<TDbContext>, IEventManager, Guid, TDbContext> factory, IEventManager eventManager)
+public abstract class DatabaseContextFactoryBase<TDbContext>(
+    Func<DbContextOptions<TDbContext>, IEventManager, Guid, TDbContext> factory, 
+    IEventManager eventManager,
+    ILoggerFactory loggerFactory)
     : Interfaces.IDatabaseContextFactory<TDbContext> where TDbContext : DbContext
 {
     public TDbContext Create(string path)
@@ -22,8 +26,8 @@ public abstract class DatabaseContextFactoryBase<TDbContext>(Func<DbContextOptio
 #if DEBUG
             .EnableDetailedErrors()
             .EnableSensitiveDataLogging()
-            .LogTo(s => Debug.WriteLine(s))
 #endif
+            .UseLoggerFactory(loggerFactory)
             .Options;
 
         // Generate unique ID for the source database path (used for tracking).
@@ -58,8 +62,8 @@ public abstract class DatabaseContextFactoryBase<TDbContext>(Func<DbContextOptio
 #if DEBUG
             .EnableDetailedErrors()
             .EnableSensitiveDataLogging()
-            .LogTo(s => Debug.WriteLine(s))
 #endif
+            .UseLoggerFactory(loggerFactory)
             .Options;
         
         // Generate unique ID for the source database path (used for tracking).

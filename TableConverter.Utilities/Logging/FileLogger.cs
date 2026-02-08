@@ -4,7 +4,6 @@ namespace TableConverter.Utilities.Logging;
 
 public class FileLogger : ILogger
 {
-
     private readonly string _logName;
     private readonly FileLoggerProvider _loggerPrv;
 
