@@ -58,10 +58,8 @@ public partial class TableColumnsEditorViewModel : BaseScopedPaneToolViewModel<T
         TreeDataSource.RowSelection!.SingleSelect = false; 
         
         TreeDataSource
-            .AddAutoColumn("ID", "Item.Id", true)
-            .AddAutoColumn("Ordinal", "Item.OrdinalPosition", true)
-            .AddAutoColumn("Name", "Item.Name", sourceTrigger: UpdateSourceTrigger.LostFocus)
-            .AddAutoColumn("Data Type", "Item.DataType", sourceTrigger: UpdateSourceTrigger.LostFocus)
+            .AddAutoColumn("ID", "Item.OrdinalPosition", true)
+            .AddAutoColumn("Name", "Item.Name", sourceTrigger: UpdateSourceTrigger.LostFocus, gridLength: GridLength.Star)
             .AddAutoColumn("Default Value", "Item.DefaultValueForCell", sourceTrigger: UpdateSourceTrigger.LostFocus);
 
         DataSource.SetFilterQuery(query => query
@@ -81,7 +79,7 @@ public partial class TableColumnsEditorViewModel : BaseScopedPaneToolViewModel<T
     {
         base.Initialise();
         
-        ColumnCommands.Add(this[TableDataCommandNames.EditColumn]);
+        ColumnCommands.Add(this[TableDataCommandNames.AddColumn]);
         ColumnCommands.Add(this[TableDataCommandNames.DeleteColumn]);
         
         _eventRegistrar.RegisterEvent<EventHandler<TreeSelectionModelSelectionChangedEventArgs<DataItem<ColumnEntity>>>>(
@@ -112,10 +110,6 @@ public partial class TableColumnsEditorViewModel : BaseScopedPaneToolViewModel<T
             SelectedItems.RemoveAll<DataItem<ColumnEntity>>();
         }
     }
-
-    #endregion
-
-    #region Private Methods
 
     #endregion
 }

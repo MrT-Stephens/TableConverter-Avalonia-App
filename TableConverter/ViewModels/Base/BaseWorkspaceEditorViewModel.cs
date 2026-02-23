@@ -41,10 +41,6 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
     [ObservableProperty] private IPaneTool? _SelectedTool;
     [ObservableProperty] private ToolsSettingsForm _ToolsSettings;
     [ObservableProperty] private ObservableCollection<ICommandInstance> _MainCommands;
-    
-    protected readonly string _storageLocationPath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), 
-        "TableConverter");
 
     #endregion
 

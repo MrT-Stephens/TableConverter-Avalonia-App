@@ -6,7 +6,7 @@ namespace TableConverter.Interfaces;
 
 public interface IFilesDialogManager : ITopLevelAware
 {
-    public Task<IStorageFile?> OpenFileAsync(FilePickerOpenOptions options);
+    public Task<IEnumerable<IStorageFile>?> OpenFileAsync(FilePickerOpenOptions options);
     
     public Task<IStorageFile?> SaveFileAsync(FilePickerSaveOptions options);
 }

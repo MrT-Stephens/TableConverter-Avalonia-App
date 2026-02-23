@@ -2,11 +2,17 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Controls.Models.TreeDataGrid;
+using Avalonia.Controls.Selection;
+using Avalonia.Controls.Templates;
+using Avalonia.Data;
+using Avalonia.Layout;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using ModelFlow.DataVirtualization.DataManagement;
+using Org.BouncyCastle.Crmf;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;
@@ -34,6 +40,7 @@ public partial class TableDataViewModel : BaseDocumentViewModel
     public override bool CanClose => !IsDirty;
 
     private readonly IDatabaseContextFactory<TableStoreDbContext> _dbContextFactory;
+    private readonly IOptions<AppOptions> _appOptions;
 
     #endregion
 
@@ -45,13 +52,15 @@ public partial class TableDataViewModel : BaseDocumentViewModel
         ISukiDialogManager dialogManager,
         ISukiToastManager toastManager,
         IDatabaseContextFactory<TableStoreDbContext> dbContextFactory,
-        IOptions<AppOptions> options)
+        IOptions<AppOptions> appOptions)
         : base(commandManager, eventManager, dialogManager, toastManager)
     {
+        _appOptions = appOptions;
         _dbContextFactory = dbContextFactory;
-        Path = System.IO.Path.Combine(options.Value.BaseContentPath, $"{DateTime.Now.ToFileTime()}.tcstore");
+        Path = string.Empty;
         DataSource = new TableStoreDataSource(_dbContextFactory);
         TreeDataSource = new FlatTreeDataGridSource<DataItem<RowEntity>>(DataSource.Collection);
+        TreeDataSource.RowSelection!.SingleSelect = false; 
         DataSource.Path = Path;
         
         Dispatcher.UIThread.Post(async void () =>
@@ -67,9 +76,24 @@ public partial class TableDataViewModel : BaseDocumentViewModel
     public override void Initialise()
     {
         base.Initialise();
+
+        var path = System.IO.Path.Combine(
+            _appOptions.Value.BaseDocumentsPath, 
+            $"{DateTime.UtcNow.ToFileTime()}.tcstore");
         
-        _eventManager.GetEvent<DbEntityChangedEvent>()
-            .Subscribe(OnEntityChanged);
+        Path = path;
+        DataSource.Path = path;
+        
+        _eventManager.GetEvent<DbEntityChangedEvent>().Subscribe(OnEntityChanged);
+        
+        _eventRegistrar.RegisterEvent<EventHandler<TreeSelectionModelSelectionChangedEventArgs<DataItem<RowEntity>>>>(
+            action => TreeDataSource.RowSelection!.SelectionChanged += action,
+            action => TreeDataSource.RowSelection!.SelectionChanged -= action, 
+            null, (_, args) =>
+            {
+                args.DeselectedItems.ForEach(item => SelectedItems.Remove(item));
+                args.SelectedItems.ForEach(item => SelectedItems.Add(item));
+            });
     }
 
     #endregion
@@ -84,8 +108,13 @@ public partial class TableDataViewModel : BaseDocumentViewModel
         
         dbContext.Columns
             .AsNoTracking()
+            .OrderBy(c => c.OrdinalPosition)
             .AsEnumerable()
-            .ForEach((column, idx) => TreeDataSource.AddAutoColumn(column.Name, idx));
+            .ForEach(column =>
+            {
+                var newColumn = CreateTemplateColumn<DataItem<RowEntity>>(column.Name, column.OrdinalPosition - 1);
+                TreeDataSource.Columns.Insert(column.OrdinalPosition - 1, newColumn);
+            });
         
         DataSource.Invalidate();
     }
@@ -99,26 +128,75 @@ public partial class TableDataViewModel : BaseDocumentViewModel
             return;
         }
         
-        RefreshDataAsync().FireAndForget();
+        RefreshDataAsync(args.Changes).FireAndForget();
     }
 
-    private async Task RefreshDataAsync()
+    private async Task RefreshDataAsync(DbEntityChange[] changes)
     {
-        await using var dbContext = await _dbContextFactory.CreateAsync(Path);
-
-        TreeDataSource = new FlatTreeDataGridSource<DataItem<RowEntity>>(DataSource.Collection);
-
-        var columns = await dbContext.Columns
-            .AsNoTracking()
-            .OrderBy(c => c.OrdinalPosition)
-            .ToListAsync();
-
-        for (var i = 0; i < columns.Count; i++)
+        foreach (var change in changes)
         {
-            TreeDataSource.AddAutoColumn(columns[i].Name, i);
+            if (change.Entity is not ColumnEntity column)
+            {
+                continue;
+            }
+
+            if (change.State is DbEntityChangeState.Deleted)
+            {
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    TreeDataSource.Columns.RemoveAt(column.OrdinalPosition - 1);
+                });
+            }
+            else if (change.State is DbEntityChangeState.Added)
+            {
+                var newColumn = CreateTemplateColumn<DataItem<RowEntity>>(column.Name, column.OrdinalPosition - 1);
+                
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    TreeDataSource.Columns.Insert(column.OrdinalPosition - 1, newColumn);
+                });
+            }
+            else if (change.State is DbEntityChangeState.Modified)
+            {
+                var newColumn = CreateTemplateColumn<DataItem<RowEntity>>(column.Name, column.OrdinalPosition - 1);
+                
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    TreeDataSource.Columns.RemoveAt(column.OrdinalPosition - 1);
+                    TreeDataSource.Columns.Insert(column.OrdinalPosition - 1, newColumn);
+                });
+            }
         }
-        
-        DataSource.Invalidate();
+    }
+
+    private static TemplateColumn<TModel> CreateTemplateColumn<TModel>(object header, int columnIndex, GridLength? gridLength = null) 
+        where TModel : class
+    {
+        return new TemplateColumn<TModel>(header,
+            new FuncDataTemplate<TModel>((_, _) => new TextBlock
+            {
+                VerticalAlignment = VerticalAlignment.Center,
+                [!TextBlock.TextProperty] = new Binding
+                {
+                    Path = $"Item.Cells[{columnIndex}].Value",
+                    Mode = BindingMode.TwoWay
+                },
+            }),
+            new FuncDataTemplate<TModel>((_, _) => new TextBox
+            {
+                VerticalAlignment = VerticalAlignment.Center,
+                [!TextBox.TextProperty] = new Binding
+                {
+                    Path = $"Item.Cells[{columnIndex}].Value",
+                    Mode = BindingMode.TwoWay,
+                    UpdateSourceTrigger = UpdateSourceTrigger.LostFocus
+                }
+            }),
+            GridLength.Auto,
+            new TemplateColumnOptions<TModel>
+            {
+                CanUserSortColumn = false,
+            });
     }
 
     #endregion

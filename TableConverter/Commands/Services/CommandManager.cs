@@ -37,12 +37,14 @@ public class CommandManager(ILogger<CommandManager> logger) : ICommandManager
     #endregion
 
     #region Command Registration Methods
-
+    
     public void RegisterCommand(string name, ICommandHandlerBase handler)
     {
+        var eventId = new EventId(0, nameof(RegisterCommand));
+        
         if (_commandHandlers.Any(c => c.CommandMetadata.Name == name))
         {
-            _logger.LogError("A command with the name '{0}' is already registered.", name);
+            _logger.LogError(eventId, "A command with the name '{0}' is already registered.", name);
             
             throw new ArgumentException("A command with the name '{0}' is already registered.".Format(name),
                 nameof(name));
@@ -50,7 +52,7 @@ public class CommandManager(ILogger<CommandManager> logger) : ICommandManager
 
         if (handler.CommandMetadata.Name != name)
         {
-            _logger.LogError("The command handler's name '{0}' does not match the provided name '{1}'.", handler.CommandMetadata.Name, name);
+            _logger.LogError(eventId, "The command handler's name '{0}' does not match the provided name '{1}'.", handler.CommandMetadata.Name, name);
             
             throw new ArgumentException("The command handler's name '{0}' does not match the provided name '{1}'."
                 .Format(handler.CommandMetadata.Name, name), nameof(name));
@@ -61,21 +63,23 @@ public class CommandManager(ILogger<CommandManager> logger) : ICommandManager
 
     public ICommandInstance RegisterCommandInstance(string name, object? viewModel = null)
     {
+        var eventId = new EventId(1, nameof(RegisterCommandInstance));
+        
         if (string.IsNullOrWhiteSpace(name))
         {
-            _logger.LogError("Command name cannot be null or whitespace.");
+            _logger.LogError(eventId, "Command name cannot be null or whitespace.");
             
             throw new ArgumentException("Command name cannot be null or whitespace.", nameof(name));
         }
 
         var instance = _instances.GetOrAdd((name, viewModel), _ =>
         {
-            _logger.LogInformation("Registering command instance for command '{0}' with view model '{1}'.", name, viewModel?.GetType().Name ?? "null");
+            _logger.LogInformation(eventId, "Registering command instance for command '{0}' with view model '{1}'.", name, viewModel?.GetType().Name ?? "null");
             
             if (_commandHandlers.FirstOrDefault(c => c.CommandMetadata.Name == name)
                 is not { } handler)
             {
-                _logger.LogError("Command with name '{0}' not found.", name);
+                _logger.LogError(eventId, "Command with name '{0}' not found.", name);
                 
                 throw new ArgumentException("Command with name '{0}' not found.".Format(name), nameof(name));
             }
@@ -142,7 +146,9 @@ public class CommandManager(ILogger<CommandManager> logger) : ICommandManager
     
     private async Task InternalExecute(object? parameter, ICommandHandlerAsync handler, ICommandContext context, ICommandMetadata metadata)
     {
-        _logger.LogInformation("Executing command '{0}' with parameter '{1}'.", handler.CommandMetadata.Name, parameter ?? "null");
+        var eventId = new EventId(2, nameof(InternalExecute));
+        
+        _logger.LogInformation(eventId, "Executing command '{0}' with parameter '{1}'.", handler.CommandMetadata.Name, parameter ?? "null");
         
         try
         {
@@ -172,7 +178,7 @@ public class CommandManager(ILogger<CommandManager> logger) : ICommandManager
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "An error occurred while executing the command `{0}`.", handler.CommandMetadata.Name);
+            _logger.LogError(eventId, e, "An error occurred while executing the command `{0}`.", handler.CommandMetadata.Name);
             OnError?.Invoke(this, e);
         }
         finally
@@ -192,13 +198,15 @@ public class CommandManager(ILogger<CommandManager> logger) : ICommandManager
                 workspace.SetBusy(false);
             }
             
-            _logger.LogInformation("Finished executing command '{0}'.", handler.CommandMetadata.Name);
+            _logger.LogInformation(eventId, "Finished executing command '{0}'.", handler.CommandMetadata.Name);
         }
     }
     
     private void InternalExecuteAsync(object? parameter, ICommandHandler handler, ICommandContext context, ICommandMetadata metadata)
     {
-        _logger.LogInformation("Executing command '{0}' with parameter '{1}'.", handler.CommandMetadata.Name, parameter ?? "null");
+        var eventId = new EventId(3, nameof(InternalExecuteAsync));
+        
+        _logger.LogInformation(eventId, "Executing command '{0}' with parameter '{1}'.", handler.CommandMetadata.Name, parameter ?? "null");
         
         try
         {
@@ -228,7 +236,7 @@ public class CommandManager(ILogger<CommandManager> logger) : ICommandManager
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "An error occurred while executing the command `{0}`.", handler.CommandMetadata.Name);
+            _logger.LogError(eventId, e, "An error occurred while executing the command `{0}`.", handler.CommandMetadata.Name);
             OnError?.Invoke(this, e);
         }
         finally
@@ -248,13 +256,15 @@ public class CommandManager(ILogger<CommandManager> logger) : ICommandManager
                 workspace.SetBusy(false);
             }
             
-            _logger.LogInformation("Finished executing command '{0}'.", handler.CommandMetadata.Name);
+            _logger.LogInformation(eventId, "Finished executing command '{0}'.", handler.CommandMetadata.Name);
         }
     }
     
     private bool InternalCanExecute(object? parameter, ICommandHandlerBase handler, ICommandContext context)
     {
-        _logger.LogInformation("Checking can execute for command '{0}' with parameter '{1}'.", handler.CommandMetadata.Name, parameter ?? "null");
+        var eventId = new EventId(4, nameof(InternalCanExecute));
+        
+        _logger.LogInformation(eventId, "Checking can execute for command '{0}' with parameter '{1}'.", handler.CommandMetadata.Name, parameter ?? "null");
 
         try
         {
@@ -269,13 +279,13 @@ public class CommandManager(ILogger<CommandManager> logger) : ICommandManager
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "An error occurred while checking can execute for the command `{0}`.", handler.CommandMetadata.Name);
+            _logger.LogError(eventId, e, "An error occurred while checking can execute for the command `{0}`.", handler.CommandMetadata.Name);
             OnError?.Invoke(this, e);
             return false;
         }
         finally
         {
-            _logger.LogInformation("Finished checking can execute for command '{0}'.", handler.CommandMetadata.Name);
+            _logger.LogInformation(eventId, "Finished checking can execute for command '{0}'.", handler.CommandMetadata.Name);
         }
     }
     

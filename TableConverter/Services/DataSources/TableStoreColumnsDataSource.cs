@@ -195,23 +195,25 @@ public class TableStoreColumnsDataSource(IFactory databaseContextFactory)
             }
 
             db.Columns.Remove(column);
+            
+            await db.SaveChangesAsync().ConfigureAwait(false);
 
             await db.Database.ExecuteSqlRawAsync(
                 """
-                WITH ORDERED AS (
-                    SELECT ID,
-                        ROW_NUMBER() OVER (ORDER BY NAME, ID) AS RN
+                WITH Ordered AS (
+                    SELECT 
+                        ID,
+                        ROW_NUMBER() OVER (ORDER BY ORDINAL_POSITION) AS RN
                     FROM COLUMNS
                 )
                 UPDATE COLUMNS
                 SET ORDINAL_POSITION = (
                     SELECT RN
-                    FROM ORDERED
-                    WHERE ORDERED.ID = COLUMNS.ID
+                    FROM Ordered
+                    WHERE Ordered.ID = COLUMNS.ID
                 );
                 """).ConfigureAwait(false);
-
-            await db.SaveChangesAsync().ConfigureAwait(false);
+            
             await transaction.CommitAsync().ConfigureAwait(false);
         }
         catch

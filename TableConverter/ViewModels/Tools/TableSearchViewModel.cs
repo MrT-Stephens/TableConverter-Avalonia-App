@@ -1,12 +1,10 @@
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.EntityFrameworkCore;
 using ModelFlow.DataVirtualization.DataManagement;
-using ModelFlow.DataVirtualization.Extensions;
 using ModelFlow.DataVirtualization.Interfaces;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
@@ -15,10 +13,8 @@ using TableConverter.Commands.Interfaces;
 using TableConverter.Extensions;
 using TableConverter.Interfaces;
 using TableConverter.Services.DataSources;
-using TableConverter.Utilities;
 using TableConverter.Utilities.Database.Contexts;
 using TableConverter.Utilities.Database.Events;
-using TableConverter.Utilities.Database.Extensions;
 using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.Utilities.Database.Models.TableStore;
 using TableConverter.Utilities.Extensions;
@@ -128,12 +124,48 @@ public partial class TableSearchViewModel : BaseScopedPaneToolViewModel<TableWor
     private void OnEntityChanged(object? sender, DbEntityChangedEventArgs args)
     {
         if (args.Type != typeof(ColumnEntity)
-            || string.IsNullOrEmpty(DataSource.Path))
+            || string.IsNullOrEmpty(DataSource.Path)
+            || DataSource.SourceId != args.SourceId)
         {
             return;
         }
-        
-        RefreshColumnNames(DataSource.Path).FireAndForget();
+
+        RefreshDataAsync(args.Changes).FireAndForget();
+    }
+    
+    private async Task RefreshDataAsync(DbEntityChange[] changes)
+    {
+        foreach (var change in changes)
+        {
+            if (change.Entity is not ColumnEntity column)
+            {
+                continue;
+            }
+
+            if (change.State is DbEntityChangeState.Deleted)
+            {
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    SearchSettings.ColumnNames.Remove(column.Name);
+                });
+            }
+            else if (change.State is DbEntityChangeState.Added)
+            {
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    SearchSettings.ColumnNames.Insert(column.OrdinalPosition - 1, column.Name);
+                });
+            }
+            else if (change.State is DbEntityChangeState.Modified
+                && change.ModifiedProperties.TryGetValue(nameof(ColumnEntity.Name), out var values)
+                && values is { Original: string originalName, Current: string currentName })
+            {
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    SearchSettings.ColumnNames.Replace(originalName, currentName);
+                });
+            }
+        }
     }
 
     #endregion

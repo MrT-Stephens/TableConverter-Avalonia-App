@@ -11,9 +11,8 @@ using System.IO;
 using Avalonia.Controls.Templates;
 using Avalonia.Threading;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using ModelFlow.DataVirtualization;
-using SukiUI.Enums;
+using ModelFlow.DataVirtualization.DataManagement;
 using TableConverter.Commands.Extensions;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Commands.Services;
@@ -22,6 +21,7 @@ using TableConverter.Configuration;
 using TableConverter.FileConverters.Extensions;
 using TableConverter.Interfaces;
 using TableConverter.Services;
+using TableConverter.Services.DataSources;
 using TableConverter.Utilities;
 using TableConverter.Utilities.Database.Contexts;
 using TableConverter.Utilities.Database.Extensions;
@@ -73,6 +73,8 @@ public class App : Application
             
             provider.RegisterCommandHandlers();
             provider.RegisterCommandError();
+            
+            DataSource.DataSourceCallbacks = provider.GetRequiredService<IDataSourceCallbacks>();
 
             DataTemplates.Add(provider.GetRequiredService<IDataTemplate>());
 
@@ -151,6 +153,8 @@ public class App : Application
                 options.FormatLogFileName = name => Path.Combine(
                     baseDirectory, string.Format(name, DateTime.UtcNow));
             }));
+
+        services.AddSingleton<IDataSourceCallbacks, LoggingDataSourceCallbacks>();
         
         // Main Display Window
         services.AddSingleton<MainWindowView>();

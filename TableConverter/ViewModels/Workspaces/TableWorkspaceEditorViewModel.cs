@@ -30,6 +30,7 @@ public partial class TableWorkspaceEditorViewModel : BaseWorkspaceEditorViewMode
         MainCommands.Add(this[TableDataCommandNames.NewFile]);
         MainCommands.Add(this[TableDataCommandNames.ImportFile]);
         MainCommands.Add(this[TableDataCommandNames.Search]);
+        MainCommands.Add(this[TableDataCommandNames.OpenFile]);
     }
 
     public override IPaneDocument CreateNewDocumentInstance()

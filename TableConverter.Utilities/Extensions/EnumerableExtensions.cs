@@ -197,4 +197,34 @@ public static class EnumerableExtensions
     {
         return source.OfType<T>().Single();
     }
+    
+    /// <summary>
+    /// Replaces an item in the source collection with a new item.
+    /// </summary>
+    /// <param name="source">
+    /// The source collection.
+    /// </param>
+    /// <param name="oldItem">
+    /// The item to be replaced.
+    /// </param>
+    /// <param name="newItem">
+    /// The new item to replace the old item with.
+    /// </param>
+    /// <typeparam name="T">
+    /// The type of items in the source collection.
+    /// </typeparam>
+    /// <exception cref="ArgumentException">
+    /// The old item was not found in the source collection.
+    /// </exception>
+    public static void Replace<T>(this IList<T> source, T oldItem, T newItem)
+    {
+        var index = source.IndexOf(oldItem);
+
+        if (index == -1)
+        {
+            throw new ArgumentException("The old item was not found in the source collection.", nameof(oldItem));
+        }
+
+        source[index] = newItem;
+    }
 }

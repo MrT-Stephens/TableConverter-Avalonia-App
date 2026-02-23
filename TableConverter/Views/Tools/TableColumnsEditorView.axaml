@@ -14,7 +14,8 @@
             <controls:CommandButtonToolBar.ItemsPanel>
                 <ItemsPanelTemplate>
                     <UniformGrid Columns="2"
-                                 ColumnSpacing="10" />
+                                 ColumnSpacing="10"
+                                 RowSpacing="10" />
                 </ItemsPanelTemplate>
             </controls:CommandButtonToolBar.ItemsPanel>
         </controls:CommandButtonToolBar>

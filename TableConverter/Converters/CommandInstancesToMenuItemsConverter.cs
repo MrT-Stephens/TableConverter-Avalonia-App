@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using Avalonia.Collections;
@@ -60,6 +61,10 @@ public class CommandInstancesToMenuItemsConverter : IValueConverter
             for (var i = 0; i < subcategories.Count; i++)
             {
                 var subItems = subcategories[i];
+                
+#if DEBUG
+                var debugCommandInstances = subItems.ToList();
+#endif
 
                 // add commands inside subcategory
                 var subMenuItems = subItems
@@ -67,6 +72,14 @@ public class CommandInstancesToMenuItemsConverter : IValueConverter
                     .Select(cmd =>
                     {
                         var keyGesture = cmd.Metadata.KeyGestures.First();
+                        
+#if DEBUG
+                        var anyWithGesture = debugCommandInstances
+                            .Where(ci => ci.Metadata.Name != cmd.Metadata.Name)
+                            .Any(ci => ci.Metadata.KeyGestures.Contains(keyGesture));
+                        
+                        Debug.Assert(!anyWithGesture, $"Duplicate key gesture '{keyGesture}' found in command '{cmd.Metadata.Title}'.");
+#endif
                         
                         if (OperatingSystem.IsMacOS())
                         {

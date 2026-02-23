@@ -34,7 +34,7 @@ public class ImportFileCommandHandler(
         "Import table data from any of the supported file types.",
         "ImportFile",
         "File",
-        0,
+        1,
         ["Ctrl+I"]);
     
     public bool CanExecute(object? parameter, ICommandContext context)
@@ -109,8 +109,8 @@ public class ImportFileCommandHandler(
             context.Cancel("File was not selected.");
             return;
         }
-
-        var path = file.Path.LocalPath;
+        
+        var path = string.Empty;
 
         var tableData = await converterService.InputFileAsync(inputConverterName, path);
 

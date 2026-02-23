@@ -23,10 +23,6 @@ public abstract class DatabaseContextFactoryBase<TDbContext>(
         
         var options = new DbContextOptionsBuilder<TDbContext>()
             .UseSqlite(connectionString)
-#if DEBUG
-            .EnableDetailedErrors()
-            .EnableSensitiveDataLogging()
-#endif
             .UseLoggerFactory(loggerFactory)
             .Options;
 
@@ -59,10 +55,6 @@ public abstract class DatabaseContextFactoryBase<TDbContext>(
 
         var options = new DbContextOptionsBuilder<TDbContext>()
             .UseSqlite(connectionString)
-#if DEBUG
-            .EnableDetailedErrors()
-            .EnableSensitiveDataLogging()
-#endif
             .UseLoggerFactory(loggerFactory)
             .Options;
         

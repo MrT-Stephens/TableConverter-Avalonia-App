@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
 using TableConverter.Interfaces;
@@ -7,7 +8,7 @@ namespace TableConverter.Services;
 
 public class FilesDialogManager : IFilesDialogManager
 {
-    public async Task<IStorageFile?> OpenFileAsync(FilePickerOpenOptions options)
+    public async Task<IEnumerable<IStorageFile>?> OpenFileAsync(FilePickerOpenOptions options)
     {
         var window = ((ITopLevelAware)this).GetTopLevel();
 
@@ -18,7 +19,7 @@ public class FilesDialogManager : IFilesDialogManager
         
         var result = await window.StorageProvider.OpenFilePickerAsync(options);
 
-        return result.Count > 0 ? result[0] : null;
+        return result.Count > 0 ? result : null;
     }
 
     public async Task<IStorageFile?> SaveFileAsync(FilePickerSaveOptions options)

@@ -87,5 +87,7 @@ public class DeleteColumnCommandHandler(
                 .WithContent($"Successfully deleted {columns.Count} columns.")
                 .Queue();
         }
+        
+        viewModel.DataSource.Invalidate();
     }
 }

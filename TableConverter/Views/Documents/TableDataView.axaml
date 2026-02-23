@@ -15,7 +15,7 @@
               ColumnDefinitions="*">
             <TextBlock HorizontalAlignment="Right">
                 <TextBlock.Text>
-                    <MultiBinding StringFormat="Rows: {0}, Columns: {1}">
+                    <MultiBinding StringFormat="Rows: {0:N0}, Columns: {1:N0}">
                         <Binding Path="DataSource.Collection.Count" />
                         <Binding Path="DataSource.ColumnCount" />
                     </MultiBinding>
