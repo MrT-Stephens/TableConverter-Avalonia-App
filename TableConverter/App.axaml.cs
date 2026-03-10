@@ -53,31 +53,31 @@ public class App : Application
         // The Line below is needed to remove Avalonia data validation.
         // Without this line, you will get duplicate validations from both Avalonia and CT
         BindingPlugins.DataValidators.RemoveAt(0);
+        
+        VirtualizationManager.Instance.UiThreadExcecuteAction = a => 
+            Dispatcher.UIThread.InvokeAsync(a).GetTask();
+            
+        DispatcherTimer.Run(() =>
+        {
+            VirtualizationManager.Instance.ProcessActions();
+            return true;
+        }, TimeSpan.FromMilliseconds(10), DispatcherPriority.Background);
+            
+        var services = new ServiceCollection();
+            
+        ConfigureViews(services);
+            
+        var provider = ConfigureServices(services);
+            
+        provider.RegisterCommandHandlers();
+        provider.RegisterCommandError();
+            
+        DataSource.DataSourceCallbacks = provider.GetRequiredService<IDataSourceCallbacks>();
+
+        DataTemplates.Add(provider.GetRequiredService<IDataTemplate>());
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            VirtualizationManager.Instance.UiThreadExcecuteAction = a => 
-                Dispatcher.UIThread.InvokeAsync(a).GetTask();
-            
-            DispatcherTimer.Run(() =>
-            {
-                VirtualizationManager.Instance.ProcessActions();
-                return true;
-            }, TimeSpan.FromMilliseconds(10), DispatcherPriority.Background);
-            
-            var services = new ServiceCollection();
-            
-            ConfigureViews(services);
-            
-            var provider = ConfigureServices(services);
-            
-            provider.RegisterCommandHandlers();
-            provider.RegisterCommandError();
-            
-            DataSource.DataSourceCallbacks = provider.GetRequiredService<IDataSourceCallbacks>();
-
-            DataTemplates.Add(provider.GetRequiredService<IDataTemplate>());
-
             var window = provider.GetRequiredService<MainWindowView>()
                 ?? throw new InvalidOperationException("Failed to create main window");
             
@@ -99,6 +99,14 @@ public class App : Application
             });
 
             desktop.MainWindow = window;
+        }
+        else if (ApplicationLifetime is ISingleViewApplicationLifetime single)
+        {
+            var viewCollection = provider.GetRequiredService<IViewsCollection>();
+
+            var mainView = viewCollection.CreateView<TableWorkspaceEditorViewModel>(provider);
+            
+            single.MainView = mainView;
         }
 
         base.OnFrameworkInitializationCompleted();
