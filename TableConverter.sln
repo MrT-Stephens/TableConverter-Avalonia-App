@@ -17,6 +17,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableConverter.Utilities", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableConverter.Utilities.Tests", "TableConverter.Utilities.Tests\TableConverter.Utilities.Tests.csproj", "{DFD30F53-90A4-4422-8A6C-CE9771CCC52C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableConverter.Desktop", "TableConverter.Desktop\TableConverter.Desktop.csproj", "{BB8416B7-A8E2-40FD-AECE-32E0851A5EB4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableConverter.Browser", "TableConverter.Browser\TableConverter.Browser.csproj", "{B62BF0D7-9DDA-4006-8CE3-0DE45669E4E5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +55,14 @@ Global
 		{DFD30F53-90A4-4422-8A6C-CE9771CCC52C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DFD30F53-90A4-4422-8A6C-CE9771CCC52C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DFD30F53-90A4-4422-8A6C-CE9771CCC52C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB8416B7-A8E2-40FD-AECE-32E0851A5EB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB8416B7-A8E2-40FD-AECE-32E0851A5EB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB8416B7-A8E2-40FD-AECE-32E0851A5EB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB8416B7-A8E2-40FD-AECE-32E0851A5EB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B62BF0D7-9DDA-4006-8CE3-0DE45669E4E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B62BF0D7-9DDA-4006-8CE3-0DE45669E4E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B62BF0D7-9DDA-4006-8CE3-0DE45669E4E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B62BF0D7-9DDA-4006-8CE3-0DE45669E4E5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

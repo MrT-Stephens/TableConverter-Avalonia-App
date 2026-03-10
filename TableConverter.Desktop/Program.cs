@@ -1,7 +1,6 @@
-using System;
 using Avalonia;
 
-namespace TableConverter;
+namespace TableConverter.Desktop;
 
 internal static class Program
 {
