@@ -8,11 +8,13 @@ using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using System;
 using System.IO;
+using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Threading;
 using Microsoft.Extensions.Configuration;
 using ModelFlow.DataVirtualization;
 using ModelFlow.DataVirtualization.DataManagement;
+using SukiUI.Enums;
 using TableConverter.Commands.Extensions;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Commands.Services;
@@ -50,10 +52,6 @@ public class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        // The Line below is needed to remove Avalonia data validation.
-        // Without this line, you will get duplicate validations from both Avalonia and CT
-        BindingPlugins.DataValidators.RemoveAt(0);
-        
         VirtualizationManager.Instance.UiThreadExcecuteAction = a => 
             Dispatcher.UIThread.InvokeAsync(a).GetTask();
             
@@ -76,6 +74,12 @@ public class App : Application
 
         DataTemplates.Add(provider.GetRequiredService<IDataTemplate>());
 
+        var toastService = provider.GetRequiredService<ISukiToastManager>()
+            ?? throw new InvalidOperationException("Failed to create toast manager");
+        
+        var dialogService = provider.GetRequiredService<ISukiDialogManager>()
+            ?? throw new InvalidOperationException("Failed to create dialog manager");
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             var window = provider.GetRequiredService<MainWindowView>()
@@ -88,25 +92,42 @@ public class App : Application
 
             window.Hosts.Add(new SukiToastHost
             {
-                Manager = provider.GetRequiredService<ISukiToastManager>()
-                    ?? throw new InvalidOperationException("Failed to create toast manager"),
+                Manager = toastService,
             });
 
             window.Hosts.Add(new SukiDialogHost
             {
-                Manager = provider.GetRequiredService<ISukiDialogManager>()
-                    ?? throw new InvalidOperationException("Failed to create dialog manager"),
+                Manager = dialogService,
             });
 
             desktop.MainWindow = window;
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime single)
         {
-            var viewCollection = provider.GetRequiredService<IViewsCollection>();
-
-            var mainView = viewCollection.CreateView<TableWorkspaceEditorViewModel>(provider);
+            // Browser setup: wrap the main content in a panel with background and dialog host
+            var mainViewModel = provider.GetRequiredService<MainWindowViewModel>();
             
-            single.MainView = mainView;
+            var panel = new Panel();
+            panel.Children.Add(new SukiBackground { Style = SukiBackgroundStyle.Bubble });
+            
+            var mainContentView = new MainContentView { DataContext = mainViewModel };
+            panel.Children.Add(mainContentView);
+            
+            single.MainView = new SukiMainHost
+            {
+                Hosts = 
+                [
+                    new SukiDialogHost
+                    {
+                        Manager = dialogService,
+                    },
+                    new SukiToastHost
+                    {
+                        Manager = toastService,
+                    }
+                ],
+                Content = panel,
+            };
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -142,9 +163,20 @@ public class App : Application
     private static ServiceProvider ConfigureServices(ServiceCollection services)
     {
         // Register Configuration
-        IConfiguration configuration = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json", false, true)
-            .Build();
+        var configBuilder = new ConfigurationBuilder();
+        
+        // In browser (WASM), appsettings.json may not be accessible via file system
+        // Make it optional for WASM builds
+        if (OperatingSystem.IsBrowser())
+        {
+            configBuilder.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+        }
+        else
+        {
+            configBuilder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+        }
+        
+        IConfiguration configuration = configBuilder.Build();
         
         services.AddSingleton(configuration);
 
@@ -152,15 +184,24 @@ public class App : Application
         services.AddOptions<AppOptions>().Bind(configuration.GetSection(nameof(AppOptions)));
         
         // Register Logging
-        var baseDirectory = configuration.GetSection(nameof(AppOptions))
-            .Get<AppOptions>()!.BaseContentPath;
-        
-        services.AddLogging(builder => builder.AddFile(configuration.GetSection("Logging"),
-            options =>
-            {
-                options.FormatLogFileName = name => Path.Combine(
-                    baseDirectory, string.Format(name, DateTime.UtcNow));
-            }));
+        // In browser builds, skip file-based logging as there's no traditional file system
+        if (!OperatingSystem.IsBrowser())
+        {
+            var baseDirectory = configuration.GetSection(nameof(AppOptions))
+                .Get<AppOptions>()!.BaseContentPath;
+            
+            services.AddLogging(builder => builder.AddFile(configuration.GetSection("Logging"),
+                options =>
+                {
+                    options.FormatLogFileName = name => Path.Combine(
+                        baseDirectory, string.Format(name, DateTime.UtcNow));
+                }));
+        }
+        else
+        {
+            // For browser builds, use minimal logging configuration
+            services.AddLogging(builder => { });
+        }
 
         services.AddSingleton<IDataSourceCallbacks, LoggingDataSourceCallbacks>();
         
@@ -170,7 +211,16 @@ public class App : Application
 
         // Custom Services
         services.AddSingleton<IDataGenerationTypes, DataGenerationTypes>();
-        services.AddSingleton<IFilesDialogManager, FilesDialogManager>();
+        // Use browser-friendly replacements when running in WASM
+        if (OperatingSystem.IsBrowser())
+        {
+            services.AddSingleton<IFilesDialogManager, BrowserFilesDialogManager>();
+        }
+        else
+        {
+            services.AddSingleton<IFilesDialogManager, FilesDialogManager>();
+        }
+
         services.AddSingleton<IEventManager, EventManager>();
 
         // SukiUI Services
@@ -181,7 +231,15 @@ public class App : Application
         services.AddSingleton<ICommandManager, CommandManager>();
         
         // Database Services
-        services.AddDatabaseFactory<TableStoreDbContext, TableStoreDatabaseContextFactory>();
+        if (OperatingSystem.IsBrowser())
+        {
+            // Use in-memory EF provider in browser to avoid native SQLite dependency
+            services.AddDatabaseFactory<TableStoreDbContext, TableConverter.Utilities.Database.Factories.BrowserTableStoreDatabaseContextFactory>();
+        }
+        else
+        {
+            services.AddDatabaseFactory<TableStoreDbContext, TableStoreDatabaseContextFactory>();
+        }
         
         // Register Command Handlers
         services.RegisterCommandHandlers();
