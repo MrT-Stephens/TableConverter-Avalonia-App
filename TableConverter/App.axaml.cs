@@ -211,16 +211,7 @@ public class App : Application
 
         // Custom Services
         services.AddSingleton<IDataGenerationTypes, DataGenerationTypes>();
-        // Use browser-friendly replacements when running in WASM
-        if (OperatingSystem.IsBrowser())
-        {
-            services.AddSingleton<IFilesDialogManager, BrowserFilesDialogManager>();
-        }
-        else
-        {
-            services.AddSingleton<IFilesDialogManager, FilesDialogManager>();
-        }
-
+        services.AddSingleton<IFilesDialogManager, FilesDialogManager>();
         services.AddSingleton<IEventManager, EventManager>();
 
         // SukiUI Services
