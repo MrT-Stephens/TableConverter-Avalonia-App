@@ -4,24 +4,35 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
              xmlns:viewModels="clr-namespace:TableConverter.ViewModels"
+             xmlns:converters="clr-namespace:TableConverter.Converters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="TableConverter.Views.MainContentView"
              x:DataType="viewModels:MainWindowViewModel">
-    <sukiUi:SukiSideMenu IsSearchEnabled="False"
-                         IsMenuExpanded="False"
-                         ItemsSource="{Binding Workspaces, Mode=OneWay}"
-                         SelectedItem="{Binding SelectedWorkspace, Mode=TwoWay}">
-        <sukiUi:SukiSideMenu.ItemTemplate>
-            <DataTemplate>
-                <sukiUi:SukiSideMenuItem Header="{Binding Title}"
-                                         ToolTip.Placement="Right"
-                                         ToolTip.Tip="{Binding Title, Mode=OneWay}">
-                    <sukiUi:SukiSideMenuItem.Icon>
-                        <PathIcon Data="{Binding Icon, Mode=OneWay}" />
-                    </sukiUi:SukiSideMenuItem.Icon>
-                </sukiUi:SukiSideMenuItem>
-            </DataTemplate>
-        </sukiUi:SukiSideMenu.ItemTemplate>
-    </sukiUi:SukiSideMenu>
+    <DockPanel>
+        <Panel DockPanel.Dock="Top">
+            <sukiUi:GlassCard Margin="0,0,0,0"
+                              BorderThickness="0"
+                              CornerRadius="0"
+                              IsAnimated="False" />
+            <Menu ItemsSource="{Binding SelectedWorkspace.MainCommands, 
+                      Converter={x:Static converters:CommandInstancesToMenuItemsConverter.Instance}}"/>
+        </Panel>
+        <sukiUi:SukiSideMenu IsSearchEnabled="False"
+                             IsMenuExpanded="False"
+                             ItemsSource="{Binding Workspaces, Mode=OneWay}"
+                             SelectedItem="{Binding SelectedWorkspace, Mode=TwoWay}">
+            <sukiUi:SukiSideMenu.ItemTemplate>
+                <DataTemplate>
+                    <sukiUi:SukiSideMenuItem Header="{Binding Title}"
+                                             ToolTip.Placement="Right"
+                                             ToolTip.Tip="{Binding Title, Mode=OneWay}">
+                        <sukiUi:SukiSideMenuItem.Icon>
+                            <PathIcon Data="{Binding Icon, Mode=OneWay}" />
+                        </sukiUi:SukiSideMenuItem.Icon>
+                    </sukiUi:SukiSideMenuItem>
+                </DataTemplate>
+            </sukiUi:SukiSideMenu.ItemTemplate>
+        </sukiUi:SukiSideMenu>
+    </DockPanel>
 </UserControl>
 
