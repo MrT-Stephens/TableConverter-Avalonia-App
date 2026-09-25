@@ -9,13 +9,12 @@ using TableConverter.Services.DataSources.Base;
 using TableConverter.Utilities.Database.Contexts;
 using TableConverter.Utilities.Database.Models.TableStore;
 using TableConverter.Utilities.Extensions;
-using IFactory = TableConverter.Utilities.Database.Interfaces.IDatabaseContextFactory<
-    TableConverter.Utilities.Database.Contexts.TableStoreDbContext>;
+using TableConverter.Utilities.Database.Interfaces;
 
 namespace TableConverter.Services.DataSources;
 
-public class TableStoreDataSource(IFactory databaseContextFactory)
-    : DataSourceFromPath<RowEntity, TableStoreDbContext>(databaseContextFactory, 250, 5)
+public class TableStoreDataSource(ITableStoreDbContextFactory databaseContextFactory)
+    : DataSourceFromPath<RowEntity>(databaseContextFactory, 250, 5)
 {
     private int? _ColumnCount;
     public int? ColumnCount

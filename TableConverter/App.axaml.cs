@@ -25,9 +25,7 @@ using TableConverter.Interfaces;
 using TableConverter.Services;
 using TableConverter.Services.DataSources;
 using TableConverter.Utilities;
-using TableConverter.Utilities.Database.Contexts;
 using TableConverter.Utilities.Database.Extensions;
-using TableConverter.Utilities.Database.Factories;
 using TableConverter.Utilities.Interfaces;
 using TableConverter.Utilities.Logging;
 using TableConverter.ViewModels;
@@ -222,16 +220,10 @@ public class App : Application
         services.AddSingleton<ICommandManager, CommandManager>();
         
         // Database Services
-        if (OperatingSystem.IsBrowser())
-        {
-            // Use in-memory EF provider in browser to avoid native SQLite dependency
-            services.AddDatabaseFactory<TableStoreDbContext, TableConverter.Utilities.Database.Factories.BrowserTableStoreDatabaseContextFactory>();
-        }
-        else
-        {
-            services.AddDatabaseFactory<TableStoreDbContext, TableStoreDatabaseContextFactory>();
-        }
-        
+        // Registers EF Core's built-in IDbContextFactory; the provider (SQLite / in-memory) is
+        // selected per environment inside TableStoreDbContextFactory.
+        services.AddTableStoreDatabase();
+
         // Register Command Handlers
         services.RegisterCommandHandlers();
         

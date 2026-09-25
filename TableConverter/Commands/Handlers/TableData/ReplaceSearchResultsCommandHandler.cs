@@ -12,6 +12,7 @@ using TableConverter.Commands.Interfaces;
 using TableConverter.Contracts;
 using TableConverter.Interfaces;
 using TableConverter.Utilities.Database.Contexts;
+using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.ViewModels.Documents;
 using TableConverter.ViewModels.Forms;
 using TableConverter.ViewModels.Tools;
@@ -26,7 +27,7 @@ public static partial class TableDataCommandNames
 public class ReplaceSearchResultsCommandHandler(
     ISukiDialogManager dialogManager,
     ISukiToastManager toastManager,
-    Utilities.Database.Interfaces.IDatabaseContextFactory<TableStoreDbContext> databaseContextFactory) 
+    ITableStoreDbContextFactory databaseContextFactory) 
     : ICommandHandlerAsync
 {
     public ICommandMetadata CommandMetadata => new CommandMetadata(
@@ -83,7 +84,7 @@ public class ReplaceSearchResultsCommandHandler(
             return;
         }
         
-        await using var dbContext = await databaseContextFactory.CreateAsync(tableDataViewModel.Path);
+        await using var dbContext = await databaseContextFactory.CreateDbContextAsync(tableDataViewModel.Path);
 
         var replacedAmount = await Task.Run(() => ReplaceValuesAsync(dbContext, settings));
 

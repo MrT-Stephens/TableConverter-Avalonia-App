@@ -5,15 +5,13 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TableConverter.Services.DataSources.Base;
-using TableConverter.Utilities.Database.Contexts;
 using TableConverter.Utilities.Database.Models.TableStore;
-using IFactory = TableConverter.Utilities.Database.Interfaces.IDatabaseContextFactory<
-    TableConverter.Utilities.Database.Contexts.TableStoreDbContext>;
+using TableConverter.Utilities.Database.Interfaces;
 
 namespace TableConverter.Services.DataSources;
 
-public class TableStoreSearchResultDataSource(IFactory databaseContextFactory)
-    : DataSourceFromPath<SearchResult, TableStoreDbContext>(databaseContextFactory, 250, 5)
+public class TableStoreSearchResultDataSource(ITableStoreDbContextFactory databaseContextFactory)
+    : DataSourceFromPath<SearchResult>(databaseContextFactory, 250, 5)
 {
     protected override async Task<bool> ContainsAsync(SearchResult item)
     {

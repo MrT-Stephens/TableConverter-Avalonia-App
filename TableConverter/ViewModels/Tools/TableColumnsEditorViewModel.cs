@@ -16,7 +16,6 @@ using TableConverter.Commands.Interfaces;
 using TableConverter.Extensions;
 using TableConverter.Interfaces;
 using TableConverter.Services.DataSources;
-using TableConverter.Utilities.Database.Contexts;
 using TableConverter.Utilities.Database.Events;
 using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.Utilities.Database.Models.TableStore;
@@ -37,7 +36,7 @@ public partial class TableColumnsEditorViewModel : BaseScopedPaneToolViewModel<T
 
     public readonly TableStoreColumnsDataSource DataSource;
     
-    private readonly IDatabaseContextFactory<TableStoreDbContext> _dbContextFactory;
+    private readonly ITableStoreDbContextFactory _dbContextFactory;
 
     #endregion
     
@@ -48,7 +47,7 @@ public partial class TableColumnsEditorViewModel : BaseScopedPaneToolViewModel<T
         IEventManager eventManager, 
         ISukiDialogManager dialogManager, 
         ISukiToastManager toastManager,
-        IDatabaseContextFactory<TableStoreDbContext> databaseContextFactory) 
+        ITableStoreDbContextFactory databaseContextFactory) 
         : base(commandManager, eventManager, dialogManager, toastManager, "Columns Editor", false)
     {
         _dbContextFactory = databaseContextFactory;

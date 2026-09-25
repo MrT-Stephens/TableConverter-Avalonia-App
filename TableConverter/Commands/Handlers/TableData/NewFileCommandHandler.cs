@@ -9,6 +9,7 @@ using TableConverter.Commands.DataModels;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Extensions;
 using TableConverter.Utilities.Database.Contexts;
+using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.ViewModels.Documents;
 using TableConverter.ViewModels.Forms;
 using TableConverter.ViewModels.Workspaces;
@@ -23,7 +24,7 @@ public static partial class TableDataCommandNames
 public class NewFileCommandHandler(
     ISukiDialogManager dialogManager,
     ISukiToastManager toastManager,
-    Utilities.Database.Interfaces.IDatabaseContextFactory<TableStoreDbContext> databaseContextFactory) 
+    ITableStoreDbContextFactory databaseContextFactory) 
     : ICommandHandlerAsync
 {
     public ICommandMetadata CommandMetadata => new CommandMetadata(
@@ -68,7 +69,7 @@ public class NewFileCommandHandler(
 
         document.Title = settings.Name;
 
-        await using var dbContext = await databaseContextFactory.CreateAsync(document.Path);
+        await using var dbContext = await databaseContextFactory.CreateDbContextAsync(document.Path);
 
         await Task.Run(() => GenerateTableData(dbContext, settings));
         

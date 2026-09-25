@@ -17,7 +17,6 @@ using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Configuration;
-using TableConverter.Utilities.Database.Contexts;
 using TableConverter.ViewModels.Base;
 using TableConverter.Extensions;
 using TableConverter.Services.DataSources;
@@ -39,7 +38,7 @@ public partial class TableDataViewModel : BaseDocumentViewModel
     
     public override bool CanClose => !IsDirty;
 
-    private readonly IDatabaseContextFactory<TableStoreDbContext> _dbContextFactory;
+    private readonly ITableStoreDbContextFactory _dbContextFactory;
     private readonly IOptions<AppOptions> _appOptions;
 
     #endregion
@@ -51,7 +50,7 @@ public partial class TableDataViewModel : BaseDocumentViewModel
         IEventManager eventManager, 
         ISukiDialogManager dialogManager,
         ISukiToastManager toastManager,
-        IDatabaseContextFactory<TableStoreDbContext> dbContextFactory,
+        ITableStoreDbContextFactory dbContextFactory,
         IOptions<AppOptions> appOptions)
         : base(commandManager, eventManager, dialogManager, toastManager)
     {
@@ -104,7 +103,7 @@ public partial class TableDataViewModel : BaseDocumentViewModel
     {
         TreeDataSource.Columns.Clear();
         
-        using var dbContext = _dbContextFactory.Create(Path);
+        using var dbContext = _dbContextFactory.CreateDbContext(Path);
         
         dbContext.Columns
             .AsNoTracking()
