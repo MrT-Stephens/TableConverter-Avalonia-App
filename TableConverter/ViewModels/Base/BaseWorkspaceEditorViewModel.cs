@@ -107,6 +107,13 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
         Documents.Remove(document);
         OnDocumentRemoved(document);
 
+        // Event subscriptions and command instances live on singleton services, so the removed document has to be
+        // released explicitly - otherwise the pane is kept alive for the lifetime of the application.
+        if (document is IDisposable disposableDocument)
+        {
+            disposableDocument.Dispose();
+        }
+
         _toastManager.CreateSimpleInfoToast()
             .OfType(NotificationType.Success)
             .WithTitle("Removed")

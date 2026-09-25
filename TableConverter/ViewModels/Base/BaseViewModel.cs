@@ -74,6 +74,10 @@ public abstract partial class BaseViewModel : ObservableValidator, IInitialise, 
         _commandManager.OnExecuted -= OnExecutedCommand;
         _commandManager.OnError -= OnErrorCommand;
 
+        // Release the command instances registered against this view model (and the subscriptions they own).
+        // Without this the singleton manager would keep both the instances and this view model alive forever.
+        _commandManager.ReleaseCommandInstances(this);
+
         _eventManager.UnregisterAllEvents(this);
     }
 

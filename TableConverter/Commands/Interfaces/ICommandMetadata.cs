@@ -55,4 +55,11 @@ public interface ICommandMetadata
     /// Only works if the parent is a workspace view model.
     /// </summary>
     public bool CanSetLoadingOnWorkspace { get; }
+
+    /// <summary>
+    /// Indicates whether the command may be executed again while a previous execution is still processing.
+    /// When <c>false</c> (the default) <c>CanExecute</c> returns <c>false</c> while
+    /// <see cref="ICommandContext.IsProcessing"/> is <c>true</c>.
+    /// </summary>
+    public bool AllowConcurrentExecutions { get; }
 }
