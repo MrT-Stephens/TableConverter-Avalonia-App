@@ -1,5 +1,6 @@
 ﻿using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
+using TableConverter.FileConverters.Utilities;
 using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.ConverterHandlers;
@@ -48,7 +49,7 @@ public class ConverterHandlerHtmlOutput : ConverterHandlerOutputAbstract<Convert
             {
                 stringWriter.Write(
                     $"{(Options!.MinifyHtml ? "" : Environment.NewLine + new string('\t', tabCount))}<td>");
-                stringWriter.Write(rows[i][j]);
+                stringWriter.Write(ConverterHandlerUtilities.GetCellValue(rows[i], j));
                 stringWriter.Write("</td>");
             }
 

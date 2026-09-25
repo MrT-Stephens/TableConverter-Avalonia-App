@@ -1,5 +1,6 @@
 ﻿using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
+using TableConverter.FileConverters.Utilities;
 using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.ConverterHandlers;
@@ -20,7 +21,8 @@ public class ConverterHandlerJsonLinesOutput : ConverterHandlerOutputAbstract<Co
 
                     for (long j = 0; j < headers.LongLength; j++)
                     {
-                        writer.Write($"\"{headers[j]}\":\"{rows[i][j]}\"");
+                        writer.Write(
+                            $"\"{headers[j]}\":\"{ConverterHandlerUtilities.GetCellValue(rows[i], j)}\"");
 
                         if (j != headers.LongLength - 1) writer.Write(",");
                     }

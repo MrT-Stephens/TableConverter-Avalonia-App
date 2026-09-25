@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
+using TableConverter.FileConverters.Utilities;
 using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.ConverterHandlers;
@@ -22,7 +23,8 @@ public class ConverterHandlerJsonOutput : ConverterHandlerOutputAbstract<Convert
                         jsonObjects[i] = new Dictionary<string, object>();
 
                         for (var j = 0; j < headers.Length; j++)
-                            jsonObjects[i].Add(headers[j].Replace(' ', '_'), rows[i][j]);
+                            jsonObjects[i].Add(headers[j].Replace(' ', '_'),
+                                ConverterHandlerUtilities.GetCellValue(rows[i], j));
                     }
 
                     return Result<string>.Success(JsonConvert.SerializeObject(jsonObjects,
@@ -46,7 +48,7 @@ public class ConverterHandlerJsonOutput : ConverterHandlerOutputAbstract<Convert
                     for (var i = 0; i < headers.Length; i++)
                         jsonObjects[i] = new Dictionary<string, string[]>
                         {
-                            { headers[i].Replace(' ', '_'), rows.Select(row => row[i]).ToArray() }
+                            { headers[i].Replace(' ', '_'), rows.Select(row => ConverterHandlerUtilities.GetCellValue(row, i)).ToArray() }
                         };
 
                     return Result<string>.Success(JsonConvert.SerializeObject(jsonObjects,

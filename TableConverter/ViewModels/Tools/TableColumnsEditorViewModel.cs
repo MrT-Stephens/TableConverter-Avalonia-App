@@ -64,10 +64,8 @@ public partial class TableColumnsEditorViewModel : BaseScopedPaneToolViewModel<T
         DataSource.SetFilterQuery(query => query
             .OrderBy(x => x.OrdinalPosition));
         
-        Dispatcher.UIThread.Post(async void () =>
-        {
-            await DataSource.EnsureInitialisedAsync();
-        });
+        // Start the data source initialisation on the UI thread without the async void anti-pattern.
+        Dispatcher.UIThread.Post(() => DataSource.EnsureInitialisedAsync().FireAndForget());
     }
     
     #endregion

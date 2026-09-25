@@ -9,6 +9,24 @@ public enum TextAlignment
 
 public static class ConverterHandlerUtilities
 {
+    /// <summary>
+    ///     Gets the value at <paramref name="columnIndex" /> in <paramref name="row" />.
+    /// </summary>
+    /// <remarks>
+    ///     Tables loaded from files can be ragged (a row may have fewer cells than there are headers),
+    ///     so callers that iterate the headers must use this instead of indexing the row directly.
+    /// </remarks>
+    /// <returns>The cell value, or an empty string when the row does not contain that column.</returns>
+    public static string GetCellValue(string[]? row, long columnIndex)
+    {
+        if (row is null || columnIndex < 0 || columnIndex >= row.LongLength)
+        {
+            return string.Empty;
+        }
+
+        return row[columnIndex];
+    }
+
     public static string AlignText(string text, TextAlignment textAlignment, int amount, char paddingCharacter)
     {
         switch (textAlignment)

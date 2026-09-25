@@ -76,9 +76,11 @@ public abstract partial class BaseDocumentViewModel : BaseViewModel, IPaneDocume
     
     #region IDisposable
 
-    public void Dispose()
+    public override void Dispose()
     {
         _eventRegistrar.Dispose();
+
+        base.Dispose();
     }
     
     #endregion

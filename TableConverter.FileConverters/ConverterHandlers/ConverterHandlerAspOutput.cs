@@ -1,5 +1,6 @@
 ﻿using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
+using TableConverter.FileConverters.Utilities;
 using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.ConverterHandlers;
@@ -16,7 +17,8 @@ public class ConverterHandlerAspOutput : ConverterHandlerOutputAbstract<Converte
 
         for (long i = 0; i < rows.LongLength; i++)
         for (long j = 0; j < headers.LongLength; j++)
-            writer.Write($"arr({j},{i + 1}) = {rows[i][j]}{Environment.NewLine}");
+            writer.Write(
+                $"arr({j},{i + 1}) = {ConverterHandlerUtilities.GetCellValue(rows[i], j)}{Environment.NewLine}");
 
         return Result<string>.Success(writer.ToString());
     }

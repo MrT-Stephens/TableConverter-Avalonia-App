@@ -169,6 +169,26 @@ public class FakerSeededGenerationTest(Faker faker) : IClassFixture<Faker>
                         {
                             "Jeff", "Monahan", "538.847.0996 x50161", "Lolita_Lehner79@yahoo.com", "North Raquelfurt",
                             "Nigeria", "knit accessorise wilted steep confound usually elementary yet jacket"
+                        },
+                        new[]
+                        {
+                            "Ryan", "Bailey", "1-786-860-9257", "Keely.Douglas@yahoo.com", "Duanemouth", "Israel",
+                            "afore valentine geez represent atop inquisitively coaxingly devise"
+                        },
+                        new[]
+                        {
+                            "Erika", "Pagac", "945-284-4684 x61802", "Alisha-Lubowitz@yahoo.com", "Kleinfurt",
+                            "Antigua and Barbuda", "gracefully anneal dependent if since arrogantly whereas"
+                        },
+                        new[]
+                        {
+                            "Aiden", "Steuber", "270.935.6872 x6413", "Eula-Green9@hotmail.com", "North Kyleeport",
+                            "Vanuatu", "while spanish mechanically usually modulo ugh"
+                        },
+                        new[]
+                        {
+                            "Candido", "Senger", "537-498-7550", "Samantha-Leannon34@yahoo.com", "South Anabelle",
+                            "British Indian Ocean Territory (Chagos Archipelago)", "supposing furthermore clueless"
                         }
                     ]
                 )

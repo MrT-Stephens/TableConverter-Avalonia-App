@@ -43,8 +43,13 @@ public class ConverterHandlerPdfOutput : ConverterHandlerOutputAbstract<Converte
 
                     for (uint i = 0; i < rows.Length; i++)
                     for (uint j = 0; j < headers.Length; j++)
-                        table.Cell().Row(i + 2).Column(j + 1).Element(Block).Text(rows[i][j])
+                    {
+                        // Guard against ragged rows: the caller may supply fewer cells than there are headers.
+                        var value = j < rows[i].Length ? rows[i][j] : string.Empty;
+
+                        table.Cell().Row(i + 2).Column(j + 1).Element(Block).Text(value)
                             .FontColor(Color.FromHex(ToHex(Options!.SelectedForegroundColor)));
+                    }
                 });
             });
         });
@@ -69,9 +74,16 @@ public class ConverterHandlerPdfOutput : ConverterHandlerOutputAbstract<Converte
 
         try
         {
-            stream.Write(PdfDocument?.GeneratePdf());
+            if (PdfDocument is null)
+            {
+                return Result.Failure("The PDF document has not been generated.");
+            }
 
-            stream.Close();
+            // The caller owns the stream, so generate into it without closing it.
+            PdfDocument.GeneratePdf(stream);
+            stream.Flush();
+
+            PdfDocument = null;
         }
         catch (Exception ex)
         {

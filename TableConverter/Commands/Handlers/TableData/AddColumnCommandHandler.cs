@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using Avalonia.Controls.Notifications;
-using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using TableConverter.Commands.DataModels;
 using TableConverter.Commands.Interfaces;
@@ -15,9 +14,7 @@ public static partial class TableDataCommandNames
     public const string AddColumn = "TableData.AddColumn";
 }
 
-public class AddColumnCommandHandler(
-    ISukiToastManager toastManager,
-    ISukiDialogManager dialogManager) 
+public class AddColumnCommandHandler(ISukiToastManager toastManager)
     : ICommandHandlerAsync
 {
     public ICommandMetadata CommandMetadata => new CommandMetadata(

@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Text;
 using TableConverter.FileConverters.Exceptions;
 using TableConverter.FileConverters.Interfaces;
@@ -11,8 +12,9 @@ public class ConverterService : IConverterService
 
     private readonly IEnumerable<IConverterProvider> _converterProviders;
     
-    private readonly Dictionary<string, IConverterHandlerInput> _inputHandlersCache;
-    private readonly Dictionary<string, IConverterHandlerOutput> _outputHandlersCache;
+    // This service is a singleton, so the caches must be safe for concurrent use.
+    private readonly ConcurrentDictionary<string, Lazy<IConverterHandlerInput>> _inputHandlersCache = new(StringComparer.Ordinal);
+    private readonly ConcurrentDictionary<string, Lazy<IConverterHandlerOutput>> _outputHandlersCache = new(StringComparer.Ordinal);
 
     public IEnumerable<IConverterMetadata> InputMetadata => _converterProviders
         .Where(x => x.Metadata.Support.HasFlag(ConverterSupport.Input))
@@ -33,9 +35,6 @@ public class ConverterService : IConverterService
     public ConverterService(IEnumerable<IConverterProvider> providers)
     {
         _converterProviders = providers;
-        
-        _inputHandlersCache = new Dictionary<string, IConverterHandlerInput>();
-        _outputHandlersCache = new Dictionary<string, IConverterHandlerOutput>();
     }
 
     #endregion
@@ -68,11 +67,31 @@ public class ConverterService : IConverterService
 
     public IConverterHandlerInput GetInputByName(string name)
     {
-        if (_inputHandlersCache.TryGetValue(name, out var inputHandler))
-        {
-            return inputHandler;
-        }
-        
+        // GetOrAdd + Lazy guarantees the handler is created exactly once, even under concurrency.
+        return _inputHandlersCache.GetOrAdd(name, CreateInputHandlerLazy).Value;
+    }
+
+    public IConverterHandlerOutput GetOutputByName(string name)
+    {
+        return _outputHandlersCache.GetOrAdd(name, CreateOutputHandlerLazy).Value;
+    }
+
+    private Lazy<IConverterHandlerInput> CreateInputHandlerLazy(string name)
+    {
+        return new Lazy<IConverterHandlerInput>(
+            () => CreateInputHandler(name),
+            LazyThreadSafetyMode.ExecutionAndPublication);
+    }
+
+    private Lazy<IConverterHandlerOutput> CreateOutputHandlerLazy(string name)
+    {
+        return new Lazy<IConverterHandlerOutput>(
+            () => CreateOutputHandler(name),
+            LazyThreadSafetyMode.ExecutionAndPublication);
+    }
+
+    private IConverterHandlerInput CreateInputHandler(string name)
+    {
         var provider = _converterProviders.FirstOrDefault(x => x.Metadata.Name == name);
 
         if (provider is null || !provider.Metadata.Support.HasFlag(ConverterSupport.Input))
@@ -80,20 +99,12 @@ public class ConverterService : IConverterService
             throw new InvalidOperationException($"Input {name} is not supported");
         }
 
-        var converter = provider.InputHandler()
-            ?? throw new NullReferenceException($"Input {name} is not supported");
-        
-        _inputHandlersCache[name] = converter;
-        return converter;
+        return provider.InputHandler()
+            ?? throw new InvalidOperationException($"Input {name} is not supported");
     }
 
-    public IConverterHandlerOutput GetOutputByName(string name)
+    private IConverterHandlerOutput CreateOutputHandler(string name)
     {
-        if (_outputHandlersCache.TryGetValue(name, out var outputHandler))
-        {
-            return outputHandler;
-        }
-        
         var provider = _converterProviders.FirstOrDefault(x => x.Metadata.Name == name);
 
         if (provider is null || !provider.Metadata.Support.HasFlag(ConverterSupport.Output))
@@ -101,11 +112,8 @@ public class ConverterService : IConverterService
             throw new InvalidOperationException($"Output {name} is not supported");
         }
 
-        var converter = provider.OutputHandler()
-            ?? throw new NullReferenceException($"Output {name} is not supported");
-        
-        _outputHandlersCache[name] = converter;
-        return converter;
+        return provider.OutputHandler()
+            ?? throw new InvalidOperationException($"Output {name} is not supported");
     }
 
     public TableData InputFile(string name, string path)

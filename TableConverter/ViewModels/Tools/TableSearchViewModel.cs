@@ -59,10 +59,8 @@ public partial class TableSearchViewModel : BaseScopedPaneToolViewModel<TableWor
             .OrderBy(x => x.RowId)
             .ThenBy(x => x.ColumnId), false);
         
-        Dispatcher.UIThread.Post(async void () =>
-        {
-            await DataSource.EnsureInitialisedAsync();
-        });
+        // Start the data source initialisation on the UI thread without the async void anti-pattern.
+        Dispatcher.UIThread.Post(() => DataSource.EnsureInitialisedAsync().FireAndForget());
     }
     
     #endregion
@@ -76,8 +74,9 @@ public partial class TableSearchViewModel : BaseScopedPaneToolViewModel<TableWor
         SearchCommands.Add(this[TableDataCommandNames.Search]);
         SearchCommands.Add(this[TableDataCommandNames.Replace]);
 
-        _eventManager.GetEvent<DbEntityChangedEvent>()
-            .Subscribe(OnEntityChanged);
+        _eventRegistrar.RegisterSubscription(
+            _eventManager.GetEvent<DbEntityChangedEvent>(),
+            OnEntityChanged);
     }
 
     protected override void OnSelectedDocumentChanged(IWorkspace workspace, IPaneDocument? oldDocument, IPaneDocument? newDocument)

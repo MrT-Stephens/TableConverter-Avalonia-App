@@ -30,7 +30,10 @@ public class ConverterHandlerXmlOutput : ConverterHandlerOutputAbstract<Converte
             {
                 // Create element for each column and set its value
                 var columnElement = xmlDocument.CreateElement(headers[j].Replace(' ', '_'));
-                columnElement.InnerText = rows[i][j];
+
+                // Guard against ragged rows: the caller may supply fewer cells than there are headers.
+                columnElement.InnerText = j < rows[i].Length ? rows[i][j] : string.Empty;
+
                 recordElement.AppendChild(columnElement);
             }
 
@@ -38,12 +41,14 @@ public class ConverterHandlerXmlOutput : ConverterHandlerOutputAbstract<Converte
             rootElement.AppendChild(recordElement);
         }
 
-        var textWriter = new StringWriter();
-        var xmlWriter = new XmlTextWriter(textWriter);
-
-        xmlWriter.Formatting = Options!.MinifyXml ? Formatting.None : Formatting.Indented;
+        using var textWriter = new StringWriter();
+        using var xmlWriter = new XmlTextWriter(textWriter)
+        {
+            Formatting = Options!.MinifyXml ? Formatting.None : Formatting.Indented
+        };
 
         xmlDocument.WriteTo(xmlWriter);
+        xmlWriter.Flush();
 
         return Result<string>.Success(textWriter.ToString());
     }

@@ -75,7 +75,7 @@ public class NewFileCommandHandler(
         
         editorViewModel.Documents.Add(document);
         editorViewModel.SelectedDocument = document;
-        document.InvalidateData();
+        await document.InvalidateDataAsync();
 
         toastManager.CreateSimpleInfoToast()
             .OfType(NotificationType.Success)

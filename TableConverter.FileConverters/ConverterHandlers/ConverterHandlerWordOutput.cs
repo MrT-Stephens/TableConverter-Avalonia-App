@@ -1,6 +1,7 @@
 ﻿using NPOI.XWPF.UserModel;
 using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
+using TableConverter.FileConverters.Utilities;
 using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.ConverterHandlers;
@@ -11,15 +12,21 @@ public class ConverterHandlerWordOutput : ConverterHandlerOutputAbstract<Convert
 
     public override Result<string> Convert(string[] headers, string[][] rows)
     {
+        WordDocument?.Close();
         WordDocument = new XWPFDocument();
 
         var table = WordDocument.CreateTable(rows.Length + 1, headers.Length);
 
-        for (var i = 0; i < headers.Length; i++) table.GetRow(0).GetCell(i).SetText(headers[i]);
+        for (var i = 0; i < headers.Length; i++) table.GetRow(0).GetCell(i).SetText(headers[i] ?? string.Empty);
 
         for (var i = 0; i < rows.Length; i++)
         for (var j = 0; j < headers.Length; j++)
-            table.GetRow(i + 1).GetCell(j).SetText(rows[i][j]);
+        {
+            // Guard against ragged rows: the caller may supply fewer cells than there are headers.
+            var value = j < rows[i].Length ? rows[i][j] : string.Empty;
+
+            table.GetRow(i + 1).GetCell(j).SetText(value);
+        }
 
         return Result<string>.Success(
             $"Please save the '.docx' file to view the generated file 😁{Environment.NewLine}");
@@ -31,9 +38,11 @@ public class ConverterHandlerWordOutput : ConverterHandlerOutputAbstract<Convert
 
         try
         {
-            WordDocument?.Write(stream);
+            // NPOI closes the stream it is given, so wrap it to protect the caller owned stream.
+            WordDocument?.Write(new NonClosingStreamWrapper(stream));
 
-            stream.Close();
+            WordDocument?.Close();
+            WordDocument = null;
         }
         catch (Exception ex)
         {

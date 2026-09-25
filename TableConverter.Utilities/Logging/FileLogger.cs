@@ -13,9 +13,10 @@ public class FileLogger : ILogger
         _loggerPrv = loggerPrv;
     }
 
-    public IDisposable BeginScope<TState>(TState state)
+    public IDisposable BeginScope<TState>(TState state) where TState : notnull
     {
-        return null!;
+        // Logging scopes are not persisted to the log file, but callers still expect a disposable.
+        return NullScope.Instance;
     }
 
     public bool IsEnabled(LogLevel logLevel)
@@ -60,6 +61,22 @@ public class FileLogger : ILogger
                     eventId,
                     message,
                     exception));
+        }
+    }
+
+    /// <summary>
+    ///     A no-op <see cref="IDisposable" /> used for logging scopes that are not persisted.
+    /// </summary>
+    private sealed class NullScope : IDisposable
+    {
+        public static readonly NullScope Instance = new();
+
+        private NullScope()
+        {
+        }
+
+        public void Dispose()
+        {
         }
     }
 }

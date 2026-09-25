@@ -4,6 +4,7 @@ using CsvHelper;
 using CsvHelper.Configuration;
 using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
+using TableConverter.FileConverters.Utilities;
 using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.ConverterHandlers;
@@ -30,7 +31,8 @@ public class ConverterHandlerCsvOutput : ConverterHandlerOutputAbstract<Converte
                     dynamic record = new ExpandoObject();
 
                     for (long j = 0; j < headers.LongLength; j++)
-                        ((IDictionary<string, object>)record)[headers[j]] = rows[i][j];
+                        ((IDictionary<string, object>)record)[headers[j]] =
+                            ConverterHandlerUtilities.GetCellValue(rows[i], j);
 
                     records.Add(record);
                 }

@@ -15,8 +15,10 @@ public enum HexCasing
 
 public class Randomizer(int? seed = null)
 {
-    private static readonly Lazy<object> Locker = new(() => new object(),
-        LazyThreadSafetyMode.ExecutionAndPublication);
+    // The guarded state (_random) is per-instance, so the lock must be per-instance too. A static lock would
+    // serialise every Randomizer in the process (e.g. every Faker generating a table concurrently), turning
+    // independent generators into a single contention point.
+    private readonly object _locker = new();
 
     private readonly Random _random = seed.HasValue ? new Random(seed.Value) : new Random();
 
@@ -37,7 +39,7 @@ public class Randomizer(int? seed = null)
     public int Number(int min, int max)
     {
         //lock any seed access, for thread safety.
-        lock (Locker.Value)
+        lock (_locker)
         {
             // Adjust the range as needed to make max inclusive. The Random.Next function uses exclusive upper bounds.
 
@@ -72,7 +74,7 @@ public class Randomizer(int? seed = null)
     public double Double(double min = 0.0d, double max = 1.0d)
     {
         //lock any seed access, for thread safety.
-        lock (Locker.Value)
+        lock (_locker)
         {
             if (min == 0.0d && max == 1.0d)
                 //use default implementation
@@ -152,7 +154,7 @@ public class Randomizer(int? seed = null)
     {
         var arr = new byte[count];
 
-        lock (Locker.Value)
+        lock (_locker)
         {
             _random.NextBytes(arr);
         }

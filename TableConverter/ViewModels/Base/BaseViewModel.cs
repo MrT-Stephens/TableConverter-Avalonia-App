@@ -15,7 +15,7 @@ using TableConverter.Utilities.Interfaces;
 
 namespace TableConverter.ViewModels.Base;
 
-public abstract partial class BaseViewModel : ObservableValidator, IInitialise, IHasSelectedItems
+public abstract partial class BaseViewModel : ObservableValidator, IInitialise, IHasSelectedItems, IDisposable
 {
     #region Fields
 
@@ -23,7 +23,9 @@ public abstract partial class BaseViewModel : ObservableValidator, IInitialise, 
     protected readonly IEventManager _eventManager;
     protected readonly ISukiDialogManager _dialogManager;
     protected readonly ISukiToastManager _toastManager;
-    
+
+    private bool _disposed;
+
     [ObservableProperty] private SelectedItemsCollection _SelectedItems = null!;
 
     #endregion
@@ -45,6 +47,34 @@ public abstract partial class BaseViewModel : ObservableValidator, IInitialise, 
         _commandManager.OnExecute += OnExecuteCommand;
         _commandManager.OnExecuted += OnExecutedCommand;
         _commandManager.OnError += OnErrorCommand;
+    }
+
+    #endregion
+
+    #region IDisposable
+
+    /// <summary>
+    ///     Gets a value indicating whether this view model has been disposed.
+    /// </summary>
+    protected bool IsDisposed => _disposed;
+
+    /// <summary>
+    ///     Releases the subscriptions this view model made against long-lived services. Derived classes that override
+    ///     this method must call <c>base.Dispose()</c>.
+    /// </summary>
+    public virtual void Dispose()
+    {
+        if (_disposed) return;
+
+        _disposed = true;
+
+        // ICommandManager is a singleton, so these subscriptions would otherwise keep every view model alive.
+        _commandManager.OnCanExecute -= OnCanExecuteCommand;
+        _commandManager.OnExecute -= OnExecuteCommand;
+        _commandManager.OnExecuted -= OnExecutedCommand;
+        _commandManager.OnError -= OnErrorCommand;
+
+        _eventManager.UnregisterAllEvents(this);
     }
 
     #endregion

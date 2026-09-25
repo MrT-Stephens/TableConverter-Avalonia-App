@@ -54,7 +54,9 @@ public class SearchTableDataCommandHandler(
     public async Task Execute(object? parameter, ICommandContext context)
     {
         if (context.Parent is not IWorkspaceEditor workspace)
-            throw new InvalidOperationException();
+            throw new InvalidOperationException(
+                $"The '{CommandMetadata.Name}' command requires an {nameof(IWorkspaceEditor)} as its parent context, " +
+                $"but received '{context.Parent?.GetType().Name ?? "null"}'.");
 
         if (!context.TryGetSelectedItem<TableSearchViewModel>(out var searchVm))
         {

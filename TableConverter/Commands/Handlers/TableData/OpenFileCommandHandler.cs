@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -86,7 +85,7 @@ public class OpenFileCommandHandler(
                 
             editorViewModel.Documents.Add(document);
             editorViewModel.SelectedDocument = document;
-            document.InvalidateData();   
+            await document.InvalidateDataAsync();   
                 
             numberOfAddedDocuments++;
         }

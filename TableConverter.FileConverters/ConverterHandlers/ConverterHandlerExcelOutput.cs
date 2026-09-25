@@ -1,6 +1,7 @@
 ﻿using NPOI.XSSF.UserModel;
 using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
+using TableConverter.FileConverters.Utilities;
 using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.ConverterHandlers;
@@ -11,6 +12,7 @@ public class ConverterHandlerExcelOutput : ConverterHandlerOutputAbstract<Conver
 
     public override Result<string> Convert(string[] headers, string[][] rows)
     {
+        ExcelWorkbook?.Close();
         ExcelWorkbook = new XSSFWorkbook();
 
         var sheet = ExcelWorkbook.CreateSheet(string.IsNullOrEmpty(Options!.SheetName) ? "Sheet1" : Options!.SheetName);
@@ -25,8 +27,25 @@ public class ConverterHandlerExcelOutput : ConverterHandlerOutputAbstract<Conver
 
             for (long j = 0; j < headers.LongLength; j++)
             {
-                sheet.AutoSizeColumn((int)i);
-                row.CreateCell((int)j).SetCellValue(rows[i][j]);
+                // Guard against ragged rows: the caller may supply fewer cells than there are headers.
+                var value = j < rows[i].LongLength ? rows[i][j] : string.Empty;
+
+                row.CreateCell((int)j).SetCellValue(value);
+            }
+        }
+
+        // Auto sizing needs the cells to exist first, and must be applied per column.
+        // It relies on a font measurement backend (SkiaSharp) which may not be present in every
+        // host, and it is only cosmetic, so a failure here must not fail the whole export.
+        for (long j = 0; j < headers.LongLength; j++)
+        {
+            try
+            {
+                sheet.AutoSizeColumn((int)j);
+            }
+            catch (Exception)
+            {
+                // Ignore: the column keeps its default width, the data is still written correctly.
             }
         }
 
@@ -40,7 +59,11 @@ public class ConverterHandlerExcelOutput : ConverterHandlerOutputAbstract<Conver
 
         try
         {
-            ExcelWorkbook?.Write(stream);
+            // NPOI closes the stream it is given, so wrap it to protect the caller owned stream.
+            ExcelWorkbook?.Write(new NonClosingStreamWrapper(stream));
+
+            ExcelWorkbook?.Close();
+            ExcelWorkbook = null;
         }
         catch (Exception ex)
         {

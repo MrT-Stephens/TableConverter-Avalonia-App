@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls;
@@ -12,7 +13,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using ModelFlow.DataVirtualization.DataManagement;
-using Org.BouncyCastle.Crmf;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;
@@ -62,10 +62,8 @@ public partial class TableDataViewModel : BaseDocumentViewModel
         TreeDataSource.RowSelection!.SingleSelect = false; 
         DataSource.Path = Path;
         
-        Dispatcher.UIThread.Post(async void () =>
-        {
-            await DataSource.EnsureInitialisedAsync();
-        });
+        // Start the data source initialisation on the UI thread without the async void anti-pattern.
+        Dispatcher.UIThread.Post(() => DataSource.EnsureInitialisedAsync().FireAndForget());
     }
 
     #endregion
@@ -82,9 +80,11 @@ public partial class TableDataViewModel : BaseDocumentViewModel
         
         Path = path;
         DataSource.Path = path;
-        
-        _eventManager.GetEvent<DbEntityChangedEvent>().Subscribe(OnEntityChanged);
-        
+
+        _eventRegistrar.RegisterSubscription(
+            _eventManager.GetEvent<DbEntityChangedEvent>(),
+            OnEntityChanged);
+
         _eventRegistrar.RegisterEvent<EventHandler<TreeSelectionModelSelectionChangedEventArgs<DataItem<RowEntity>>>>(
             action => TreeDataSource.RowSelection!.SelectionChanged += action,
             action => TreeDataSource.RowSelection!.SelectionChanged -= action, 
@@ -99,23 +99,39 @@ public partial class TableDataViewModel : BaseDocumentViewModel
 
     #region Methods
     
-    public void InvalidateData()
+    public async Task InvalidateDataAsync()
     {
-        TreeDataSource.Columns.Clear();
-        
-        using var dbContext = _dbContextFactory.CreateDbContext(Path);
-        
-        dbContext.Columns
-            .AsNoTracking()
-            .OrderBy(c => c.OrdinalPosition)
-            .AsEnumerable()
-            .ForEach(column =>
+        if (string.IsNullOrEmpty(Path))
+        {
+            return;
+        }
+
+        // Read the columns off the UI thread: querying the store is not rendering work, so it must not
+        // block the UI.
+        List<ColumnEntity> columns;
+
+        await using (var dbContext = await _dbContextFactory.CreateDbContextAsync(Path).ConfigureAwait(false))
+        {
+            columns = await dbContext.Columns
+                .AsNoTracking()
+                .OrderBy(c => c.OrdinalPosition)
+                .ToListAsync()
+                .ConfigureAwait(false);
+        }
+
+        // The grid columns are UI state, so they are rebuilt on the UI thread.
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            TreeDataSource.Columns.Clear();
+
+            foreach (var column in columns)
             {
                 var newColumn = CreateTemplateColumn<DataItem<RowEntity>>(column.Name, column.OrdinalPosition - 1);
                 TreeDataSource.Columns.Insert(column.OrdinalPosition - 1, newColumn);
-            });
-        
-        DataSource.Invalidate();
+            }
+
+            DataSource.Invalidate();
+        });
     }
 
     private void OnEntityChanged(object? sender, DbEntityChangedEventArgs args)

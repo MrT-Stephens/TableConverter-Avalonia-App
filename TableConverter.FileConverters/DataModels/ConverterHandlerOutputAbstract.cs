@@ -54,6 +54,10 @@ public abstract class ConverterHandlerOutputAbstract<T> : IConverterHandlerOutpu
     /// <param name="stream">The stream to which the data will be written.</param>
     /// <param name="buffer">The buffer containing the data to be saved.</param>
     /// <returns>A result indicating the success or failure of the save operation.</returns>
+    /// <remarks>
+    ///     The stream is written to but not closed: ownership stays with the caller, which is
+    ///     <see cref="ConverterService" /> when saving a converted file.
+    /// </remarks>
     public virtual Result SaveFile(Stream? stream, ReadOnlyMemory<byte> buffer)
     {
         // Ensure the stream is not null before attempting to write
@@ -61,11 +65,9 @@ public abstract class ConverterHandlerOutputAbstract<T> : IConverterHandlerOutpu
 
         try
         {
-            // Write the data to the stream
+            // Write the data to the stream; the caller is responsible for disposing it.
             stream.Write(buffer.Span);
-
-            // Close the stream after writing
-            stream.Close();
+            stream.Flush();
         }
         catch (Exception ex)
         {

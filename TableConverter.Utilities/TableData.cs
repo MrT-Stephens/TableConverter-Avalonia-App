@@ -5,7 +5,7 @@ namespace TableConverter.Utilities;
 /// <summary>
 ///     Represents a table containing headers and rows of data.
 /// </summary>
-public class TableData
+public class TableData : IEquatable<TableData>
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="TableData" /> class with headers and rows.
@@ -24,8 +24,11 @@ public class TableData
     /// <param name="other">The table data to copy.</param>
     public TableData(TableData other)
     {
+        ArgumentNullException.ThrowIfNull(other);
+
         Headers = new List<string>(other.Headers);
-        Rows = new List<string[]>(other.Rows);
+        // Deep copy the rows so mutating a copied table can never affect the original.
+        Rows = other.Rows.Select(row => row.ToArray()).ToList();
     }
 
     /// <summary>
@@ -39,25 +42,64 @@ public class TableData
     public List<string[]> Rows { get; }
 
     /// <summary>
+    ///     Determines whether the current <see cref="TableData" /> is equal to another <see cref="TableData" />.
+    /// </summary>
+    /// <param name="other">The table data to compare with the current instance.</param>
+    /// <returns>True if both tables have identical headers and rows; otherwise, false.</returns>
+    public bool Equals(TableData? other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+
+        if (Headers.Count != other.Headers.Count) return false;
+        if (Rows.Count != other.Rows.Count) return false;
+        if (!Headers.SequenceEqual(other.Headers, StringComparer.Ordinal)) return false;
+
+        for (var i = 0; i < Rows.Count; i++)
+        {
+            if (!Rows[i].SequenceEqual(other.Rows[i], StringComparer.Ordinal))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
     ///     Determines whether the current <see cref="TableData" /> is equal to another object.
     /// </summary>
     /// <param name="obj">The object to compare with the current instance.</param>
     /// <returns>True if the current instance is equal to the specified object; otherwise, false.</returns>
     public override bool Equals(object? obj)
     {
-        if (obj is not TableData other) return false;
-
-        return Headers.SequenceEqual(other.Headers) &&
-               !Rows.Where((row, i) => !row.SequenceEqual(other.Rows[i])).Any();
+        return obj is TableData other && Equals(other);
     }
 
     /// <summary>
     ///     Returns a hash code for the current <see cref="TableData" /> instance.
     /// </summary>
-    /// <returns>A hash code representing the current instance.</returns>
+    /// <returns>A content-based hash code representing the current instance.</returns>
     public override int GetHashCode()
     {
-        return HashCode.Combine(Headers, Rows);
+        var hash = new HashCode();
+
+        foreach (var header in Headers)
+        {
+            hash.Add(header);
+        }
+
+        foreach (var row in Rows)
+        {
+            hash.Add(row.Length);
+
+            foreach (var cell in row)
+            {
+                hash.Add(cell);
+            }
+        }
+
+        return hash.ToHashCode();
     }
 
     /// <summary>

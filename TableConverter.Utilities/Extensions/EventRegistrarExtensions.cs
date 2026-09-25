@@ -32,6 +32,26 @@ public static class EventRegistrarExtensions
         eventRegistrar.Register(handle, owner);
         return eventRegistrar;
     }
+
+    /// <summary>
+    ///     Subscribes <paramref name="handler" /> to <paramref name="eventHandler" /> and tracks the subscription so it is
+    ///     removed when the registrar is disposed. Use this instead of calling <c>Subscribe</c> directly, otherwise the
+    ///     subscription is never released.
+    /// </summary>
+    /// <returns>
+    ///     The registration that owns the subscription. Disposing it removes just this subscription; it is also removed
+    ///     when the registrar is disposed.
+    /// </returns>
+    public static IEventRegistration RegisterSubscription<TEventArgs>(
+        this IEventRegistrar eventRegistrar,
+        IEventHandler<TEventArgs> eventHandler,
+        EventHandler<TEventArgs> handler,
+        object? owner = null)
+        where TEventArgs : EventArgs
+    {
+        var subscription = new EventHandlerSubscriptionHandle<TEventArgs>(eventHandler, handler);
+        return eventRegistrar.Register(subscription, owner);
+    }
 }
 
 public sealed class PropertyChangedEventHandle(INotifyPropertyChanged target, PropertyChangedEventHandler handler) 
@@ -58,3 +78,19 @@ public sealed class EventHandle<TDelegate>(Action<TDelegate> add, Action<TDelega
     public void Add() => _add(_handler);
     public void Remove() => _remove(_handler);
 }
+
+public sealed class EventHandlerSubscriptionHandle<TEventArgs>(
+    IEventHandler<TEventArgs> eventHandler,
+    EventHandler<TEventArgs> handler)
+    : IEventHandle where TEventArgs : EventArgs
+{
+    private readonly IEventHandler<TEventArgs> _eventHandler =
+        eventHandler ?? throw new ArgumentNullException(nameof(eventHandler));
+
+    private readonly EventHandler<TEventArgs> _handler = handler ?? throw new ArgumentNullException(nameof(handler));
+
+    public void Add() => _eventHandler.Subscribe(_handler);
+
+    public void Remove() => _eventHandler.Unsubscribe(_handler);
+}
+

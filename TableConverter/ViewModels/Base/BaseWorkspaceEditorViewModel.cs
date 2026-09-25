@@ -233,9 +233,11 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
         SelectedTool = tool;
     }
 
-    public void Dispose()
+    public override void Dispose()
     {
         _eventRegistrar.Dispose();
+
+        base.Dispose();
     }
 
     #endregion

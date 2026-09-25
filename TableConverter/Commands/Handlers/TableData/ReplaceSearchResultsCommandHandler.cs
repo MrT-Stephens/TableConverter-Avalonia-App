@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls.Notifications;
 using Microsoft.Data.Sqlite;
@@ -9,7 +7,6 @@ using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using TableConverter.Commands.DataModels;
 using TableConverter.Commands.Interfaces;
-using TableConverter.Contracts;
 using TableConverter.Interfaces;
 using TableConverter.Utilities.Database.Contexts;
 using TableConverter.Utilities.Database.Interfaces;
@@ -95,7 +92,7 @@ public class ReplaceSearchResultsCommandHandler(
             .Queue();
         
         searchViewModel.DataSource.Invalidate();
-        tableDataViewModel.InvalidateData();
+        await tableDataViewModel.InvalidateDataAsync();
     }
 
     private async Task<int> ReplaceValuesAsync(TableStoreDbContext context, SearchSettingsFrom settings)

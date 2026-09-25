@@ -7,7 +7,6 @@ using Avalonia.Data;
 using Avalonia.Layout;
 using SukiUI.Theme;
 using TableConverter.Contracts;
-using TableConverter.Converters;
 
 namespace TableConverter.Views.Controls;
 
@@ -56,31 +55,16 @@ public class DynamicDataGrid : DataGrid
 
         for (var i = 0; i < Headers.Count; i++)
         {
-            DataGridBoundColumn column;
-
-            if (false)
+            // Cells are always rendered as text. A DataGridCheckBoxColumn variant used to live here
+            // behind an `if (false)` guard, which made the branch unreachable dead code.
+            var column = new DataGridTextColumn
             {
-                column = new DataGridCheckBoxColumn
+                Binding = new Binding
                 {
-                    Binding = new Binding
-                    {
-                        Path = $"[{i}]",
-                        Mode = BindingMode.TwoWay,
-                        Converter = new FuncValueConverter<bool>(Convert.ToBoolean),
-                    }
-                };
-            }
-            else
-            {
-                column = new DataGridTextColumn
-                {
-                    Binding = new Binding
-                    {
-                        Path = $"Item.Cells[{i}].Value",
-                        Mode = BindingMode.TwoWay,
-                    },
-                };
-            }
+                    Path = $"Item.Cells[{i}].Value",
+                    Mode = BindingMode.TwoWay,
+                },
+            };
 
             var header = new TextBox
             {

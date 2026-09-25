@@ -10,45 +10,54 @@ public class ConverterHandlerMarkdownOutput : ConverterHandlerOutputAbstract<Con
 {
     public override Result<string> Convert(string[] headers, string[][] rows)
     {
-        var asciiOutput = new StringBuilder();
+        var boldColumnNames = Options!.BoldColumnNames;
+        var boldFirstColumn = Options!.BoldFirstColumn;
 
-        // Calculates the max text character widths of every column.
-        var maxColumnWidths = new long[headers.Length];
+        // Build bolded copies: the caller's table data must never be mutated.
+        var displayHeaders = new string[headers.Length];
 
         for (var i = 0; i < headers.Length; i++)
-            if ((i == 0 && Options!.BoldFirstColumn) || Options!.BoldColumnNames)
-                maxColumnWidths[i] = headers[i].Length + 6;
-            else
-                maxColumnWidths[i] = headers[i].Length + 2;
+            displayHeaders[i] = boldColumnNames || (i == 0 && boldFirstColumn)
+                ? $"**{headers[i]}**"
+                : headers[i];
 
-        foreach (var row in rows)
-            for (var i = 0; i < headers.Length; i++)
-                if (i == 0 && Options!.BoldFirstColumn)
-                    maxColumnWidths[i] = Math.Max(maxColumnWidths[i], row[i].Length + 6);
-                else
-                    maxColumnWidths[i] = Math.Max(maxColumnWidths[i], row[i].Length + 2);
+        var displayRows = new string[rows.Length][];
 
-        // Bold the data if the user has selected to bold the first column.
-        if (Options!.BoldFirstColumn || Options!.BoldColumnNames) headers[0] = "**" + headers[0] + "**";
+        for (var r = 0; r < rows.Length; r++)
+        {
+            var row = rows[r];
+            var displayRow = new string[row.Length];
 
-        if (Options!.BoldColumnNames)
-            for (long i = 1; i < headers.LongLength; i++)
-                headers[i] = "**" + headers[i] + "**";
+            for (var i = 0; i < row.Length; i++)
+                displayRow[i] = i == 0 && boldFirstColumn
+                    ? $"**{row[i]}**"
+                    : row[i];
 
-        if (Options!.BoldFirstColumn)
-            foreach (var row in rows)
-                row[0] = "**" + row[0] + "**";
+            displayRows[r] = displayRow;
+        }
+
+        // Calculates the max text character widths of every column, including the bold markers.
+        var maxColumnWidths = new long[displayHeaders.Length];
+
+        for (var i = 0; i < displayHeaders.Length; i++)
+            maxColumnWidths[i] = displayHeaders[i].Length + 2;
+
+        foreach (var row in displayRows)
+            for (var i = 0; i < displayHeaders.Length && i < row.Length; i++)
+                maxColumnWidths[i] = Math.Max(maxColumnWidths[i], row[i].Length + 2);
 
         // Draw the table.
+        var asciiOutput = new StringBuilder();
+
         switch (Options!.SelectedTableType)
         {
             case ConverterHandlerMarkdownOutputOptions.TableStyles.Normal:
             {
-                asciiOutput.AppendLine("|" + DrawDataRow(headers, maxColumnWidths,
+                asciiOutput.AppendLine("|" + DrawDataRow(displayHeaders, maxColumnWidths,
                     Options!.SelectedTextAlignment, '|') + "|");
                 asciiOutput.AppendLine("|" + DrawSeparator(maxColumnWidths, '|', '-') + "|");
 
-                foreach (var row in rows)
+                foreach (var row in displayRows)
                     asciiOutput.AppendLine("|" + DrawDataRow(row, maxColumnWidths,
                         Options!.SelectedTextAlignment, '|') + "|");
 
@@ -56,11 +65,11 @@ public class ConverterHandlerMarkdownOutput : ConverterHandlerOutputAbstract<Con
             }
             case ConverterHandlerMarkdownOutputOptions.TableStyles.Simple:
             {
-                asciiOutput.AppendLine(DrawDataRow(headers, maxColumnWidths,
+                asciiOutput.AppendLine(DrawDataRow(displayHeaders, maxColumnWidths,
                     Options!.SelectedTextAlignment, '|'));
                 asciiOutput.AppendLine(DrawSeparator(maxColumnWidths, '|', '-'));
 
-                foreach (var row in rows)
+                foreach (var row in displayRows)
                     asciiOutput.AppendLine(DrawDataRow(row, maxColumnWidths,
                         Options!.SelectedTextAlignment, '|'));
 
@@ -90,11 +99,14 @@ public class ConverterHandlerMarkdownOutput : ConverterHandlerOutputAbstract<Con
     {
         var dataRow = new StringBuilder();
 
-        for (long i = 0; i < row.LongLength; i++)
+        // Iterate the column widths so ragged rows (fewer or more cells than headers) cannot throw.
+        for (long i = 0; i < columnWidths.LongLength; i++)
         {
-            dataRow.Append(ConverterHandlerUtilities.AlignText(row[i], textAlignment, (int)columnWidths[i], ' '));
+            var cell = i < row.LongLength ? row[i] : string.Empty;
 
-            dataRow.Append(i == row.LongLength - 1 ? "" : intersectionChar);
+            dataRow.Append(ConverterHandlerUtilities.AlignText(cell, textAlignment, (int)columnWidths[i], ' '));
+
+            dataRow.Append(i == columnWidths.LongLength - 1 ? "" : intersectionChar);
         }
 
         return dataRow.ToString();
