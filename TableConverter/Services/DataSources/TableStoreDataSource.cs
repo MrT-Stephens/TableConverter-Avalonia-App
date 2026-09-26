@@ -186,10 +186,30 @@ public class TableStoreDataSource(ITableStoreDbContextFactory databaseContextFac
                 return false;
             }
 
-            entity.Id = viewModel.Id;
+            // Only the values of the row's cells are written back. Each cell is matched to the one the
+            // store already holds by the column it belongs to rather than replacing the row's cells
+            // wholesale, which would try to insert cells the store already has and collide on their
+            // keys.
+            var storedCells = entity.Cells
+                .GroupBy(cell => cell.ColumnId)
+                .ToDictionary(group => group.Key, group => group.First());
 
-            entity.Cells.Clear();
-            entity.Cells.AddRange(viewModel.Cells);
+            foreach (var cell in viewModel.Cells)
+            {
+                if (storedCells.TryGetValue(cell.ColumnId, out var stored))
+                {
+                    stored.Value = cell.Value;
+                    continue;
+                }
+
+                // A column added since the row was read has no cell of the row's to write to yet.
+                entity.Cells.Add(new CellEntity
+                {
+                    RowId = entity.Id,
+                    ColumnId = cell.ColumnId,
+                    Value = cell.Value
+                });
+            }
 
             await db.SaveChangesAsync().ConfigureAwait(false);
             await transaction.CommitAsync().ConfigureAwait(false);
