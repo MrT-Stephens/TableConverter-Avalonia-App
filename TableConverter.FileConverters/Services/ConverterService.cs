@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using System.Text;
 using TableConverter.FileConverters.Exceptions;
 using TableConverter.FileConverters.Interfaces;
 using TableConverter.Utilities;
@@ -116,93 +115,53 @@ public class ConverterService : IConverterService
             ?? throw new InvalidOperationException($"Output {name} is not supported");
     }
 
-    public TableData InputFile(string name, string path)
+    public async Task ImportFileAsync(
+        string name,
+        string path,
+        ITableRowSink sink,
+        IProgress<ConversionProgress>? progress = null,
+        CancellationToken cancellationToken = default)
     {
-        var converter = GetInputByName(name);
-        
-        using var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+        ArgumentNullException.ThrowIfNull(sink);
 
-        var readResult = converter.ReadFile(stream);
-
-        if (readResult.IsSuccess is false)
-        {
-            throw new FileConverterException(name, readResult.Error ?? string.Empty);
-        }
-
-        var parseResult = converter.ReadText(readResult.Value);
-
-        if (parseResult.IsSuccess is false)
-        {
-            throw new FileConverterException(name, parseResult.Error ?? string.Empty);
-        }
-        
-        return parseResult.Value;
-    }
-
-    public async Task<TableData> InputFileAsync(string name, string path)
-    {
         var converter = GetInputByName(name);
 
         await using var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read);
 
-        var readResult = await converter.ReadFileAsync(stream);
+        var result = await converter.ReadStreamAsync(stream, sink, progress, cancellationToken).ConfigureAwait(false);
 
-        if (readResult.IsSuccess is false)
+        if (result.IsSuccess is false)
         {
-            throw new FileConverterException(name, readResult.Error ?? string.Empty);
+            throw new FileConverterException(name, result.Error ?? string.Empty);
         }
 
-        var parseResult = await converter.ReadTextAsync(readResult.Value);
-
-        if (parseResult.IsSuccess is false)
+        // A converter that reported success but never completed the sink would leave the destination
+        // silently empty. Catching it here turns a quiet data loss into a reported failure.
+        if (sink.IsCompleted is false)
         {
-            throw new FileConverterException(name, parseResult.Error ?? string.Empty);
-        }
-        
-        return parseResult.Value;
-    }
-
-    public void OutputFile(string name, string path, TableData tableData)
-    {
-        var converter = GetOutputByName(name);
-        
-        var converterResult = converter.Convert(tableData.Headers.ToArray(), tableData.Rows.ToArray());
-
-        if (converterResult.IsSuccess is false)
-        {
-            throw new FileConverterException(name, converterResult.Error ?? string.Empty);
-        }
-        
-        using var stream = File.Open(path, FileMode.Create, FileAccess.Write, FileShare.Read);
-        var text = Encoding.UTF8.GetBytes(converterResult.Value);
-        
-        var writeResult = converter.SaveFile(stream, text);
-
-        if (writeResult.IsSuccess is false)
-        {
-            throw new FileConverterException(name, writeResult.Error ?? string.Empty);
+            throw new FileConverterException(
+                name, "The file was read but the table was not finished, so nothing was stored.");
         }
     }
 
-    public async Task OutputFileAsync(string name, string path, TableData tableData)
+    public async Task ExportFileAsync(
+        string name,
+        string path,
+        ITableRowSource source,
+        IProgress<ConversionProgress>? progress = null,
+        CancellationToken cancellationToken = default)
     {
-        var converter = GetOutputByName(name);
-        
-        var converterResult = await converter.ConvertAsync(tableData.Headers.ToArray(), tableData.Rows.ToArray());
+        ArgumentNullException.ThrowIfNull(source);
 
-        if (converterResult.IsSuccess is false)
-        {
-            throw new FileConverterException(name, converterResult.Error ?? string.Empty);
-        }
+        var converter = GetOutputByName(name);
 
         await using var stream = File.Open(path, FileMode.Create, FileAccess.Write, FileShare.Read);
-        var text = Encoding.UTF8.GetBytes(converterResult.Value);
-        
-        var writeResult = await converter.SaveFileAsync(stream, text);
 
-        if (writeResult.IsSuccess is false)
+        var result = await converter.ConvertToStreamAsync(stream, source, progress, cancellationToken).ConfigureAwait(false);
+
+        if (result.IsSuccess is false)
         {
-            throw new FileConverterException(name, writeResult.Error ?? string.Empty);
+            throw new FileConverterException(name, result.Error ?? string.Empty);
         }
     }
 

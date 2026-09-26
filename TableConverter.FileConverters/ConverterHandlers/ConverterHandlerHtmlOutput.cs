@@ -7,62 +7,73 @@ namespace TableConverter.FileConverters.ConverterHandlers;
 
 public class ConverterHandlerHtmlOutput : ConverterHandlerOutputAbstract<ConverterHandlerHtmlOutputOptions>
 {
-    public override Result<string> Convert(string[] headers, string[][] rows)
+    public override async Task<Result> ConvertToStreamAsync(
+        Stream? stream,
+        ITableRowSource source,
+        IProgress<ConversionProgress>? progress = null,
+        CancellationToken cancellationToken = default)
     {
-        var stringWriter = new StringWriter();
+        ArgumentNullException.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(source);
+
+        await using var writer = TableRowStream.CreateTextWriter(stream);
+
+        var headers = await source.GetHeadersAsync(cancellationToken).ConfigureAwait(false);
 
         var tabCount = 0;
 
-        stringWriter.Write($"<table>{(Options!.MinifyHtml ? "" : Environment.NewLine + new string('\t', ++tabCount))}");
+        writer.Write($"<table>{(Options!.MinifyHtml ? "" : Environment.NewLine + new string('\t', ++tabCount))}");
 
         if (Options!.IncludeTheadTbody)
-            stringWriter.Write(
+            writer.Write(
                 $"<thead>{(Options!.MinifyHtml ? "" : Environment.NewLine + new string('\t', ++tabCount))}");
 
-        stringWriter.Write($"<tr>{(Options!.MinifyHtml ? "" : Environment.NewLine)}");
+        writer.Write($"<tr>{(Options!.MinifyHtml ? "" : Environment.NewLine)}");
 
         tabCount++;
 
-        for (long i = 0; i < headers.LongLength; i++)
+        for (var i = 0; i < headers.Count; i++)
         {
-            stringWriter.Write($"{(Options!.MinifyHtml ? "" : new string('\t', tabCount))}<th>");
-            stringWriter.Write(headers[i]);
-            stringWriter.Write($"</th>{(Options!.MinifyHtml ? "" : Environment.NewLine)}");
+            writer.Write($"{(Options!.MinifyHtml ? "" : new string('\t', tabCount))}<th>");
+            writer.Write(headers[i]);
+            writer.Write($"</th>{(Options!.MinifyHtml ? "" : Environment.NewLine)}");
         }
 
-        stringWriter.Write($"{(Options!.MinifyHtml ? "" : new string('\t', --tabCount))}</tr>");
+        writer.Write($"{(Options!.MinifyHtml ? "" : new string('\t', --tabCount))}</tr>");
 
         if (Options!.IncludeTheadTbody)
-            stringWriter.Write(
+            writer.Write(
                 $"{(Options!.MinifyHtml ? "" : Environment.NewLine + new string('\t', --tabCount))}</thead>");
 
-        for (long i = 0; i < rows.LongLength; i++)
+        await foreach (var row in source.ReadTextRowsAsync(cancellationToken).ConfigureAwait(false))
         {
             if (Options!.IncludeTheadTbody)
-                stringWriter.Write(
+                writer.Write(
                     $"{(Options!.MinifyHtml ? "" : Environment.NewLine + new string('\t', tabCount++))}<tbody>");
 
-            stringWriter.Write(
+            writer.Write(
                 $"{(Options!.MinifyHtml ? "" : Environment.NewLine + new string('\t', tabCount++))}<tr>");
 
-            for (long j = 0; j < headers.LongLength; j++)
+            for (var j = 0; j < headers.Count; j++)
             {
-                stringWriter.Write(
+                writer.Write(
                     $"{(Options!.MinifyHtml ? "" : Environment.NewLine + new string('\t', tabCount))}<td>");
-                stringWriter.Write(ConverterHandlerUtilities.GetCellValue(rows[i], j));
-                stringWriter.Write("</td>");
+                writer.Write(ConverterHandlerUtilities.GetCellValue(row, j));
+                writer.Write("</td>");
             }
 
-            stringWriter.Write(
+            writer.Write(
                 $"{(Options!.MinifyHtml ? "" : Environment.NewLine + new string('\t', --tabCount))}</tr>");
 
             if (Options!.IncludeTheadTbody)
-                stringWriter.Write(
+                writer.Write(
                     $"{(Options!.MinifyHtml ? "" : Environment.NewLine + new string('\t', --tabCount))}</tbody>");
         }
 
-        stringWriter.Write($"{(Options!.MinifyHtml ? "" : Environment.NewLine)}</table>");
+        writer.Write($"{(Options!.MinifyHtml ? "" : Environment.NewLine)}</table>");
 
-        return Result<string>.Success(stringWriter.ToString());
+        await writer.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+        return Result.Success();
     }
 }

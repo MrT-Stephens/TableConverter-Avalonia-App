@@ -12,44 +12,44 @@ public class HtmlInputTestCases : InputConverterTestCasesBase
     ///     Test cases that should pass.
     /// </summary>
     protected override
-        IReadOnlyList<(string FileName, ConverterHandlerBaseOptions Options, TableData ExpectedTableData)>
+        IReadOnlyList<(string FileName, ConverterHandlerBaseOptions Options, TableSnapshot ExpectedTableData)>
         SuccessfulTestCases { get; } =
     [
         (
             // Test case 1: Test with a simple HTML table.
             "test_input_html_1.html",
             new ConverterHandlerBaseOptions(),
-            Utils.TestTableData
+            Utils.TestTable
         ),
         (
             // Test case 2: Test with a simple HTML table with <thead> and <tbody> tags.
             "test_input_html_2.html",
             new ConverterHandlerBaseOptions(),
-            Utils.TestTableData
+            Utils.TestTable
         ),
         (
             // Test case 3: Test with a simple HTML table minified.
             "test_input_html_3.html",
             new ConverterHandlerBaseOptions(),
-            Utils.TestTableData
+            Utils.TestTable
         ),
         (
             // Test case 4: Test with a simple HTML table with <thead> and <tbody> tags minified.
             "test_input_html_4.html",
             new ConverterHandlerBaseOptions(),
-            Utils.TestTableData
+            Utils.TestTable
         ),
         (
             // Test case 5: Test with a simple styled HTML table.
             "test_input_html_5.html",
             new ConverterHandlerBaseOptions(),
-            Utils.TestTableData
+            Utils.TestTable
         ),
         (
             // Test case 6: Test with a simple styled HTML table minified.
             "test_input_html_6.html",
             new ConverterHandlerBaseOptions(),
-            Utils.TestTableData
+            Utils.TestTable
         )
     ];
 

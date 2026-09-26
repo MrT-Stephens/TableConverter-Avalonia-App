@@ -12,7 +12,7 @@ public class CsvInputTestCases : InputConverterTestCasesBase
     ///     Test cases for successful conversion.
     /// </summary>
     protected override
-        IReadOnlyList<(string FileName, ConverterHandlerBaseOptions Options, TableData ExpectedTableData)>
+        IReadOnlyList<(string FileName, ConverterHandlerBaseOptions Options, TableSnapshot ExpectedTableData)>
         SuccessfulTestCases { get; } =
     [
         (
@@ -23,7 +23,7 @@ public class CsvInputTestCases : InputConverterTestCasesBase
                 IncludeHeader = true,
                 Delimiter = ","
             },
-            Utils.TestTableData
+            Utils.TestTable
         ),
         (
             // Test case 2: Correct CSV file with ampersand delimiter
@@ -33,7 +33,7 @@ public class CsvInputTestCases : InputConverterTestCasesBase
                 IncludeHeader = true,
                 Delimiter = "&"
             },
-            Utils.TestTableData
+            Utils.TestTable
         )
     ];
 

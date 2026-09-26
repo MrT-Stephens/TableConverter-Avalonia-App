@@ -1,55 +1,70 @@
 ﻿using System.Xml;
 using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
+using TableConverter.FileConverters.Utilities;
 using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.ConverterHandlers;
 
 public class ConverterHandlerXmlOutput : ConverterHandlerOutputAbstract<ConverterHandlerXmlOutputOptions>
 {
-    public override Result<string> Convert(string[] headers, string[][] rows)
+    public override async Task<Result> ConvertToStreamAsync(
+        Stream? stream,
+        ITableRowSource source,
+        IProgress<ConversionProgress>? progress = null,
+        CancellationToken cancellationToken = default)
     {
-        var xmlDocument = new XmlDocument();
+        ArgumentNullException.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(source);
 
-        // Create XML declaration
-        var xmlDeclaration = xmlDocument.CreateXmlDeclaration("1.0", "UTF-8", null);
-        xmlDocument.AppendChild(xmlDeclaration);
+        await using var writer = TableRowStream.CreateTextWriter(stream);
 
-        // Create root element
-        var rootElement = xmlDocument.CreateElement(Options!.XmlRootNodeName.Replace(' ', '_'));
-        xmlDocument.AppendChild(rootElement);
+        var headers = await source.GetHeadersAsync(cancellationToken).ConfigureAwait(false);
 
-        // Iterate over DataTable rows
-        for (var i = 0; i < rows.Length; i++)
+        var settings = new XmlWriterSettings
         {
-            // Create record element
-            var recordElement = xmlDocument.CreateElement(Options!.XmlElementNodeName.Replace(' ', '_'));
+            Indent = !Options!.MinifyXml,
+            OmitXmlDeclaration = true,
+            // The writer belongs to the caller, so it must survive being disposed here.
+            CloseOutput = false
+        };
+
+        // The declaration is written with a fixed encoding so the output does not depend on which writer
+        // the caller supplied; the converters have always emitted UTF-8.
+        writer.Write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+
+        using var xmlWriter = XmlWriter.Create(writer, settings);
+
+        var rootName = Options!.XmlRootNodeName.Replace(' ', '_');
+        var elementName = Options!.XmlElementNodeName.Replace(' ', '_');
+
+        xmlWriter.WriteStartElement(rootName);
+
+        await foreach (var row in source.ReadTextRowsAsync(cancellationToken).ConfigureAwait(false))
+        {
+            xmlWriter.WriteStartElement(elementName);
 
             // Iterate over DataTable columns
-            for (var j = 0; j < headers.Length; j++)
+            for (var j = 0; j < headers.Count; j++)
             {
                 // Create element for each column and set its value
-                var columnElement = xmlDocument.CreateElement(headers[j].Replace(' ', '_'));
+                xmlWriter.WriteStartElement(headers[j].Replace(' ', '_'));
 
                 // Guard against ragged rows: the caller may supply fewer cells than there are headers.
-                columnElement.InnerText = j < rows[i].Length ? rows[i][j] : string.Empty;
+                xmlWriter.WriteString(j < row.Length ? row[j] : string.Empty);
 
-                recordElement.AppendChild(columnElement);
+                xmlWriter.WriteEndElement();
             }
 
             // Append record element to the root
-            rootElement.AppendChild(recordElement);
+            xmlWriter.WriteEndElement();
         }
 
-        using var textWriter = new StringWriter();
-        using var xmlWriter = new XmlTextWriter(textWriter)
-        {
-            Formatting = Options!.MinifyXml ? Formatting.None : Formatting.Indented
-        };
-
-        xmlDocument.WriteTo(xmlWriter);
+        xmlWriter.WriteEndElement();
         xmlWriter.Flush();
 
-        return Result<string>.Success(textWriter.ToString());
+        await writer.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+        return Result.Success();
     }
 }

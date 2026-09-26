@@ -1,19 +1,37 @@
 ﻿using System.Text.RegularExpressions;
 using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
+using TableConverter.FileConverters.Utilities;
 using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.ConverterHandlers;
 
 public partial class ConverterHandlerSQLInput : ConverterHandlerInputAbstract<ConverterHandlerSQLInputOptions>
 {
-    public override Result<TableData> ReadText(string text)
+    public override async Task<Result> ReadStreamAsync(
+        Stream? stream,
+        ITableRowSink sink,
+        IProgress<ConversionProgress>? progress = null,
+        CancellationToken cancellationToken = default)
     {
+        var opened = TableRowStream.OpenTextReader(stream);
+
+        if (opened.IsSuccess is false)
+        {
+            return Result.Failure(opened.Error!);
+        }
+
+        using var reader = opened.Value;
+
         var headers = new List<string>();
         var rows = new List<string[]>();
 
         try
         {
+            // The INSERT statements are pulled out with a regex, so the whole file is needed before the
+            // first row can be written.
+            var text = await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+
             if (Options!.HasColumnNames)
             {
                 var matches = SqlWithColumnNamesRegex().Matches(text);
@@ -31,7 +49,7 @@ public partial class ConverterHandlerSQLInput : ConverterHandlerInputAbstract<Co
                         if (tableName.StartsWith(quoteType.Value) && tableName.EndsWith(quoteType.Value) &&
                             quoteType.Key != Options!.SelectedQuoteType)
                         {
-                            return Result<TableData>.Failure(
+                            return Result.Failure(
                                 $"The table name is enclosed in {quoteType.Key} but the selected quote type is {Options!.SelectedQuoteType}.");
                         }
                     }
@@ -52,7 +70,7 @@ public partial class ConverterHandlerSQLInput : ConverterHandlerInputAbstract<Co
 
                     if (columns.Length != values.Length)
                     {
-                        return Result<TableData>.Failure(
+                        return Result.Failure(
                             $"The number of columns and values do not match at row {rows.Count + 1}.");
                     }
 
@@ -71,10 +89,11 @@ public partial class ConverterHandlerSQLInput : ConverterHandlerInputAbstract<Co
         }
         catch (Exception ex)
         {
-            return Result<TableData>.Failure(ex.Message);
+            return Result.Failure(ex.Message);
         }
 
-        return Result<TableData>.Success(new TableData(headers, rows));
+        return await TableRowStream.PushAsync(headers, rows, sink, cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
     }
 
     [GeneratedRegex("""INSERT\sINTO\s([`"\[]?\w+[`"\]]?)\s*\((.*?)\)\s*VALUES\s*\((.*?)\);""", RegexOptions.Singleline)]

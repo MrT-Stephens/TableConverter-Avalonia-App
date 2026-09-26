@@ -12,7 +12,7 @@ public class JsonInputTestCases : InputConverterTestCasesBase
     ///     Test cases for successful test cases.
     /// </summary>
     protected override
-        IReadOnlyList<(string FileName, ConverterHandlerBaseOptions Options, TableData ExpectedTableData)>
+        IReadOnlyList<(string FileName, ConverterHandlerBaseOptions Options, TableSnapshot ExpectedTableData)>
         SuccessfulTestCases { get; } =
     [
         (
@@ -22,7 +22,7 @@ public class JsonInputTestCases : InputConverterTestCasesBase
             {
                 SelectedJsonFormatType = ConverterHandlerJsonInputOptions.JsonStyles.ArrayOfObjects
             },
-            Utils.TestTableData
+            Utils.TestTable
         ),
         (
             // Test case 2: Test with json in array of objects format minified.
@@ -31,7 +31,7 @@ public class JsonInputTestCases : InputConverterTestCasesBase
             {
                 SelectedJsonFormatType = ConverterHandlerJsonInputOptions.JsonStyles.ArrayOfObjects
             },
-            Utils.TestTableData
+            Utils.TestTable
         ),
         (
             // Test case 3: Test with json in 2D arrays format.
@@ -40,7 +40,7 @@ public class JsonInputTestCases : InputConverterTestCasesBase
             {
                 SelectedJsonFormatType = ConverterHandlerJsonInputOptions.JsonStyles.TwoDimensionalArrays
             },
-            Utils.TestTableData
+            Utils.TestTable
         ),
         (
             // Test case 4: Test with json in 2D arrays format minified.
@@ -49,7 +49,7 @@ public class JsonInputTestCases : InputConverterTestCasesBase
             {
                 SelectedJsonFormatType = ConverterHandlerJsonInputOptions.JsonStyles.TwoDimensionalArrays
             },
-            Utils.TestTableData
+            Utils.TestTable
         ),
         (
             // Test case 5: Test with json in column arrays format.
@@ -58,7 +58,7 @@ public class JsonInputTestCases : InputConverterTestCasesBase
             {
                 SelectedJsonFormatType = ConverterHandlerJsonInputOptions.JsonStyles.ColumnArrays
             },
-            Utils.TestTableData
+            Utils.TestTable
         ),
         (
             // Test case 6: Test with json in column arrays format minified.
@@ -67,7 +67,7 @@ public class JsonInputTestCases : InputConverterTestCasesBase
             {
                 SelectedJsonFormatType = ConverterHandlerJsonInputOptions.JsonStyles.ColumnArrays
             },
-            Utils.TestTableData
+            Utils.TestTable
         ),
         (
             // Test case 7: Test with json in keyed arrays format.
@@ -76,7 +76,7 @@ public class JsonInputTestCases : InputConverterTestCasesBase
             {
                 SelectedJsonFormatType = ConverterHandlerJsonInputOptions.JsonStyles.KeyedArrays
             },
-            Utils.TestTableData
+            Utils.TestTable
         ),
         (
             // Test case 8: Test with json in keyed arrays format minified.
@@ -85,7 +85,7 @@ public class JsonInputTestCases : InputConverterTestCasesBase
             {
                 SelectedJsonFormatType = ConverterHandlerJsonInputOptions.JsonStyles.KeyedArrays
             },
-            Utils.TestTableData
+            Utils.TestTable
         )
     ];
 

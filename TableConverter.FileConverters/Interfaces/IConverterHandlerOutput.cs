@@ -1,5 +1,4 @@
-﻿using TableConverter.FileConverters.DataModels;
-using TableConverter.Utilities;
+﻿using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.Interfaces;
 
@@ -14,40 +13,34 @@ public interface IConverterHandlerOutput
     public dynamic? Options { get; set; }
 
     /// <summary>
-    ///     Converts the given headers and rows into a formatted string.
+    ///     Pulls rows from <paramref name="source" /> and writes the converted table straight to
+    ///     <paramref name="stream" />.
     /// </summary>
-    /// <param name="headers">The headers for the table data.</param>
-    /// <param name="rows">The rows containing the table data.</param>
-    /// <returns>A result containing the converted table data as a string.</returns>
-    public Result<string> Convert(string[] headers, string[][] rows);
-
-    /// <summary>
-    ///     Asynchronously converts the given headers and rows into a formatted string.
-    /// </summary>
-    /// <param name="headers">The headers for the table data.</param>
-    /// <param name="rows">The rows containing the table data.</param>
-    /// <returns>
-    ///     A task that represents the asynchronous operation, containing a result with the converted table data as a
-    ///     string.
-    /// </returns>
-    public Task<Result<string>> ConvertAsync(string[] headers, string[][] rows);
-
-    /// <summary>
-    ///     Saves the converted table data to the specified stream.
-    /// </summary>
-    /// <param name="stream">The stream to save the converted data to.</param>
-    /// <param name="buffer">The buffer containing the data to be saved.</param>
-    /// <returns>A result indicating the success or failure of the operation.</returns>
-    public Result SaveFile(Stream? stream, ReadOnlyMemory<byte> buffer);
-
-    /// <summary>
-    ///     Asynchronously saves the converted table data to the specified stream.
-    /// </summary>
-    /// <param name="stream">The stream to save the converted data to.</param>
-    /// <param name="buffer">The buffer containing the data to be saved.</param>
-    /// <returns>
-    ///     A task that represents the asynchronous operation, containing a result indicating the success or failure of
-    ///     the operation.
-    /// </returns>
-    public Task<Result> SaveFileAsync(Stream? stream, ReadOnlyMemory<byte> buffer);
+    /// <param name="stream">The stream to write the converted data to.</param>
+    /// <param name="source">The table to convert, supplied one row at a time.</param>
+    /// <param name="progress">
+    ///     Receives how far the write has got, or <see langword="null" /> if the caller does not want
+    ///     progress. The unit is the handler's to choose, most often the rows pulled from
+    ///     <paramref name="source" />.
+    /// </param>
+    /// <param name="cancellationToken">Token used to cancel the conversion.</param>
+    /// <returns>A task that represents the asynchronous operation, containing a result indicating success or failure.</returns>
+    /// <remarks>
+    ///     <para>
+    ///         This is the only entry point an output handler implements. A large table is never held in
+    ///         memory as a whole, nor converted into one giant string, before it can be written out:
+    ///         rows are pulled and written as they go.
+    ///     </para>
+    ///     <para>
+    ///         The stream is written to but not closed: ownership stays with the caller.
+    ///     </para>
+    ///     <para>
+    ///         Reporting through <paramref name="progress" /> is the handler's own affair: a handler that
+    ///         cannot measure its work simply never reports. Reports should be throttled, because
+    ///         <see cref="IProgress{T}" /> marshals each one onto the captured context.
+    ///     </para>
+    /// </remarks>
+    public Task<Result> ConvertToStreamAsync(Stream? stream, ITableRowSource source,
+        IProgress<ConversionProgress>? progress = null,
+        CancellationToken cancellationToken = default);
 }

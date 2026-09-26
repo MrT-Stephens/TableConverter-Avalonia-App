@@ -1,5 +1,4 @@
-﻿using System.Dynamic;
-using System.Globalization;
+﻿using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
 using TableConverter.FileConverters.ConverterHandlersOptions;
@@ -11,40 +10,60 @@ namespace TableConverter.FileConverters.ConverterHandlers;
 
 public class ConverterHandlerCsvOutput : ConverterHandlerOutputAbstract<ConverterHandlerCsvOptions>
 {
-    public override Result<string> Convert(string[] headers, string[][] rows)
+    public override async Task<Result> ConvertToStreamAsync(
+        Stream? stream,
+        ITableRowSource source,
+        IProgress<ConversionProgress>? progress = null,
+        CancellationToken cancellationToken = default)
     {
-        using var writer = new StringWriter();
+        ArgumentNullException.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(source);
+
+        await using var writer = TableRowStream.CreateTextWriter(stream);
 
         try
         {
+            var headers = await source.GetHeadersAsync(cancellationToken).ConfigureAwait(false);
+
+            // The writer belongs to the caller, so the CSV writer must not close it.
             using var csv = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture)
             {
                 Delimiter = Options!.Delimiter,
                 NewLine = Environment.NewLine,
                 HasHeaderRecord = Options!.IncludeHeader
-            });
+            }, leaveOpen: true);
+
+            // The header is written from the first row rather than up front, so an empty table produces
+            // an empty file, which is what writing a list of records used to do.
+            var wroteHeader = false;
+
+            await foreach (var row in source.ReadTextRowsAsync(cancellationToken).ConfigureAwait(false))
             {
-                List<object> records = [];
-
-                for (long i = 0; i < rows.LongLength; i++)
+                if (!wroteHeader)
                 {
-                    dynamic record = new ExpandoObject();
+                    if (Options!.IncludeHeader)
+                    {
+                        for (var j = 0; j < headers.Count; j++) csv.WriteField(headers[j]);
 
-                    for (long j = 0; j < headers.LongLength; j++)
-                        ((IDictionary<string, object>)record)[headers[j]] =
-                            ConverterHandlerUtilities.GetCellValue(rows[i], j);
+                        csv.NextRecord();
+                    }
 
-                    records.Add(record);
+                    wroteHeader = true;
                 }
 
-                csv.WriteRecords(records);
+                for (var j = 0; j < headers.Count; j++)
+                    csv.WriteField(ConverterHandlerUtilities.GetCellValue(row, j));
+
+                csv.NextRecord();
             }
         }
         catch (Exception ex)
         {
-            return Result<string>.Failure(ex.Message);
+            return Result.Failure(ex.Message);
         }
 
-        return Result<string>.Success(writer.ToString());
+        await writer.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+        return Result.Success();
     }
 }

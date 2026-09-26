@@ -133,12 +133,13 @@ public class ImportFileCommandHandler(
 
         try
         {
-            var tableData = await converterService.InputFileAsync(inputConverterName, path);
-
             // The imported table lives in a store of its own, so the rest of the editor (search,
             // columns, editing) works on it exactly as it does on a document created with New File.
             await document.CreateNewStoreAsync(Path.GetFileNameWithoutExtension(selectedFile.Name));
-            await document.ImportDataAsync(tableData);
+
+            // The converter writes straight into the store, so a large file is never held in memory as
+            // a whole table before it can be stored.
+            await document.ImportDataAsync(converterService, inputConverterName, path);
         }
         catch (Exception exception)
         {

@@ -142,11 +142,11 @@ public class ExportFileCommandHandler(
         try
         {
             // Reading the store and converting the table is not rendering work, so it all stays off
-            // the UI thread.
+            // the UI thread. The converter reads straight from the store, so a large table is never held
+            // in memory as a whole before it can be written out.
             await Task.Run(async () =>
             {
-                var tableData = await document.ReadTableDataAsync();
-                await converterService.OutputFileAsync(outputName, path, tableData);
+                await document.ExportDataAsync(converterService, outputName, path);
             });
         }
         catch (Exception exception)
@@ -167,4 +167,3 @@ public class ExportFileCommandHandler(
             .Queue();
     }
 }
-

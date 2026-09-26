@@ -142,11 +142,13 @@ public class ColumnDataTypeTests
         {
             // An imported table carries no type information, so it must not leave columns with a type
             // that was never chosen.
-            var tableData = new TableData(["A", "B"], [["a1", "b1"]]);
-
             await using (var dbContext = await factory.CreateDbContextAsync(path))
             {
-                await TableStoreDataWriter.WriteAsync(dbContext, tableData);
+                await using var sink = TableStoreRowSink.Create(dbContext);
+
+                await sink.BeginAsync(["A", "B"]);
+                await sink.WriteRowAsync(["a1", "b1"]);
+                await sink.CompleteAsync();
             }
 
             await using (var dbContext = await factory.CreateDbContextAsync(path))
@@ -177,4 +179,3 @@ public class ColumnDataTypeTests
         }
     }
 }
-

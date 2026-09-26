@@ -1,6 +1,5 @@
 using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
-using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.Tests.TestBase;
 
@@ -10,7 +9,7 @@ public abstract class InputConverterTestCasesBase
         (
         string FileName,
         ConverterHandlerBaseOptions Options,
-        TableData ExpectedTableData
+        TableSnapshot ExpectedTableData
         )> SuccessfulTestCases { get; }
 
     protected abstract IReadOnlyList<

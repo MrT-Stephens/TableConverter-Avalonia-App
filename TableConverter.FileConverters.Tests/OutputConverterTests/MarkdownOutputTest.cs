@@ -3,6 +3,7 @@ using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.ConverterProviders;
 using TableConverter.FileConverters.Interfaces;
 using TableConverter.FileConverters.Services;
+using TableConverter.FileConverters.Tests.TestBase;
 using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.Tests.OutputConverterTests;
@@ -10,9 +11,9 @@ namespace TableConverter.FileConverters.Tests.OutputConverterTests;
 public class MarkdownOutputTest
 {
     [Fact]
-    public void Convert_Does_Not_Mutate_The_Caller_Headers_Or_Rows()
+    public async Task Convert_Does_Not_Mutate_The_Caller_Headers_Or_Rows()
     {
-        // Regression: this handler used to bold cells in place, corrupting the caller's TableData.
+        // Regression: this handler used to bold cells in place, corrupting the caller's table.
         var handler = new ConverterHandlerMarkdownOutput
         {
             Options = new ConverterHandlerMarkdownOutputOptions
@@ -25,7 +26,7 @@ public class MarkdownOutputTest
         var headers = new[] { "Name", "Age" };
         var rows = new[] { new[] { "Alice", "30" }, new[] { "Bob", "25" } };
 
-        var result = handler.Convert(headers, rows);
+        var result = await Utils.ConvertToTextAsync(handler, headers, rows);
 
         Assert.True(result.IsSuccess, result.Error);
 
@@ -38,7 +39,7 @@ public class MarkdownOutputTest
     }
 
     [Fact]
-    public void Convert_Does_Not_Mutate_The_Caller_Data_When_Bolding_Is_Disabled()
+    public async Task Convert_Does_Not_Mutate_The_Caller_Data_When_Bolding_Is_Disabled()
     {
         var handler = new ConverterHandlerMarkdownOutput
         {
@@ -48,7 +49,7 @@ public class MarkdownOutputTest
         var headers = new[] { "Name", "Age" };
         var rows = new[] { new[] { "Alice", "30" } };
 
-        var result = handler.Convert(headers, rows);
+        var result = await Utils.ConvertToTextAsync(handler, headers, rows);
 
         Assert.True(result.IsSuccess, result.Error);
 
@@ -59,14 +60,14 @@ public class MarkdownOutputTest
     }
 
     [Fact]
-    public void Convert_Renders_A_Table_With_The_Expected_Shape()
+    public async Task Convert_Renders_A_Table_With_The_Expected_Shape()
     {
         var handler = new ConverterHandlerMarkdownOutput
         {
             Options = new ConverterHandlerMarkdownOutputOptions()
         };
 
-        var result = handler.Convert(["Name", "Age"], [["Alice", "30"]]);
+        var result = await Utils.ConvertToTextAsync(handler, ["Name", "Age"], [["Alice", "30"]]);
 
         Assert.True(result.IsSuccess, result.Error);
 
@@ -81,7 +82,7 @@ public class MarkdownOutputTest
     }
 
     [Fact]
-    public void Convert_Handles_Rows_With_Fewer_Cells_Than_Headers()
+    public async Task Convert_Handles_Rows_With_Fewer_Cells_Than_Headers()
     {
         // Regression: this used to throw IndexOutOfRangeException.
         var handler = new ConverterHandlerMarkdownOutput
@@ -89,14 +90,14 @@ public class MarkdownOutputTest
             Options = new ConverterHandlerMarkdownOutputOptions()
         };
 
-        var result = handler.Convert(["A", "B", "C"], [["1"]]);
+        var result = await Utils.ConvertToTextAsync(handler, ["A", "B", "C"], [["1"]]);
 
         Assert.True(result.IsSuccess, result.Error);
         Assert.Contains("1", result.Value);
     }
 
     [Fact]
-    public void Convert_Handles_Rows_With_More_Cells_Than_Headers()
+    public async Task Convert_Handles_Rows_With_More_Cells_Than_Headers()
     {
         // Regression: this used to throw IndexOutOfRangeException.
         var handler = new ConverterHandlerMarkdownOutput
@@ -104,21 +105,21 @@ public class MarkdownOutputTest
             Options = new ConverterHandlerMarkdownOutputOptions()
         };
 
-        var result = handler.Convert(["A"], [["1", "2"]]);
+        var result = await Utils.ConvertToTextAsync(handler, ["A"], [["1", "2"]]);
 
         Assert.True(result.IsSuccess, result.Error);
         Assert.Contains("1", result.Value);
     }
 
     [Fact]
-    public void Convert_Handles_Empty_Input()
+    public async Task Convert_Handles_Empty_Input()
     {
         var handler = new ConverterHandlerMarkdownOutput
         {
             Options = new ConverterHandlerMarkdownOutputOptions()
         };
 
-        var result = handler.Convert([], []);
+        var result = await Utils.ConvertToTextAsync(handler, [], []);
 
         Assert.True(result.IsSuccess, result.Error);
     }
@@ -126,7 +127,8 @@ public class MarkdownOutputTest
     [Theory]
     [InlineData(ConverterHandlerMarkdownOutputOptions.TableStyles.Normal)]
     [InlineData(ConverterHandlerMarkdownOutputOptions.TableStyles.Simple)]
-    public void Convert_Does_Not_Mutate_Input_For_Any_Table_Style(ConverterHandlerMarkdownOutputOptions.TableStyles style)
+    public async Task Convert_Does_Not_Mutate_Input_For_Any_Table_Style(
+        ConverterHandlerMarkdownOutputOptions.TableStyles style)
     {
         var handler = new ConverterHandlerMarkdownOutput
         {
@@ -141,7 +143,7 @@ public class MarkdownOutputTest
         var headers = new[] { "Name", "Age" };
         var rows = new[] { new[] { "Alice", "30" } };
 
-        var result = handler.Convert(headers, rows);
+        var result = await Utils.ConvertToTextAsync(handler, headers, rows);
 
         Assert.True(result.IsSuccess, result.Error);
         Assert.Equal(new[] { "Name", "Age" }, headers);
@@ -149,9 +151,9 @@ public class MarkdownOutputTest
     }
 
     [Fact]
-    public void OutputFile_Does_Not_Corrupt_The_Source_Table_Data()
+    public async Task Export_Does_Not_Corrupt_The_Source_Table()
     {
-        // The end-to-end path: ConverterService hands the handler the *same* row arrays as the TableData.
+        // The end-to-end path: ConverterService hands the handler the *same* row arrays the table holds.
         var service = new ConverterService([new ConverterProviderMarkdown()]);
 
         var options = service.GetOutputOptionsByName<ConverterHandlerMarkdownOutputOptions>("Markdown");
@@ -159,50 +161,19 @@ public class MarkdownOutputTest
         options!.BoldColumnNames = true;
         options.BoldFirstColumn = true;
 
-        var tableData = new TableData(["Name", "Age"], [["Alice", "30"]]);
+        var table = new TableSnapshot(["Name", "Age"], [["Alice", "30"]]);
 
         var path = Path.Combine(Path.GetTempPath(), $"tableconverter-{Guid.NewGuid():N}.md");
 
         try
         {
-            service.OutputFile("Markdown", path, tableData);
+            await service.ExportFileAsync("Markdown", path, table);
 
-            Assert.Equal(new[] { "Name", "Age" }, tableData.Headers);
-            Assert.Equal(new[] { "Alice", "30" }, tableData.Rows[0]);
+            Assert.Equal(new[] { "Name", "Age" }, table.Headers);
+            Assert.Equal(new[] { "Alice", "30" }, table.Rows[0]);
 
             Assert.True(File.Exists(path));
             Assert.Contains("**Alice**", File.ReadAllText(path));
-        }
-        finally
-        {
-            if (File.Exists(path))
-            {
-                File.Delete(path);
-            }
-        }
-    }
-
-    [Fact]
-    public async Task OutputFileAsync_Does_Not_Corrupt_The_Source_Table_Data()
-    {
-        var service = new ConverterService([new ConverterProviderMarkdown()]);
-
-        var options = service.GetOutputOptionsByName<ConverterHandlerMarkdownOutputOptions>("Markdown");
-        Assert.NotNull(options);
-        options!.BoldFirstColumn = true;
-
-        var tableData = new TableData(["Name", "Age"], [["Alice", "30"]]);
-
-        var path = Path.Combine(Path.GetTempPath(), $"tableconverter-{Guid.NewGuid():N}.md");
-
-        try
-        {
-            await service.OutputFileAsync("Markdown", path, tableData);
-
-            Assert.Equal(new[] { "Name", "Age" }, tableData.Headers);
-            Assert.Equal(new[] { "Alice", "30" }, tableData.Rows[0]);
-
-            Assert.True(File.Exists(path));
         }
         finally
         {
@@ -235,4 +206,3 @@ public class MarkdownOutputTest
         Assert.Contains("not supported", exception.Message);
     }
 }
-

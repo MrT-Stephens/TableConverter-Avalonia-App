@@ -2,15 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using Avalonia;
 using TableConverter.DataGeneration;
-using TableConverter.DataGeneration.Exceptions;
 using TableConverter.Contracts;
 using TableConverter.Interfaces;
-using TableConverter.Utilities;
-using TableConverter.ViewModels;
-using DataGenerationFieldViewModel = TableConverter.ViewModels.Models.DataGenerationFieldViewModel;
 
 namespace TableConverter.Services;
 
@@ -34,32 +29,6 @@ public class DataGenerationTypes : IDataGenerationTypes
         Faker.Value.Seed(seed);
     }
 
-    public async Task<Result<TableData>> GenerateData(DataGenerationFieldViewModel[] fields, int rowCount = 0)
-    {
-        var builder = FakerWithAttributedModules.Create(Faker.Value);
-
-        foreach (var field in fields)
-            builder.AddKeyed(
-                field.Name,
-                field.Key,
-                field.Parameters.Select(param => param.Value).ToArray()!,
-                field.BlankPercentage
-            );
-
-        builder.WithRowCount(rowCount);
-
-        try
-        {
-            return Result<TableData>.Success(await builder.BuildAsync());
-        }
-        catch (Exception ex)
-        {
-            if (ex.InnerException is FakerArgumentException fakerArgumentException)
-                return Result<TableData>.Failure(fakerArgumentException.ToString());
-
-            throw;
-        }
-    }
 
     private static IReadOnlyList<DataGenerationType> LoadDataGenerationTypes()
     {

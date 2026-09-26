@@ -3,7 +3,7 @@ using TableConverter.FileConverters.ConverterHandlers;
 using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.ConverterProviders;
 using TableConverter.FileConverters.Services;
-using TableConverter.Utilities;
+using TableConverter.FileConverters.Tests.TestBase;
 
 namespace TableConverter.FileConverters.Tests.OutputConverterTests;
 
@@ -23,11 +23,11 @@ public class XmlOutputTest
     }
 
     [Fact]
-    public void Convert_Produces_Well_Formed_Xml()
+    public async Task Convert_Produces_Well_Formed_Xml()
     {
         var handler = CreateHandler();
 
-        var result = handler.Convert(["Name", "Age"], [["Alice", "30"], ["Bob", "25"]]);
+        var result = await Utils.ConvertToTextAsync(handler, ["Name", "Age"], [["Alice", "30"], ["Bob", "25"]]);
 
         Assert.True(result.IsSuccess, result.Error);
 
@@ -43,11 +43,11 @@ public class XmlOutputTest
     }
 
     [Fact]
-    public void Convert_Replaces_Spaces_In_Node_Names()
+    public async Task Convert_Replaces_Spaces_In_Node_Names()
     {
         var handler = CreateHandler();
 
-        var result = handler.Convert(["First Name"], [["Alice"]]);
+        var result = await Utils.ConvertToTextAsync(handler, ["First Name"], [["Alice"]]);
 
         Assert.True(result.IsSuccess, result.Error);
 
@@ -57,12 +57,12 @@ public class XmlOutputTest
     }
 
     [Fact]
-    public void Convert_Handles_Rows_With_Fewer_Cells_Than_Headers()
+    public async Task Convert_Handles_Rows_With_Fewer_Cells_Than_Headers()
     {
         // Regression: this used to throw IndexOutOfRangeException.
         var handler = CreateHandler();
 
-        var result = handler.Convert(["A", "B", "C"], [["1"]]);
+        var result = await Utils.ConvertToTextAsync(handler, ["A", "B", "C"], [["1"]]);
 
         Assert.True(result.IsSuccess, result.Error);
 
@@ -75,11 +75,11 @@ public class XmlOutputTest
     }
 
     [Fact]
-    public void Convert_Handles_Empty_Input()
+    public async Task Convert_Handles_Empty_Input()
     {
         var handler = CreateHandler();
 
-        var result = handler.Convert([], []);
+        var result = await Utils.ConvertToTextAsync(handler, [], []);
 
         Assert.True(result.IsSuccess, result.Error);
 
@@ -89,17 +89,17 @@ public class XmlOutputTest
     }
 
     [Fact]
-    public void Convert_Honours_The_Minify_Option()
+    public async Task Convert_Honours_The_Minify_Option()
     {
-        var indented = CreateHandler().Convert(["A"], [["1"]]).Value;
-        var minified = CreateHandler(minify: true).Convert(["A"], [["1"]]).Value;
+        var indented = (await Utils.ConvertToTextAsync(CreateHandler(), ["A"], [["1"]])).Value;
+        var minified = (await Utils.ConvertToTextAsync(CreateHandler(minify: true), ["A"], [["1"]])).Value;
 
         Assert.Contains(Environment.NewLine, indented);
         Assert.DoesNotContain(Environment.NewLine, minified);
     }
 
     [Fact]
-    public void OutputFile_Writes_A_Parsable_Document()
+    public async Task Export_Writes_A_Parsable_Document()
     {
         var service = new ConverterService([new ConverterProviderXml()]);
 
@@ -108,13 +108,13 @@ public class XmlOutputTest
         options!.XmlRootNodeName = "root";
         options.XmlElementNodeName = "record";
 
-        var tableData = new TableData(["Name", "Age"], [["Alice", "30"]]);
+        var table = new TableSnapshot(["Name", "Age"], [["Alice", "30"]]);
 
         var path = Path.Combine(Path.GetTempPath(), $"tableconverter-{Guid.NewGuid():N}.xml");
 
         try
         {
-            service.OutputFile("XML", path, tableData);
+            await service.ExportFileAsync("XML", path, table);
 
             Assert.True(File.Exists(path));
 

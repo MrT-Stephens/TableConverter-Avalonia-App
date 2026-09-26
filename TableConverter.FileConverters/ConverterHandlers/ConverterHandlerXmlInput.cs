@@ -1,36 +1,53 @@
 ﻿using System.Data;
 using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
+using TableConverter.FileConverters.Utilities;
 using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.ConverterHandlers;
 
 public class ConverterHandlerXmlInput : ConverterHandlerInputAbstract<ConverterHandlerBaseOptions>
 {
-    public override Result<TableData> ReadText(string text)
+    public override async Task<Result> ReadStreamAsync(
+        Stream? stream,
+        ITableRowSink sink,
+        IProgress<ConversionProgress>? progress = null,
+        CancellationToken cancellationToken = default)
     {
-        var headers = new List<string>();
-        var rows = new List<string[]>();
+        var opened = TableRowStream.OpenTextReader(stream);
+
+        if (opened.IsSuccess is false)
+        {
+            return Result.Failure(opened.Error!);
+        }
+
+        using var reader = opened.Value;
 
         try
         {
-            using var reader = new StringReader(text);
             using var dataSet = new DataSet();
 
+            // ReadXml consumes the reader directly, so the document is parsed as it arrives instead of
+            // being pulled into a string first.
             dataSet.ReadXml(reader);
 
             var table = dataSet.Tables[0];
 
-            headers.AddRange(from DataColumn column in table.Columns select column.ColumnName);
+            var headers = (from DataColumn column in table.Columns select column.ColumnName).ToList();
 
-            rows.AddRange(
-                from DataRow row in table.Rows select row.ItemArray.Select(x => x?.ToString() ?? "").ToArray());
+            await sink.BeginAsync(headers, cancellationToken).ConfigureAwait(false);
+
+            foreach (DataRow row in table.Rows)
+                await sink.WriteRowAsync(row.ItemArray.Select(x => x?.ToString() ?? "").ToArray(), cancellationToken)
+                    .ConfigureAwait(false);
+
+            await sink.CompleteAsync(cancellationToken).ConfigureAwait(false);
+
+            return Result.Success();
         }
         catch (Exception ex)
         {
-            return Result<TableData>.Failure($"Error reading XML file: '{ex.Message}'");
+            return Result.Failure($"Error reading XML file: '{ex.Message}'");
         }
-
-        return Result<TableData>.Success(new TableData(headers, rows));
     }
 }

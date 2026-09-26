@@ -12,20 +12,20 @@ public class YamlInputTestCases : InputConverterTestCasesBase
     ///     Test cases which are expected to be successful.
     /// </summary>
     protected override
-        IReadOnlyList<(string FileName, ConverterHandlerBaseOptions Options, TableData ExpectedTableData)>
+        IReadOnlyList<(string FileName, ConverterHandlerBaseOptions Options, TableSnapshot ExpectedTableData)>
         SuccessfulTestCases { get; } =
     [
         // Test Case 1: Successful data.
         (
             "test_input_yaml_1.txt",    
             new ConverterHandlerBaseOptions(),
-            Utils.TestTableData
+            Utils.TestTable
         ),
         // Test Case 2: Successful data.
         (
             "test_input_yaml_2.txt",
             new ConverterHandlerBaseOptions(),
-            Utils.TestTableData
+            Utils.TestTable
         ),
     ];
 

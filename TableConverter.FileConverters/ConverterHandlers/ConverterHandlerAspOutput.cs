@@ -7,19 +7,37 @@ namespace TableConverter.FileConverters.ConverterHandlers;
 
 public class ConverterHandlerAspOutput : ConverterHandlerOutputAbstract<ConverterHandlerBaseOptions>
 {
-    public override Result<string> Convert(string[] headers, string[][] rows)
+    public override async Task<Result> ConvertToStreamAsync(
+        Stream? stream,
+        ITableRowSource source,
+        IProgress<ConversionProgress>? progress = null,
+        CancellationToken cancellationToken = default)
     {
-        using var writer = new StringWriter();
+        ArgumentNullException.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(source);
 
-        writer.Write($"Dim arr({headers.LongLength},{rows.LongLength + 1}){Environment.NewLine}");
+        await using var writer = TableRowStream.CreateTextWriter(stream);
 
-        for (long i = 0; i < headers.LongLength; i++) writer.Write($"arr({i},0) = {headers[i]}{Environment.NewLine}");
+        var headers = await source.GetHeadersAsync(cancellationToken).ConfigureAwait(false);
 
-        for (long i = 0; i < rows.LongLength; i++)
-        for (long j = 0; j < headers.LongLength; j++)
+        // The array is declared with its size up front, so the row count is needed before the first row
+        // can be written and the rows are gathered here first.
+        var rows = new List<string[]>();
+
+        await foreach (var row in source.ReadTextRowsAsync(cancellationToken).ConfigureAwait(false))
+            rows.Add(row);
+
+        writer.Write($"Dim arr({headers.Count},{rows.Count + 1}){Environment.NewLine}");
+
+        for (var i = 0; i < headers.Count; i++) writer.Write($"arr({i},0) = {headers[i]}{Environment.NewLine}");
+
+        for (var i = 0; i < rows.Count; i++)
+        for (var j = 0; j < headers.Count; j++)
             writer.Write(
                 $"arr({j},{i + 1}) = {ConverterHandlerUtilities.GetCellValue(rows[i], j)}{Environment.NewLine}");
 
-        return Result<string>.Success(writer.ToString());
+        await writer.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+        return Result.Success();
     }
 }

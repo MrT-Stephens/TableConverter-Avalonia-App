@@ -2,6 +2,7 @@ using System.Reflection;
 using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
 using TableConverter.FileConverters.Interfaces;
+using TableConverter.FileConverters.Utilities;
 using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.Tests.TestBase;
@@ -10,8 +11,8 @@ namespace TableConverter.FileConverters.Tests.TestBase;
 ///     This abstract base class provides common functionality for testing input converter handlers.
 ///     It expects an implementation of IConverterHandlerInput (generic type TInputConverter) and a corresponding test data
 ///     class (TInputConverterData)
-///     that provides test cases. The class facilitates both synchronous and asynchronous file conversion tests, including
-///     the necessary assertions to validate the conversion process.
+///     that provides test cases. The class drives the handler's single read method and asserts on the table it
+///     gathers.
 /// </summary>
 /// <typeparam name="TInputConverter">
 ///     The input converter handler type that implements IConverterHandlerInput and is used
@@ -32,95 +33,52 @@ public abstract class InputConverterTestBase<TInputConverter, TInputConverterDat
     protected readonly TInputConverter Handler = new();
 
     /// <summary>
-    ///     Synchronous test method that tests file conversion functionality.
+    ///     Reads a file straight into a sink, which is the only path a read takes, and checks that the
+    ///     gathered table matches the expected data.
     /// </summary>
     [Theory]
     [MemberData(nameof(GetSuccessfulTestCases))]
-    public void TestInputFile_WithSuccessfulData(
+    public async Task TestInputFile_WithSuccessfulData(
         string fileName,
         ConverterHandlerBaseOptions options,
-        TableData expectedTableDataResult)
+        TableSnapshot expectedTableResult)
     {
         Handler.Options = options; // Sets the options for the handler.
 
-        using var stream = GetFileStream(fileName); // Retrieves the file stream from resources.
+        await using var stream = GetFileStream(fileName); // Retrieves the file stream from resources.
 
-        // Perform file reading and conversion, asserting success at each stage.
-        var fileResult = Handler.ReadFile(stream);
-        Assert.True(fileResult.IsSuccess, $"fileResult.IsSuccess is false. Error: {fileResult.Error}");
+        var sink = new TableSnapshot();
 
-        var convertResult = Handler.ReadText(fileResult.Value);
-        Assert.True(convertResult.IsSuccess, $"convertResult.IsSuccess is false. Error: {convertResult.Error}");
+        var result = await Handler.ReadStreamAsync(stream, sink);
 
-        // Compare the actual conversion result with the expected data.
-        Assert.Equal(expectedTableDataResult, convertResult.Value);
+        Assert.True(result.IsSuccess, $"result.IsSuccess is false. Error: {result.Error}");
+        Assert.True(sink.IsCompleted, "The sink was not completed, so the table would be discarded.");
+
+        // Compare the gathered table with the expected data.
+        Assert.Equal(expectedTableResult, sink);
     }
 
     /// <summary>
-    ///     Asynchronous test method that tests asynchronous file conversion functionality.
-    /// </summary>
-    [Theory]
-    [MemberData(nameof(GetSuccessfulTestCases))]
-    public async Task TestInputFileAsync_WithSuccessfulData(
-        string fileName,
-        ConverterHandlerBaseOptions options,
-        TableData expectedTableDataResult)
-    {
-        Handler.Options = options; // Sets the options for the handler.
-
-        await using var stream = GetFileStream(fileName); // Asynchronously retrieves the file stream.
-
-        // Perform asynchronous file reading and conversion, asserting success at each stage.
-        var fileResult = await Handler.ReadFileAsync(stream);
-        Assert.True(fileResult.IsSuccess, $"fileResult.IsSuccess is false. Error: {fileResult.Error}");
-
-        var convertResult = await Handler.ReadTextAsync(fileResult.Value);
-        Assert.True(convertResult.IsSuccess, $"convertResult.IsSuccess is false. Error: {convertResult.Error}");
-
-        // Compare the actual asynchronous conversion result with the expected data.
-        Assert.Equal(expectedTableDataResult, convertResult.Value);
-    }
-
-    /// <summary>
-    ///     Synchronous test method that tests file conversion functionality with incorrect data.
+    ///     A parse that fails must leave the sink uncompleted, which is what tells the destination to
+    ///     discard whatever was written rather than keep half a table.
     /// </summary>
     [Theory]
     [MemberData(nameof(GetFailTestCases))]
-    public virtual void TestInputFile_WithFailData(string fileName, ConverterHandlerBaseOptions options)
+    public virtual async Task TestInputFile_WithFailData(string fileName, ConverterHandlerBaseOptions options)
     {
         Handler.Options = options; // Sets the options for the handler.
 
-        using var stream = GetFileStream(fileName); // Retrieves the file stream from resources.
+        await using var stream = GetFileStream(fileName); // Retrieves the file stream from resources.
 
-        // Perform file reading and conversion, asserting success at each stage.
-        var fileResult = Handler.ReadFile(stream);
-        Assert.True(fileResult.IsSuccess, $"fileResult.IsSuccess is false. Error: {fileResult.Error}");
+        var sink = new TableSnapshot();
 
-        var convertResult = Handler.ReadText(fileResult.Value);
-        Assert.False(convertResult.IsSuccess,
-            $"convertResult.IsSuccess is true. Should be false due to data being incorrect. Data: {convertResult.Value}");
+        var result = await Handler.ReadStreamAsync(stream, sink);
+
+        Assert.False(result.IsSuccess, "result.IsSuccess is true. Should be false due to data being incorrect.");
+        Assert.False(sink.IsCompleted,
+            "The sink was completed for a failed parse, so a half read table would be kept.");
     }
 
-    /// <summary>
-    ///     Asynchronous test method that tests asynchronous file conversion functionality with incorrect data.
-    /// </summary>
-    [Theory]
-    [MemberData(nameof(GetFailTestCases))]
-    public virtual async Task TestInputFileAsync_WithFailData(string fileName, ConverterHandlerBaseOptions options)
-    {
-        Handler.Options = options; // Sets the options for the handler.
-
-        await using var stream = GetFileStream(fileName); // Asynchronously retrieves the file stream.
-
-        // Perform asynchronous file reading and conversion, asserting success at each stage.
-        var fileResult = await Handler.ReadFileAsync(stream);
-        Assert.True(fileResult.IsSuccess, $"fileResult.IsSuccess is false. Error: {fileResult.Error}");
-
-        var convertResult = await Handler.ReadTextAsync(fileResult.Value);
-        Assert.False(convertResult.IsSuccess,
-            $"convertResult.IsSuccess is true. Should be false due to data being incorrect. Data: {convertResult.Value}");
-    }
-    
     /// <summary>
     ///     Test method that tests file conversion functionality with empty data.
     /// </summary>
@@ -128,13 +86,16 @@ public abstract class InputConverterTestBase<TInputConverter, TInputConverterDat
     [Theory]
     [InlineData("test_input_empty.txt")]
     [InlineData("test_input_whitespace.txt")]
-    public virtual void TestInputFile_WithEmptyData(string fileName)
+    public virtual async Task TestInputFile_WithEmptyData(string fileName)
     {
-        using var stream = GetFileStream(fileName); // Retrieves the file stream from resources.
+        await using var stream = GetFileStream(fileName); // Retrieves the file stream from resources.
+
+        var sink = new TableSnapshot();
 
         // Perform file reading, asserting failure due to empty data.
-        var fileResult = Handler.ReadFile(stream);
-        Assert.False(fileResult.IsSuccess, "fileResult.IsSuccess is true. Should be false due to empty data.");
+        var result = await Handler.ReadStreamAsync(stream, sink);
+
+        Assert.False(result.IsSuccess, "result.IsSuccess is true. Should be false due to empty data.");
     }
 
     /// <summary>

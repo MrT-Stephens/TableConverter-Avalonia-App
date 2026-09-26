@@ -1,24 +1,37 @@
 ﻿using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
+using TableConverter.FileConverters.Utilities;
 using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.ConverterHandlers;
 
 public class ConverterHandlerMultiLineOutput : ConverterHandlerOutputAbstract<ConverterHandlerMultiLineOptions>
 {
-    public override Result<string> Convert(string[] headers, string[][] rows)
+    public override async Task<Result> ConvertToStreamAsync(
+        Stream? stream,
+        ITableRowSource source,
+        IProgress<ConversionProgress>? progress = null,
+        CancellationToken cancellationToken = default)
     {
-        using var writer = new StringWriter();
+        ArgumentNullException.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(source);
+
+        await using var writer = TableRowStream.CreateTextWriter(stream);
+
+        var headers = await source.GetHeadersAsync(cancellationToken).ConfigureAwait(false);
 
         foreach (var column in headers) writer.WriteLine(column);
 
-        foreach (var str in rows)
+        await foreach (var row in source.ReadTextRowsAsync(cancellationToken).ConfigureAwait(false))
         {
             if (Options!.RowSeparator != string.Empty) writer.WriteLine(Options!.RowSeparator);
 
-            for (long j = 0; j < headers.LongLength; j++) writer.WriteLine(str[j]);
+            for (var j = 0; j < headers.Count; j++)
+                writer.WriteLine(ConverterHandlerUtilities.GetCellValue(row, j));
         }
 
-        return Result<string>.Success(writer.ToString());
+        await writer.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+        return Result.Success();
     }
 }

@@ -1,26 +1,41 @@
 ﻿using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
+using TableConverter.FileConverters.Utilities;
 using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.ConverterHandlers;
 
 public class ConverterHandlerAspInput : ConverterHandlerInputAbstract<ConverterHandlerBaseOptions>
 {
-    public override Result<TableData> ReadText(string text)
+    public override async Task<Result> ReadStreamAsync(
+        Stream? stream,
+        ITableRowSink sink,
+        IProgress<ConversionProgress>? progress = null,
+        CancellationToken cancellationToken = default)
     {
+        var opened = TableRowStream.OpenTextReader(stream);
+
+        if (opened.IsSuccess is false)
+        {
+            return Result.Failure(opened.Error!);
+        }
+
+        using var reader = opened.Value;
+
         var headers = new List<string>();
         var rows = new List<string[]>();
 
         try
         {
-            using var reader = new StringReader(text);
+            // The file declares the size of the array up front and then fills the cells by index in
+            // whatever order they appear, so the rows are gathered before they can be handed on.
             var firstLine = true;
             long columnsCount = 0, rowsCount = 0;
             long parsedRows = 0;
 
-            for (var line = reader.ReadLine()?.Trim();
+            for (var line = (await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false))?.Trim();
                  !string.IsNullOrEmpty(line);
-                 line = reader?.ReadLine()?.Trim())
+                 line = (await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false))?.Trim())
             {
                 parsedRows++;
 
@@ -65,14 +80,15 @@ public class ConverterHandlerAspInput : ConverterHandlerInputAbstract<ConverterH
             if (columnsCount != 0 && rowsCount != 0 && parsedRows / columnsCount < rowsCount &&
                 parsedRows / rowsCount < columnsCount)
             {
-                return Result<TableData>.Failure("Incorrect number of rows of data in the file");
+                return Result.Failure("Incorrect number of rows of data in the file");
             }
         }
         catch (Exception ex)
         {
-            return Result<TableData>.Failure(ex.Message);
+            return Result.Failure(ex.Message);
         }
 
-        return Result<TableData>.Success(new TableData(headers, rows));
+        return await TableRowStream.PushAsync(headers, rows, sink, cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
     }
 }

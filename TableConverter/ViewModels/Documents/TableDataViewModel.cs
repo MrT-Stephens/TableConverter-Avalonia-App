@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Controls.Models.TreeDataGrid;
@@ -21,6 +22,7 @@ using TableConverter.Commands.Interfaces;
 using TableConverter.Configuration;
 using TableConverter.Contracts;
 using TableConverter.Converters;
+using TableConverter.FileConverters.Interfaces;
 using TableConverter.Interfaces;
 using TableConverter.ViewModels.Base;
 using TableConverter.Extensions;
@@ -343,12 +345,28 @@ public partial class TableDataViewModel : BaseDocumentViewModel, ISessionDocumen
     #region Import
 
     /// <summary>
-    /// Replaces everything in this document's store with <paramref name="tableData"/>. Used to fill a
-    /// newly created store with the result of an import.
+    /// Streams a file straight into this document's store, one row at a time, so neither the file nor
+    /// the table it holds is ever held in memory as a whole. Used to fill a newly created store with
+    /// the result of an import.
     /// </summary>
-    public async Task ImportDataAsync(TableData tableData)
+    /// <param name="converterService">The service that resolves the input converter.</param>
+    /// <param name="converterName">The input converter to read the file with.</param>
+    /// <param name="sourcePath">The file to import.</param>
+    /// <param name="progress">
+    ///     Receives how far the import has got, or <see langword="null" /> if the caller does not want
+    ///     progress. What it is told is up to the converter.
+    /// </param>
+    /// <param name="cancellationToken">Token used to cancel the import.</param>
+    /// <exception cref="InvalidOperationException">The document has no table store.</exception>
+    public async Task ImportDataAsync(
+        IConverterService converterService,
+        string converterName,
+        string sourcePath,
+        IProgress<ConversionProgress>? progress = null,
+        CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(tableData);
+        ArgumentNullException.ThrowIfNull(converterService);
+        ArgumentException.ThrowIfNullOrWhiteSpace(sourcePath);
 
         if (string.IsNullOrEmpty(Path))
         {
@@ -356,9 +374,16 @@ public partial class TableDataViewModel : BaseDocumentViewModel, ISessionDocumen
                 "The document has no table store. Call CreateNewStoreAsync before importing data.");
         }
 
-        await using (var dbContext = await _dbContextFactory.CreateDbContextAsync(Path).ConfigureAwait(false))
+        await using (var dbContext = await _dbContextFactory
+                         .CreateDbContextAsync(Path, cancellationToken).ConfigureAwait(false))
         {
-            await TableStoreDataWriter.WriteAsync(dbContext, tableData).ConfigureAwait(false);
+            // The converter fills the store through the sink, so rows are written as they are parsed
+            // rather than the whole table being built up in memory first.
+            await using var sink = TableStoreRowSink.Create(dbContext);
+
+            await converterService
+                .ImportFileAsync(converterName, sourcePath, sink, progress, cancellationToken)
+                .ConfigureAwait(false);
         }
 
         await InvalidateDataAsync();
@@ -369,22 +394,44 @@ public partial class TableDataViewModel : BaseDocumentViewModel, ISessionDocumen
     #region Export
 
     /// <summary>
-    /// Reads the whole store into a <see cref="TableData" />, ready to be written out by one of the
-    /// file converters.
+    /// Streams this document's store straight into a file, one row at a time, so the table is never
+    /// held in memory as a whole before it is written out.
     /// </summary>
+    /// <param name="converterService">The service that resolves the output converter.</param>
+    /// <param name="converterName">The output converter to write the file with.</param>
+    /// <param name="destinationPath">The file to write.</param>
+    /// <param name="progress">
+    ///     Receives how far the export has got, or <see langword="null" /> if the caller does not want
+    ///     progress. What it is told is up to the converter.
+    /// </param>
+    /// <param name="cancellationToken">Token used to cancel the export.</param>
     /// <exception cref="InvalidOperationException">The document has no table store.</exception>
-    public async Task<TableData> ReadTableDataAsync()
+    public async Task ExportDataAsync(
+        IConverterService converterService,
+        string converterName,
+        string destinationPath,
+        IProgress<ConversionProgress>? progress = null,
+        CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(converterService);
+        ArgumentException.ThrowIfNullOrWhiteSpace(destinationPath);
+
         if (string.IsNullOrEmpty(Path))
         {
             throw new InvalidOperationException(
                 "The document has no table store, so there is nothing to export.");
         }
 
-        // Reading the store is not rendering work, so it stays off the UI thread.
-        await using var dbContext = await _dbContextFactory.CreateDbContextAsync(Path).ConfigureAwait(false);
+        await using var dbContext = await _dbContextFactory
+            .CreateDbContextAsync(Path, cancellationToken).ConfigureAwait(false);
 
-        return await TableStoreDataReader.ReadAsync(dbContext).ConfigureAwait(false);
+        // The converter pulls rows as it writes, so a table of any size costs one page of memory to
+        // export instead of the whole of it.
+        var source = TableStoreRowSource.Create(dbContext);
+
+        await converterService
+            .ExportFileAsync(converterName, destinationPath, source, progress, cancellationToken)
+            .ConfigureAwait(false);
     }
 
     #endregion

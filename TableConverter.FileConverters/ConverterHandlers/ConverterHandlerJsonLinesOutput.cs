@@ -5,31 +5,46 @@ using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.ConverterHandlers;
 
-public class ConverterHandlerJsonLinesOutput : ConverterHandlerOutputAbstract<ConverterHandlerJsonLinesOutputOptions>
+public class ConverterHandlerJsonLinesOutput
+    : ConverterHandlerOutputAbstract<ConverterHandlerJsonLinesOutputOptions>
 {
-    public override Result<string> Convert(string[] headers, string[][] rows)
+    public override async Task<Result> ConvertToStreamAsync(
+        Stream? stream,
+        ITableRowSource source,
+        IProgress<ConversionProgress>? progress = null,
+        CancellationToken cancellationToken = default)
     {
-        using var writer = new StringWriter();
+        ArgumentNullException.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(source);
+
+        await using var writer = TableRowStream.CreateTextWriter(stream);
+
+        var headers = await source.GetHeadersAsync(cancellationToken).ConfigureAwait(false);
 
         switch (Options!.SelectedJsonLinesFormatType)
         {
             case ConverterHandlerJsonLinesOutputOptions.JsonLinesStyles.Objects:
             {
-                for (long i = 0; i < rows.LongLength; i++)
+                // Lines are separated by writing the newline before every line but the first, which is
+                // the same output as leaving it off the last row but does not need the row count.
+                var first = true;
+
+                await foreach (var row in source.ReadTextRowsAsync(cancellationToken).ConfigureAwait(false))
                 {
+                    if (!first) writer.Write(Environment.NewLine);
+
+                    first = false;
+
                     writer.Write("{");
 
-                    for (long j = 0; j < headers.LongLength; j++)
+                    for (var j = 0; j < headers.Count; j++)
                     {
-                        writer.Write(
-                            $"\"{headers[j]}\":\"{ConverterHandlerUtilities.GetCellValue(rows[i], j)}\"");
+                        writer.Write($"\"{headers[j]}\":\"{ConverterHandlerUtilities.GetCellValue(row, j)}\"");
 
-                        if (j != headers.LongLength - 1) writer.Write(",");
+                        if (j != headers.Count - 1) writer.Write(",");
                     }
 
                     writer.Write("}");
-
-                    if (i != rows.LongLength - 1) writer.Write(Environment.NewLine);
                 }
 
                 break;
@@ -46,21 +61,27 @@ public class ConverterHandlerJsonLinesOutput : ConverterHandlerOutputAbstract<Co
                 writer.Write(Environment.NewLine);
 
                 // Write rows
-                for (long i = 0; i < rows.LongLength; i++)
+                var first = true;
+
+                await foreach (var row in source.ReadTextRowsAsync(cancellationToken).ConfigureAwait(false))
                 {
+                    if (!first) writer.Write(Environment.NewLine);
+
+                    first = false;
+
                     writer.Write("[");
 
-                    writer.Write(string.Join(",", rows[i].Select(str => $"\"{str}\"").ToArray()));
+                    writer.Write(string.Join(",", row.Select(str => $"\"{str}\"").ToArray()));
 
                     writer.Write("]");
-
-                    if (i != rows.LongLength - 1) writer.Write(Environment.NewLine);
                 }
 
                 break;
             }
         }
 
-        return Result<string>.Success(writer.ToString());
+        await writer.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+        return Result.Success();
     }
 }

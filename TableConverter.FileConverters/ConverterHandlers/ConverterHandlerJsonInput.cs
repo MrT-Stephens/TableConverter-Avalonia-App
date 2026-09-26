@@ -1,19 +1,37 @@
 ﻿using Newtonsoft.Json;
 using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
+using TableConverter.FileConverters.Utilities;
 using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.ConverterHandlers;
 
 public class ConverterHandlerJsonInput : ConverterHandlerInputAbstract<ConverterHandlerJsonInputOptions>
 {
-    public override Result<TableData> ReadText(string text)
+    public override async Task<Result> ReadStreamAsync(
+        Stream? stream,
+        ITableRowSink sink,
+        IProgress<ConversionProgress>? progress = null,
+        CancellationToken cancellationToken = default)
     {
+        var opened = TableRowStream.OpenTextReader(stream);
+
+        if (opened.IsSuccess is false)
+        {
+            return Result.Failure(opened.Error!);
+        }
+
+        using var reader = opened.Value;
+
         var headers = new List<string>();
         var rows = new List<string[]>();
 
         try
         {
+            // JSON has to be seen in full before any of it can be parsed, so the reader is drained here
+            // rather than in the caller. The parsed table still goes to the sink a row at a time.
+            var text = await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+
             bool ValidateArrayOfObjects(List<Dictionary<string, object>> jsonObjects)
             {
                 if (jsonObjects.Count == 0)
@@ -58,7 +76,7 @@ public class ConverterHandlerJsonInput : ConverterHandlerInputAbstract<Converter
                     var jsonObjects = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(text);
 
                     if (jsonObjects is null || !ValidateArrayOfObjects(jsonObjects))
-                        return Result<TableData>.Failure("Invalid or empty JSON schema for 'Array of Objects'.");
+                        return Result.Failure("Invalid or empty JSON schema for 'Array of Objects'.");
 
                     foreach (var jsonObject in jsonObjects)
                     {
@@ -76,7 +94,7 @@ public class ConverterHandlerJsonInput : ConverterHandlerInputAbstract<Converter
                     var jsonArrays = JsonConvert.DeserializeObject<List<List<object>>>(text);
 
                     if (jsonArrays is null || !Validate2DArrays(jsonArrays))
-                        return Result<TableData>.Failure("Invalid or empty JSON schema for '2D Arrays'.");
+                        return Result.Failure("Invalid or empty JSON schema for '2D Arrays'.");
 
                     headers.AddRange(jsonArrays[0].ConvertAll(value => value?.ToString() ?? ""));
 
@@ -90,7 +108,7 @@ public class ConverterHandlerJsonInput : ConverterHandlerInputAbstract<Converter
                     var jsonObjects = JsonConvert.DeserializeObject<List<Dictionary<string, string[]>>>(text);
 
                     if (jsonObjects is null || !ValidateColumnArrays(jsonObjects))
-                        return Result<TableData>.Failure("Invalid or empty JSON schema for 'Column Arrays'.");
+                        return Result.Failure("Invalid or empty JSON schema for 'Column Arrays'.");
 
                     for (var i = 0; i < jsonObjects.Count; i++)
                     {
@@ -111,7 +129,7 @@ public class ConverterHandlerJsonInput : ConverterHandlerInputAbstract<Converter
                     var jsonObjects = JsonConvert.DeserializeObject<List<Dictionary<string, string[]>>>(text);
 
                     if (jsonObjects == null || !ValidateKeyedArrays(jsonObjects))
-                        return Result<TableData>.Failure("Invalid or empty JSON schema for 'Keyed Arrays'.");
+                        return Result.Failure("Invalid or empty JSON schema for 'Keyed Arrays'.");
 
                     headers.AddRange(jsonObjects[0].Values.First().Select(value => value?.ToString() ?? ""));
 
@@ -120,14 +138,15 @@ public class ConverterHandlerJsonInput : ConverterHandlerInputAbstract<Converter
                     break;
                 }
                 default:
-                    return Result<TableData>.Failure("Invalid JSON format type.");
+                    return Result.Failure("Invalid JSON format type.");
             }
         }
         catch (Exception ex)
         {
-            return Result<TableData>.Failure(ex.Message);
+            return Result.Failure(ex.Message);
         }
 
-        return Result<TableData>.Success(new TableData(headers, rows));
+        return await TableRowStream.PushAsync(headers, rows, sink, cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
     }
 }

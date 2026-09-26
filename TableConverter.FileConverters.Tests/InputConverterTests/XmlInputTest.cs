@@ -12,20 +12,20 @@ public class XmlInputTestCases : InputConverterTestCasesBase
     ///     Test cases which are expected to be successful.
     /// </summary>
     protected override
-        IReadOnlyList<(string FileName, ConverterHandlerBaseOptions Options, TableData ExpectedTableData)>
+        IReadOnlyList<(string FileName, ConverterHandlerBaseOptions Options, TableSnapshot ExpectedTableData)>
         SuccessfulTestCases { get; } =
     [
         // Test case 1: Test with a valid XML file.
         (
             "test_input_xml_1.xml",
             new ConverterHandlerBaseOptions(),
-            Utils.TestTableData
+            Utils.TestTable
         ),
         // Test case 2: Test with a valid XML file. Minified XML.
         (
             "test_input_xml_2.xml",
             new ConverterHandlerBaseOptions(),
-            Utils.TestTableData
+            Utils.TestTable
         )
     ];
 
