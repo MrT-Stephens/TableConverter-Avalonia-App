@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using TableConverter.Interfaces;
 using TableConverter.Utilities.Extensions;
@@ -25,7 +26,7 @@ public class DataGenerationWorkspaceEditorViewModel : BaseWorkspaceEditorViewMod
         return _serviceProvider.GetRequiredService<DataGenerationSchemaViewModel>();
     }
 
-    protected override IPaneDocument CreateDefaultDocumentInstance()
+    protected override Task<IPaneDocument> CreateDefaultDocumentInstanceAsync()
     {
         if (CreateNewDocumentInstance() is not DataGenerationSchemaViewModel schema)
         {
@@ -34,7 +35,7 @@ public class DataGenerationWorkspaceEditorViewModel : BaseWorkspaceEditorViewMod
 
         schema.Title = "Schema-Designer".GetUniqueString();
 
-        return schema;
+        return Task.FromResult<IPaneDocument>(schema);
     }
 
     #endregion

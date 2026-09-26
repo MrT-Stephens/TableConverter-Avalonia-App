@@ -212,6 +212,13 @@ public class App : Application
         services.AddSingleton<IFilesDialogManager, FilesDialogManager>();
         services.AddSingleton<IEventManager, EventManager>();
 
+        // Remembers which documents were open, for every document type, so they can be reopened on the
+        // next start. How a document type stores its data is its own concern.
+        services.AddSingleton<IDocumentSession, DocumentSession>();
+
+        // Owns the store files that hold table data documents.
+        services.AddSingleton<ITableStoreFiles, TableStoreFiles>();
+
         // SukiUI Services
         services.AddSingleton<ISukiToastManager, SukiToastManager>();
         services.AddSingleton<ISukiDialogManager, SukiDialogManager>();

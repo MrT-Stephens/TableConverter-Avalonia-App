@@ -67,15 +67,19 @@ public class NewFileCommandHandler(
             throw new InvalidOperationException("Document should be of type TableDataViewModel");
         }
 
-        document.Title = settings.Name;
+        // The store is reserved up front so its data can be generated before the document loads it,
+        // which avoids the grid briefly showing an empty table.
+        var path = document.ReserveStorePath();
 
-        await using var dbContext = await databaseContextFactory.CreateDbContextAsync(document.Path);
+        await using (var dbContext = await databaseContextFactory.CreateDbContextAsync(path))
+        {
+            await Task.Run(() => GenerateTableData(dbContext, settings));
+        }
 
-        await Task.Run(() => GenerateTableData(dbContext, settings));
-        
-        editorViewModel.Documents.Add(document);
+        await document.LoadAsync(path, settings.Name, isTemporaryStore: true);
+
+        editorViewModel.AddDocument(document);
         editorViewModel.SelectedDocument = document;
-        await document.InvalidateDataAsync();
 
         toastManager.CreateSimpleInfoToast()
             .OfType(NotificationType.Success)

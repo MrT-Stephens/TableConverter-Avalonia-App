@@ -6,12 +6,14 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Contracts.Events;
 using TableConverter.Extensions;
@@ -29,6 +31,15 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
     
     protected readonly IServiceProvider _serviceProvider;
     protected readonly IEventRegistrar _eventRegistrar = new EventRegistrar();
+
+    private readonly IDocumentSession _documentSession;
+    private readonly ILogger _logger;
+
+    /// <summary>
+    /// Set while documents are being restored so the intermediate states of the restore are never
+    /// written back to the session.
+    /// </summary>
+    private bool _isRestoringDocuments;
 
     [ObservableProperty] private string _Title;
     [ObservableProperty] private object _Icon;
@@ -57,6 +68,8 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
             serviceProvider.GetRequiredService<ISukiToastManager>())
     {
         _serviceProvider = serviceProvider;
+        _documentSession = serviceProvider.GetRequiredService<IDocumentSession>();
+        _logger = serviceProvider.GetRequiredService<ILogger<BaseWorkspaceEditorViewModel>>();
         
         Title = title;
         Index = index;
@@ -127,7 +140,11 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
 
     public abstract IPaneDocument CreateNewDocumentInstance();
 
-    protected abstract IPaneDocument CreateDefaultDocumentInstance();
+    /// <summary>
+    /// Creates the document a workspace falls back to when there is nothing to restore. Asynchronous
+    /// because creating it can involve reading data from disk.
+    /// </summary>
+    protected abstract Task<IPaneDocument> CreateDefaultDocumentInstanceAsync();
     
     #endregion
 
@@ -163,7 +180,27 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
 
     #region Virtual Methods
 
+    /// <summary>
+    /// The session keys of the document types this workspace is responsible for restoring. It is empty
+    /// by default, which keeps a workspace out of the session entirely.
+    /// </summary>
+    /// <remarks>
+    /// A key listed here has to match the <see cref="ISessionDocument.DocumentType" /> of the documents
+    /// <see cref="CreateNewDocumentInstance" /> returns, because that is what tells the entries of one
+    /// document type apart from another.
+    /// </remarks>
+    protected virtual IReadOnlyCollection<string> DocumentTypes => [];
+
     protected virtual void OnDocumentRemoved(IPaneDocument document)
+    {
+        // Do nothing - Can be overridden
+    }
+
+    /// <summary>
+    /// Called once the previous session has been restored, so a workspace can clean up whatever the
+    /// restored documents leave behind.
+    /// </summary>
+    protected virtual void OnDocumentsRestored()
     {
         // Do nothing - Can be overridden
     }
@@ -179,14 +216,20 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
         InitialiseEvents();
         InitialiseTools();
         InitialiseDocuments();
+
+        // Every change to the open documents is written straight back, so the session always describes
+        // what the user can see.
+        Documents.CollectionChanged += (_, _) => PersistSession();
     }
 
-    public void InitialiseDocuments()
+    public virtual void InitialiseDocuments()
     {
         if (Documents.Count > 0)
+        {
             return;
+        }
 
-        AddDocument(CreateDefaultDocumentInstance());
+        RestoreDocumentsAsync().FireAndForget();
     }
     
     public void InitialiseEvents()
@@ -242,9 +285,101 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
 
     public override void Dispose()
     {
+        // The workspace outlives every document it opened, so the session gets one last write on the
+        // way out.
+        PersistSession();
+
         _eventRegistrar.Dispose();
 
         base.Dispose();
+    }
+
+    #endregion
+
+    #region Session
+
+    /// <summary>
+    /// Reopens the documents of this workspace's types that were open last time, falling back to the
+    /// workspace's default document when there is nothing to restore. Entries belonging to another
+    /// document type are left for the workspace that owns them.
+    /// </summary>
+    private async Task RestoreDocumentsAsync()
+    {
+        _isRestoringDocuments = true;
+
+        try
+        {
+            // A workspace which does not take part in the session has nothing to read.
+            IReadOnlyList<DocumentSessionEntry> entries = DocumentTypes.Count == 0
+                ? []
+                : [.. _documentSession.Load().Where(entry => DocumentTypes.Contains(entry.DocumentType))];
+
+            foreach (var entry in entries)
+            {
+                if (CreateNewDocumentInstance() is not ISessionDocument document)
+                {
+                    break;
+                }
+
+                try
+                {
+                    await document.RestoreSessionStateAsync(entry.State);
+                }
+                catch (Exception exception)
+                {
+                    // One document that cannot be reopened must not stop the rest from being restored.
+                    // It is skipped, and dropped from the session when it is written back.
+                    _logger.LogWarning(exception, "A '{DocumentType}' document could not be reopened.",
+                        entry.DocumentType);
+
+                    // The document was already resolved from the container, so it has to be released
+                    // exactly like a document the user closes would be.
+                    if (document is IDisposable disposableDocument)
+                    {
+                        disposableDocument.Dispose();
+                    }
+
+                    continue;
+                }
+
+                AddDocument(document);
+            }
+
+            if (Documents.Count == 0)
+            {
+                AddDocument(await CreateDefaultDocumentInstanceAsync());
+            }
+
+            OnDocumentsRestored();
+
+            SelectedDocument ??= Documents.FirstOrDefault();
+        }
+        finally
+        {
+            _isRestoringDocuments = false;
+        }
+
+        PersistSession();
+    }
+
+    /// <summary>
+    /// Writes the currently open documents to the session, so they can be reopened next time.
+    /// </summary>
+    private void PersistSession()
+    {
+        if (_isRestoringDocuments)
+        {
+            // The intermediate states of a restore are never what the user last saw.
+            return;
+        }
+
+        foreach (var documentType in DocumentTypes)
+        {
+            _documentSession.Save(documentType, Documents
+                .OfType<ISessionDocument>()
+                .Where(document => string.Equals(document.DocumentType, documentType, StringComparison.Ordinal))
+                .Select(document => document.CaptureSessionState()));
+        }
     }
 
     #endregion

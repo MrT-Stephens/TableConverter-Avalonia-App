@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls.Notifications;
@@ -20,25 +19,26 @@ namespace TableConverter.Commands.Handlers.TableData;
 
 public static partial class TableDataCommandNames
 {
-    public const string ImportFile = "TableData.ImportFile";
+    public const string ExportFile = "TableData.ExportFile";
 }
 
-public class ImportFileCommandHandler(
+public class ExportFileCommandHandler(
     ISukiDialogManager dialogManager,
     ISukiToastManager toastManager,
     IFilesDialogManager filesDialogManager,
-    IConverterService converterService) 
+    IConverterService converterService)
     : ICommandHandlerAsync
 {
     public ICommandMetadata CommandMetadata => new CommandMetadata(
-        TableDataCommandNames.ImportFile,
-        "Import File",
-        "Import table data from any of the supported file types.",
-        "ImportFile",
+        TableDataCommandNames.ExportFile,
+        "Export File",
+        "Export the selected table data to any of the supported file types.",
+        "ExportFile",
         "File",
-        1,
-        ["Ctrl+I"]);
-    
+        2,
+        ["Ctrl+E"],
+        canSetLoadingOnWorkspace: true);
+
     public bool CanExecute(object? parameter, ICommandContext context)
     {
         return context.Parent is TableWorkspaceEditorViewModel;
@@ -46,37 +46,47 @@ public class ImportFileCommandHandler(
 
     public async Task Execute(object? parameter, ICommandContext context)
     {
-        if (context.Parent is not TableWorkspaceEditorViewModel editorViewModel)
+        if (context.Parent is not TableWorkspaceEditorViewModel)
         {
             context.Cancel("Selected workspace is not correct.");
             return;
         }
-        
-        string? inputConverterName = null;
-        
-        var inputConverterSelectResult = await dialogManager.CreateDialog()
-            .WithTitle("Select a File Type to Import")
+
+        if (!context.TryGetSelectedItem<TableDataViewModel>(out var document))
+        {
+            context.Cancel("No table data document is selected.");
+            return;
+        }
+
+        string? outputConverterName = null;
+
+        var outputConverterSelectResult = await dialogManager.CreateDialog()
+            .WithTitle("Select a File Type to Export")
             .WithSelection(
-                converterService.InputNames,
-                conv => inputConverterName = conv)
+                converterService.OutputNames,
+                conv => outputConverterName = conv)
             .Dismiss().ByClickingBackground()
             .WithYesNoResult("Ok", "Cancel")
             .TryShowAsync();
-        
+
         dialogManager.DismissDialog();
 
-        if (!inputConverterSelectResult || string.IsNullOrEmpty(inputConverterName))
+        if (!outputConverterSelectResult || string.IsNullOrEmpty(outputConverterName))
         {
             context.Cancel("File type was not selected.");
             return;
         }
 
-        var options = converterService.GetInputOptionsByName<ConverterHandlerBaseOptions>(inputConverterName);
+        // The name is assigned from inside the dialog callback, so the flow analysis cannot tell that
+        // it is known to be set here.
+        var outputName = outputConverterName!;
+
+        var options = converterService.GetOutputOptionsByName<ConverterHandlerBaseOptions>(outputName);
 
         if (options is not null)
         {
             var optionsResult = await dialogManager.CreateDialog()
-                .WithTitle("Import Options")
+                .WithTitle("Export Options")
                 .WithForm(options)
                 .WithYesNoResult("Ok", "Cancel")
                 .TryShowAsync();
@@ -87,14 +97,16 @@ public class ImportFileCommandHandler(
                 return;
             }
         }
-        
-        var metadata = converterService.GetInputMetadataByName(inputConverterName);
-        
-        var file = await filesDialogManager.OpenFileAsync(new FilePickerOpenOptions
+
+        var metadata = converterService.GetOutputMetadataByName(outputName);
+
+        var file = await filesDialogManager.SaveFileAsync(new FilePickerSaveOptions
         {
-            Title = $"Import {metadata.Name} File",
-            AllowMultiple = false,
-            FileTypeFilter =
+            Title = $"Export {metadata.Name} File",
+            SuggestedFileName = document.Title,
+            DefaultExtension = metadata.Extensions.FirstOrDefault()?.TrimStart('.'),
+            ShowOverwritePrompt = true,
+            FileTypeChoices =
             [
                 new FilePickerFileType(metadata.Name)
                 {
@@ -112,55 +124,47 @@ public class ImportFileCommandHandler(
             return;
         }
 
-        var selectedFile = file.First();
-
         // The converters open the file by path, and the storage provider hands back a Uri that is not
-        // a path SQLite or File.Open can use.
-        var path = selectedFile.TryGetLocalPath();
+        // a path File.Open can use.
+        var path = file.TryGetLocalPath();
 
         if (string.IsNullOrEmpty(path))
         {
             toastManager.CreateSimpleInfoToast()
                 .OfType(NotificationType.Error)
-                .WithTitle("Import Failed")
-                .WithContent($"'{selectedFile.Name}' is not a file on this device, so it cannot be read.")
+                .WithTitle("Export Failed")
+                .WithContent($"'{file.Name}' is not a file on this device, so it cannot be written.")
                 .Queue();
 
             return;
         }
-
-        var document = (TableDataViewModel)editorViewModel.CreateNewDocumentInstance();
 
         try
         {
-            var tableData = await converterService.InputFileAsync(inputConverterName, path);
-
-            // The imported table lives in a store of its own, so the rest of the editor (search,
-            // columns, editing) works on it exactly as it does on a document created with New File.
-            await document.CreateNewStoreAsync(Path.GetFileNameWithoutExtension(selectedFile.Name));
-            await document.ImportDataAsync(tableData);
+            // Reading the store and converting the table is not rendering work, so it all stays off
+            // the UI thread.
+            await Task.Run(async () =>
+            {
+                var tableData = await document.ReadTableDataAsync();
+                await converterService.OutputFileAsync(outputName, path, tableData);
+            });
         }
         catch (Exception exception)
         {
-            // The document was never added to the workspace, so it has to be released explicitly.
-            document.Dispose();
-
             toastManager.CreateSimpleInfoToast()
                 .OfType(NotificationType.Error)
-                .WithTitle("Import Failed")
-                .WithContent($"'{selectedFile.Name}' could not be imported. {exception.Message}")
+                .WithTitle("Export Failed")
+                .WithContent($"'{document.Title}' could not be exported. {exception.Message}")
                 .Queue();
 
             return;
         }
-
-        editorViewModel.AddDocument(document);
-        editorViewModel.SelectedDocument = document;
 
         toastManager.CreateSimpleInfoToast()
             .OfType(NotificationType.Success)
             .WithTitle("Success")
-            .WithContent($"The file '{document.Title}' has been successfully imported.")
+            .WithContent($"'{document.Title}' has been successfully exported.")
             .Queue();
     }
 }
+

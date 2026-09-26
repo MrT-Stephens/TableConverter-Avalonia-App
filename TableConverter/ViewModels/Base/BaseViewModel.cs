@@ -9,7 +9,6 @@ using TableConverter.Commands.Interfaces;
 using TableConverter.Common;
 using TableConverter.Interfaces;
 using TableConverter.Utilities.Collections;
-using TableConverter.Utilities.Database.Models.TableStore;
 using TableConverter.Utilities.Extensions;
 using TableConverter.Utilities.Interfaces;
 
