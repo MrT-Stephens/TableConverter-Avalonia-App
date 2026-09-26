@@ -109,6 +109,7 @@ public class NewFileCommandHandler(
             FROM SEQ;
             
             -- INSERT COLUMNS
+            -- 0 is the text data type, matching ColumnDataType.Text.
             INSERT INTO COLUMNS (NAME, DATA_TYPE, ORDINAL_POSITION)
             SELECT
                 'Column ' || N,

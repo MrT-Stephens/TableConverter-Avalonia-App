@@ -9,6 +9,7 @@ using Avalonia.Controls.Selection;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Layout;
+using Avalonia.Media;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,7 @@ using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Configuration;
 using TableConverter.Contracts;
+using TableConverter.Converters;
 using TableConverter.Interfaces;
 using TableConverter.ViewModels.Base;
 using TableConverter.Extensions;
@@ -141,7 +143,9 @@ public partial class TableDataViewModel : BaseDocumentViewModel, ISessionDocumen
 
             foreach (var column in columns)
             {
-                var newColumn = CreateTemplateColumn<DataItem<RowEntity>>(column.Name, column.OrdinalPosition - 1);
+                var newColumn = CreateTemplateColumn<DataItem<RowEntity>>(
+                    column.Name, column.OrdinalPosition - 1, column.DataType);
+
                 TreeDataSource.Columns.Insert(column.OrdinalPosition - 1, newColumn);
             }
 
@@ -179,7 +183,8 @@ public partial class TableDataViewModel : BaseDocumentViewModel, ISessionDocumen
             }
             else if (change.State is DbEntityChangeState.Added)
             {
-                var newColumn = CreateTemplateColumn<DataItem<RowEntity>>(column.Name, column.OrdinalPosition - 1);
+                var newColumn = CreateTemplateColumn<DataItem<RowEntity>>(
+                    column.Name, column.OrdinalPosition - 1, column.DataType);
                 
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {
@@ -188,7 +193,10 @@ public partial class TableDataViewModel : BaseDocumentViewModel, ISessionDocumen
             }
             else if (change.State is DbEntityChangeState.Modified)
             {
-                var newColumn = CreateTemplateColumn<DataItem<RowEntity>>(column.Name, column.OrdinalPosition - 1);
+                // A column that was retyped is rebuilt rather than patched: the type is what decides how
+                // its cells are drawn, so the whole column has to be replaced.
+                var newColumn = CreateTemplateColumn<DataItem<RowEntity>>(
+                    column.Name, column.OrdinalPosition - 1, column.DataType);
                 
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {
@@ -199,30 +207,63 @@ public partial class TableDataViewModel : BaseDocumentViewModel, ISessionDocumen
         }
     }
 
-    private static TemplateColumn<TModel> CreateTemplateColumn<TModel>(object header, int columnIndex, GridLength? gridLength = null) 
+    /// <summary>
+    /// Builds the grid column that shows the values of one table column.
+    /// </summary>
+    /// <param name="header">The column heading, which is the column's name.</param>
+    /// <param name="columnIndex">The position of the column within a row's cells.</param>
+    /// <param name="dataType">The type the column was given, which decides how its cells read.</param>
+    /// <param name="gridLength">The width to give the column.</param>
+    private static TemplateColumn<TModel> CreateTemplateColumn<TModel>(
+        object header,
+        int columnIndex,
+        ColumnDataType dataType,
+        GridLength? gridLength = null) 
         where TModel : class
     {
+        var valuePath = $"Item.Cells[{columnIndex}].Value";
+
+        // A value is never rejected for not matching its column's type, because a typed column would
+        // otherwise be unusable while its values were still being entered. The type only decides how the
+        // cell reads: numbers are right aligned, so a column of them lines up the way it would in a
+        // spreadsheet, and anything that does not read as the type is marked, so the styles can draw it
+        // in the theme's error colour.
+        var textAlignment = dataType.IsNumeric() ? TextAlignment.Right : TextAlignment.Left;
+        var mismatch = new ColumnValueMismatchConverter(dataType);
+
         return new TemplateColumn<TModel>(header,
             new FuncDataTemplate<TModel>((_, _) => new TextBlock
             {
                 VerticalAlignment = VerticalAlignment.Center,
+                TextAlignment = textAlignment,
                 [!TextBlock.TextProperty] = new Binding
                 {
-                    Path = $"Item.Cells[{columnIndex}].Value",
+                    Path = valuePath,
                     Mode = BindingMode.TwoWay
                 },
+                [!ColumnValueMismatch.IsMismatchedProperty] = new Binding
+                {
+                    Path = valuePath,
+                    Converter = mismatch
+                }
             }),
             new FuncDataTemplate<TModel>((_, _) => new TextBox
             {
                 VerticalAlignment = VerticalAlignment.Center,
+                TextAlignment = textAlignment,
                 [!TextBox.TextProperty] = new Binding
                 {
-                    Path = $"Item.Cells[{columnIndex}].Value",
+                    Path = valuePath,
                     Mode = BindingMode.TwoWay,
                     UpdateSourceTrigger = UpdateSourceTrigger.LostFocus
+                },
+                [!ColumnValueMismatch.IsMismatchedProperty] = new Binding
+                {
+                    Path = valuePath,
+                    Converter = mismatch
                 }
             }),
-            GridLength.Auto,
+            gridLength ?? GridLength.Auto,
             new TemplateColumnOptions<TModel>
             {
                 CanUserSortColumn = false,

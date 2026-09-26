@@ -93,7 +93,7 @@ public class TableStoreSearchResultDataSource(ITableStoreDbContextFactory databa
         {
             RowId = index,
             ColumnId = 0,
-            Value = "...",
+            Value = DataSourcePlaceholder.Text
         };
     }
 

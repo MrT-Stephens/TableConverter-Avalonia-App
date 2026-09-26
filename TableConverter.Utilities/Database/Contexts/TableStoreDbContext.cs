@@ -51,6 +51,9 @@ public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> op
             
             b.Property(x => x.DataType)
                 .HasColumnName("DATA_TYPE")
+                // Stored as its numeric value, which is the value the column type carries, so renaming an
+                // enum member can never change what an existing store holds.
+                .HasConversion<int>()
                 .IsRequired();
             
             b.Property(x => x.OrdinalPosition)

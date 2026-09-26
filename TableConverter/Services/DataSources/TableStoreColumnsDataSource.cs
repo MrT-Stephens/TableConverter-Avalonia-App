@@ -93,7 +93,8 @@ public class TableStoreColumnsDataSource(ITableStoreDbContextFactory databaseCon
         return new ColumnEntity
         {
             Id = index + 1,
-            Name = "...",
+            Name = DataSourcePlaceholder.Text,
+            DataType = ColumnDataType.Text,
             DefaultValueForCell = string.Empty
         };
     }

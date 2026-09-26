@@ -129,7 +129,7 @@ public class TableStoreDataSource(ITableStoreDbContextFactory databaseContextFac
             {
                 RowId = index,
                 ColumnId = i + 1,
-                Value = "..."
+                Value = DataSourcePlaceholder.Text
             });
         }
 

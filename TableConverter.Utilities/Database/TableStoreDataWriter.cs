@@ -2,6 +2,7 @@ using System.Text;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using TableConverter.Utilities.Database.Contexts;
+using TableConverter.Utilities.Database.Models.TableStore;
 
 namespace TableConverter.Utilities.Database;
 
@@ -15,10 +16,10 @@ namespace TableConverter.Utilities.Database;
 public static class TableStoreDataWriter
 {
     /// <summary>
-    /// The data type stored for every written column. 0 is the store's "text" data type, matching the
-    /// columns produced by the New File command.
+    /// The data type stored for every written column. An imported table carries no type information, so
+    /// its columns are text, matching the columns produced by the New File command.
     /// </summary>
-    private const int TextDataType = 0;
+    private const int TextDataType = (int)ColumnDataType.Text;
 
     /// <summary>
     /// The number of cells written per insert. Each cell binds one parameter, and the default SQLite
@@ -191,4 +192,3 @@ public static class TableStoreDataWriter
         parameters.Clear();
     }
 }
-

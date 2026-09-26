@@ -14,8 +14,8 @@ public sealed class ColumnEntity : EntityBaseWithAutoSynchronize<int>
         set => SetField(ref _Name, value);
     }
 
-    private int _DataType;
-    public int DataType
+    private ColumnDataType _DataType;
+    public ColumnDataType DataType
     {
         get => _DataType;
         set => SetField(ref _DataType, value);

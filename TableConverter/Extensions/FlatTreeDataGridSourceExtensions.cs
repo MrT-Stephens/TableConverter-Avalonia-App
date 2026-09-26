@@ -1,5 +1,7 @@
+using System;
 using Avalonia.Controls;
 using Avalonia.Controls.Models.TreeDataGrid;
+using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Layout;
@@ -80,6 +82,51 @@ public static class FlatTreeDataGridSourceExtensions
                 CanUserSortColumn = false,
             }));
         
+        return source;
+    }
+
+    /// <summary>
+    /// Adds a column whose values are picked from the members of <typeparamref name="TEnum" />, which
+    /// the grid shows as their names. Used for a property that names one option rather than holding free
+    /// text, so it cannot be filled in with something the application does not understand.
+    /// </summary>
+    public static FlatTreeDataGridSource<TModel> AddEnumColumn<TModel, TEnum>(
+        this FlatTreeDataGridSource<TModel> source,
+        object header,
+        string bindingPath,
+        GridLength? gridLength = null)
+        where TModel : class
+        where TEnum : struct, Enum
+    {
+        var values = Enum.GetValues<TEnum>();
+
+        source.Columns.Add(new TemplateColumn<TModel>(
+            header,
+            new FuncDataTemplate<TModel>((_, _) => new TextBlock
+            {
+                VerticalAlignment = VerticalAlignment.Center,
+                [!TextBlock.TextProperty] = new Binding
+                {
+                    Path = bindingPath,
+                    Mode = BindingMode.OneWay
+                },
+            }),
+            new FuncDataTemplate<TModel>((_, _) => new ComboBox
+            {
+                VerticalAlignment = VerticalAlignment.Center,
+                ItemsSource = values,
+                [!SelectingItemsControl.SelectedItemProperty] = new Binding
+                {
+                    Path = bindingPath,
+                    Mode = BindingMode.TwoWay
+                }
+            }),
+            gridLength ?? GridLength.Auto,
+            new TemplateColumnOptions<TModel>
+            {
+                CanUserSortColumn = false,
+            }));
+
         return source;
     }
 }

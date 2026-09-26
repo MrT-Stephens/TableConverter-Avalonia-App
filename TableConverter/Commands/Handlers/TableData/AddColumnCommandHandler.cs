@@ -43,7 +43,8 @@ public class AddColumnCommandHandler(ISukiToastManager toastManager)
         
         var column = new ColumnEntity
         {
-            Name = string.Empty
+            Name = string.Empty,
+            DataType = ColumnDataType.Text
         };
 
         var (success, _, _) = await viewModel.DataSource.CreateAsync(column);

@@ -59,6 +59,7 @@ public partial class TableColumnsEditorViewModel : BaseScopedPaneToolViewModel<T
         TreeDataSource
             .AddAutoColumn("ID", "Item.OrdinalPosition", true)
             .AddAutoColumn("Name", "Item.Name", sourceTrigger: UpdateSourceTrigger.LostFocus, gridLength: GridLength.Star)
+            .AddEnumColumn<DataItem<ColumnEntity>, ColumnDataType>("Type", "Item.DataType")
             .AddAutoColumn("Default Value", "Item.DefaultValueForCell", sourceTrigger: UpdateSourceTrigger.LostFocus);
 
         DataSource.SetFilterQuery(query => query
