@@ -12,7 +12,7 @@ public class MultiLineInputTestCases : InputConverterTestCasesBase
     ///     Test cases which are expected to be successful.
     /// </summary>
     protected override
-        IReadOnlyList<(string FileName, ConverterHandlerBaseOptions Options, TableData ExpectedTableData)>
+        IReadOnlyList<(string FileName, ConverterHandlerBaseOptions Options, TableSnapshot ExpectedTableData)>
         SuccessfulTestCases { get; } =
     [
         (
@@ -22,7 +22,7 @@ public class MultiLineInputTestCases : InputConverterTestCasesBase
             {
                 RowSeparator = "---"
             },
-            Utils.TestTableData
+            Utils.TestTable
         ),
         (
             // Test case 2: Test with a row separator of "-(*)$%\u00a3@@@)(\u00a3$)\u00a3_$\u00a3$\u00a3\u00a3$"
@@ -31,7 +31,7 @@ public class MultiLineInputTestCases : InputConverterTestCasesBase
             {
                 RowSeparator = "-(*)$%\u00a3@@@)(\u00a3$)\u00a3_$\u00a3$\u00a3\u00a3$"
             },
-            Utils.TestTableData
+            Utils.TestTable
         ),
     ];
 

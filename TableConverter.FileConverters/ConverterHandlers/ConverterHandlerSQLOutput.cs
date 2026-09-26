@@ -1,54 +1,85 @@
-﻿using System.Text;
-using TableConverter.FileConverters.ConverterHandlersOptions;
+﻿using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
+using TableConverter.FileConverters.Utilities;
 using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.ConverterHandlers;
 
 public class ConverterHandlerSQLOutput : ConverterHandlerOutputAbstract<ConverterHandlerSQLOutputOptions>
 {
-    public override Result<string> Convert(string[] headers, string[][] rows)
+    public override async Task<Result> ConvertToStreamAsync(
+        Stream? stream,
+        ITableRowSource source,
+        IProgress<ConversionProgress>? progress = null,
+        CancellationToken cancellationToken = default)
     {
-        var sqlBuilder = new StringBuilder();
+        ArgumentNullException.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(source);
+
+        await using var writer = TableRowStream.CreateTextWriter(stream);
+
+        var headers = await source.GetHeadersAsync(cancellationToken).ConfigureAwait(false);
+
+        var quoteType = Options!.QuoteTypes[Options!.SelectedQuoteType];
+        var closingQuote = quoteType == "[" ? "]" : quoteType;
 
         var headersText = string.Join(", ", headers.Select(header =>
-            $"{Options!.QuoteTypes[Options!.SelectedQuoteType]}" +
-            $"{header.Replace(' ', '_')}" +
-            $"{(Options!.QuoteTypes[Options!.SelectedQuoteType] == "[" ? "]" : Options!.QuoteTypes[Options!.SelectedQuoteType])}"
-        ));
+            $"{quoteType}{header.Replace(' ', '_')}{closingQuote}"));
 
-        for (long i = 0; i < rows.LongLength; i++)
+        if (Options!.InsertMultiRowsAtOnce)
         {
-            var rowText = string.Join(", ", rows[i].Select(val => $"\'{val.Replace("\'", "\'\'")}\'"));
+            // The closing ';' and newline belong after the last row, which is only known once the rows
+            // run out, so they are written after the loop rather than with the last row.
+            var wroteAny = false;
 
-            if (Options!.InsertMultiRowsAtOnce)
+            await foreach (var row in source.ReadTextRowsAsync(cancellationToken).ConfigureAwait(false))
             {
-                if (i == 0)
+                var rowText = BuildRowText(row, headers.Count);
+
+                if (!wroteAny)
                 {
-                    sqlBuilder.Append($"INSERT INTO " +
-                                      $"{Options!.QuoteTypes[Options!.SelectedQuoteType]}" +
-                                      $"{Options!.TableName.Replace(' ', '_')}" +
-                                      $"{(Options!.QuoteTypes[Options!.SelectedQuoteType] == "[" ? "]" : Options!.QuoteTypes[Options!.SelectedQuoteType])} " +
-                                      $"({headersText}) VALUES{Environment.NewLine} ({rowText})");
+                    writer.Write("INSERT INTO " +
+                                 $"{quoteType}" +
+                                 $"{Options!.TableName.Replace(' ', '_')}" +
+                                 $"{closingQuote} " +
+                                 $"({headersText}) VALUES{Environment.NewLine} ({rowText})");
+
+                    wroteAny = true;
                 }
                 else
                 {
-                    sqlBuilder.Append($",{Environment.NewLine} ({rowText})");
-
-                    if (i == rows.LongLength - 1) sqlBuilder.Append($";{Environment.NewLine}");
+                    writer.Write($",{Environment.NewLine} ({rowText})");
                 }
             }
-            else
+
+            if (wroteAny)
             {
-                sqlBuilder.AppendLine($"INSERT INTO " +
-                                      $"{Options!.QuoteTypes[Options!.SelectedQuoteType]}" +
-                                      $"{Options!.TableName.Replace(' ', '_')}" +
-                                      $"{(Options!.QuoteTypes[Options!.SelectedQuoteType] == "[" ? "]" : Options!.QuoteTypes[Options!.SelectedQuoteType])} " +
-                                      $"({headersText}) VALUES ({rowText});"
-                );
+                writer.Write($";{Environment.NewLine}");
+            }
+        }
+        else
+        {
+            await foreach (var row in source.ReadTextRowsAsync(cancellationToken).ConfigureAwait(false))
+            {
+                var rowText = BuildRowText(row, headers.Count);
+
+                writer.Write($"INSERT INTO " +
+                             $"{quoteType}" +
+                             $"{Options!.TableName.Replace(' ', '_')}" +
+                             $"{closingQuote} " +
+                             $"({headersText}) VALUES ({rowText});" + Environment.NewLine);
             }
         }
 
-        return Result<string>.Success(sqlBuilder.ToString());
+        await writer.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+        return Result.Success();
+    }
+
+    private static string BuildRowText(string[] row, int columnCount)
+    {
+        // Iterate the headers so a ragged row is padded rather than producing fewer values than columns.
+        return string.Join(", ", Enumerable.Range(0, columnCount)
+            .Select(j => $"\'{ConverterHandlerUtilities.GetCellValue(row, j).Replace("\'", "\'\'")}\'"));
     }
 }

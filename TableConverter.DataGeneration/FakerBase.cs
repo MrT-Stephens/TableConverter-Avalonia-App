@@ -37,17 +37,19 @@ public abstract class FakerBase : IFaker
         {
             if (_LocaleType == value) return;
 
-            _LocaleType = value;
-
-            if (_CachedLocales.TryGetValue(_LocaleType, out var locale))
+            // Resolve the locale before mutating state, so an unknown identifier throws without leaving the faker
+            // pointing at a locale type that does not match the loaded <see cref="Locale" />.
+            if (_CachedLocales.TryGetValue(value, out var locale))
             {
                 Locale = (LocaleBase)locale;
             }
             else
             {
-                Locale = (LocaleBase)LocaleFactory.CreateLocale(_LocaleType);
-                _CachedLocales.Add(_LocaleType, Locale);
+                Locale = (LocaleBase)LocaleFactory.CreateLocale(value);
+                _CachedLocales.Add(value, Locale);
             }
+
+            _LocaleType = value;
         }
     }
 

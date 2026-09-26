@@ -28,6 +28,7 @@ public record CommandMetadata : ICommandMetadata
         IconName = null;
         CanSetLoadingState = false;
         CanSetLoadingOnWorkspace = false;
+        AllowConcurrentExecutions = false;
         KeyGestures = [];
     }
 
@@ -62,6 +63,10 @@ public record CommandMetadata : ICommandMetadata
     /// Indicates whether the command can set the loading state of the workspace.
     /// Only works if the parent is a workspace view model.
     /// </param>
+    /// <param name="allowConcurrentExecutions">
+    /// Indicates whether the command may be executed again while a previous execution is still processing.
+    /// Defaults to <c>false</c> so <c>CanExecute</c> returns <c>false</c> while the command is processing.
+    /// </param>
     public CommandMetadata(
         string name, 
         string title, 
@@ -71,7 +76,8 @@ public record CommandMetadata : ICommandMetadata
         int? subCategoryIndex = null, 
         string[]? keyGestures = null, 
         bool canSetLoadingState = false,
-        bool canSetLoadingOnWorkspace = false)
+        bool canSetLoadingOnWorkspace = false,
+        bool allowConcurrentExecutions = false)
         : this(name)
     {
         Title = title;
@@ -82,6 +88,7 @@ public record CommandMetadata : ICommandMetadata
         KeyGestures = keyGestures ?? [];
         CanSetLoadingState = canSetLoadingState;
         CanSetLoadingOnWorkspace = canSetLoadingOnWorkspace;
+        AllowConcurrentExecutions = allowConcurrentExecutions;
     }
 
     /// <inheritdoc />
@@ -110,6 +117,9 @@ public record CommandMetadata : ICommandMetadata
     
     /// <inheritdoc />
     public bool CanSetLoadingOnWorkspace { get; }
+
+    /// <inheritdoc />
+    public bool AllowConcurrentExecutions { get; }
 
     /// <inheritdoc />
     public StreamGeometry? IconPath

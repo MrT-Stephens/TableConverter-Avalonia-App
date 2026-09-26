@@ -7,14 +7,16 @@ public class FakerSeededGenerationTest(Faker faker) : IClassFixture<Faker>
 {
     [Theory]
     [MemberData(nameof(GetTestCases))]
-    public void TestFaker_WithSeededGeneration(int seed, string locale, TableData expected)
+    public async Task TestFaker_WithSeededGeneration(int seed, string locale, TableSnapshot expected)
     {
         // Set the seed and locale
         faker.Seed(seed);
         faker.LocaleType = locale;
 
         // Generate the data
-        var data = Faker.Create(faker)
+        var data = new TableSnapshot();
+
+        await Faker.Create(faker)
             .Add("First Name", f => f.Person.FirstName())
             .Add("Last Name", f => f.Person.LastName())
             .Add("Phone Number", f => f.Phone.PhoneNumber())
@@ -23,7 +25,7 @@ public class FakerSeededGenerationTest(Faker faker) : IClassFixture<Faker>
             .Add("Country", f => f.Location.Country())
             .Add("Words", f => f.Word.Words())
             .WithRowCount(25)
-            .Build();
+            .BuildAsync(data);
 
         // Assert to check if the data is generated correctly
         Assert.Equal(expected, data);
@@ -31,14 +33,16 @@ public class FakerSeededGenerationTest(Faker faker) : IClassFixture<Faker>
 
     [Theory]
     [MemberData(nameof(GetTestCases))]
-    public void TestFakerAsync_WithSeededGeneration(int seed, string locale, TableData expected)
+    public async Task TestFakerAsync_WithSeededGeneration(int seed, string locale, TableSnapshot expected)
     {
         // Set the seed and locale
         faker.Seed(seed);
         faker.LocaleType = locale;
 
         // Generate the data
-        var data = Faker.Create(faker)
+        var data = new TableSnapshot();
+
+        await Faker.Create(faker)
             .Add("First Name", f => f.Person.FirstName())
             .Add("Last Name", f => f.Person.LastName())
             .Add("Phone Number", f => f.Phone.PhoneNumber())
@@ -47,7 +51,7 @@ public class FakerSeededGenerationTest(Faker faker) : IClassFixture<Faker>
             .Add("Country", f => f.Location.Country())
             .Add("Words", f => f.Word.Words())
             .WithRowCount(25)
-            .Build();
+            .BuildAsync(data);
 
         // Assert to check if the data is generated correctly
         Assert.Equal(expected, data);
@@ -55,12 +59,12 @@ public class FakerSeededGenerationTest(Faker faker) : IClassFixture<Faker>
 
     public static IEnumerable<object[]> GetTestCases()
     {
-        List<(int Seed, string Locale, TableData ExpectedData)> cases =
+        List<(int Seed, string Locale, TableSnapshot ExpectedData)> cases =
         [
             (
                 1045453543,
                 "en",
-                new TableData(
+                new TableSnapshot(
                     ["First Name", "Last Name", "Phone Number", "Email", "City", "Country", "Words"],
                     [
                         new[]
@@ -169,6 +173,26 @@ public class FakerSeededGenerationTest(Faker faker) : IClassFixture<Faker>
                         {
                             "Jeff", "Monahan", "538.847.0996 x50161", "Lolita_Lehner79@yahoo.com", "North Raquelfurt",
                             "Nigeria", "knit accessorise wilted steep confound usually elementary yet jacket"
+                        },
+                        new[]
+                        {
+                            "Ryan", "Bailey", "1-786-860-9257", "Keely.Douglas@yahoo.com", "Duanemouth", "Israel",
+                            "afore valentine geez represent atop inquisitively coaxingly devise"
+                        },
+                        new[]
+                        {
+                            "Erika", "Pagac", "945-284-4684 x61802", "Alisha-Lubowitz@yahoo.com", "Kleinfurt",
+                            "Antigua and Barbuda", "gracefully anneal dependent if since arrogantly whereas"
+                        },
+                        new[]
+                        {
+                            "Aiden", "Steuber", "270.935.6872 x6413", "Eula-Green9@hotmail.com", "North Kyleeport",
+                            "Vanuatu", "while spanish mechanically usually modulo ugh"
+                        },
+                        new[]
+                        {
+                            "Candido", "Senger", "537-498-7550", "Samantha-Leannon34@yahoo.com", "South Anabelle",
+                            "British Indian Ocean Territory (Chagos Archipelago)", "supposing furthermore clueless"
                         }
                     ]
                 )
@@ -176,7 +200,7 @@ public class FakerSeededGenerationTest(Faker faker) : IClassFixture<Faker>
             (
                 1045453543,
                 "zh_CN",
-                new TableData(
+                new TableSnapshot(
                     ["First Name", "Last Name", "Phone Number", "Email", "City", "Country", "Words"],
                     [
                         new[]
@@ -305,7 +329,7 @@ public class FakerSeededGenerationTest(Faker faker) : IClassFixture<Faker>
             (
                 1045453543,
                 "en_GB",
-                new TableData(
+                new TableSnapshot(
                     ["First Name", "Last Name", "Phone Number", "Email", "City", "Country", "Words"],
                     [
                         new[]

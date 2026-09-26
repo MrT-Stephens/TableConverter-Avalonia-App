@@ -15,6 +15,7 @@ using TableConverter.Commands.Interfaces;
 using TableConverter.Contracts;
 using TableConverter.Interfaces;
 using TableConverter.Utilities.Database.Contexts;
+using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.Utilities.Database.Models;
 using TableConverter.Utilities.Database.Models.TableStore;
 using TableConverter.Utilities.Extensions;
@@ -31,7 +32,7 @@ public static partial class TableDataCommandNames
 
 public class SearchTableDataCommandHandler(
     ISukiToastManager toastManager,
-    Utilities.Database.Interfaces.IDatabaseContextFactory<TableStoreDbContext> databaseContextFactory)
+    ITableStoreDbContextFactory databaseContextFactory)
     : ICommandHandlerAsync
 {
     public ICommandMetadata CommandMetadata => new CommandMetadata(
@@ -53,7 +54,9 @@ public class SearchTableDataCommandHandler(
     public async Task Execute(object? parameter, ICommandContext context)
     {
         if (context.Parent is not IWorkspaceEditor workspace)
-            throw new InvalidOperationException();
+            throw new InvalidOperationException(
+                $"The '{CommandMetadata.Name}' command requires an {nameof(IWorkspaceEditor)} as its parent context, " +
+                $"but received '{context.Parent?.GetType().Name ?? "null"}'.");
 
         if (!context.TryGetSelectedItem<TableSearchViewModel>(out var searchVm))
         {
@@ -98,7 +101,7 @@ public class SearchTableDataCommandHandler(
 
     private async Task<int> SearchAsync(string searchText, SearchSettingsFrom settings, string path)
     {
-        await using var db = await databaseContextFactory.CreateAsync(path);
+        await using var db = await databaseContextFactory.CreateDbContextAsync(path);
         await using var tx = await db.Database.BeginTransactionAsync();
         
         try
@@ -237,7 +240,7 @@ public class SearchTableDataCommandHandler(
     /// </summary>
     private async Task<int> SearchViaRegexAsync(string searchText, SearchSettingsFrom settings, string path)
     {
-        await using var sharedContext = await databaseContextFactory.CreateAsync(path);
+        await using var sharedContext = await databaseContextFactory.CreateDbContextAsync(path);
         await using var transaction = await sharedContext.Database.BeginTransactionAsync();
 
         try
@@ -326,7 +329,7 @@ public class SearchTableDataCommandHandler(
                     },
                     async (worker, cancellationToken) =>
                     {
-                        await using var db = await databaseContextFactory.CreateAsync(path, cancellationToken);
+                        await using var db = await databaseContextFactory.CreateDbContextAsync(path, cancellationToken);
 
                         var start = minRow + worker * rangeSize;
 

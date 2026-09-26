@@ -9,6 +9,11 @@ namespace TableConverter.FileConverters.DataModels;
 ///     <typeparamref name="T" />.
 /// </summary>
 /// <typeparam name="T">The type of the options that extend <see cref="ConverterHandlerBaseOptions" />.</typeparam>
+/// <remarks>
+///     A handler implements a single method, <see cref="ConvertToStreamAsync" />, which pulls the table from
+///     the source and writes it straight to the stream, so a large table is never held in memory as a whole
+///     and never turned into one giant string first.
+/// </remarks>
 public abstract class ConverterHandlerOutputAbstract<T> : IConverterHandlerOutput
     where T : ConverterHandlerBaseOptions, new()
 {
@@ -26,65 +31,10 @@ public abstract class ConverterHandlerOutputAbstract<T> : IConverterHandlerOutpu
         set => Options = value;
     }
 
-    /// <summary>
-    ///     Converts the provided headers and rows into a formatted string.
-    /// </summary>
-    /// <param name="headers">The headers of the table data.</param>
-    /// <param name="rows">The rows containing the table data.</param>
-    /// <returns>A result containing the converted table data as a string.</returns>
-    public abstract Result<string> Convert(string[] headers, string[][] rows);
-
-    /// <summary>
-    ///     Asynchronously converts the provided headers and rows into a formatted string.
-    /// </summary>
-    /// <param name="headers">The headers of the table data.</param>
-    /// <param name="rows">The rows containing the table data.</param>
-    /// <returns>
-    ///     A task that represents the asynchronous operation, containing the result with the converted table data as a
-    ///     string.
-    /// </returns>
-    public async Task<Result<string>> ConvertAsync(string[] headers, string[][] rows)
-    {
-        return await Task.Run(() => Convert(headers, rows));
-    }
-
-    /// <summary>
-    ///     Saves the converted data to a stream.
-    /// </summary>
-    /// <param name="stream">The stream to which the data will be written.</param>
-    /// <param name="buffer">The buffer containing the data to be saved.</param>
-    /// <returns>A result indicating the success or failure of the save operation.</returns>
-    public virtual Result SaveFile(Stream? stream, ReadOnlyMemory<byte> buffer)
-    {
-        // Ensure the stream is not null before attempting to write
-        ArgumentNullException.ThrowIfNull(stream, nameof(stream));
-
-        try
-        {
-            // Write the data to the stream
-            stream.Write(buffer.Span);
-
-            // Close the stream after writing
-            stream.Close();
-        }
-        catch (Exception ex)
-        {
-            // Return a failure result if an exception occurs during writing
-            return Result.Failure(ex.Message);
-        }
-
-        // Return a success result if the file was saved without errors
-        return Result.Success();
-    }
-
-    /// <summary>
-    ///     Asynchronously saves the converted data to a stream.
-    /// </summary>
-    /// <param name="output">The stream to which the data will be written.</param>
-    /// <param name="buffer">The buffer containing the data to be saved.</param>
-    /// <returns>A task that represents the asynchronous operation, containing the result of the save operation.</returns>
-    public async Task<Result> SaveFileAsync(Stream? output, ReadOnlyMemory<byte> buffer)
-    {
-        return await Task.Run(() => SaveFile(output, buffer));
-    }
+    /// <inheritdoc />
+    public abstract Task<Result> ConvertToStreamAsync(
+        Stream? stream,
+        ITableRowSource source,
+        IProgress<ConversionProgress>? progress = null,
+        CancellationToken cancellationToken = default);
 }

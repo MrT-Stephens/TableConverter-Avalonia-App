@@ -92,42 +92,29 @@ public abstract class FakerBuilderBase<TFaker>(TFaker fakerInstance) : IFakerBui
     }
 
     /// <inheritdoc />
-    public TableData Build()
+    public async Task BuildAsync(ITableRowSink sink, CancellationToken cancellationToken = default)
     {
-        var rows = new List<string[]>();
+        ArgumentNullException.ThrowIfNull(sink);
 
+        // Flatten the column names to match the number of generators for each column.
+        var columnHeaders = _actions.SelectMany(pair => pair.Value.Select(_ => pair.Key)).ToList();
+
+        await sink.BeginAsync(columnHeaders, cancellationToken).ConfigureAwait(false);
+
+        // Rows are generated and handed over one at a time rather than gathered into a whole table
+        // first, so the memory a build needs does not grow with the row count.
         for (var i = 0; i < _RowCount; i++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var row = new List<string>();
 
-            foreach (var (columnName, actions) in _actions)
+            foreach (var (_, actions) in _actions)
                 row.AddRange(actions.Select(action => action(FakerInstance)));
 
-            rows.Add(row.ToArray());
+            await sink.WriteRowAsync(row, cancellationToken).ConfigureAwait(false);
         }
 
-        // Flatten the column names to match the number of generators for each column
-        var columnHeaders = _actions.SelectMany(pair => pair.Value.Select(_ => pair.Key)).ToList();
-
-        return new TableData(columnHeaders, rows);
-    }
-
-    /// <inheritdoc />
-    public async Task<TableData> BuildAsync()
-    {
-        var rows = await Task.WhenAll(Enumerable.Range(0, _RowCount).Select(_ => Task.Run(() =>
-        {
-            var row = new List<string>();
-
-            foreach (var (columnName, actions) in _actions)
-                row.AddRange(actions.Select(action => action(FakerInstance)));
-
-            return row.ToArray();
-        })));
-
-        // Flatten the column names to match the number of generators for each column
-        var columnHeaders = _actions.SelectMany(pair => pair.Value.Select(_ => pair.Key)).ToList();
-
-        return new TableData(columnHeaders, rows.ToList());
+        await sink.CompleteAsync(cancellationToken).ConfigureAwait(false);
     }
 }

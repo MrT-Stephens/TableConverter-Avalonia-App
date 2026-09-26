@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,6 +7,7 @@ using Avalonia.Platform.Storage;
 using SukiUI.Toasts;
 using TableConverter.Commands.DataModels;
 using TableConverter.Commands.Interfaces;
+using TableConverter.Contracts;
 using TableConverter.Interfaces;
 using TableConverter.ViewModels.Documents;
 using TableConverter.ViewModels.Workspaces;
@@ -51,7 +51,11 @@ public class OpenFileCommandHandler(
             AllowMultiple = true,
             FileTypeFilter =
             [
-                new FilePickerFileType(".tcstore")
+                new FilePickerFileType("Table Store")
+                {
+                    Patterns = [$"*{TableStoreFile.Extension}"],
+                },
+                FilePickerFileTypes.All,
             ]
         });
 
@@ -61,10 +65,29 @@ public class OpenFileCommandHandler(
         }
 
         var numberOfAddedDocuments = 0;
-            
+
         foreach (var file in result)
         {
-            if (editorViewModel.Documents.Any(d => d is TableDataViewModel doc && doc.Path == file.Path.ToString()))
+            // The storage provider hands back a Uri, which SQLite would treat as a relative file name.
+            // A local path is required to open the store.
+            var path = file.TryGetLocalPath();
+
+            if (string.IsNullOrEmpty(path))
+            {
+                toastManager.CreateSimpleInfoToast()
+                    .OfType(NotificationType.Error)
+                    .WithTitle("File Not On This Device")
+                    .WithContent($"'{file.Name}' is not a file on this device, so it cannot be opened.")
+                    .Queue();
+
+                continue;
+            }
+
+            path = Path.GetFullPath(path);
+
+            if (editorViewModel.Documents.Any(document =>
+                    document is TableDataViewModel existing
+                    && string.Equals(existing.Path, path, StringComparison.OrdinalIgnoreCase)))
             {
                 toastManager.CreateSimpleInfoToast()
                     .OfType(NotificationType.Error)
@@ -80,21 +103,40 @@ public class OpenFileCommandHandler(
                 throw new InvalidOperationException("Document should be of type TableDataViewModel");
             }
 
-            document.Title = Path.GetFileNameWithoutExtension(file.Name);
-            document.Path = file.Path.ToString();
-            document.DataSource.Path = file.Path.ToString();
-                
-            editorViewModel.Documents.Add(document);
+            try
+            {
+                // Opened stores stay owned by the user, so the document only ever reads from them.
+                await document.OpenStoreAsync(path, Path.GetFileNameWithoutExtension(file.Name));
+            }
+            catch (Exception exception)
+            {
+                // One unreadable file should not stop the rest of the selection from opening.
+                document.Dispose();
+
+                toastManager.CreateSimpleInfoToast()
+                    .OfType(NotificationType.Error)
+                    .WithTitle("Could Not Open File")
+                    .WithContent($"'{file.Name}' could not be opened. {exception.Message}")
+                    .Queue();
+
+                continue;
+            }
+
+            editorViewModel.AddDocument(document);
             editorViewModel.SelectedDocument = document;
-            document.InvalidateData();   
-                
+
             numberOfAddedDocuments++;
+        }
+
+        if (numberOfAddedDocuments == 0)
+        {
+            return;
         }
 
         toastManager.CreateSimpleInfoToast()
             .OfType(NotificationType.Success)
             .WithTitle("Added New File(s)")
-            .WithContent("Successfully added " + numberOfAddedDocuments + " file(s).")
+            .WithContent($"Successfully added {numberOfAddedDocuments} file(s).")
             .Queue();
     }
 }

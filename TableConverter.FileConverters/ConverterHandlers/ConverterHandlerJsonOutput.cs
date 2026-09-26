@@ -1,82 +1,143 @@
 ﻿using Newtonsoft.Json;
 using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
+using TableConverter.FileConverters.Utilities;
 using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.ConverterHandlers;
 
 public class ConverterHandlerJsonOutput : ConverterHandlerOutputAbstract<ConverterHandlerJsonOutputOptions>
 {
-    public override Result<string> Convert(string[] headers, string[][] rows)
+    public override async Task<Result> ConvertToStreamAsync(
+        Stream? stream,
+        ITableRowSource source,
+        IProgress<ConversionProgress>? progress = null,
+        CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(source);
+
+        await using var writer = TableRowStream.CreateTextWriter(stream);
+
         try
         {
+            var headers = await source.GetHeadersAsync(cancellationToken).ConfigureAwait(false);
+
+            // The writer streams the document out as it is built, so the whole of it is never held as
+            // one string. It is closed, not the caller's writer, which must stay open.
+            using var jsonWriter = new JsonTextWriter(writer)
+            {
+                Formatting = Options!.MinifyJson ? Formatting.None : Formatting.Indented,
+                CloseOutput = false
+            };
+
             switch (Options!.SelectedJsonFormatType)
             {
                 case ConverterHandlerJsonOutputOptions.JsonStyles.ArrayOfObjects:
                 {
-                    var jsonObjects = new Dictionary<string, object>[rows.Length];
+                    jsonWriter.WriteStartArray();
 
-                    for (var i = 0; i < rows.Length; i++)
+                    await foreach (var row in source.ReadTextRowsAsync(cancellationToken).ConfigureAwait(false))
                     {
-                        jsonObjects[i] = new Dictionary<string, object>();
+                        jsonWriter.WriteStartObject();
 
-                        for (var j = 0; j < headers.Length; j++)
-                            jsonObjects[i].Add(headers[j].Replace(' ', '_'), rows[i][j]);
+                        for (var j = 0; j < headers.Count; j++)
+                        {
+                            jsonWriter.WritePropertyName(headers[j].Replace(' ', '_'));
+                            jsonWriter.WriteValue(ConverterHandlerUtilities.GetCellValue(row, j));
+                        }
+
+                        jsonWriter.WriteEndObject();
                     }
 
-                    return Result<string>.Success(JsonConvert.SerializeObject(jsonObjects,
-                        Options!.MinifyJson ? Formatting.None : Formatting.Indented));
+                    jsonWriter.WriteEndArray();
+                    break;
                 }
                 case ConverterHandlerJsonOutputOptions.JsonStyles.TwoDimensionalArrays:
                 {
-                    var jsonArray = new string[rows.Length + 1][];
+                    jsonWriter.WriteStartArray();
 
-                    jsonArray[0] = headers.Select(c => c.Replace(' ', '_')).ToArray();
+                    jsonWriter.WriteStartArray();
+                    foreach (var header in headers) jsonWriter.WriteValue(header.Replace(' ', '_'));
+                    jsonWriter.WriteEndArray();
 
-                    for (var i = 0; i < rows.Length; i++) jsonArray[i + 1] = rows[i];
+                    await foreach (var row in source.ReadTextRowsAsync(cancellationToken).ConfigureAwait(false))
+                    {
+                        jsonWriter.WriteStartArray();
+                        foreach (var cell in row) jsonWriter.WriteValue(cell);
+                        jsonWriter.WriteEndArray();
+                    }
 
-                    return Result<string>.Success(JsonConvert.SerializeObject(jsonArray,
-                        Options!.MinifyJson ? Formatting.None : Formatting.Indented));
+                    jsonWriter.WriteEndArray();
+                    break;
                 }
                 case ConverterHandlerJsonOutputOptions.JsonStyles.ColumnArrays:
                 {
-                    var jsonObjects = new Dictionary<string, string[]>[headers.Length];
+                    // Every row is needed for each column, so the rows are gathered once rather than
+                    // being read back from the source once per column.
+                    var rows = new List<string[]>();
 
-                    for (var i = 0; i < headers.Length; i++)
-                        jsonObjects[i] = new Dictionary<string, string[]>
-                        {
-                            { headers[i].Replace(' ', '_'), rows.Select(row => row[i]).ToArray() }
-                        };
+                    await foreach (var row in source.ReadTextRowsAsync(cancellationToken).ConfigureAwait(false))
+                        rows.Add(row);
 
-                    return Result<string>.Success(JsonConvert.SerializeObject(jsonObjects,
-                        Options!.MinifyJson ? Formatting.None : Formatting.Indented));
+                    jsonWriter.WriteStartArray();
+
+                    for (var j = 0; j < headers.Count; j++)
+                    {
+                        jsonWriter.WriteStartObject();
+                        jsonWriter.WritePropertyName(headers[j].Replace(' ', '_'));
+                        jsonWriter.WriteStartArray();
+
+                        foreach (var row in rows)
+                            jsonWriter.WriteValue(ConverterHandlerUtilities.GetCellValue(row, j));
+
+                        jsonWriter.WriteEndArray();
+                        jsonWriter.WriteEndObject();
+                    }
+
+                    jsonWriter.WriteEndArray();
+                    break;
                 }
                 case ConverterHandlerJsonOutputOptions.JsonStyles.KeyedArrays:
                 {
-                    var jsonObjects = new Dictionary<long, string[]>[rows.Length + 1];
+                    var rows = new List<string[]>();
 
-                    jsonObjects[0] = new Dictionary<long, string[]>
+                    await foreach (var row in source.ReadTextRowsAsync(cancellationToken).ConfigureAwait(false))
+                        rows.Add(row);
+
+                    jsonWriter.WriteStartArray();
+
+                    jsonWriter.WriteStartObject();
+                    jsonWriter.WritePropertyName("0");
+                    jsonWriter.WriteStartArray();
+                    foreach (var header in headers) jsonWriter.WriteValue(header.Replace(' ', '_'));
+                    jsonWriter.WriteEndArray();
+                    jsonWriter.WriteEndObject();
+
+                    for (var i = 0; i < rows.Count; i++)
                     {
-                        { 0, headers.Select(c => c.Replace(' ', '_')).ToArray() }
-                    };
+                        jsonWriter.WriteStartObject();
+                        jsonWriter.WritePropertyName((i + 1).ToString());
+                        jsonWriter.WriteStartArray();
+                        foreach (var cell in rows[i]) jsonWriter.WriteValue(cell);
+                        jsonWriter.WriteEndArray();
+                        jsonWriter.WriteEndObject();
+                    }
 
-                    for (var i = 0; i < rows.Length; i++)
-                        jsonObjects[i + 1] = new Dictionary<long, string[]>
-                        {
-                            { i + 1, rows[i] }
-                        };
-
-                    return Result<string>.Success(JsonConvert.SerializeObject(jsonObjects,
-                        Options!.MinifyJson ? Formatting.None : Formatting.Indented));
+                    jsonWriter.WriteEndArray();
+                    break;
                 }
+                default:
+                    return Result.Failure("Unsupported json format");
             }
         }
         catch (Exception ex)
         {
-            return Result<string>.Failure(ex.Message);
+            return Result.Failure(ex.Message);
         }
 
-        return Result<string>.Failure("Unsupported json format");
+        await writer.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+        return Result.Success();
     }
 }

@@ -1,6 +1,8 @@
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Avalonia.Controls.Notifications;
 using Avalonia.Platform.Storage;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
@@ -109,21 +111,55 @@ public class ImportFileCommandHandler(
             context.Cancel("File was not selected.");
             return;
         }
-        
-        var path = string.Empty;
 
-        var tableData = await converterService.InputFileAsync(inputConverterName, path);
+        var selectedFile = file.First();
 
-        var document = (editorViewModel.CreateNewDocumentInstance() as TableDataViewModel)!;
+        // The converters open the file by path, and the storage provider hands back a Uri that is not
+        // a path SQLite or File.Open can use.
+        var path = selectedFile.TryGetLocalPath();
 
-        document.Title = Path.GetFileNameWithoutExtension(path);
-        //document.Headers = tableData.Headers.ToObservableCollection();
-        //document.Rows = tableData.Rows.ToObservableCollection();
-        
+        if (string.IsNullOrEmpty(path))
+        {
+            toastManager.CreateSimpleInfoToast()
+                .OfType(NotificationType.Error)
+                .WithTitle("Import Failed")
+                .WithContent($"'{selectedFile.Name}' is not a file on this device, so it cannot be read.")
+                .Queue();
+
+            return;
+        }
+
+        var document = (TableDataViewModel)editorViewModel.CreateNewDocumentInstance();
+
+        try
+        {
+            // The imported table lives in a store of its own, so the rest of the editor (search,
+            // columns, editing) works on it exactly as it does on a document created with New File.
+            await document.CreateNewStoreAsync(Path.GetFileNameWithoutExtension(selectedFile.Name));
+
+            // The converter writes straight into the store, so a large file is never held in memory as
+            // a whole table before it can be stored.
+            await document.ImportDataAsync(converterService, inputConverterName, path);
+        }
+        catch (Exception exception)
+        {
+            // The document was never added to the workspace, so it has to be released explicitly.
+            document.Dispose();
+
+            toastManager.CreateSimpleInfoToast()
+                .OfType(NotificationType.Error)
+                .WithTitle("Import Failed")
+                .WithContent($"'{selectedFile.Name}' could not be imported. {exception.Message}")
+                .Queue();
+
+            return;
+        }
+
         editorViewModel.AddDocument(document);
         editorViewModel.SelectedDocument = document;
 
         toastManager.CreateSimpleInfoToast()
+            .OfType(NotificationType.Success)
             .WithTitle("Success")
             .WithContent($"The file '{document.Title}' has been successfully imported.")
             .Queue();

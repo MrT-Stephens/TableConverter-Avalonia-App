@@ -7,51 +7,43 @@ namespace TableConverter.FileConverters.ConverterHandlers;
 
 public class ConverterHandlerWordInput : ConverterHandlerInputAbstract<ConverterHandlerBaseOptions>
 {
-    private XWPFDocument? WordDocument { get; set; }
-
-    public override Result<TableData> ReadText(string text)
+    public override async Task<Result> ReadStreamAsync(
+        Stream? stream,
+        ITableRowSink sink,
+        IProgress<ConversionProgress>? progress = null,
+        CancellationToken cancellationToken = default)
     {
-        var headers = new List<string>();
-        var rows = new List<string[]>();
+        ArgumentNullException.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(sink);
 
         try
         {
-            if (WordDocument == null) throw new Exception("Word Document is not initialized.");
+            using var document = new XWPFDocument(stream);
 
-            foreach (var row in WordDocument.Tables[0].Rows)
-                if (row == WordDocument.Tables[0].Rows[0])
-                    headers.AddRange(row.GetTableCells().Select(cell => cell.GetText()));
-                else
-                    rows.Add(row.GetTableCells().Select(cell => cell.GetText()).ToArray());
+            if (document.Tables.Count == 0)
+            {
+                return Result.Failure("No tables found in the Word document");
+            }
 
-            WordDocument.Close();
-            WordDocument.Dispose();
-            WordDocument = null;
+            var table = document.Tables[0];
+
+            var headers = table.Rows[0].GetTableCells().Select(cell => cell.GetText()).ToList();
+
+            await sink.BeginAsync(headers, cancellationToken).ConfigureAwait(false);
+
+            for (var i = 1; i < table.Rows.Count; i++)
+            {
+                await sink.WriteRowAsync(table.Rows[i].GetTableCells().Select(cell => cell.GetText()).ToArray(),
+                    cancellationToken).ConfigureAwait(false);
+            }
+
+            await sink.CompleteAsync(cancellationToken).ConfigureAwait(false);
+
+            return Result.Success();
         }
         catch (Exception ex)
         {
-            return Result<TableData>.Failure(ex.Message);
+            return Result.Failure(ex.Message);
         }
-
-        return Result<TableData>.Success(new TableData(headers, rows));
-    }
-
-    public override Result<string> ReadFile(Stream? stream)
-    {
-        ArgumentNullException.ThrowIfNull(stream, nameof(stream));
-
-        try
-        {
-            WordDocument = new XWPFDocument(stream);
-
-            if (WordDocument.Tables.Count == 0)
-                return Result<string>.Failure("No tables found in the Word document");
-        }
-        catch (Exception ex)
-        {
-            return Result<string>.Failure($"Error reading Word file: '{ex.Message}'");
-        }
-
-        return Result<string>.Success($"Word files are not visible within this text box 😭{Environment.NewLine}");
     }
 }

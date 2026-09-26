@@ -54,20 +54,15 @@ public interface IFakerBuilder<out TFaker> where TFaker : IFaker
         Func<TFaker, string> valueGenerator, int blankValuePercentage = 0);
 
     /// <summary>
-    ///     Builds and returns a <see cref="TableData" /> object with the generated columns and rows based on the defined
-    ///     rules.
+    ///     Generates the configured rows and writes them to <paramref name="sink" />, one row at a time.
     /// </summary>
-    /// <returns>
-    ///     A <see cref="TableData" /> object containing the column names and generated rows.
-    /// </returns>
-    TableData Build();
-
-    /// <summary>
-    ///     Asynchronously builds and returns a <see cref="TableData" /> object with the generated columns and rows
-    ///     based on the defined rules.
-    /// </summary>
-    /// <returns>
-    ///     A task representing the asynchronous operation, containing the generated <see cref="TableData" />.
-    /// </returns>
-    Task<TableData> BuildAsync();
+    /// <param name="sink">The destination the generated rows are written to.</param>
+    /// <param name="cancellationToken">Token used to cancel the generation.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    /// <remarks>
+    ///     The builder owns the call order on <paramref name="sink" />: it declares the headers, writes
+    ///     each row and completes. A generator that throws part way through leaves the sink uncompleted,
+    ///     so the destination discards what was written rather than keeping half a table.
+    /// </remarks>
+    Task BuildAsync(ITableRowSink sink, CancellationToken cancellationToken = default);
 }

@@ -10,8 +10,6 @@
  
           <SolidColorBrush x:Key="TreeDataGridHeaderBorderBrushPointerOverBrush" Color="Transparent" />
           <SolidColorBrush x:Key="TreeDataGridHeaderBorderBrushPressedBrush" Color="Transparent" />
-          <SolidColorBrush x:Key="TreeDataGridHeaderForegroundPointerOverBrush" Color="Black" />
-          <SolidColorBrush x:Key="TreeDataGridHeaderForegroundPressedBrush" Color="Black" />
     
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
@@ -19,8 +17,6 @@
    
           <SolidColorBrush x:Key="TreeDataGridHeaderBorderBrushPointerOverBrush" Color="Transparent" />
           <SolidColorBrush x:Key="TreeDataGridHeaderBorderBrushPressedBrush" Color="Transparent" />
-          <SolidColorBrush x:Key="TreeDataGridHeaderForegroundPointerOverBrush" Color="White" />
-          <SolidColorBrush x:Key="TreeDataGridHeaderForegroundPressedBrush" Color="White" />
 
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>
@@ -135,12 +131,12 @@
    
           <Setter Property="BorderBrush" Value="{DynamicResource SukiPrimaryColor50}" />
           <Setter Property="TextBlock.Foreground"
-                  Value="{DynamicResource TreeDataGridHeaderForegroundPointerOverBrush}" />
+                  Value="{DynamicResource SukiText}" />
         </Style>
 
         <Style Selector="^:pressed /template/ Border#DataGridBorder">
             <Setter Property="BorderBrush" Value="{DynamicResource SukiPrimaryColor50}" />
-          <Setter Property="TextBlock.Foreground" Value="{DynamicResource TreeDataGridHeaderForegroundPressedBrush}" />
+          <Setter Property="TextBlock.Foreground" Value="{DynamicResource SukiText}" />
         </Style>
 
         <Style Selector="^[SortDirection=Ascending] /template/ Path#SortIcon">
@@ -337,5 +333,22 @@
 
   <Style Selector=":is(TreeDataGridCell):selected">
     <Setter Property="Background" Value="{DynamicResource SukiPrimaryColor15}" />
+  </Style>
+
+  <!-- A cell's text is drawn in the theme's own text colour, so a table reads the same way as the rest
+       of the application in either theme. -->
+  <Style Selector=":is(TreeDataGridCell) TextBlock">
+    <Setter Property="Foreground" Value="{DynamicResource SukiText}" />
+  </Style>
+
+  <!-- A value that does not read as its column's type is drawn in the theme's error colour. The mark is
+       set on the cell by ColumnValueMismatch, and the colour comes from the theme here so that it
+       follows the theme when the theme changes. -->
+  <Style Selector=":is(TreeDataGridCell) TextBlock:mismatch">
+    <Setter Property="Foreground" Value="{DynamicResource SukiDangerColor}" />
+  </Style>
+
+  <Style Selector=":is(TreeDataGridCell) TextBox:mismatch">
+    <Setter Property="Foreground" Value="{DynamicResource SukiDangerColor}" />
   </Style>
 </Styles>

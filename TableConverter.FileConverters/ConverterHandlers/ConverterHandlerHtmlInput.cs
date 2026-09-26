@@ -1,21 +1,39 @@
 ﻿using System.Text.RegularExpressions;
 using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
+using TableConverter.FileConverters.Utilities;
 using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.ConverterHandlers;
 
 public partial class ConverterHandlerHtmlInput : ConverterHandlerInputAbstract<ConverterHandlerBaseOptions>
 {
-    public override Result<TableData> ReadText(string text)
+    public override async Task<Result> ReadStreamAsync(
+        Stream? stream,
+        ITableRowSink sink,
+        IProgress<ConversionProgress>? progress = null,
+        CancellationToken cancellationToken = default)
     {
+        var opened = TableRowStream.OpenTextReader(stream);
+
+        if (opened.IsSuccess is false)
+        {
+            return Result.Failure(opened.Error!);
+        }
+
+        using var reader = opened.Value;
+
         var headers = new List<string>();
         var rows = new List<string[]>();
 
         try
         {
+            // The table is found by matching tags across the whole document, so it has to be read in
+            // full before the first row can be written.
+            var text = await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+
             if (ValidateHtmlTags(text) is { IsSuccess: false } result)
-                return Result<TableData>.Failure($"Invalid HTML tags. {result.Error}");
+                return Result.Failure($"Invalid HTML tags. {result.Error}");
 
             // Extract content within the <table> tags
             var tableMatches = TableRegex().Matches(text);
@@ -60,10 +78,11 @@ public partial class ConverterHandlerHtmlInput : ConverterHandlerInputAbstract<C
         }
         catch (Exception ex)
         {
-            return Result<TableData>.Failure(ex.Message);
+            return Result.Failure(ex.Message);
         }
 
-        return Result<TableData>.Success(new TableData(headers, rows));
+        return await TableRowStream.PushAsync(headers, rows, sink, cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
     }
 
     // Helper function to validate HTML tags

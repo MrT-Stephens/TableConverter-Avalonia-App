@@ -17,40 +17,73 @@ public class ConverterHandlerPdfOutput : ConverterHandlerOutputAbstract<Converte
         Settings.EnableDebugging = false;
     }
 
-    private Document? PdfDocument { get; set; }
-
-    public override Result<string> Convert(string[] headers, string[][] rows)
+    public override async Task<Result> ConvertToStreamAsync(
+        Stream? stream,
+        ITableRowSource source,
+        IProgress<ConversionProgress>? progress = null,
+        CancellationToken cancellationToken = default)
     {
-        PdfDocument = Document.Create(container =>
+        ArgumentNullException.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(source);
+
+        try
         {
-            container.Page(page =>
+            var headers = await source.GetHeadersAsync(cancellationToken).ConfigureAwait(false);
+
+            // QuestPDF composes the document on this thread, so the source is enumerated synchronously
+            // as the table is laid out. The enumeration still pages the rows in from the source, so the
+            // whole table is never held at once.
+            var rows = source.ReadRowsAsync(cancellationToken).ToBlockingEnumerable(cancellationToken);
+
+            var document = Document.Create(container =>
             {
-                page.Content().Table(table =>
+                container.Page(page =>
                 {
-                    table.ExtendLastCellsToTableBottom();
-                    table.ColumnsDefinition(columnDefinitions =>
+                    page.Content().Table(pdfTable =>
                     {
-                        for (var i = 0; i < headers.Length; i++) columnDefinitions.RelativeColumn();
+                        pdfTable.ExtendLastCellsToTableBottom();
+                        pdfTable.ColumnsDefinition(columnDefinitions =>
+                        {
+                            for (var i = 0; i < headers.Count; i++) columnDefinitions.RelativeColumn();
+                        });
+
+                        for (uint i = 0; i < headers.Count; i++)
+                            if (Options!.BoldHeader)
+                                pdfTable.Cell().Row(1).Column(i + 1).Element(Block).Text(headers[(int)i]).ExtraBold()
+                                    .FontColor(Color.FromHex(ToHex(Options!.SelectedForegroundColor)));
+                            else
+                                pdfTable.Cell().Row(1).Column(i + 1).Element(Block).Text(headers[(int)i])
+                                    .FontColor(Color.FromHex(ToHex(Options!.SelectedForegroundColor)));
+
+                        var rowIndex = 2u;
+
+                        foreach (var cells in rows)
+                        {
+                            for (uint j = 0; j < headers.Count; j++)
+                            {
+                                // Guard against ragged rows: the caller may supply fewer cells than there are headers.
+                                var value = j < cells.Length ? cells[j] : string.Empty;
+
+                                pdfTable.Cell().Row(rowIndex).Column(j + 1).Element(Block).Text(value ?? string.Empty)
+                                    .FontColor(Color.FromHex(ToHex(Options!.SelectedForegroundColor)));
+                            }
+
+                            rowIndex++;
+                        }
                     });
-
-                    for (uint i = 0; i < headers.Length; i++)
-                        if (Options!.BoldHeader)
-                            table.Cell().Row(1).Column(i + 1).Element(Block).Text(headers[i]).ExtraBold()
-                                .FontColor(Color.FromHex(ToHex(Options!.SelectedForegroundColor)));
-                        else
-                            table.Cell().Row(1).Column(i + 1).Element(Block).Text(headers[i])
-                                .FontColor(Color.FromHex(ToHex(Options!.SelectedForegroundColor)));
-
-                    for (uint i = 0; i < rows.Length; i++)
-                    for (uint j = 0; j < headers.Length; j++)
-                        table.Cell().Row(i + 2).Column(j + 1).Element(Block).Text(rows[i][j])
-                            .FontColor(Color.FromHex(ToHex(Options!.SelectedForegroundColor)));
                 });
             });
-        });
 
-        return Result<string>.Success(
-            $"Please save the '.pdf' file to view the generated file 😁{Environment.NewLine}");
+            // The caller owns the stream, so generate into it without closing it.
+            document.GeneratePdf(stream);
+            stream.Flush();
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure(ex.Message);
+        }
     }
 
     private IContainer Block(IContainer container)
@@ -63,23 +96,6 @@ public class ConverterHandlerPdfOutput : ConverterHandlerOutputAbstract<Converte
             .AlignMiddle();
     }
 
-    public override Result SaveFile(Stream? stream, ReadOnlyMemory<byte> buffer)
-    {
-        ArgumentNullException.ThrowIfNull(stream, nameof(stream));
-
-        try
-        {
-            stream.Write(PdfDocument?.GeneratePdf());
-
-            stream.Close();
-        }
-        catch (Exception ex)
-        {
-            return Result.Failure(ex.Message);
-        }
-
-        return Result.Success();
-    }
 
     private static string ToHex(System.Drawing.KnownColor knownColor)
     {

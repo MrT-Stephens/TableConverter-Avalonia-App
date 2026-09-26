@@ -12,20 +12,20 @@ public class JsonLinesInputTestCases : InputConverterTestCasesBase
     ///     Test cases for successful test cases.
     /// </summary>
     protected override
-        IReadOnlyList<(string FileName, ConverterHandlerBaseOptions Options, TableData ExpectedTableData)>
+        IReadOnlyList<(string FileName, ConverterHandlerBaseOptions Options, TableSnapshot ExpectedTableData)>
         SuccessfulTestCases { get; } =
     [
         (
             // Test case 1: Test with json lines in objects format.
             "test_input_jsonlines_1.jsonl",
             new ConverterHandlerBaseOptions(),
-            Utils.TestTableData
+            Utils.TestTable
         ),
         (
             // Test case 2: Test with json lines in array format.
             "test_input_jsonlines_2.jsonl",
             new ConverterHandlerBaseOptions(),
-            Utils.TestTableData
+            Utils.TestTable
         )
     ];
 

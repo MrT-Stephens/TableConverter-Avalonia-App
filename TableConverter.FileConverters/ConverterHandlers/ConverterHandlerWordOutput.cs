@@ -1,45 +1,57 @@
 ﻿using NPOI.XWPF.UserModel;
 using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
+using TableConverter.FileConverters.Utilities;
 using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.ConverterHandlers;
 
 public class ConverterHandlerWordOutput : ConverterHandlerOutputAbstract<ConverterHandlerBaseOptions>
 {
-    private XWPFDocument? WordDocument { get; set; }
-
-    public override Result<string> Convert(string[] headers, string[][] rows)
+    public override async Task<Result> ConvertToStreamAsync(
+        Stream? stream,
+        ITableRowSource source,
+        IProgress<ConversionProgress>? progress = null,
+        CancellationToken cancellationToken = default)
     {
-        WordDocument = new XWPFDocument();
-
-        var table = WordDocument.CreateTable(rows.Length + 1, headers.Length);
-
-        for (var i = 0; i < headers.Length; i++) table.GetRow(0).GetCell(i).SetText(headers[i]);
-
-        for (var i = 0; i < rows.Length; i++)
-        for (var j = 0; j < headers.Length; j++)
-            table.GetRow(i + 1).GetCell(j).SetText(rows[i][j]);
-
-        return Result<string>.Success(
-            $"Please save the '.docx' file to view the generated file 😁{Environment.NewLine}");
-    }
-
-    public override Result SaveFile(Stream? stream, ReadOnlyMemory<byte> buffer)
-    {
-        ArgumentNullException.ThrowIfNull(stream, nameof(stream));
+        ArgumentNullException.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(source);
 
         try
         {
-            WordDocument?.Write(stream);
+            var headers = await source.GetHeadersAsync(cancellationToken).ConfigureAwait(false);
 
-            stream.Close();
+            using var document = new XWPFDocument();
+
+            // The table starts with the header row only and gains a row per row read, so its size does
+            // not have to be counted out before the document can be built.
+            var wordTable = document.CreateTable(1, headers.Count);
+
+            for (var i = 0; i < headers.Count; i++)
+                wordTable.GetRow(0).GetCell(i).SetText(headers[i] ?? string.Empty);
+
+            await foreach (var cells in source.ReadTextRowsAsync(cancellationToken).ConfigureAwait(false))
+            {
+                // NPOI gives the new row as many cells as the table has columns.
+                var wordRow = wordTable.CreateRow();
+
+                for (var j = 0; j < headers.Count; j++)
+                {
+                    // Guard against ragged rows: the caller may supply fewer cells than there are headers.
+                    var value = j < cells.Length ? cells[j] : string.Empty;
+
+                    wordRow.GetCell(j).SetText(value);
+                }
+            }
+
+            // NPOI closes the stream it is given, so wrap it to protect the caller owned stream.
+            document.Write(new NonClosingStreamWrapper(stream));
+
+            return Result.Success();
         }
         catch (Exception ex)
         {
             return Result.Failure(ex.Message);
         }
-
-        return Result.Success();
     }
 }

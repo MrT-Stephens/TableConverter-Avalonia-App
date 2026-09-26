@@ -9,6 +9,7 @@ using TableConverter.Commands.DataModels;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Extensions;
 using TableConverter.Utilities.Database.Contexts;
+using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.ViewModels.Documents;
 using TableConverter.ViewModels.Forms;
 using TableConverter.ViewModels.Workspaces;
@@ -23,7 +24,7 @@ public static partial class TableDataCommandNames
 public class NewFileCommandHandler(
     ISukiDialogManager dialogManager,
     ISukiToastManager toastManager,
-    Utilities.Database.Interfaces.IDatabaseContextFactory<TableStoreDbContext> databaseContextFactory) 
+    ITableStoreDbContextFactory databaseContextFactory) 
     : ICommandHandlerAsync
 {
     public ICommandMetadata CommandMetadata => new CommandMetadata(
@@ -66,15 +67,19 @@ public class NewFileCommandHandler(
             throw new InvalidOperationException("Document should be of type TableDataViewModel");
         }
 
-        document.Title = settings.Name;
+        // The store is reserved up front so its data can be generated before the document loads it,
+        // which avoids the grid briefly showing an empty table.
+        var path = document.ReserveStorePath();
 
-        await using var dbContext = await databaseContextFactory.CreateAsync(document.Path);
+        await using (var dbContext = await databaseContextFactory.CreateDbContextAsync(path))
+        {
+            await Task.Run(() => GenerateTableData(dbContext, settings));
+        }
 
-        await Task.Run(() => GenerateTableData(dbContext, settings));
-        
-        editorViewModel.Documents.Add(document);
+        await document.LoadAsync(path, settings.Name, isTemporaryStore: true);
+
+        editorViewModel.AddDocument(document);
         editorViewModel.SelectedDocument = document;
-        document.InvalidateData();
 
         toastManager.CreateSimpleInfoToast()
             .OfType(NotificationType.Success)
@@ -104,6 +109,7 @@ public class NewFileCommandHandler(
             FROM SEQ;
             
             -- INSERT COLUMNS
+            -- 0 is the text data type, matching ColumnDataType.Text.
             INSERT INTO COLUMNS (NAME, DATA_TYPE, ORDINAL_POSITION)
             SELECT
                 'Column ' || N,

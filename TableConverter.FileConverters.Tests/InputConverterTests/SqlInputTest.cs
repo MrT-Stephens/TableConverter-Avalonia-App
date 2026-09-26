@@ -12,7 +12,7 @@ public class SqlInputTestCases : InputConverterTestCasesBase
     ///     Test cases which are expected to be successful.
     /// </summary>
     protected override
-        IReadOnlyList<(string FileName, ConverterHandlerBaseOptions Options, TableData ExpectedTableData)>
+        IReadOnlyList<(string FileName, ConverterHandlerBaseOptions Options, TableSnapshot ExpectedTableData)>
         SuccessfulTestCases { get; } =
     [
         // Test case 1: Test with a valid Sql input file. No quotes. Has column names.
@@ -23,7 +23,7 @@ public class SqlInputTestCases : InputConverterTestCasesBase
                 SelectedQuoteType = ConverterHandlerSQLInputOptions.QuoteStyles.None,
                 HasColumnNames = true
             },
-            Utils.TestTableData
+            Utils.TestTable
         ),
         // Test case 2: Test with a valid Sql input file. Double Quotes. Has column names.
         (
@@ -33,7 +33,7 @@ public class SqlInputTestCases : InputConverterTestCasesBase
                 SelectedQuoteType = ConverterHandlerSQLInputOptions.QuoteStyles.DoubleQuotes,
                 HasColumnNames = true
             },
-            Utils.TestTableData
+            Utils.TestTable
         ),
         // Test case 3: Test with a valid Sql input file. MySQL Quotes. Has column names.
         (
@@ -43,7 +43,7 @@ public class SqlInputTestCases : InputConverterTestCasesBase
                 SelectedQuoteType = ConverterHandlerSQLInputOptions.QuoteStyles.MySqlQuotes,
                 HasColumnNames = true
             },
-            Utils.TestTableData
+            Utils.TestTable
         ),
         // Test case 4: Test with a valid Sql input file. SQL Server Quotes. Has column names.
         (
@@ -53,7 +53,7 @@ public class SqlInputTestCases : InputConverterTestCasesBase
                 SelectedQuoteType = ConverterHandlerSQLInputOptions.QuoteStyles.SqlServerQuotes,
                 HasColumnNames = true
             },
-            Utils.TestTableData
+            Utils.TestTable
         ),
     ];
 

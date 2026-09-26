@@ -8,74 +8,93 @@ namespace TableConverter.FileConverters.ConverterHandlers;
 
 public class ConverterHandlerAsciiOutput : ConverterHandlerOutputAbstract<ConverterHandlerAsciiOutputOptions>
 {
-    public override Result<string> Convert(string[] headers, string[][] rows)
+    public override async Task<Result> ConvertToStreamAsync(
+        Stream? stream,
+        ITableRowSource source,
+        IProgress<ConversionProgress>? progress = null,
+        CancellationToken cancellationToken = default)
     {
-        var asciiOutput = new StringBuilder();
+        ArgumentNullException.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(source);
+
+        await using var writer = TableRowStream.CreateTextWriter(stream);
+
+        var headers = await source.GetHeadersAsync(cancellationToken).ConfigureAwait(false);
 
         var tableCharacterConfig = Options!.TableTypes[Options!.SelectedTableType];
-
-        // Calculates the max text character widths of every column.
-        var maxColumnWidths = new long[headers.LongLength];
-
-        for (long i = 0; i < headers.LongLength; i++) maxColumnWidths[i] = headers[i].Length + 2;
-
-        foreach (var row in rows)
-            for (long i = 0; i < row.LongLength; i++)
-                maxColumnWidths[i] = Math.Max(maxColumnWidths[i], row[i].LongCount() + 2);
 
         var comment = Options!.SelectedCommentType == Options!.CommentTypes.First().Key
             ? ""
             : $"{Options!.CommentTypes[Options!.SelectedCommentType]}    ";
 
+        // A column is as wide as its widest cell, so every row has to be seen before the header can be
+        // drawn. The rows are gathered here, then written out as they are drawn, so the whole table is
+        // never held as one string.
+        var rows = new List<string[]>();
+
+        await foreach (var row in source.ReadTextRowsAsync(cancellationToken).ConfigureAwait(false))
+            rows.Add(row);
+
+        // Calculates the max text character widths of every column.
+        var maxColumnWidths = new long[headers.Count];
+
+        for (var i = 0; i < headers.Count; i++) maxColumnWidths[i] = headers[i].Length + 2;
+
+        foreach (var row in rows)
+            for (var i = 0; i < row.Length; i++)
+                maxColumnWidths[i] = Math.Max(maxColumnWidths[i], row[i].LongCount() + 2);
+
         // Draws the table header.
-        asciiOutput.AppendLine(comment +
-                               DrawSeparator(maxColumnWidths,
-                                   tableCharacterConfig.HeaderTopLeft,
-                                   tableCharacterConfig.HeaderTopRight,
-                                   tableCharacterConfig.TopIntersection,
-                                   tableCharacterConfig.Horizontal));
+        writer.Write(comment +
+                     DrawSeparator(maxColumnWidths,
+                         tableCharacterConfig.HeaderTopLeft,
+                         tableCharacterConfig.HeaderTopRight,
+                         tableCharacterConfig.TopIntersection,
+                         tableCharacterConfig.Horizontal) + Environment.NewLine);
 
-        asciiOutput.AppendLine(comment +
-                               DrawDataRow(headers, maxColumnWidths,
-                                   Options!.SelectedTextAlignment,
-                                   tableCharacterConfig.Vertical,
-                                   tableCharacterConfig.Vertical,
-                                   tableCharacterConfig.Vertical));
+        writer.Write(comment +
+                     DrawDataRow(headers, maxColumnWidths,
+                         Options!.SelectedTextAlignment,
+                         tableCharacterConfig.Vertical,
+                         tableCharacterConfig.Vertical,
+                         tableCharacterConfig.Vertical) + Environment.NewLine);
 
-        asciiOutput.AppendLine(comment +
-                               DrawSeparator(maxColumnWidths,
-                                   tableCharacterConfig.LeftIntersection,
-                                   tableCharacterConfig.RightIntersection,
-                                   tableCharacterConfig.MiddleIntersection,
-                                   tableCharacterConfig.Horizontal));
+        writer.Write(comment +
+                     DrawSeparator(maxColumnWidths,
+                         tableCharacterConfig.LeftIntersection,
+                         tableCharacterConfig.RightIntersection,
+                         tableCharacterConfig.MiddleIntersection,
+                         tableCharacterConfig.Horizontal) + Environment.NewLine);
 
         // Draws the table rows.
-        for (long i = 0; i < rows.LongLength; i++)
+        for (var i = 0; i < rows.Count; i++)
         {
-            asciiOutput.AppendLine(comment +
-                                   DrawDataRow(rows[i], maxColumnWidths,
-                                       Options!.SelectedTextAlignment,
-                                       tableCharacterConfig.Vertical,
-                                       tableCharacterConfig.Vertical,
-                                       tableCharacterConfig.Vertical));
+            writer.Write(comment +
+                         DrawDataRow(rows[i], maxColumnWidths,
+                             Options!.SelectedTextAlignment,
+                             tableCharacterConfig.Vertical,
+                             tableCharacterConfig.Vertical,
+                             tableCharacterConfig.Vertical) + Environment.NewLine);
 
-            if (i < rows.LongLength - 1 && Options!.ForceRowSeparators)
-                asciiOutput.AppendLine(comment +
-                                       DrawSeparator(maxColumnWidths,
-                                           tableCharacterConfig.LeftIntersection,
-                                           tableCharacterConfig.RightIntersection,
-                                           tableCharacterConfig.MiddleIntersection,
-                                           tableCharacterConfig.Horizontal));
-            else if (i == rows.LongLength - 1)
-                asciiOutput.AppendLine(comment +
-                                       DrawSeparator(maxColumnWidths,
-                                           tableCharacterConfig.BottomLeft,
-                                           tableCharacterConfig.BottomRight,
-                                           tableCharacterConfig.BottomIntersection,
-                                           tableCharacterConfig.Horizontal));
+            if (i < rows.Count - 1 && Options!.ForceRowSeparators)
+                writer.Write(comment +
+                             DrawSeparator(maxColumnWidths,
+                                 tableCharacterConfig.LeftIntersection,
+                                 tableCharacterConfig.RightIntersection,
+                                 tableCharacterConfig.MiddleIntersection,
+                                 tableCharacterConfig.Horizontal) + Environment.NewLine);
+            else if (i == rows.Count - 1)
+                writer.Write(comment +
+                             DrawSeparator(maxColumnWidths,
+                                 tableCharacterConfig.BottomLeft,
+                                 tableCharacterConfig.BottomRight,
+                                 tableCharacterConfig.BottomIntersection,
+                                 tableCharacterConfig.Horizontal) + Environment.NewLine);
         }
 
-        return Result<string>.Success(asciiOutput.ToString());
+        await writer.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+        return Result.Success();
     }
 
     private static string DrawSeparator(long[] columnWidths, char leftChar, char rightChar, char intersectionChar,
@@ -95,18 +114,18 @@ public class ConverterHandlerAsciiOutput : ConverterHandlerOutputAbstract<Conver
         return separator.ToString();
     }
 
-    private static string DrawDataRow(string[] row, long[] columnWidths, TextAlignment textAlignment, char leftChar,
-        char rightChar, char intersectionChar)
+    private static string DrawDataRow(IReadOnlyList<string> row, long[] columnWidths, TextAlignment textAlignment,
+        char leftChar, char rightChar, char intersectionChar)
     {
         var dataRow = new StringBuilder();
 
         dataRow.Append(leftChar);
 
-        for (long i = 0; i < row.LongLength; i++)
+        for (var i = 0; i < row.Count; i++)
         {
             dataRow.Append(ConverterHandlerUtilities.AlignText(row[i], textAlignment, (int)columnWidths[i], ' '));
 
-            dataRow.Append(i == row.LongLength - 1 ? rightChar : intersectionChar);
+            dataRow.Append(i == row.Count - 1 ? rightChar : intersectionChar);
         }
 
         return dataRow.ToString();

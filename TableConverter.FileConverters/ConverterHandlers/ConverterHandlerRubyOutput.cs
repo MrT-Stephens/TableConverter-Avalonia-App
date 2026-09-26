@@ -1,44 +1,53 @@
 ﻿using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
+using TableConverter.FileConverters.Utilities;
 using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.ConverterHandlers;
 
 public class ConverterHandlerRubyOutput : ConverterHandlerOutputAbstract<ConverterHandlerBaseOptions>
 {
-    public override Result<string> Convert(string[] headers, string[][] rows)
+    public override async Task<Result> ConvertToStreamAsync(
+        Stream? stream,
+        ITableRowSource source,
+        IProgress<ConversionProgress>? progress = null,
+        CancellationToken cancellationToken = default)
     {
-        using var writer = new StringWriter();
+        ArgumentNullException.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(source);
+
+        await using var writer = TableRowStream.CreateTextWriter(stream);
+
+        var headers = await source.GetHeadersAsync(cancellationToken).ConfigureAwait(false);
 
         writer.Write("[");
         writer.Write(Environment.NewLine);
 
-        writer.Write(GenerateRubyArray(headers));
+        WriteRubyArray(writer, headers);
 
-        for (long i = 0; i < rows.LongLength; i++) writer.Write(GenerateRubyArray(rows[i]));
+        await foreach (var row in source.ReadTextRowsAsync(cancellationToken).ConfigureAwait(false))
+            WriteRubyArray(writer, row);
 
         writer.Write("];");
         writer.Write(Environment.NewLine);
 
-        return Result<string>.Success(writer.ToString());
+        await writer.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+        return Result.Success();
     }
 
-    private static string GenerateRubyArray(string[] values)
+    private static void WriteRubyArray(TextWriter writer, IReadOnlyList<string> values)
     {
-        using var writer = new StringWriter();
-
         writer.Write("\t{");
 
-        for (long i = 0; i < values.LongLength; i++)
+        for (var i = 0; i < values.Count; i++)
         {
             writer.Write($"\"val{i}\"=>\"{values[i]}\"");
 
-            if (i < values.LongLength - 1) writer.Write(",");
+            if (i < values.Count - 1) writer.Write(",");
         }
 
         writer.Write("}");
         writer.Write(Environment.NewLine);
-
-        return writer.ToString();
     }
 }

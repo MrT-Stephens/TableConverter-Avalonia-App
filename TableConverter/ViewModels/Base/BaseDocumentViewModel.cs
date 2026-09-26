@@ -1,17 +1,15 @@
 using System;
-using System.Collections.Generic;
 using CommunityToolkit.Mvvm.ComponentModel;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Interfaces;
 using TableConverter.Utilities;
-using TableConverter.Utilities.Extensions;
 using TableConverter.Utilities.Interfaces;
 
 namespace TableConverter.ViewModels.Base;
 
-public abstract partial class BaseDocumentViewModel : BaseViewModel, IPaneDocument, ISerialisationData, IIdentifiable, IDisposable
+public abstract partial class BaseDocumentViewModel : BaseViewModel, IPaneDocument, IIdentifiable, IDisposable
 {
     #region Properties
     
@@ -21,7 +19,6 @@ public abstract partial class BaseDocumentViewModel : BaseViewModel, IPaneDocume
 
     [ObservableProperty] private string _Title;
     [ObservableProperty] private bool _IsEnabled;
-    [ObservableProperty] private bool _IsDirty;
 
     public abstract bool CanClose { get; }
     
@@ -40,7 +37,6 @@ public abstract partial class BaseDocumentViewModel : BaseViewModel, IPaneDocume
     {
         Title = string.Empty;
         IsEnabled = true;
-        IsDirty = false;
         Workspace = null!;
     }
 
@@ -58,27 +54,15 @@ public abstract partial class BaseDocumentViewModel : BaseViewModel, IPaneDocume
         // Do nothing - Can be overriden
     }
 
-    public void ExportState(IDictionary<string, object> data)
-    {
-        data[nameof(Title)] = Title;
-        data[nameof(IsEnabled)] = IsEnabled;
-        data[nameof(IsDirty)] = IsDirty;
-    }
-
-    public void ImportState(IDictionary<string, object> data)
-    {
-        Title = data.GetOrThrow<string>(nameof(Title));
-        IsEnabled = data.GetOrThrow<bool>(nameof(IsEnabled));
-        IsDirty = data.GetOrThrow<bool>(nameof(IsDirty));
-    }
-
     #endregion
     
     #region IDisposable
 
-    public void Dispose()
+    public override void Dispose()
     {
         _eventRegistrar.Dispose();
+
+        base.Dispose();
     }
     
     #endregion

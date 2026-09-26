@@ -1,16 +1,31 @@
 using Microsoft.EntityFrameworkCore;
+using TableConverter.Utilities.Database.Configuration;
 using TableConverter.Utilities.Database.Events;
-using TableConverter.Utilities.Database.Models;
 using TableConverter.Utilities.Database.Models.TableStore;
 using TableConverter.Utilities.Extensions;
-using TableConverter.Utilities.Interfaces;
 
 namespace TableConverter.Utilities.Database.Contexts;
 
-public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> options, IEventManager eventsManager, Guid sourceId) 
+public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> options) 
     : DbContext(options)
 {
-    public Guid SourceId { get; } = sourceId;
+    /// <remarks>
+    /// This is the only public constructor on purpose: EF Core creates the context instances on
+    /// behalf of <see cref="Factories.TableStoreDbContextFactory"/>, and the per data source state
+    /// (path, source id and the services the context needs) travels in the options.
+    /// </remarks>
+    private readonly TableStoreOptionsExtension _tableStore = options
+        .FindExtension<TableStoreOptionsExtension>()
+        ?? throw new InvalidOperationException(
+            "TableStoreDbContext requires options configured with UseTableStore(...). " +
+            "Use ITableStoreDbContextFactory to create table store contexts.");
+
+    /// <summary>
+    /// The table store this context is bound to.
+    /// </summary>
+    public string Path => _tableStore.Path;
+
+    public Guid SourceId => _tableStore.SourceId;
     public DbSet<ColumnEntity> Columns => Set<ColumnEntity>();
     public DbSet<RowEntity> Rows => Set<RowEntity>();
     public DbSet<CellEntity> Cells => Set<CellEntity>();
@@ -36,6 +51,9 @@ public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> op
             
             b.Property(x => x.DataType)
                 .HasColumnName("DATA_TYPE")
+                // Stored as its numeric value, which is the value the column type carries, so renaming an
+                // enum member can never change what an existing store holds.
+                .HasConversion<int>()
                 .IsRequired();
             
             b.Property(x => x.OrdinalPosition)
@@ -150,7 +168,7 @@ public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> op
         {
             changes.ForEach(change =>
             {
-                eventsManager
+                _tableStore.EventManager
                     .GetEvent<DbEntityChangedEvent>()
                     .Publish(new DbEntityChangedEventArgs
                     {
@@ -174,7 +192,7 @@ public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> op
         {
             foreach (var change in  changes)
             {
-                eventsManager
+                _tableStore.EventManager
                     .GetEvent<DbEntityChangedEvent>()
                     .Publish(new DbEntityChangedEventArgs
                     {

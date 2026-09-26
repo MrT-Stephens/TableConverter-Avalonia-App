@@ -1,5 +1,4 @@
 using System;
-using System.Windows.Input;
 
 namespace TableConverter.Commands.Interfaces;
 
@@ -79,7 +78,7 @@ public interface ICommandManager : IDisposable
     public ICommandInstance this[string name] { get; }
     
     /// <summary>
-    /// Indexer to retrieve a command by its name and associated view model.
+    /// Retrieves a command by its name and associated view model.
     /// </summary>
     /// <param name="name">
     /// The name of the command to retrieve. This should match the name used when registering the command.
@@ -88,4 +87,51 @@ public interface ICommandManager : IDisposable
     /// An optional view model associated with the command. This can be used to differentiate commands with the same name but different contexts.
     /// </param>
     public ICommandInstance this[string name, object? viewModel] { get; }
+
+    /// <summary>
+    /// Raises <see cref="System.Windows.Input.ICommand.CanExecuteChanged"/> for every registered command
+    /// instance so that bound controls re-query <c>CanExecute</c>. This is the equivalent of WPF's
+    /// <c>CommandManager.InvalidateRequerySuggested()</c>.
+    /// <para>
+    /// Call this when state which <c>CanExecute</c> depends on changes but is not observable (for example a
+    /// database refresh, a background service flag or a static/global setting).
+    /// </para>
+    /// </summary>
+    public void InvalidateRequerySuggested();
+
+    /// <summary>
+    /// Raises <see cref="System.Windows.Input.ICommand.CanExecuteChanged"/> for every command instance whose
+    /// parent is <paramref name="viewModel"/>.
+    /// </summary>
+    /// <param name="viewModel">
+    /// The view model whose commands should be re-evaluated. Pass <c>null</c> to target the global
+    /// (view model-less) command instances.
+    /// </param>
+    public void InvalidateRequerySuggested(object? viewModel);
+
+    /// <summary>
+    /// Raises <see cref="System.Windows.Input.ICommand.CanExecuteChanged"/> for a single command instance.
+    /// </summary>
+    /// <param name="name">
+    /// The name of the command to re-evaluate.
+    /// </param>
+    /// <param name="viewModel">
+    /// The view model the command instance is associated with.
+    /// </param>
+    public void InvalidateRequerySuggested(string name, object? viewModel);
+
+    /// <summary>
+    /// Releases every command instance created for <paramref name="viewModel"/> together with the event
+    /// subscriptions those instances own (selection, view model and context notifications).
+    /// <para>
+    /// The command manager is a singleton, so without this the instances - and the view models they reference as
+    /// their parent - are kept alive for the lifetime of the application. Call this from the view model's
+    /// <c>Dispose</c>, otherwise a fresh instance is registered the next time the command is requested.
+    /// </para>
+    /// </summary>
+    /// <param name="viewModel">
+    /// The view model whose command instances should be released. Pass <c>null</c> to release the global
+    /// (view model-less) command instances.
+    /// </param>
+    public void ReleaseCommandInstances(object? viewModel);
 }

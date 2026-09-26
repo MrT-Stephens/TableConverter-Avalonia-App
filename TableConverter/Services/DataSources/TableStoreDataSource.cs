@@ -9,13 +9,12 @@ using TableConverter.Services.DataSources.Base;
 using TableConverter.Utilities.Database.Contexts;
 using TableConverter.Utilities.Database.Models.TableStore;
 using TableConverter.Utilities.Extensions;
-using IFactory = TableConverter.Utilities.Database.Interfaces.IDatabaseContextFactory<
-    TableConverter.Utilities.Database.Contexts.TableStoreDbContext>;
+using TableConverter.Utilities.Database.Interfaces;
 
 namespace TableConverter.Services.DataSources;
 
-public class TableStoreDataSource(IFactory databaseContextFactory)
-    : DataSourceFromPath<RowEntity, TableStoreDbContext>(databaseContextFactory, 250, 5)
+public class TableStoreDataSource(ITableStoreDbContextFactory databaseContextFactory)
+    : DataSourceFromPath<RowEntity>(databaseContextFactory, 250, 5)
 {
     private int? _ColumnCount;
     public int? ColumnCount
@@ -88,7 +87,11 @@ public class TableStoreDataSource(IFactory databaseContextFactory)
 
         query = filterSortQuery(query);
 
+        // The order the rows are read in is the store's own order, which is what makes a row's place in
+        // the table its identity: the grid shows the nth row it is given, and the nth row of the store is
+        // the one carrying the nth id.
         return await query
+            .OrderBy(row => row.Id)
             .Skip(offset)
             .Take(count)
             .ToListAsync()
@@ -130,7 +133,7 @@ public class TableStoreDataSource(IFactory databaseContextFactory)
             {
                 RowId = index,
                 ColumnId = i + 1,
-                Value = "..."
+                Value = DataSourcePlaceholder.Text
             });
         }
 
@@ -187,10 +190,30 @@ public class TableStoreDataSource(IFactory databaseContextFactory)
                 return false;
             }
 
-            entity.Id = viewModel.Id;
+            // Only the values of the row's cells are written back. Each cell is matched to the one the
+            // store already holds by the column it belongs to rather than replacing the row's cells
+            // wholesale, which would try to insert cells the store already has and collide on their
+            // keys.
+            var storedCells = entity.Cells
+                .GroupBy(cell => cell.ColumnId)
+                .ToDictionary(group => group.Key, group => group.First());
 
-            entity.Cells.Clear();
-            entity.Cells.AddRange(viewModel.Cells);
+            foreach (var cell in viewModel.Cells)
+            {
+                if (storedCells.TryGetValue(cell.ColumnId, out var stored))
+                {
+                    stored.Value = cell.Value;
+                    continue;
+                }
+
+                // A column added since the row was read has no cell of the row's to write to yet.
+                entity.Cells.Add(new CellEntity
+                {
+                    RowId = entity.Id,
+                    ColumnId = cell.ColumnId,
+                    Value = cell.Value
+                });
+            }
 
             await db.SaveChangesAsync().ConfigureAwait(false);
             await transaction.CommitAsync().ConfigureAwait(false);

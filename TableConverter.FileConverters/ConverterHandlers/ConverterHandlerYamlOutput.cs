@@ -1,25 +1,38 @@
 ﻿using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
+using TableConverter.FileConverters.Utilities;
 using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.ConverterHandlers;
 
 public class ConverterHandlerYamlOutput : ConverterHandlerOutputAbstract<ConverterHandlerBaseOptions>
 {
-    public override Result<string> Convert(string[] headers, string[][] rows)
+    public override async Task<Result> ConvertToStreamAsync(
+        Stream? stream,
+        ITableRowSource source,
+        IProgress<ConversionProgress>? progress = null,
+        CancellationToken cancellationToken = default)
     {
-        using var writer = new StringWriter();
+        ArgumentNullException.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(source);
+
+        await using var writer = TableRowStream.CreateTextWriter(stream);
+
+        var headers = await source.GetHeadersAsync(cancellationToken).ConfigureAwait(false);
 
         writer.Write($"---{Environment.NewLine}");
 
-        foreach (var str in rows)
+        await foreach (var row in source.ReadTextRowsAsync(cancellationToken).ConfigureAwait(false))
         {
             writer.Write($"-{Environment.NewLine}");
 
-            for (long j = 0; j < headers.LongLength; j++)
-                writer.Write($"    {headers[j].Replace(' ', '_')}: {str[j]}{Environment.NewLine}");
+            for (var j = 0; j < headers.Count; j++)
+                writer.Write(
+                    $"    {headers[j].Replace(' ', '_')}: {ConverterHandlerUtilities.GetCellValue(row, j)}{Environment.NewLine}");
         }
 
-        return Result<string>.Success(writer.ToString());
+        await writer.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+        return Result.Success();
     }
 }

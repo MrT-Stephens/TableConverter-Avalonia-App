@@ -12,14 +12,14 @@ public class RubyInputTestCases : InputConverterTestCasesBase
     ///     Test cases which are expected to be successful.
     /// </summary>
     protected override
-        IReadOnlyList<(string FileName, ConverterHandlerBaseOptions Options, TableData ExpectedTableData)>
+        IReadOnlyList<(string FileName, ConverterHandlerBaseOptions Options, TableSnapshot ExpectedTableData)>
         SuccessfulTestCases { get; } =
     [
         // Test case 1: Test with a valid Ruby input file.
         (
             "test_input_ruby_1.txt",
             new ConverterHandlerBaseOptions(),
-            Utils.TestTableData
+            Utils.TestTable
         )
     ];
 

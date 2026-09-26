@@ -13,7 +13,6 @@ using TableConverter.Commands.Interfaces;
 using TableConverter.Extensions;
 using TableConverter.Interfaces;
 using TableConverter.Services.DataSources;
-using TableConverter.Utilities.Database.Contexts;
 using TableConverter.Utilities.Database.Events;
 using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.Utilities.Database.Models.TableStore;
@@ -36,7 +35,7 @@ public partial class TableSearchViewModel : BaseScopedPaneToolViewModel<TableWor
 
     public readonly TableStoreSearchResultDataSource DataSource;
     
-    private readonly IDatabaseContextFactory<TableStoreDbContext> _databaseContextFactory;
+    private readonly ITableStoreDbContextFactory _databaseContextFactory;
     
     #endregion
     
@@ -47,7 +46,7 @@ public partial class TableSearchViewModel : BaseScopedPaneToolViewModel<TableWor
         IEventManager eventManager, 
         ISukiDialogManager dialogManager, 
         ISukiToastManager toastManager,
-        IDatabaseContextFactory<TableStoreDbContext> databaseContextFactory)
+        ITableStoreDbContextFactory databaseContextFactory)
         : base(commandManager, eventManager, dialogManager, toastManager, "Search & Replace")
     {
         _databaseContextFactory = databaseContextFactory;
@@ -60,10 +59,8 @@ public partial class TableSearchViewModel : BaseScopedPaneToolViewModel<TableWor
             .OrderBy(x => x.RowId)
             .ThenBy(x => x.ColumnId), false);
         
-        Dispatcher.UIThread.Post(async void () =>
-        {
-            await DataSource.EnsureInitialisedAsync();
-        });
+        // Start the data source initialisation on the UI thread without the async void anti-pattern.
+        Dispatcher.UIThread.Post(() => DataSource.EnsureInitialisedAsync().FireAndForget());
     }
     
     #endregion
@@ -77,8 +74,9 @@ public partial class TableSearchViewModel : BaseScopedPaneToolViewModel<TableWor
         SearchCommands.Add(this[TableDataCommandNames.Search]);
         SearchCommands.Add(this[TableDataCommandNames.Replace]);
 
-        _eventManager.GetEvent<DbEntityChangedEvent>()
-            .Subscribe(OnEntityChanged);
+        _eventRegistrar.RegisterSubscription(
+            _eventManager.GetEvent<DbEntityChangedEvent>(),
+            OnEntityChanged);
     }
 
     protected override void OnSelectedDocumentChanged(IWorkspace workspace, IPaneDocument? oldDocument, IPaneDocument? newDocument)
@@ -108,7 +106,7 @@ public partial class TableSearchViewModel : BaseScopedPaneToolViewModel<TableWor
 
     private async Task RefreshColumnNames(string path)
     {
-        await using var db = await _databaseContextFactory.CreateAsync(path);
+        await using var db = await _databaseContextFactory.CreateDbContextAsync(path);
 
         var columnNames = await db.Columns
             .AsNoTracking()

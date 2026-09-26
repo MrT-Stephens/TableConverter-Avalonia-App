@@ -11,14 +11,14 @@ public class AspInputTestCases : InputConverterTestCasesBase
     /// Test cases which should pass
     /// </summary>
     protected override
-        IReadOnlyList<(string FileName, ConverterHandlerBaseOptions Options, TableData ExpectedTableData)>
+        IReadOnlyList<(string FileName, ConverterHandlerBaseOptions Options, TableSnapshot ExpectedTableData)>
         SuccessfulTestCases { get; } =
     [
         (
             // Test case 1: Correct input file
             "test_input_asp_1.asp",
             new ConverterHandlerBaseOptions(),
-            Utils.TestTableData
+            Utils.TestTable
         )
     ];
 

@@ -6,6 +6,7 @@ using TableConverter.Commands.Interfaces;
 using TableConverter.Contracts.Events;
 using TableConverter.Interfaces;
 using TableConverter.Utilities;
+using TableConverter.Utilities.Extensions;
 using TableConverter.Utilities.Interfaces;
 
 namespace TableConverter.ViewModels.Base;
@@ -54,12 +55,11 @@ public abstract partial class BaseScopedPaneToolViewModel<TWorkspace> : BaseView
     public override void Initialise()
     {
         base.Initialise();
-        
-        _eventManager.GetEvent<WorkspaceDocumentSelectedEvent>()
-            .Subscribe((_, args) =>
-            {
-                OnSelectedDocumentChanged(args.Workspace, args.OldDocument, args.NewDocument);
-            });
+
+        // Register through the registrar so the subscription is released on dispose.
+        _eventRegistrar.RegisterSubscription(
+            _eventManager.GetEvent<WorkspaceDocumentSelectedEvent>(),
+            (_, args) => OnSelectedDocumentChanged(args.Workspace, args.OldDocument, args.NewDocument));
     }
 
     public override ICommandInstance this[string commandName] => _commandManager[commandName, Workspace];
@@ -80,9 +80,11 @@ public abstract partial class BaseScopedPaneToolViewModel<TWorkspace> : BaseView
         // Do nothing - Can be overriden
     }
     
-    public void Dispose()
+    public override void Dispose()
     {
         _eventRegistrar.Dispose();
+
+        base.Dispose();
     }
 
     #endregion

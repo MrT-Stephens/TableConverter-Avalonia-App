@@ -1,18 +1,18 @@
 using System;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using ModelFlow.DataVirtualization.DataManagement;
 using TableConverter.Utilities;
+using TableConverter.Utilities.Database.Contexts;
+using TableConverter.Utilities.Database.Interfaces;
 
 namespace TableConverter.Services.DataSources.Base;
 
-public abstract class DataSourceFromPath<TModel, TContext> : DataSource<TModel> 
+public abstract class DataSourceFromPath<TModel> : DataSource<TModel> 
     where TModel : class 
-    where TContext : DbContext
 {
     #region Properties
 
-    protected readonly Utilities.Database.Interfaces.IDatabaseContextFactory<TContext> _databaseContextFactory;
+    protected readonly ITableStoreDbContextFactory _databaseContextFactory;
 
     private Guid? _SourceId = null;
     public Guid? SourceId
@@ -51,7 +51,7 @@ public abstract class DataSourceFromPath<TModel, TContext> : DataSource<TModel>
     #region Constructors
     
     protected DataSourceFromPath(
-        Utilities.Database.Interfaces.IDatabaseContextFactory<TContext> factory, 
+        ITableStoreDbContextFactory factory, 
         int pageSize, 
         int maxPages, 
         bool autoSync = true) 
@@ -64,9 +64,9 @@ public abstract class DataSourceFromPath<TModel, TContext> : DataSource<TModel>
 
     #region Methods
 
-    protected Task<TContext> CreateDbAsync()
+    protected Task<TableStoreDbContext> CreateDbAsync()
     {
-        return _databaseContextFactory.CreateAsync(Path);
+        return _databaseContextFactory.CreateDbContextAsync(Path);
     }
 
     #endregion
