@@ -39,10 +39,12 @@
             </NumericUpDown>
         </Grid>
         <controls:CommandButtonToolBar Grid.Row="1"
-                                       ItemsSource="{Binding GeneralCommands, Mode=OneWay}">
+                                       Commands="{Binding GeneralCommands, Mode=OneWay}"
+                                       Orientation="Vertical">
             <controls:CommandButtonToolBar.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <UniformGrid RowSpacing="10" 
+                    <UniformGrid RowSpacing="10"
+                                 ColumnSpacing="10"
                                  Columns="2" />
                 </ItemsPanelTemplate>
             </controls:CommandButtonToolBar.ItemsPanel>

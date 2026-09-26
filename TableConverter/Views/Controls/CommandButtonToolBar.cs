@@ -77,6 +77,12 @@ public class CommandButtonToolBar : ItemsControl
 
     private readonly HashSet<ICommandInstance> _wiredCommands = [];
 
+    /// <summary>
+    ///     The command collection currently shown, so a change of <see cref="Commands" /> can be followed and the
+    ///     collection is never subscribed to more than once.
+    /// </summary>
+    private ObservableCollection<ICommandInstance>? _ShownCommands;
+
     public CommandButtonToolBar()
     {
         ItemsPanel = new FuncTemplate<Panel>(() => new StackPanel
@@ -90,27 +96,41 @@ public class CommandButtonToolBar : ItemsControl
     {
         base.OnInitialized();
 
-        ItemsSource = Commands;
+        // The commands are exposed as a property of this control rather than as the items source, so they are
+        // taken up here and followed from then on. A view which binds the items source itself, rather than this
+        // property, is left alone until there are commands to show so its binding is not replaced with nothing.
+        ShowCommands(Commands);
+    }
 
-        if (Commands is not null)
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+
+        // The commands are usually bound to a view model, and a binding is resolved again once the data context
+        // arrives, so a change of Commands has to be followed and not just the value read at initialisation.
+        if (change.Property == CommandsProperty)
         {
-            Commands.CollectionChanged += OnCommandsCollectionChanged;
-
-            foreach (var cmd in Commands)
-            {
-                Wire(cmd);
-            }
-
-            UpdateAnyProcessing();
+            ShowCommands(change.GetNewValue<ObservableCollection<ICommandInstance>?>());
         }
+    }
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+
+        // Leaving the tree releases the collection subscription, so it is taken up again on the way back in.
+        ShowCommands(Commands);
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnDetachedFromVisualTree(e);
 
-        if (Commands != null)
-            Commands.CollectionChanged -= OnCommandsCollectionChanged;
+        if (_ShownCommands is not null)
+        {
+            _ShownCommands.CollectionChanged -= OnCommandsCollectionChanged;
+            _ShownCommands = null;
+        }
 
         foreach (var cmd in _wiredCommands)
         {
@@ -125,41 +145,32 @@ public class CommandButtonToolBar : ItemsControl
         _wiredCommands.Clear();
     }
 
-    private void OnCommandsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    /// <summary>
+    ///     Makes <paramref name="commands" /> the items of the toolbar. A null collection (a view model which has
+    ///     not been set yet) leaves whatever the view bound to the items source in place.
+    /// </summary>
+    private void ShowCommands(ObservableCollection<ICommandInstance>? commands)
     {
-        if (e.OldItems != null)
+        if (commands is null || ReferenceEquals(_ShownCommands, commands))
         {
-            foreach (ICommandInstance cmd in e.OldItems)
-            {
-                Unwire(cmd);
-            }
+            return;
         }
 
-        if (e.NewItems != null)
+        if (_ShownCommands is not null)
         {
-            foreach (ICommandInstance cmd in e.NewItems)
-            {
-                Wire(cmd);
-            }
+            _ShownCommands.CollectionChanged -= OnCommandsCollectionChanged;
         }
 
-        if (e.Action == NotifyCollectionChangedAction.Reset)
+        _ShownCommands = commands;
+        commands.CollectionChanged += OnCommandsCollectionChanged;
+
+        // Assigning the items source replaces any binding a view made to it, which is why the commands of a view
+        // that binds this property have to be adopted here rather than by that binding.
+        ItemsSource = commands;
+
+        foreach (var command in commands)
         {
-            foreach (var cmd in _wiredCommands)
-            {
-                if (cmd.Context is not INotifyPropertyChanged notify)
-                {
-                    continue;
-                }
-                
-                notify.PropertyChanged -= OnCommandMetadataChanged;
-            }
-
-            _wiredCommands.Clear();
-
-            if (Commands != null)
-                foreach (var cmd in Commands)
-                    Wire(cmd);
+            Wire(command);
         }
 
         UpdateAnyProcessing();
@@ -203,7 +214,47 @@ public class CommandButtonToolBar : ItemsControl
     {
         AnyCommandProcessing =
             DisableAllIfProcessing &&
-            Commands?.Any(c => c.Context.IsProcessing) == true;
+            _ShownCommands?.Any(c => c.Context.IsProcessing) == true;
+    }
+
+    private void OnCommandsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.OldItems != null)
+        {
+            foreach (ICommandInstance cmd in e.OldItems)
+            {
+                Unwire(cmd);
+            }
+        }
+
+        if (e.NewItems != null)
+        {
+            foreach (ICommandInstance cmd in e.NewItems)
+            {
+                Wire(cmd);
+            }
+        }
+
+        if (e.Action == NotifyCollectionChangedAction.Reset)
+        {
+            foreach (var cmd in _wiredCommands)
+            {
+                if (cmd.Context is not INotifyPropertyChanged notify)
+                {
+                    continue;
+                }
+
+                notify.PropertyChanged -= OnCommandMetadataChanged;
+            }
+
+            _wiredCommands.Clear();
+
+            if (_ShownCommands is not null)
+                foreach (var cmd in _ShownCommands)
+                    Wire(cmd);
+        }
+
+        UpdateAnyProcessing();
     }
 
     protected override Control CreateContainerForItemOverride(object? item, int index, object? recycleKey)

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text.Json;
 using System.Threading;
@@ -67,6 +68,17 @@ public partial class TableDataViewModel : BaseDocumentViewModel, ISessionDocumen
     private readonly ITableStoreDbContextFactory _dbContextFactory;
     private readonly IOptions<AppOptions> _appOptions;
 
+    /// <summary>
+    /// How many times the grid has been rebuilt from the store.
+    /// </summary>
+    /// <remarks>
+    /// A change read off the store is only applied to the grid while the rebuild it was read under is
+    /// still the one the grid is showing. A change that is still on its way when a rebuild lands
+    /// describes a table the grid no longer shows, and applying it would put back a column the rebuild
+    /// had already replaced.
+    /// </remarks>
+    private int _GridGeneration;
+
     #endregion
 
     #region Constructors
@@ -112,18 +124,92 @@ public partial class TableDataViewModel : BaseDocumentViewModel, ISessionDocumen
                 args.DeselectedItems.ForEach(item => SelectedItems.Remove(item));
                 args.SelectedItems.ForEach(item => SelectedItems.Add(item));
             });
+
+        // A reset throws away every row the grid was showing and reads the table again, so what the
+        // selection was holding belongs to rows that are no longer part of it.
+        _eventRegistrar.RegisterCollectionChanged(DataSource.Collection, this, OnRowCollectionChanged);
     }
 
     #endregion
 
     #region Methods
     
+    /// <summary>
+    /// The positions, in the order the table keeps its rows in, of the rows selected in the grid.
+    /// </summary>
+    /// <remarks>
+    /// A position is handed out rather than the selected rows themselves because the grid only holds the
+    /// rows it has scrolled to. A row it has not read yet is a placeholder with no id of its own, so its
+    /// place in the table is the only thing that names it.
+    /// </remarks>
+    public IReadOnlyList<int> GetSelectedRowPositions()
+    {
+        if (TreeDataSource.RowSelection is not { } selection)
+        {
+            return [];
+        }
+
+        // The grid is flat, so a selected row is addressed by a path of a single step.
+        return
+        [
+            .. selection.SelectedIndexes
+                .Where(path => path.Count > 0)
+                .Select(path => path[0])
+        ];
+    }
+
+    /// <summary>
+    /// Drops the selection when the rows the grid was showing are replaced.
+    /// </summary>
+    private void OnRowCollectionChanged(object? sender, NotifyCollectionChangedEventArgs args)
+    {
+        if (args.Action is not NotifyCollectionChangedAction.Reset)
+        {
+            return;
+        }
+
+        // The data source raises its change notifications from whichever thread read the store, so the
+        // selection - which belongs to the grid - is only ever touched on the UI thread.
+        if (Dispatcher.UIThread.CheckAccess())
+        {
+            ClearRowSelection();
+            return;
+        }
+
+        Dispatcher.UIThread.Post(ClearRowSelection);
+    }
+
+    private void ClearRowSelection()
+    {
+        if (IsDisposed)
+        {
+            return;
+        }
+
+        if (TreeDataSource.RowSelection is { Count: > 0 } selection)
+        {
+            selection.Clear();
+        }
+
+        // The rows the selection was part of are gone, but the document and the tools it was shared with
+        // are not, so only the rows are dropped.
+        SelectedItems.RemoveAll<DataItem<RowEntity>>();
+    }
+
+    /// <summary>
+    /// Reads the table's columns and rows again, rebuilding the grid to match.
+    /// </summary>
     public async Task InvalidateDataAsync()
     {
         if (string.IsNullOrEmpty(Path))
         {
             return;
         }
+
+        // The store is about to be read again, so anything still on its way from an earlier read is stale
+        // by the time it arrives: the rebuild takes a generation of its own and the older changes are
+        // dropped rather than applied to the grid it replaces.
+        _GridGeneration++;
 
         // Read the columns off the UI thread: querying the store is not rendering work, so it must not
         // block the UI.
@@ -169,11 +255,22 @@ public partial class TableDataViewModel : BaseDocumentViewModel, ISessionDocumen
 
     private async Task RefreshDataAsync(DbEntityChange[] changes)
     {
+        // A change read off the store before the grid was last rebuilt describes a table the grid no
+        // longer shows, so it is dropped rather than applied to the grid that replaced it.
+        var generation = _GridGeneration;
+
         foreach (var change in changes)
         {
             if (change.Entity is not ColumnEntity column)
             {
                 continue;
+            }
+
+            // Checked for every change rather than once, because the changes are applied one at a time and
+            // a rebuild can land between two of them.
+            if (generation != _GridGeneration)
+            {
+                return;
             }
 
             if (change.State is DbEntityChangeState.Deleted)

@@ -49,6 +49,16 @@ public partial class TableWorkspaceEditorViewModel : BaseWorkspaceEditorViewMode
         MainCommands.Add(this[TableDataCommandNames.ExportFile]);
         MainCommands.Add(this[TableDataCommandNames.Search]);
         MainCommands.Add(this[TableDataCommandNames.OpenFile]);
+
+        // The table tools are commands too, so the same actions are offered by the workspace menu and by the
+        // table utilities tool, with one implementation behind both.
+        MainCommands.Add(this[TableDataCommandNames.AddRow]);
+        MainCommands.Add(this[TableDataCommandNames.DeleteRows]);
+        MainCommands.Add(this[TableDataCommandNames.TrimWhitespace]);
+        MainCommands.Add(this[TableDataCommandNames.RemoveDuplicateRows]);
+        MainCommands.Add(this[TableDataCommandNames.TransposeClockwise]);
+        MainCommands.Add(this[TableDataCommandNames.TransposeCounterClockwise]);
+        MainCommands.Add(this[TableDataCommandNames.SortByColumn]);
     }
 
     public override IPaneDocument CreateNewDocumentInstance()
@@ -113,4 +123,3 @@ public partial class TableWorkspaceEditorViewModel : BaseWorkspaceEditorViewMode
 
     #endregion
 }
-

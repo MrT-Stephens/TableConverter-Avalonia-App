@@ -391,17 +391,21 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
         foreach (var tool in tools)
         {
             tool.Workspace = this;
-            
-            if (tool is IInitialise initialiseTool)
-            {
-                initialiseTool.Initialise();
-            }
-            
+
+            // The selection is handed over before the tool is initialised, because initialising builds the
+            // tool's command instances and each of those captures the selection it should read. A tool given
+            // the workspace's selection afterwards would leave every one of its commands looking at the empty
+            // collection the tool started life with, so its buttons would never see a selection at all.
             if (tool is IHasSelectedItems hasSelectedItemsTool)
             {
                 hasSelectedItemsTool.SelectedItems = SelectedItems;
             }
-            
+
+            if (tool is IInitialise initialiseTool)
+            {
+                initialiseTool.Initialise();
+            }
+
             Tools.Add(tool);
         }
     }

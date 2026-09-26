@@ -87,7 +87,11 @@ public class TableStoreDataSource(ITableStoreDbContextFactory databaseContextFac
 
         query = filterSortQuery(query);
 
+        // The order the rows are read in is the store's own order, which is what makes a row's place in
+        // the table its identity: the grid shows the nth row it is given, and the nth row of the store is
+        // the one carrying the nth id.
         return await query
+            .OrderBy(row => row.Id)
             .Skip(offset)
             .Take(count)
             .ToListAsync()

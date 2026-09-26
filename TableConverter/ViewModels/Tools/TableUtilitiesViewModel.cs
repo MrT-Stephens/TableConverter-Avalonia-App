@@ -6,6 +6,7 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
+using TableConverter.Commands.Handlers.TableData;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Interfaces;
 using TableConverter.Services.DataSources;
@@ -51,6 +52,21 @@ public partial class TableUtilitiesViewModel : BaseScopedPaneToolViewModel<Table
     #endregion
 
     #region Overrides
+
+    public override void Initialise()
+    {
+        base.Initialise();
+
+        // Each table tool is a command, so the same buttons serve the tool pane and the workspace menu, and
+        // there is one implementation behind both.
+        GeneralCommands.Add(this[TableDataCommandNames.AddRow]);
+        GeneralCommands.Add(this[TableDataCommandNames.DeleteRows]);
+        GeneralCommands.Add(this[TableDataCommandNames.TrimWhitespace]);
+        GeneralCommands.Add(this[TableDataCommandNames.RemoveDuplicateRows]);
+        GeneralCommands.Add(this[TableDataCommandNames.TransposeClockwise]);
+        GeneralCommands.Add(this[TableDataCommandNames.TransposeCounterClockwise]);
+        GeneralCommands.Add(this[TableDataCommandNames.SortByColumn]);
+    }
 
     protected override void OnSelectedDocumentChanged(IWorkspace workspace, 
         IPaneDocument? oldDocument, IPaneDocument? newDocument)
