@@ -5,6 +5,7 @@ using TableConverter.Commands.DataModels;
 using TableConverter.Commands.Extensions;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Utilities.Database;
+using TableConverter.Utilities.Database.History;
 using TableConverter.Utilities.Database.Interfaces;
 
 namespace TableConverter.Commands.Handlers.TableData;
@@ -23,7 +24,8 @@ public static partial class TableDataCommandNames
 /// </remarks>
 public class TrimWhitespaceCommandHandler(
     ISukiToastManager toastManager,
-    ITableStoreDbContextFactory databaseContextFactory)
+    ITableStoreDbContextFactory databaseContextFactory,
+    ITableHistory history)
     : ICommandHandlerAsync
 {
     public ICommandMetadata CommandMetadata => new CommandMetadata(
@@ -52,11 +54,24 @@ public class TrimWhitespaceCommandHandler(
 
         await using var db = await databaseContextFactory.CreateDbContextAsync(document.Path);
 
-        // The column names are cleaned up alongside the cells, and a table whose values are already clean is
-        // left alone rather than rewritten in full.
-        var trimmed = await TableStoreMaintenance.Create(db).TrimAsync();
+        var maintenance = TableStoreMaintenance.Create(db);
 
-        if (trimmed == 0)
+        // The rows a trim would rewrite are named by the condition the trim itself runs on, and the column
+        // names are rewritten alongside the values, so both parts of the table are described before the
+        // pass runs. The two readings are recorded as the one step the user thinks of as one operation.
+        var rowsToTrim = await maintenance.GetRowIdsToTrimAsync();
+
+        await using var edit = history.BeginEdit(
+            document.Path, TableEditKind.CellsChanged, "Trimmed whitespace");
+
+        await edit.CaptureBeforeAsync(TableRegion.Rows(rowsToTrim));
+        await edit.CaptureBeforeAsync(TableRegion.Columns());
+
+        var trimmed = await maintenance.TrimAsync();
+
+        // A table whose values and names are already clean is left alone rather than rewritten in full, and
+        // a pass that changed nothing is not a step the user can take back.
+        if (await edit.CommitAsync() is null)
         {
             toastManager.CreateSimpleInfoToast()
                 .OfType(NotificationType.Information)

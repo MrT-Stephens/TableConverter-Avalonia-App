@@ -3,6 +3,7 @@ using SukiUI.Toasts;
 using TableConverter.Commands.DataModels;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Utilities.Database;
+using TableConverter.Utilities.Database.History;
 using TableConverter.Utilities.Database.Interfaces;
 
 namespace TableConverter.Commands.Handlers.TableData;
@@ -22,8 +23,9 @@ public static partial class TableDataCommandNames
 public class TransposeClockwiseCommandHandler(
     ISukiDialogManager dialogManager,
     ISukiToastManager toastManager,
-    ITableStoreDbContextFactory databaseContextFactory)
-    : TableRotationCommandHandler(dialogManager, toastManager, databaseContextFactory)
+    ITableStoreDbContextFactory databaseContextFactory,
+    ITableHistory history)
+    : TableRotationCommandHandler(dialogManager, toastManager, databaseContextFactory, history)
 {
     protected override TableRotation Rotation => TableRotation.Clockwise;
 

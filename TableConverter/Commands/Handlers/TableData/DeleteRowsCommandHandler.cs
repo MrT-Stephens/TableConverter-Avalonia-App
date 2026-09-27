@@ -7,6 +7,7 @@ using SukiUI.Toasts;
 using TableConverter.Commands.DataModels;
 using TableConverter.Commands.Extensions;
 using TableConverter.Commands.Interfaces;
+using TableConverter.Utilities.Database.History;
 using TableConverter.Utilities.Database.Interfaces;
 
 namespace TableConverter.Commands.Handlers.TableData;
@@ -28,7 +29,8 @@ public static partial class TableDataCommandNames
 public class DeleteRowsCommandHandler(
     ISukiDialogManager dialogManager,
     ISukiToastManager toastManager,
-    ITableStoreDbContextFactory databaseContextFactory)
+    ITableStoreDbContextFactory databaseContextFactory,
+    ITableHistory history)
     : ICommandHandlerAsync
 {
     public ICommandMetadata CommandMetadata => new CommandMetadata(
@@ -80,7 +82,16 @@ public class DeleteRowsCommandHandler(
 
         var rowIds = await db.GetRowIdsAtPositionsAsync(positions);
 
+        // The rows are described by what they hold before they go, so taking the step back puts them back
+        // under their own ids and with their own values rather than as rows appended to the end.
+        await using var edit = history.BeginEdit(
+            document.Path, TableEditKind.RowsDeleted, $"Removed {rowIds.Count} row(s)");
+
+        await edit.CaptureBeforeAsync(TableRegion.Rows(rowIds));
+
         var deleted = await db.DeleteRowsAsync(rowIds);
+
+        await edit.CommitAsync();
 
         if (deleted < rowIds.Count)
         {

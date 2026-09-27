@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using TableConverter.Utilities.Database.Contexts;
 using TableConverter.Utilities.Database.Factories;
+using TableConverter.Utilities.Database.History;
 using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.Utilities.Database.Interceptors;
 
@@ -32,6 +34,13 @@ public static class DependencyInjectionExtensions
         // callers can target a specific table store file.
         services.AddSingleton<ITableStoreDbContextFactory>(
             sp => (TableStoreDbContextFactory)sp.GetRequiredService<IDbContextFactory<TableStoreDbContext>>());
+
+        // The history owns no state of its own: everything it knows lives in the store it describes, so
+        // one instance can serve every document that is open.
+        services.AddSingleton<ITableHistory>(sp => new TableStoreHistory(
+            sp.GetRequiredService<ITableStoreDbContextFactory>(),
+            sp.GetRequiredService<ILogger<TableStoreHistory>>(),
+            TableStoreHistory.DefaultMaximumEntries));
 
         return services;
     }

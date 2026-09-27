@@ -7,13 +7,16 @@ using Microsoft.EntityFrameworkCore;
 using ModelFlow.DataVirtualization.DataManagement;
 using TableConverter.Services.DataSources.Base;
 using TableConverter.Utilities.Database.Contexts;
+using TableConverter.Utilities.Database.History;
 using TableConverter.Utilities.Database.Models.TableStore;
 using TableConverter.Utilities.Extensions;
 using TableConverter.Utilities.Database.Interfaces;
 
 namespace TableConverter.Services.DataSources;
 
-public class TableStoreDataSource(ITableStoreDbContextFactory databaseContextFactory)
+public class TableStoreDataSource(
+    ITableStoreDbContextFactory databaseContextFactory,
+    ITableHistory history)
     : DataSourceFromPath<RowEntity>(databaseContextFactory, 250, 5)
 {
     private int? _ColumnCount;
@@ -148,7 +151,11 @@ public class TableStoreDataSource(ITableStoreDbContextFactory databaseContextFac
         {
             return false;
         }
-        
+
+        // An edit made straight in the grid is a step in the table's history like any other, so it is
+        // described the same way the commands describe theirs.
+        await using var edit = history.BeginEdit(Path, TableEditKind.RowsAdded, "Added a row");
+
         await using var db = await CreateDbAsync().ConfigureAwait(false);
         await using var transaction = await db.Database.BeginTransactionAsync().ConfigureAwait(false);
 
@@ -165,6 +172,11 @@ public class TableStoreDataSource(ITableStoreDbContextFactory databaseContextFac
             throw;
         }
 
+        // A row only has the id it is remembered under once the store has given it one, so it is described
+        // now that it has.
+        await edit.CaptureAfterAsync(TableRegion.Rows([item.Id])).ConfigureAwait(false);
+        await edit.CommitAsync().ConfigureAwait(false);
+
         return true;
     }
 
@@ -174,7 +186,12 @@ public class TableStoreDataSource(ITableStoreDbContextFactory databaseContextFac
         {
             return false;
         }
-        
+
+        // The whole row is described before it is written, because a cell the user edited is not reported
+        // to the data source - only the row it belongs to is - and the diff works out which values moved.
+        await using var edit = history.BeginEdit(Path, TableEditKind.CellsChanged, "Edited a row");
+        await edit.CaptureBeforeAsync(TableRegion.Rows([viewModel.Id])).ConfigureAwait(false);
+
         await using var db = await CreateDbAsync().ConfigureAwait(false);
         await using var transaction = await db.Database.BeginTransactionAsync().ConfigureAwait(false);
 
@@ -224,6 +241,8 @@ public class TableStoreDataSource(ITableStoreDbContextFactory databaseContextFac
             throw;
         }
 
+        await edit.CommitAsync().ConfigureAwait(false);
+
         return true;
     }
 
@@ -233,7 +252,10 @@ public class TableStoreDataSource(ITableStoreDbContextFactory databaseContextFac
         {
             return false;
         }
-        
+
+        await using var edit = history.BeginEdit(Path, TableEditKind.RowsDeleted, "Deleted a row");
+        await edit.CaptureBeforeAsync(TableRegion.Rows([item.Id])).ConfigureAwait(false);
+
         await using var db = await CreateDbAsync().ConfigureAwait(false);
         await using var transaction = await db.Database.BeginTransactionAsync().ConfigureAwait(false);
 
@@ -259,6 +281,8 @@ public class TableStoreDataSource(ITableStoreDbContextFactory databaseContextFac
             await transaction.RollbackAsync().ConfigureAwait(false);
             throw;
         }
+
+        await edit.CommitAsync().ConfigureAwait(false);
 
         return true;
     }

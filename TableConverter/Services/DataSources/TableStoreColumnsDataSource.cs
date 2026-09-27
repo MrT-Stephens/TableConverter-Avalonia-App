@@ -6,13 +6,16 @@ using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using TableConverter.Services.DataSources.Base;
+using TableConverter.Utilities.Database.History;
 using TableConverter.Utilities.Database.Models.TableStore;
 using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.Utilities.Models;
 
 namespace TableConverter.Services.DataSources;
 
-public class TableStoreColumnsDataSource(ITableStoreDbContextFactory databaseContextFactory)
+public class TableStoreColumnsDataSource(
+    ITableStoreDbContextFactory databaseContextFactory,
+    ITableHistory history)
     : DataSourceFromPath<ColumnEntity>(databaseContextFactory, 250, 5)
 {
     protected override async Task<bool> ContainsAsync(ColumnEntity item)
@@ -109,6 +112,11 @@ public class TableStoreColumnsDataSource(ITableStoreDbContextFactory databaseCon
             return false;
         }
 
+        // A column added from the columns editor changes the shape of the table, so the whole set of
+        // columns is remembered rather than only the one added: removing a column renumbers the ones that
+        // follow it, and a step has to describe the table it left behind.
+        await using var edit = history.BeginEdit(Path, TableEditKind.ColumnsChanged, "Added a column");
+
         await using var db = await CreateDbAsync().ConfigureAwait(false);
         await using var transaction = await db.Database.BeginTransactionAsync().ConfigureAwait(false);
 
@@ -132,6 +140,9 @@ public class TableStoreColumnsDataSource(ITableStoreDbContextFactory databaseCon
             throw;
         }
 
+        await edit.CaptureAfterAsync(TableRegion.Columns()).ConfigureAwait(false);
+        await edit.CommitAsync().ConfigureAwait(false);
+
         return true;
     }
 
@@ -141,6 +152,11 @@ public class TableStoreColumnsDataSource(ITableStoreDbContextFactory databaseCon
         {
             return false;
         }
+
+        // Renaming a column, or changing what it holds, needs no cell values remembered: only the columns
+        // themselves are described.
+        await using var edit = history.BeginEdit(Path, TableEditKind.ColumnsChanged, "Edited a column");
+        await edit.CaptureBeforeAsync(TableRegion.Columns()).ConfigureAwait(false);
 
         await using var db = await CreateDbAsync().ConfigureAwait(false);
         await using var transaction = await db.Database.BeginTransactionAsync().ConfigureAwait(false);
@@ -170,6 +186,8 @@ public class TableStoreColumnsDataSource(ITableStoreDbContextFactory databaseCon
             throw;
         }
 
+        await edit.CommitAsync().ConfigureAwait(false);
+
         return true;
     }
 
@@ -179,6 +197,11 @@ public class TableStoreColumnsDataSource(ITableStoreDbContextFactory databaseCon
         {
             return false;
         }
+
+        // A removed column takes the values under it out of the table with it, so those values are
+        // remembered as well: putting the column back has to put them back too.
+        await using var edit = history.BeginEdit(Path, TableEditKind.ColumnsChanged, "Deleted a column");
+        await edit.CaptureBeforeAsync(TableRegion.Columns([item.Id])).ConfigureAwait(false);
 
         await using var db = await CreateDbAsync().ConfigureAwait(false);
         await using var transaction = await db.Database.BeginTransactionAsync().ConfigureAwait(false);
@@ -221,6 +244,8 @@ public class TableStoreColumnsDataSource(ITableStoreDbContextFactory databaseCon
             await transaction.RollbackAsync().ConfigureAwait(false);
             throw;
         }
+
+        await edit.CommitAsync().ConfigureAwait(false);
 
         return true;
     }

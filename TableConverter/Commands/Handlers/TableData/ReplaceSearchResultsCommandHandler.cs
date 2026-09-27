@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls.Notifications;
 using Microsoft.Data.Sqlite;
@@ -9,6 +10,7 @@ using TableConverter.Commands.DataModels;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Interfaces;
 using TableConverter.Utilities.Database.Contexts;
+using TableConverter.Utilities.Database.History;
 using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.ViewModels.Documents;
 using TableConverter.ViewModels.Forms;
@@ -24,7 +26,8 @@ public static partial class TableDataCommandNames
 public class ReplaceSearchResultsCommandHandler(
     ISukiDialogManager dialogManager,
     ISukiToastManager toastManager,
-    ITableStoreDbContextFactory databaseContextFactory) 
+    ITableStoreDbContextFactory databaseContextFactory,
+    ITableHistory history)
     : ICommandHandlerAsync
 {
     public ICommandMetadata CommandMetadata => new CommandMetadata(
@@ -83,7 +86,35 @@ public class ReplaceSearchResultsCommandHandler(
         
         await using var dbContext = await databaseContextFactory.CreateDbContextAsync(tableDataViewModel.Path);
 
+        // The results say exactly which parts of the table the replace will work through, so they are
+        // described before it runs: the values under the cells it will rewrite, and - because a result with
+        // no row names a column heading rather than a cell - the names of the columns it will rewrite.
+        await using var edit = history.BeginEdit(
+            tableDataViewModel.Path,
+            TableEditKind.CellsChanged,
+            $"Replaced {replaceValues.Count} occurrence(s) with '{settings.ReplaceText}'");
+
+        if (settings.ReplaceInRows)
+        {
+            var cells = replaceValues
+                .Where(result => result.Item.RowId > 0)
+                .Select(result => (result.Item.RowId, result.Item.ColumnId))
+                .ToList();
+
+            if (cells.Count > 0)
+            {
+                await edit.CaptureBeforeAsync(TableRegion.Cells(cells));
+            }
+        }
+
+        if (settings.ReplaceInHeaders)
+        {
+            await edit.CaptureBeforeAsync(TableRegion.Columns());
+        }
+
         var replacedAmount = await Task.Run(() => ReplaceValuesAsync(dbContext, settings));
+
+        await edit.CommitAsync();
 
         toastManager.CreateSimpleInfoToast()
             .OfType(NotificationType.Success)

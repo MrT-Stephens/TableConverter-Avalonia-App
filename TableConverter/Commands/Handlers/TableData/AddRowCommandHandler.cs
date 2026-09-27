@@ -5,6 +5,7 @@ using TableConverter.Commands.DataModels;
 using TableConverter.Commands.Extensions;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Utilities.Database;
+using TableConverter.Utilities.Database.History;
 using TableConverter.Utilities.Database.Interfaces;
 
 namespace TableConverter.Commands.Handlers.TableData;
@@ -24,7 +25,8 @@ public static partial class TableDataCommandNames
 /// </remarks>
 public class AddRowCommandHandler(
     ISukiToastManager toastManager,
-    ITableStoreDbContextFactory databaseContextFactory)
+    ITableStoreDbContextFactory databaseContextFactory,
+    ITableHistory history)
     : ICommandHandlerAsync
 {
     public ICommandMetadata CommandMetadata => new CommandMetadata(
@@ -53,9 +55,17 @@ public class AddRowCommandHandler(
 
         await using var db = await databaseContextFactory.CreateDbContextAsync(document.Path);
 
+        // A row that did not exist has no identity until it has been written, so what the step did is
+        // described by what the row holds once it is there rather than by what it held before.
+        await using var edit = history.BeginEdit(document.Path, TableEditKind.RowsAdded, "Added a row");
+
         // The row and the cells of the columns it was added under are written together, so the store is
         // never left holding a row that is missing cells the grid would then bind against.
-        await TableStoreMaintenance.Create(db).AddRowAsync();
+        var rowId = await TableStoreMaintenance.Create(db).AddRowAsync();
+
+        await edit.CaptureAfterAsync(TableRegion.Rows([rowId]));
+
+        await edit.CommitAsync();
 
         toastManager.CreateSimpleInfoToast()
             .OfType(NotificationType.Success)

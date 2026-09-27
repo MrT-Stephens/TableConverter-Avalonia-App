@@ -50,6 +50,11 @@ public partial class TableWorkspaceEditorViewModel : BaseWorkspaceEditorViewMode
         MainCommands.Add(this[TableDataCommandNames.Search]);
         MainCommands.Add(this[TableDataCommandNames.OpenFile]);
 
+        // Undo and redo walk the table's own history rather than the grid's, so they are offered by the
+        // workspace menu and bound to the familiar keys.
+        MainCommands.Add(this[TableDataCommandNames.Undo]);
+        MainCommands.Add(this[TableDataCommandNames.Redo]);
+
         // The table tools are commands too, so the same actions are offered by the workspace menu and by the
         // table utilities tool, with one implementation behind both.
         MainCommands.Add(this[TableDataCommandNames.AddRow]);

@@ -9,6 +9,7 @@ using TableConverter.Commands.DataModels;
 using TableConverter.Commands.Extensions;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Utilities.Database;
+using TableConverter.Utilities.Database.History;
 using TableConverter.Utilities.Database.Interfaces;
 
 namespace TableConverter.Commands.Handlers.TableData;
@@ -24,7 +25,8 @@ public static partial class TableDataCommandNames
 public class RemoveDuplicateRowsCommandHandler(
     ISukiDialogManager dialogManager,
     ISukiToastManager toastManager,
-    ITableStoreDbContextFactory databaseContextFactory)
+    ITableStoreDbContextFactory databaseContextFactory,
+    ITableHistory history)
     : ICommandHandlerAsync
 {
     public ICommandMetadata CommandMetadata => new CommandMetadata(
@@ -70,20 +72,16 @@ public class RemoveDuplicateRowsCommandHandler(
             return;
         }
 
-        var result = await dialogManager.CreateDialog()
-            .WithTitle("Are you sure?")
-            .WithContent($"You are about to delete {duplicates} duplicate row(s). " +
-                         "The first row of each repeated set of values is kept. Are you sure you want to proceed?")
-            .Dismiss().ByClickingBackground()
-            .WithYesNoResult("Yes", "No")
-            .TryShowAsync();
+        // The rows the delete is about to take are named by the query the delete itself runs on, so what is
+        // about to be lost is described before it goes and the step can be taken back with its values.
+        await using var edit = history.BeginEdit(
+            document.Path, TableEditKind.RowsDeleted, $"Removed {duplicates} duplicate row(s)");
 
-        if (!result)
-        {
-            return;
-        }
+        await edit.CaptureBeforeAsync(TableRegion.Rows(await maintenance.GetDuplicateRowIdsAsync()));
 
         var deleted = await maintenance.RemoveDuplicateRowsAsync();
+
+        await edit.CommitAsync();
 
         if (deleted < duplicates)
         {

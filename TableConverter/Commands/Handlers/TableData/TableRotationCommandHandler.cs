@@ -7,6 +7,7 @@ using TableConverter.Commands.DataModels;
 using TableConverter.Commands.Extensions;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Utilities.Database;
+using TableConverter.Utilities.Database.History;
 using TableConverter.Utilities.Database.Interfaces;
 
 namespace TableConverter.Commands.Handlers.TableData;
@@ -29,7 +30,8 @@ namespace TableConverter.Commands.Handlers.TableData;
 public abstract class TableRotationCommandHandler(
     ISukiDialogManager dialogManager,
     ISukiToastManager toastManager,
-    ITableStoreDbContextFactory databaseContextFactory)
+    ITableStoreDbContextFactory databaseContextFactory,
+    ITableHistory history)
     : ICommandHandlerAsync
 {
     /// <summary>
@@ -77,15 +79,25 @@ public abstract class TableRotationCommandHandler(
 
         await using var db = await databaseContextFactory.CreateDbContextAsync(document.Path);
 
+        // A turn is recorded by the direction it was made in rather than by the table it produced, because
+        // turning a table one way and then the other leaves it exactly as it was.
+        await using var edit = history.BeginEdit(
+            document.Path, TableEditKind.TableRotated, $"Transposed {direction}");
+
+        await edit.CaptureBeforeAsync(TableRegion.Rotated(Rotation));
+
         var shape = await TableStoreMaintenance.Create(db).RotateAsync(Rotation);
 
         // A table with no columns holds nothing to turn, and turning it could not be described, so it is
-        // reported rather than replaced with a table that says nothing.
+        // reported rather than replaced with a table that says nothing. The recording is dropped without
+        // being committed, so a turn that did not happen leaves no step behind.
         if (shape is not { } turned)
         {
             context.Cancel("The table has no columns to turn.");
             return;
         }
+
+        await edit.CommitAsync();
 
         toastManager.CreateSimpleInfoToast()
             .OfType(NotificationType.Success)

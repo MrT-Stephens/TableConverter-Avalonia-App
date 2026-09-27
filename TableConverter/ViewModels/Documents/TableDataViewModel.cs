@@ -27,6 +27,7 @@ using TableConverter.Services.DataSources;
 using TableConverter.Utilities;
 using TableConverter.Utilities.Database;
 using TableConverter.Utilities.Database.Events;
+using TableConverter.Utilities.Database.History;
 using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.Utilities.Database.Models.TableStore;
 using TableConverter.Utilities.Extensions;
@@ -87,13 +88,14 @@ public partial class TableDataViewModel : BaseDocumentViewModel, ISessionDocumen
         ISukiDialogManager dialogManager,
         ISukiToastManager toastManager,
         ITableStoreDbContextFactory dbContextFactory,
+        ITableHistory history,
         IOptions<AppOptions> appOptions)
         : base(commandManager, eventManager, dialogManager, toastManager)
     {
         _appOptions = appOptions;
         _dbContextFactory = dbContextFactory;
         Path = string.Empty;
-        DataSource = new TableStoreDataSource(_dbContextFactory);
+        DataSource = new TableStoreDataSource(_dbContextFactory, history);
         TreeDataSource = new FlatTreeDataGridSource<DataItem<RowEntity>>(DataSource.Collection);
         TreeDataSource.RowSelection!.SingleSelect = false; 
         DataSource.Path = Path;

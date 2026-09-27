@@ -14,6 +14,7 @@ using TableConverter.Commands.DataModels;
 using TableConverter.Commands.Extensions;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Extensions;
+using TableConverter.Utilities.Database.History;
 using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.Utilities.Database.Models.TableStore;
 using TableConverter.Utilities.Models;
@@ -31,7 +32,8 @@ public static partial class TableDataCommandNames
 public class SortByColumnCommandHandler(
     ISukiDialogManager dialogManager,
     ISukiToastManager toastManager,
-    ITableStoreDbContextFactory databaseContextFactory)
+    ITableStoreDbContextFactory databaseContextFactory,
+    ITableHistory history)
     : ICommandHandlerAsync
 {
     private static readonly string[] SortDirections = ["Ascending", "Descending"];
@@ -174,6 +176,16 @@ public class SortByColumnCommandHandler(
         var isDescending = directionList.SelectedIndex == 1;
 
         await using var db = await databaseContextFactory.CreateDbContextAsync(document.Path);
+
+        // Putting the rows in a different order renumbers them, so what is remembered is the order they
+        // were in rather than the values they hold.
+        await using var edit = history.BeginEdit(
+            document.Path,
+            TableEditKind.RowOrderChanged,
+            $"Sorted by '{column.Name}' {(isDescending ? "descending" : "ascending")}");
+
+        await edit.CaptureBeforeAsync(TableRegion.RowOrder());
+
         await using var transaction = await db.Database.BeginTransactionAsync();
 
         try
@@ -190,6 +202,8 @@ public class SortByColumnCommandHandler(
             await transaction.RollbackAsync();
             throw;
         }
+
+        await edit.CommitAsync();
 
         toastManager.CreateSimpleInfoToast()
             .OfType(NotificationType.Success)

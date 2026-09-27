@@ -49,8 +49,24 @@ public sealed class TableStoreMaintenance
     private static readonly string TrimSql = $"""
         UPDATE CELLS
         SET VALUE = TRIM(VALUE, {WhitespaceSql})
-        WHERE VALUE IS NOT NULL
-          AND TRIM(VALUE, {WhitespaceSql}) <> VALUE;
+        WHERE {TrimmableCellSql("VALUE")};
+        """;
+
+    /// <summary>
+    ///     The rows that hold a cell a trim would change, so what is about to be rewritten can be remembered
+    ///     before it is.
+    /// </summary>
+    /// <remarks>
+    ///     The rows are found by the condition the trim itself runs on rather than by reading the table, so
+    ///     naming them costs what the change costs rather than what the table costs. A row the trim would
+    ///     leave alone is left out, which is what keeps an entry describing the trim from holding values the
+    ///     trim never touched.
+    /// </remarks>
+    private static readonly string RowsToTrimSql = $"""
+        SELECT DISTINCT ROW_ID AS Value
+        FROM CELLS
+        WHERE {TrimmableCellSql("VALUE")}
+        ORDER BY ROW_ID;
         """;
 
     /// <summary>
@@ -95,6 +111,18 @@ public sealed class TableStoreMaintenance
         """;
 
     /// <summary>
+    ///     The rows <see cref="RemoveDuplicateRowsSql" /> deletes, so what is about to be removed can be
+    ///     remembered before it is.
+    /// </summary>
+    private static readonly string DuplicateRowIdsSql = $"""
+        {KeepFirstOfEachSignatureSql}
+        SELECT ROW_ID AS Value
+        FROM Signatures
+        WHERE ROW_ID NOT IN (SELECT ROW_ID FROM Keepers)
+        ORDER BY ROW_ID;
+        """;
+
+    /// <summary>
     ///     Counts the rows <see cref="RemoveDuplicateRowsSql" /> deletes, so what a user is told they are
     ///     about to lose is worked out the same way as what they lose.
     /// </summary>
@@ -112,22 +140,34 @@ public sealed class TableStoreMaintenance
             FROM COLUMNS C
             WHERE C.ID = CELLS.COLUMN_ID
         )
-        WHERE {EmptyCellSql("VALUE")}
-          AND COALESCE((
-              SELECT C.DEFAULT_VALUE_FOR_CELL
-              FROM COLUMNS C
-              WHERE C.ID = CELLS.COLUMN_ID
-          ), '') <> '';
+        WHERE {FillableCellSql};
+        """;
+
+    /// <summary>
+    ///     The rows that hold a cell a fill would change, so what is about to be rewritten can be remembered
+    ///     before it is.
+    /// </summary>
+    private static readonly string RowsToFillSql = $"""
+        SELECT DISTINCT ROW_ID AS Value
+        FROM CELLS
+        WHERE {FillableCellSql}
+        ORDER BY ROW_ID;
         """;
 
     private static readonly string RemoveEmptyRowsSql = $"""
         DELETE FROM ROWS
-        WHERE NOT EXISTS (
-            SELECT 1
-            FROM CELLS
-            WHERE CELLS.ROW_ID = ROWS.ID
-              AND {NotEmptyCellSql("CELLS.VALUE")}
-        );
+        WHERE {EmptyRowSql};
+        """;
+
+    /// <summary>
+    ///     The rows <see cref="RemoveEmptyRowsSql" /> deletes, so what is about to be removed can be
+    ///     remembered before it is.
+    /// </summary>
+    private static readonly string EmptyRowIdsSql = $"""
+        SELECT ROWS.ID AS Value
+        FROM ROWS
+        WHERE {EmptyRowSql}
+        ORDER BY ROWS.ID;
         """;
 
     private readonly TableStoreDbContext _dbContext;
@@ -158,11 +198,7 @@ public sealed class TableStoreMaintenance
     /// <returns>The number of cells that were trimmed.</returns>
     public async Task<int> TrimAsync(CancellationToken cancellationToken = default)
     {
-        await using var transaction = await _dbContext.Database
-            .BeginTransactionAsync(cancellationToken)
-            .ConfigureAwait(false);
-
-        try
+        return await _dbContext.Database.RunAsync(async () =>
         {
             // A value that is nothing but whitespace is trimmed to nothing rather than left holding the
             // whitespace, which is what lets the passes that treat an empty cell as a missing one see it.
@@ -172,15 +208,8 @@ public sealed class TableStoreMaintenance
 
             await TrimColumnNamesAsync(cancellationToken).ConfigureAwait(false);
 
-            await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
-
             return trimmedCells;
-        }
-        catch
-        {
-            await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
-            throw;
-        }
+        }, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -235,6 +264,56 @@ public sealed class TableStoreMaintenance
     }
 
     /// <summary>
+    ///     Names the rows that hold a cell <see cref="TrimAsync" /> would change, so what is about to be
+    ///     rewritten can be remembered before it is.
+    /// </summary>
+    public async Task<IReadOnlyList<int>> GetRowIdsToTrimAsync(CancellationToken cancellationToken = default)
+    {
+        return await ReadRowIdsAsync(RowsToTrimSql, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    ///     Names the rows that hold a cell <see cref="FillEmptyCellsAsync" /> would change.
+    /// </summary>
+    public async Task<IReadOnlyList<int>> GetRowIdsToFillAsync(CancellationToken cancellationToken = default)
+    {
+        return await ReadRowIdsAsync(RowsToFillSql, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    ///     Names the rows <see cref="RemoveEmptyRowsAsync" /> would delete, so what is about to be removed
+    ///     can be remembered before it is.
+    /// </summary>
+    public async Task<IReadOnlyList<int>> GetEmptyRowIdsAsync(CancellationToken cancellationToken = default)
+    {
+        return await ReadRowIdsAsync(EmptyRowIdsSql, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    ///     Names the rows <see cref="RemoveDuplicateRowsAsync" /> would delete, so what is about to be
+    ///     removed can be remembered before it is.
+    /// </summary>
+    public async Task<IReadOnlyList<int>> GetDuplicateRowIdsAsync(CancellationToken cancellationToken = default)
+    {
+        return await ReadRowIdsAsync(DuplicateRowIdsSql, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    ///     Names the columns <see cref="RemoveEmptyColumnsAsync" /> would delete, so what is about to be
+    ///     removed can be remembered before it is.
+    /// </summary>
+    public async Task<IReadOnlyList<int>> GetEmptyColumnIdsAsync(CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.Columns
+            .AsNoTracking()
+            .Where(column => !column.Cells.Any(cell => cell.Value != null && cell.Value.Trim() != ""))
+            .OrderBy(column => column.OrdinalPosition)
+            .Select(column => column.Id)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    /// <summary>
     ///     Deletes every column whose cells all hold nothing, and closes the gap the deleted columns
     ///     leave in the ordinal positions.
     /// </summary>
@@ -245,23 +324,14 @@ public sealed class TableStoreMaintenance
     /// </remarks>
     public async Task<int> RemoveEmptyColumnsAsync(CancellationToken cancellationToken = default)
     {
-        var emptyColumnIds = await _dbContext.Columns
-            .AsNoTracking()
-            .Where(column => !column.Cells.Any(cell => cell.Value != null && cell.Value.Trim() != ""))
-            .Select(column => column.Id)
-            .ToListAsync(cancellationToken)
-            .ConfigureAwait(false);
+        var emptyColumnIds = await GetEmptyColumnIdsAsync(cancellationToken).ConfigureAwait(false);
 
         if (emptyColumnIds.Count == 0)
         {
             return 0;
         }
 
-        await using var transaction = await _dbContext.Database
-            .BeginTransactionAsync(cancellationToken)
-            .ConfigureAwait(false);
-
-        try
+        return await _dbContext.Database.RunAsync(async () =>
         {
             var columns = await _dbContext.Columns
                 .Where(column => emptyColumnIds.Contains(column.Id))
@@ -274,15 +344,8 @@ public sealed class TableStoreMaintenance
 
             await RenumberColumnsAsync(cancellationToken).ConfigureAwait(false);
 
-            await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
-
             return columns.Count;
-        }
-        catch
-        {
-            await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
-            throw;
-        }
+        }, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -414,11 +477,7 @@ public sealed class TableStoreMaintenance
                 : (turnedColumnIndex, columns.Count - 1 - turnedRowIndex);
         }
 
-        await using var transaction = await _dbContext.Database
-            .BeginTransactionAsync(cancellationToken)
-            .ConfigureAwait(false);
-
-        try
+        return await _dbContext.Database.RunAsync(async () =>
         {
             // The cells belong to the rows and columns, so emptying the store also empties it of the
             // cells the turned table is about to replace.
@@ -477,15 +536,56 @@ public sealed class TableStoreMaintenance
             }
 
             await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-            await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
-        }
-        catch
-        {
-            await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
-            throw;
-        }
 
-        return new TableShape(turnedRowCount, turnedColumnCount);
+            return new TableShape(turnedRowCount, turnedColumnCount);
+        }, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    ///     The cells a trim would change. A value that is nothing but whitespace is trimmed to nothing
+    ///     rather than left holding the whitespace, which is what lets the passes that treat an empty cell
+    ///     as a missing one see it.
+    /// </summary>
+    private static string TrimmableCellSql(string valueSql)
+    {
+        return $"{valueSql} IS NOT NULL AND TRIM({valueSql}, {WhitespaceSql}) <> {valueSql}";
+    }
+
+    /// <summary>
+    ///     The cells a fill would change: one that holds nothing, in a column that holds a default value
+    ///     to fill it with. A column without one is left alone, so the pass never invents data.
+    /// </summary>
+    private static string FillableCellSql => $"""
+        {EmptyCellSql("VALUE")}
+          AND COALESCE((
+              SELECT C.DEFAULT_VALUE_FOR_CELL
+              FROM COLUMNS C
+              WHERE C.ID = CELLS.COLUMN_ID
+          ), '') <> ''
+        """;
+
+    /// <summary>
+    ///     The rows that hold nothing, which are the rows a de-emptying pass removes.
+    /// </summary>
+    private static string EmptyRowSql => $"""
+        NOT EXISTS (
+            SELECT 1
+            FROM CELLS
+            WHERE CELLS.ROW_ID = ROWS.ID
+              AND {NotEmptyCellSql("CELLS.VALUE")}
+        )
+        """;
+
+    /// <summary>
+    ///     Reads the ids a statement names, which the statement selects as <c>Value</c> so the provider
+    ///     reads them the same way it reads a single scalar.
+    /// </summary>
+    private async Task<List<int>> ReadRowIdsAsync(string sql, CancellationToken cancellationToken)
+    {
+        return await _dbContext.Database
+            .SqlQueryRaw<int>(sql)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
     }
 
     /// <summary>
@@ -556,3 +656,4 @@ public sealed class TableStoreMaintenance
             .ConfigureAwait(false);
     }
 }
+

@@ -17,6 +17,7 @@ using TableConverter.Extensions;
 using TableConverter.Interfaces;
 using TableConverter.Services.DataSources;
 using TableConverter.Utilities.Database.Events;
+using TableConverter.Utilities.Database.History;
 using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.Utilities.Database.Models.TableStore;
 using TableConverter.Utilities.Extensions;
@@ -48,12 +49,13 @@ public partial class TableColumnsEditorViewModel : BaseScopedPaneToolViewModel<T
         IEventManager eventManager, 
         ISukiDialogManager dialogManager, 
         ISukiToastManager toastManager,
-        ITableStoreDbContextFactory databaseContextFactory) 
+        ITableStoreDbContextFactory databaseContextFactory,
+        ITableHistory history) 
         : base(commandManager, eventManager, dialogManager, toastManager, "Columns Editor", false)
     {
         _dbContextFactory = databaseContextFactory;
         ColumnCommands = [];
-        DataSource = new TableStoreColumnsDataSource(databaseContextFactory);
+        DataSource = new TableStoreColumnsDataSource(databaseContextFactory, history);
         TreeDataSource = new FlatTreeDataGridSource<DataItem<ColumnEntity>>(DataSource.Collection);
         TreeDataSource.RowSelection!.SingleSelect = false; 
         

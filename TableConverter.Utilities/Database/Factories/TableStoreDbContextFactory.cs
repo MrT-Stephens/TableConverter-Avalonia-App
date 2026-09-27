@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using TableConverter.Utilities.Database.Configuration;
 using TableConverter.Utilities.Database.Contexts;
+using TableConverter.Utilities.Database.History;
 using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.Utilities.Interfaces;
 
@@ -68,6 +69,10 @@ public sealed class TableStoreDbContextFactory(
         try
         {
             dbContext.Database.EnsureCreated();
+
+            // EnsureCreated only ever creates a whole database, so a store written before the history
+            // existed still has every table but that one and has to be given it here.
+            TableHistorySchema.EnsureCreated(dbContext);
         }
         finally
         {
@@ -90,6 +95,10 @@ public sealed class TableStoreDbContextFactory(
         try
         {
             await dbContext.Database.EnsureCreatedAsync(cancellationToken).ConfigureAwait(false);
+
+            // EnsureCreated only ever creates a whole database, so a store written before the history
+            // existed still has every table but that one and has to be given it here.
+            await TableHistorySchema.EnsureCreatedAsync(dbContext, cancellationToken).ConfigureAwait(false);
         }
         finally
         {
