@@ -21,6 +21,7 @@ using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.Utilities.Database.Models.TableStore;
 using TableConverter.Utilities.Extensions;
 using TableConverter.Utilities.Interfaces;
+using TableConverter.Utilities.Models;
 using TableConverter.ViewModels.Base;
 using TableConverter.ViewModels.Documents;
 using TableConverter.ViewModels.Workspaces;

@@ -2,7 +2,7 @@ using System;
 using System.Globalization;
 using Avalonia.Data.Converters;
 using TableConverter.Services.DataSources.Base;
-using TableConverter.Utilities.Database.Models.TableStore;
+using TableConverter.Utilities.Models;
 
 namespace TableConverter.Converters;
 

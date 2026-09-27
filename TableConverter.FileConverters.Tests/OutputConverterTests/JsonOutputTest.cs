@@ -1,6 +1,7 @@
 using Newtonsoft.Json.Linq;
 using TableConverter.FileConverters.ConverterHandlers;
 using TableConverter.FileConverters.ConverterHandlersOptions;
+using TableConverter.Utilities.Models;
 
 namespace TableConverter.FileConverters.Tests.OutputConverterTests;
 
@@ -124,5 +125,52 @@ public class JsonOutputTest
 
         Assert.True(result.IsSuccess, result.Error);
         Assert.Empty(JArray.Parse(result.Value));
+    }
+
+    [Fact]
+    public async Task Writes_Numbers_And_Booleans_As_Json_Values_For_Typed_Columns()
+    {
+        IReadOnlyList<TableColumn> columns =
+        [
+            new TableColumn("Name", ColumnDataType.Text),
+            new TableColumn("Age", ColumnDataType.Integer),
+            new TableColumn("Active", ColumnDataType.Boolean)
+        ];
+
+        var result = await Utils.ConvertTypedToTextAsync(
+            CreateHandler(ConverterHandlerJsonOutputOptions.JsonStyles.ArrayOfObjects),
+            columns,
+            [["Alice", "30", "true"], ["Bob", "25", "false"]]);
+
+        Assert.True(result.IsSuccess, result.Error);
+
+        var json = JArray.Parse(result.Value);
+
+        // The whole point of the type: a number is a number in the document, not a quoted string.
+        Assert.Equal(JTokenType.Integer, json[0]!["Age"]!.Type);
+        Assert.Equal(30, json[0]!["Age"]!.Value<int>());
+        Assert.Equal(JTokenType.Boolean, json[0]!["Active"]!.Type);
+        Assert.True(json[0]!["Active"]!.Value<bool>());
+        Assert.False(json[1]!["Active"]!.Value<bool>());
+        Assert.Equal("Alice", json[0]!["Name"]!.Value<string>());
+    }
+
+    [Fact]
+    public async Task Writes_Text_For_A_Value_That_Does_Not_Read_As_Its_Type()
+    {
+        IReadOnlyList<TableColumn> columns =
+        [
+            new TableColumn("Age", ColumnDataType.Integer)
+        ];
+
+        var result = await Utils.ConvertTypedToTextAsync(
+            CreateHandler(ConverterHandlerJsonOutputOptions.JsonStyles.ArrayOfObjects), columns, [["not a number"]]);
+
+        Assert.True(result.IsSuccess, result.Error);
+
+        var json = JArray.Parse(result.Value);
+
+        Assert.Equal(JTokenType.String, json[0]!["Age"]!.Type);
+        Assert.Equal("not a number", json[0]!["Age"]!.Value<string>());
     }
 }

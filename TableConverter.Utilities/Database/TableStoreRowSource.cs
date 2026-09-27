@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
 using TableConverter.Utilities.Database.Contexts;
+using TableConverter.Utilities.Models;
 
 namespace TableConverter.Utilities.Database;
 
@@ -25,7 +26,7 @@ public sealed class TableStoreRowSource : ITableRowSource
     private readonly TableStoreDbContext _dbContext;
     private readonly int _rowsPerPage;
 
-    private IReadOnlyList<string>? _headers;
+    private IReadOnlyList<TableColumn>? _columns;
     private Dictionary<int, int>? _indexByColumnId;
 
     private TableStoreRowSource(TableStoreDbContext dbContext, int rowsPerPage)
@@ -51,11 +52,11 @@ public sealed class TableStoreRowSource : ITableRowSource
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<string>> GetHeadersAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<TableColumn>> GetColumnsAsync(CancellationToken cancellationToken = default)
     {
         await EnsureColumnsAsync(cancellationToken).ConfigureAwait(false);
 
-        return _headers!;
+        return _columns!;
     }
 
     /// <inheritdoc />
@@ -64,7 +65,7 @@ public sealed class TableStoreRowSource : ITableRowSource
     {
         await EnsureColumnsAsync(cancellationToken).ConfigureAwait(false);
 
-        var columnCount = _headers!.Count;
+        var columnCount = _columns!.Count;
         var indexByColumnId = _indexByColumnId!;
         var lastRowId = 0;
 
@@ -120,7 +121,7 @@ public sealed class TableStoreRowSource : ITableRowSource
 
     private async Task EnsureColumnsAsync(CancellationToken cancellationToken)
     {
-        if (_headers is not null)
+        if (_columns is not null)
         {
             return;
         }
@@ -132,16 +133,18 @@ public sealed class TableStoreRowSource : ITableRowSource
             .ConfigureAwait(false);
 
         var indexByColumnId = new Dictionary<int, int>(columns.Count);
-        var headers = new string[columns.Count];
+        var declared = new TableColumn[columns.Count];
 
         for (var index = 0; index < columns.Count; index++)
         {
-            headers[index] = columns[index].Name;
+            // The type is what the column was read to hold, which is what lets an exporter write its
+            // cells as the kind of thing they are rather than as text.
+            declared[index] = new TableColumn(columns[index].Name, columns[index].DataType);
             indexByColumnId[columns[index].Id] = index;
         }
 
         _indexByColumnId = indexByColumnId;
-        _headers = headers;
+        _columns = declared;
     }
 
     private readonly record struct CellValue(int RowId, int ColumnId, string? Value);

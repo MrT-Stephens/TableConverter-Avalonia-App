@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Text;
 using TableConverter.Utilities;
+using TableConverter.Utilities.Models;
 
 namespace TableConverter.FileConverters.Tests.TestBase;
 
@@ -15,7 +16,7 @@ namespace TableConverter.FileConverters.Tests.TestBase;
 /// </remarks>
 public sealed class TableSnapshot : ITableRowSink, ITableRowSource, IEquatable<TableSnapshot>
 {
-    private readonly List<string> _headers = [];
+    private readonly List<TableColumn> _columns = [];
     private readonly List<string[]> _rows = [];
 
     /// <summary>
@@ -32,11 +33,16 @@ public sealed class TableSnapshot : ITableRowSink, ITableRowSource, IEquatable<T
     /// <param name="headers">The column names of the table.</param>
     /// <param name="rows">The rows of the table, positionally matching <paramref name="headers" />.</param>
     public TableSnapshot(IReadOnlyList<string> headers, IEnumerable<string[]> rows)
+        : this(TableColumn.Untyped(headers), rows)
     {
-        ArgumentNullException.ThrowIfNull(headers);
+    }
+
+    private TableSnapshot(IReadOnlyList<TableColumn> columns, IEnumerable<string[]> rows)
+    {
+        ArgumentNullException.ThrowIfNull(columns);
         ArgumentNullException.ThrowIfNull(rows);
 
-        _headers.AddRange(headers);
+        _columns.AddRange(columns);
 
         foreach (var row in rows)
         {
@@ -45,9 +51,29 @@ public sealed class TableSnapshot : ITableRowSink, ITableRowSource, IEquatable<T
     }
 
     /// <summary>
+    ///     Creates a snapshot whose columns already carry a type, which is what a test of a typed read or
+    ///     write starts from.
+    /// </summary>
+    /// <param name="columns">The columns of the table, carrying how their values read.</param>
+    /// <param name="rows">The rows of the table, positionally matching <paramref name="columns" />.</param>
+    /// <remarks>
+    ///     A factory rather than a second constructor: an empty collection expression reads as either a
+    ///     set of names or a set of columns, so two constructors would make such a call ambiguous.
+    /// </remarks>
+    public static TableSnapshot WithColumns(IReadOnlyList<TableColumn> columns, IEnumerable<string[]> rows)
+    {
+        return new TableSnapshot(columns, rows);
+    }
+
+    /// <summary>
+    ///     Gets the columns, in the order the values of each row are held.
+    /// </summary>
+    public IReadOnlyList<TableColumn> Columns => _columns;
+
+    /// <summary>
     ///     Gets the column names, in the order the values of each row are held.
     /// </summary>
-    public IReadOnlyList<string> Headers => _headers;
+    public IReadOnlyList<string> Headers => _columns.Names();
 
     /// <summary>
     ///     Gets the rows, each positionally matching <see cref="Headers" />.
@@ -58,12 +84,12 @@ public sealed class TableSnapshot : ITableRowSink, ITableRowSource, IEquatable<T
     public bool IsCompleted { get; private set; }
 
     /// <inheritdoc />
-    public Task BeginAsync(IReadOnlyList<string> headers, CancellationToken cancellationToken = default)
+    public Task BeginAsync(IReadOnlyList<TableColumn> columns, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(headers);
+        ArgumentNullException.ThrowIfNull(columns);
 
-        _headers.Clear();
-        _headers.AddRange(headers);
+        _columns.Clear();
+        _columns.AddRange(columns);
 
         return Task.CompletedTask;
     }
@@ -89,9 +115,9 @@ public sealed class TableSnapshot : ITableRowSink, ITableRowSource, IEquatable<T
     }
 
     /// <inheritdoc />
-    public Task<IReadOnlyList<string>> GetHeadersAsync(CancellationToken cancellationToken = default)
+    public Task<IReadOnlyList<TableColumn>> GetColumnsAsync(CancellationToken cancellationToken = default)
     {
-        return Task.FromResult<IReadOnlyList<string>>(_headers.ToArray());
+        return Task.FromResult<IReadOnlyList<TableColumn>>(_columns.ToArray());
     }
 
     /// <inheritdoc />
@@ -124,7 +150,7 @@ public sealed class TableSnapshot : ITableRowSink, ITableRowSource, IEquatable<T
             return true;
         }
 
-        return _headers.SequenceEqual(other._headers) && RowsEqual(other);
+        return _columns.Names().SequenceEqual(other._columns.Names()) && RowsEqual(other);
     }
 
     /// <inheritdoc />
@@ -138,9 +164,9 @@ public sealed class TableSnapshot : ITableRowSink, ITableRowSource, IEquatable<T
     {
         var hash = new HashCode();
 
-        foreach (var header in _headers)
+        foreach (var column in _columns)
         {
-            hash.Add(header);
+            hash.Add(column);
         }
 
         foreach (var row in _rows)
@@ -159,7 +185,7 @@ public sealed class TableSnapshot : ITableRowSink, ITableRowSource, IEquatable<T
     {
         var builder = new StringBuilder();
 
-        builder.Append(string.Join(',', _headers));
+        builder.Append(string.Join(',', _columns.Names()));
 
         foreach (var row in _rows)
         {

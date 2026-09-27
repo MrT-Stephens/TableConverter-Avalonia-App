@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -19,6 +20,7 @@ using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.Utilities.Database.Models;
 using TableConverter.Utilities.Database.Models.TableStore;
 using TableConverter.Utilities.Extensions;
+using TableConverter.Utilities.Models;
 using TableConverter.ViewModels.Documents;
 using TableConverter.ViewModels.Forms;
 using TableConverter.ViewModels.Tools;
@@ -35,6 +37,15 @@ public class SearchTableDataCommandHandler(
     ITableStoreDbContextFactory databaseContextFactory)
     : ICommandHandlerAsync
 {
+    /// <summary>
+    ///     The stored codes of the column types that read as numbers, and as dates, which is what the
+    ///     typed comparison of a value match is gated on.
+    /// </summary>
+    private static readonly string NumericDataTypeCodes =
+        $"{(int)ColumnDataType.Integer}, {(int)ColumnDataType.Decimal}";
+
+    private static readonly string DateDataTypeCodes = $"{(int)ColumnDataType.Date}, {(int)ColumnDataType.DateTime}";
+
     public ICommandMetadata CommandMetadata => new CommandMetadata(
         TableDataCommandNames.Search,
         "Search",
@@ -111,12 +122,24 @@ public class SearchTableDataCommandHandler(
             var searchColumn = settings.SearchInSpecificColumn;
             var searchAllColumns = searchColumn == "All";
 
-            object[] parameters =
-            [
-                new SqliteParameter("@SEARCH_TEXT", searchText),
-                new SqliteParameter("@PATTERN", $"%{searchText}%"),
-                new SqliteParameter("@COLUMN", searchColumn)
-            ];
+            var parameters = new List<SqliteParameter>
+            {
+                new("@SEARCH_TEXT", searchText),
+                new("@PATTERN", $"%{searchText}%"),
+                new("@COLUMN", searchColumn),
+                new("@SEARCH_NUMBER", SearchNumber(searchText))
+            };
+
+            // A search for a number, or for a date, is also compared as that kind of value, so "30" finds
+            // a cell holding "30.00" and a day finds a cell holding it as a timestamp. A search that reads
+            // as neither is compared as text alone.
+            var compareNumbers = double.TryParse(searchText, NumberStyles.Number, CultureInfo.InvariantCulture,
+                out _);
+            var compareDates = DateOnly.TryParse(searchText, CultureInfo.InvariantCulture, DateTimeStyles.None, out _)
+                               || DateTime.TryParse(searchText, CultureInfo.InvariantCulture, DateTimeStyles.None,
+                                   out _);
+
+            var exactRowMatch = BuildExactRowMatch(settings.MatchCase, compareNumbers, compareDates);
 
             var inserted = 0;
             
@@ -173,27 +196,16 @@ public class SearchTableDataCommandHandler(
                 if (settings.MatchWholeWord)
                 {
                     inserted += await db.Database.ExecuteSqlRawAsync(
-                        settings.MatchCase
-                            ? $"""
-                            INSERT INTO SEARCH_RESULT (ROW_ID, COLUMN_ID, VALUE, FOUND_VALUE)
-                            SELECT C.ROW_ID, C.COLUMN_ID, C.VALUE, @SEARCH_TEXT
-                            FROM CELLS C
-                            JOIN COLUMNS COL
-                                ON C.COLUMN_ID = COL.ID
-                            WHERE 
-                                {(searchAllColumns ? "" : "COL.NAME = @COLUMN AND")} 
-                                C.VALUE = @SEARCH_TEXT;
-                            """
-                            : $"""
-                            INSERT INTO SEARCH_RESULT (ROW_ID, COLUMN_ID, VALUE, FOUND_VALUE)
-                            SELECT C.ROW_ID, C.COLUMN_ID, C.VALUE, @SEARCH_TEXT
-                            FROM CELLS C
-                            JOIN COLUMNS COL
-                                ON C.COLUMN_ID = COL.ID
-                            WHERE 
-                                {(searchAllColumns ? "" : "COL.NAME = @COLUMN AND")} 
-                                C.VALUE COLLATE NOCASE = @SEARCH_TEXT;
-                            """,
+                        $"""
+                        INSERT INTO SEARCH_RESULT (ROW_ID, COLUMN_ID, VALUE, FOUND_VALUE)
+                        SELECT C.ROW_ID, C.COLUMN_ID, C.VALUE, @SEARCH_TEXT
+                        FROM CELLS C
+                        JOIN COLUMNS COL
+                            ON C.COLUMN_ID = COL.ID
+                        WHERE 
+                            {(searchAllColumns ? "" : "COL.NAME = @COLUMN AND")} 
+                            {exactRowMatch};
+                        """,
                         parameters);
                 }
                 else
@@ -401,5 +413,55 @@ public class SearchTableDataCommandHandler(
             await transaction.RollbackAsync();
             throw;
         }
+    }
+
+    /// <summary>
+    ///     Reads <paramref name="searchText" /> as the number a numeric column is compared against.
+    /// </summary>
+    /// <returns>
+    ///     The number, which is passed as a double because SQLite has no other kind of number, or
+    ///     <see cref="DBNull.Value" /> when the text is not a number, in which case no cell can match it.
+    /// </returns>
+    private static object SearchNumber(string searchText)
+    {
+        return double.TryParse(searchText, NumberStyles.Number, CultureInfo.InvariantCulture, out var number)
+            ? number
+            : DBNull.Value;
+    }
+
+    /// <summary>
+    ///     Builds the predicate for an exact value match on a row's cell.
+    /// </summary>
+    /// <param name="matchCase">Whether the text comparison has to match the case.</param>
+    /// <param name="compareNumbers">Whether the search text reads as a number, so numeric columns match it.</param>
+    /// <param name="compareDates">Whether the search text reads as a date, so date columns match it.</param>
+    /// <remarks>
+    ///     The comparison is textual first, because that is what a cell holds. A numeric or date column is
+    ///     then also compared as its own kind of value, which is what lets a search for "30" find a cell
+    ///     holding "30.00" rather than only the cell that happens to hold exactly "30". A cell is only
+    ///     read as a number when it holds one of its own accord, because SQLite reads anything it cannot
+    ///     parse as zero and that would otherwise let any text match a search for zero.
+    /// </remarks>
+    private static string BuildExactRowMatch(bool matchCase, bool compareNumbers, bool compareDates)
+    {
+        var textMatch = matchCase ? "C.VALUE = @SEARCH_TEXT" : "C.VALUE COLLATE NOCASE = @SEARCH_TEXT";
+
+        var clauses = new List<string> { textMatch };
+
+        if (compareNumbers)
+        {
+            clauses.Add($"""
+                (COL.DATA_TYPE IN ({NumericDataTypeCodes})
+                    AND C.VALUE GLOB '*[0-9]*' AND C.VALUE NOT GLOB '*[A-Za-z]*'
+                    AND CAST(C.VALUE AS REAL) = @SEARCH_NUMBER)
+                """);
+        }
+
+        if (compareDates)
+        {
+            clauses.Add($"(COL.DATA_TYPE IN ({DateDataTypeCodes}) AND DATE(C.VALUE) = DATE(@SEARCH_TEXT))");
+        }
+
+        return $"({string.Join(" OR ", clauses)})";
     }
 }

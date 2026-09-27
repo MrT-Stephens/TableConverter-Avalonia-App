@@ -10,6 +10,7 @@ using TableConverter.Commands.Interfaces;
 using TableConverter.Extensions;
 using TableConverter.Utilities.Database.Contexts;
 using TableConverter.Utilities.Database.Interfaces;
+using TableConverter.Utilities.Models;
 using TableConverter.ViewModels.Documents;
 using TableConverter.ViewModels.Forms;
 using TableConverter.ViewModels.Workspaces;

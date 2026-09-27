@@ -16,6 +16,7 @@ using TableConverter.Commands.Interfaces;
 using TableConverter.Extensions;
 using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.Utilities.Database.Models.TableStore;
+using TableConverter.Utilities.Models;
 
 namespace TableConverter.Commands.Handlers.TableData;
 

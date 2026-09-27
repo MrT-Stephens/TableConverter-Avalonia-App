@@ -1,5 +1,6 @@
 using System.Text;
 using TableConverter.Utilities;
+using TableConverter.Utilities.Models;
 
 namespace TableConverter.DataGeneration.Tests;
 
@@ -13,7 +14,7 @@ namespace TableConverter.DataGeneration.Tests;
 /// </remarks>
 public sealed class TableSnapshot : ITableRowSink, IEquatable<TableSnapshot>
 {
-    private readonly List<string> _headers = [];
+    private readonly List<TableColumn> _columns = [];
     private readonly List<string[]> _rows = [];
 
     /// <summary>
@@ -34,7 +35,7 @@ public sealed class TableSnapshot : ITableRowSink, IEquatable<TableSnapshot>
         ArgumentNullException.ThrowIfNull(headers);
         ArgumentNullException.ThrowIfNull(rows);
 
-        _headers.AddRange(headers);
+        _columns.AddRange(TableColumn.Untyped(headers));
 
         foreach (var row in rows)
         {
@@ -43,9 +44,14 @@ public sealed class TableSnapshot : ITableRowSink, IEquatable<TableSnapshot>
     }
 
     /// <summary>
+    ///     Gets the columns, in the order the values of each row are held.
+    /// </summary>
+    public IReadOnlyList<TableColumn> Columns => _columns;
+
+    /// <summary>
     ///     Gets the column names, in the order the values of each row are held.
     /// </summary>
-    public IReadOnlyList<string> Headers => _headers;
+    public IReadOnlyList<string> Headers => _columns.Names();
 
     /// <summary>
     ///     Gets the rows, each positionally matching <see cref="Headers" />.
@@ -56,12 +62,12 @@ public sealed class TableSnapshot : ITableRowSink, IEquatable<TableSnapshot>
     public bool IsCompleted { get; private set; }
 
     /// <inheritdoc />
-    public Task BeginAsync(IReadOnlyList<string> headers, CancellationToken cancellationToken = default)
+    public Task BeginAsync(IReadOnlyList<TableColumn> columns, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(headers);
+        ArgumentNullException.ThrowIfNull(columns);
 
-        _headers.Clear();
-        _headers.AddRange(headers);
+        _columns.Clear();
+        _columns.AddRange(columns);
 
         return Task.CompletedTask;
     }
@@ -99,7 +105,7 @@ public sealed class TableSnapshot : ITableRowSink, IEquatable<TableSnapshot>
             return true;
         }
 
-        return _headers.SequenceEqual(other._headers) && RowsEqual(other);
+        return _columns.Names().SequenceEqual(other._columns.Names()) && RowsEqual(other);
     }
 
     /// <inheritdoc />
@@ -113,9 +119,9 @@ public sealed class TableSnapshot : ITableRowSink, IEquatable<TableSnapshot>
     {
         var hash = new HashCode();
 
-        foreach (var header in _headers)
+        foreach (var column in _columns)
         {
-            hash.Add(header);
+            hash.Add(column);
         }
 
         foreach (var row in _rows)
@@ -154,7 +160,7 @@ public sealed class TableSnapshot : ITableRowSink, IEquatable<TableSnapshot>
     {
         var sb = new StringBuilder();
         sb.Append("TableSnapshot: ");
-        sb.Append(_headers.Count);
+        sb.Append(_columns.Count);
         sb.Append(" headers, ");
         sb.Append(_rows.Count);
         sb.Append(" rows");

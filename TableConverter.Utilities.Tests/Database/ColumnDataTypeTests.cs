@@ -5,12 +5,13 @@ using TableConverter.Utilities.Database.Extensions;
 using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.Utilities.Database.Models.TableStore;
 using TableConverter.Utilities.Interfaces;
+using TableConverter.Utilities.Models;
 
 namespace TableConverter.Utilities.Tests.Database;
 
 /// <summary>
-/// Covers column types: how a value is tested against the type its column was given, and how the type
-/// itself is kept in the store.
+/// Covers column types: how a value is tested against the type its column was given, how a column that
+/// named no type has one read off its values, and how the type itself is kept in the store.
 /// </summary>
 public class ColumnDataTypeTests
 {
@@ -41,6 +42,7 @@ public class ColumnDataTypeTests
     [InlineData(ColumnDataType.Boolean, "true")]
     [InlineData(ColumnDataType.Boolean, "False")]
     [InlineData(ColumnDataType.Date, "2026-09-26")]
+    [InlineData(ColumnDataType.Date, "2026-09-26T00:00:00")]
     [InlineData(ColumnDataType.DateTime, "2026-09-26T14:30:00")]
     public void IsValidValue_Accepts_Values_That_Read_As_The_Type(ColumnDataType dataType, string value)
     {
@@ -54,6 +56,8 @@ public class ColumnDataTypeTests
     [InlineData(ColumnDataType.Boolean, "yes")]
     [InlineData(ColumnDataType.Boolean, "1")]
     [InlineData(ColumnDataType.Date, "not a date")]
+    [InlineData(ColumnDataType.Date, "2026-09-26T14:30:00")]
+    [InlineData(ColumnDataType.Date, "2026-09-26 14:30:00")]
     [InlineData(ColumnDataType.DateTime, "not a date")]
     public void IsValidValue_Rejects_Values_That_Do_Not_Read_As_The_Type(ColumnDataType dataType, string value)
     {
@@ -131,7 +135,7 @@ public class ColumnDataTypeTests
     }
 
     [Fact]
-    public async Task A_Store_Written_From_A_Table_Is_Typed_As_Text()
+    public async Task A_Column_That_Reads_As_Nothing_Stays_Text()
     {
         using var provider = BuildProvider();
         var factory = provider.GetRequiredService<ITableStoreDbContextFactory>();
@@ -140,8 +144,8 @@ public class ColumnDataTypeTests
 
         try
         {
-            // An imported table carries no type information, so it must not leave columns with a type
-            // that was never chosen.
+            // A column whose values do not read as any kind of value is left as text, so an imported
+            // table never ends up with a type that reading the values could not justify.
             await using (var dbContext = await factory.CreateDbContextAsync(path))
             {
                 await using var sink = TableStoreRowSink.Create(dbContext);
@@ -168,6 +172,163 @@ public class ColumnDataTypeTests
         }
     }
 
+    [Fact]
+    public async Task A_Column_That_Named_No_Type_Is_Typed_From_The_Values_Written_To_It()
+    {
+        using var provider = BuildProvider();
+        var factory = provider.GetRequiredService<ITableStoreDbContextFactory>();
+
+        var path = NewStorePath();
+
+        try
+        {
+            // This is how an imported or generated table stops being made of nothing but text: the values
+            // are read to find out what each column holds.
+            await using (var dbContext = await factory.CreateDbContextAsync(path))
+            {
+                await using var sink = TableStoreRowSink.Create(dbContext);
+
+                await sink.BeginAsync(["Whole", "Fraction", "Flag", "Day", "Moment"]);
+
+                await sink.WriteRowAsync(["42", "1234.56", "true", "2026-09-26", "2026-09-26T14:30:00"]);
+                await sink.WriteRowAsync(["7", "-0.5", "False", "2025-01-02", "2025-01-02T09:00:00"]);
+
+                await sink.CompleteAsync();
+            }
+
+            await using (var dbContext = await factory.CreateDbContextAsync(path))
+            {
+                var types = await dbContext.Columns
+                    .AsNoTracking()
+                    .OrderBy(column => column.OrdinalPosition)
+                    .Select(column => column.DataType)
+                    .ToListAsync();
+
+                Assert.Equal(
+                [
+                    ColumnDataType.Integer,
+                    ColumnDataType.Decimal,
+                    ColumnDataType.Boolean,
+                    ColumnDataType.Date,
+                    ColumnDataType.DateTime
+                ], types);
+            }
+        }
+        finally
+        {
+            DeleteStore(path);
+        }
+    }
+
+    [Fact]
+    public async Task A_Column_Whose_Values_Do_Not_Agree_Stays_Text()
+    {
+        using var provider = BuildProvider();
+        var factory = provider.GetRequiredService<ITableStoreDbContextFactory>();
+
+        var path = NewStorePath();
+
+        try
+        {
+            // One value that does not fit is enough to leave the column as text, so a column is never
+            // mistyped on the strength of the values that happen to read.
+            await using (var dbContext = await factory.CreateDbContextAsync(path))
+            {
+                await using var sink = TableStoreRowSink.Create(dbContext);
+
+                await sink.BeginAsync(["Amount"]);
+
+                await sink.WriteRowAsync(["42"]);
+                await sink.WriteRowAsync(["not a number"]);
+
+                await sink.CompleteAsync();
+            }
+
+            await using (var dbContext = await factory.CreateDbContextAsync(path))
+            {
+                var type = await dbContext.Columns.AsNoTracking().Select(column => column.DataType).SingleAsync();
+
+                Assert.Equal(ColumnDataType.Text, type);
+            }
+        }
+        finally
+        {
+            DeleteStore(path);
+        }
+    }
+
+    [Fact]
+    public async Task A_Column_Whose_Type_Was_Chosen_Keeps_It()
+    {
+        using var provider = BuildProvider();
+        var factory = provider.GetRequiredService<ITableStoreDbContextFactory>();
+
+        var path = NewStorePath();
+
+        try
+        {
+            // A column that named its type is taken at its word, so a text column of numbers stays a text
+            // column rather than being read back as something the person who set it did not ask for.
+            await using (var dbContext = await factory.CreateDbContextAsync(path))
+            {
+                await using var sink = TableStoreRowSink.Create(dbContext);
+
+                await sink.BeginAsync([new TableColumn("Code", ColumnDataType.Text)]);
+
+                await sink.WriteRowAsync(["0042"]);
+
+                await sink.CompleteAsync();
+            }
+
+            await using (var dbContext = await factory.CreateDbContextAsync(path))
+            {
+                var type = await dbContext.Columns.AsNoTracking().Select(column => column.DataType).SingleAsync();
+
+                Assert.Equal(ColumnDataType.Text, type);
+            }
+        }
+        finally
+        {
+            DeleteStore(path);
+        }
+    }
+
+    [Fact]
+    public async Task A_Column_Of_Timestamps_Is_A_Date_And_Time_Column()
+    {
+        using var provider = BuildProvider();
+        var factory = provider.GetRequiredService<ITableStoreDbContextFactory>();
+
+        var path = NewStorePath();
+
+        try
+        {
+            // A timestamp is a date and a time, so reading it as a date would quietly drop the time the
+            // moment it was shown or exported.
+            await using (var dbContext = await factory.CreateDbContextAsync(path))
+            {
+                await using var sink = TableStoreRowSink.Create(dbContext);
+
+                await sink.BeginAsync(["Taken"]);
+
+                await sink.WriteRowAsync(["2026-09-26T14:30:00"]);
+
+                await sink.CompleteAsync();
+            }
+
+            await using (var dbContext = await factory.CreateDbContextAsync(path))
+            {
+                var type = await dbContext.Columns.AsNoTracking().Select(column => column.DataType).SingleAsync();
+
+                Assert.Equal(ColumnDataType.DateTime, type);
+            }
+        }
+        finally
+        {
+            DeleteStore(path);
+        }
+    }
+
     private static void DeleteStore(string path)
     {
         foreach (var file in new[] { path, $"{path}-wal", $"{path}-shm" })
@@ -179,3 +340,4 @@ public class ColumnDataTypeTests
         }
     }
 }
+

@@ -2,6 +2,7 @@ using System.Text;
 using TableConverter.FileConverters.Interfaces;
 using TableConverter.FileConverters.Tests.TestBase;
 using TableConverter.Utilities;
+using TableConverter.Utilities.Models;
 
 namespace TableConverter.FileConverters.Tests;
 
@@ -51,6 +52,27 @@ public static class Utils
     }
 
     /// <summary>
+    ///     Runs an output handler over a table whose columns carry a type, for a test that asserts on the
+    ///     kind of cells an exporter writes rather than only on their text.
+    /// </summary>
+    /// <param name="handler">The handler to run.</param>
+    /// <param name="columns">The typed columns of the table to convert.</param>
+    /// <param name="rows">The rows of the table to convert.</param>
+    public static async Task<Result<string>> ConvertTypedToTextAsync(
+        IConverterHandlerOutput handler,
+        IReadOnlyList<TableColumn> columns,
+        string[][] rows)
+    {
+        using var stream = new MemoryStream();
+
+        var result = await handler.ConvertToStreamAsync(stream, TableSnapshot.WithColumns(columns, rows));
+
+        return result.IsSuccess
+            ? Result<string>.Success(Encoding.UTF8.GetString(stream.ToArray()))
+            : Result<string>.Failure(result.Error ?? string.Empty);
+    }
+
+    /// <summary>
     ///     Runs an output handler over a table through its single entry point, writing into
     ///     <paramref name="stream" />, for a format a test has to read back from the bytes rather than
     ///     from text.
@@ -66,5 +88,23 @@ public static class Utils
         Stream stream)
     {
         return handler.ConvertToStreamAsync(stream, new TableSnapshot(headers, rows));
+    }
+
+    /// <summary>
+    ///     Runs an output handler over a table whose columns carry a type, writing into
+    ///     <paramref name="stream" />, for a format a test has to read back from the bytes rather than
+    ///     from text.
+    /// </summary>
+    /// <param name="handler">The handler to run.</param>
+    /// <param name="columns">The typed columns of the table to convert.</param>
+    /// <param name="rows">The rows of the table to convert.</param>
+    /// <param name="stream">The stream the converted table is written to.</param>
+    public static Task<Result> ConvertTypedToStreamAsync(
+        IConverterHandlerOutput handler,
+        IReadOnlyList<TableColumn> columns,
+        string[][] rows,
+        Stream stream)
+    {
+        return handler.ConvertToStreamAsync(stream, TableSnapshot.WithColumns(columns, rows));
     }
 }

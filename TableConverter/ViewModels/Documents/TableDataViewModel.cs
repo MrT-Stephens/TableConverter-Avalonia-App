@@ -35,6 +35,7 @@ using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.Utilities.Database.Models.TableStore;
 using TableConverter.Utilities.Extensions;
 using TableConverter.Utilities.Interfaces;
+using TableConverter.Utilities.Models;
 
 namespace TableConverter.ViewModels.Documents;
 
@@ -323,12 +324,14 @@ public partial class TableDataViewModel : BaseDocumentViewModel, ISessionDocumen
         var valuePath = $"Item.Cells[{columnIndex}].Value";
 
         // A value is never rejected for not matching its column's type, because a typed column would
-        // otherwise be unusable while its values were still being entered. The type only decides how the
-        // cell reads: numbers are right aligned, so a column of them lines up the way it would in a
-        // spreadsheet, and anything that does not read as the type is marked, so the styles can draw it
-        // in the theme's error colour.
+        // otherwise be unusable while its values were still being entered. The type decides how the
+        // cell reads: the value is laid out the way its type reads, so a column of numbers is grouped
+        // and lines up on the right the way it would in a spreadsheet, a date is shown in the one form
+        // that cannot be misread, and anything that does not read as the type is marked, so the styles
+        // can draw it in the theme's error colour.
         var textAlignment = dataType.IsNumeric() ? TextAlignment.Right : TextAlignment.Left;
         var mismatch = new ColumnValueMismatchConverter(dataType);
+        var format = new ColumnValueFormatConverter(dataType);
 
         return new TemplateColumn<TModel>(header,
             new FuncDataTemplate<TModel>((_, _) => new TextBlock
@@ -338,7 +341,8 @@ public partial class TableDataViewModel : BaseDocumentViewModel, ISessionDocumen
                 [!TextBlock.TextProperty] = new Binding
                 {
                     Path = valuePath,
-                    Mode = BindingMode.TwoWay
+                    Mode = BindingMode.TwoWay,
+                    Converter = format
                 },
                 [!ColumnValueMismatch.IsMismatchedProperty] = new Binding
                 {

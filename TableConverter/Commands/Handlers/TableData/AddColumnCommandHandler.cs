@@ -5,6 +5,7 @@ using TableConverter.Commands.DataModels;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Extensions;
 using TableConverter.Utilities.Database.Models.TableStore;
+using TableConverter.Utilities.Models;
 using TableConverter.ViewModels.Tools;
 
 namespace TableConverter.Commands.Handlers.TableData;

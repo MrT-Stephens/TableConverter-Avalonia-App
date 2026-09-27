@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using TableConverter.Services.DataSources.Base;
 using TableConverter.Utilities.Database.Models.TableStore;
 using TableConverter.Utilities.Database.Interfaces;
+using TableConverter.Utilities.Models;
 
 namespace TableConverter.Services.DataSources;
 

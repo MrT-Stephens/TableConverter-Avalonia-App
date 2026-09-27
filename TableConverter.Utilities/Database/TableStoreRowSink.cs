@@ -3,7 +3,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using TableConverter.Utilities.Database.Contexts;
-using TableConverter.Utilities.Database.Models.TableStore;
+using TableConverter.Utilities.Models;
 
 namespace TableConverter.Utilities.Database;
 
@@ -25,12 +25,6 @@ namespace TableConverter.Utilities.Database;
 /// </remarks>
 public sealed class TableStoreRowSink : ITableRowSink, IAsyncDisposable
 {
-    /// <summary>
-    ///     The data type stored for every written column. An imported table carries no type information,
-    ///     so its columns are text, matching the columns produced by the New File command.
-    /// </summary>
-    private const int TextDataType = (int)ColumnDataType.Text;
-
     /// <summary>
     ///     The number of cells buffered before a batch is inserted. Each cell binds one parameter, and
     ///     the default SQLite limit on bound parameters has historically been as low as 999, so the
@@ -67,6 +61,18 @@ public sealed class TableStoreRowSink : ITableRowSink, IAsyncDisposable
     private IDbContextTransaction? _transaction;
     private int _columnCount;
 
+    /// <summary>
+    ///     Which columns were declared without a type, and so have their type read off the values that
+    ///     are written to them. <see langword="null" /> when every column named its type.
+    /// </summary>
+    private bool[]? _inferColumn;
+
+    /// <summary>
+    ///     Reads the type of each column that was declared without one. <see langword="null" /> when
+    ///     every column named its type.
+    /// </summary>
+    private ColumnTypeInference? _inference;
+
     /// <summary>The number of row ids currently waiting in <see cref="_rowValues" />.</summary>
     private int _bufferedRows;
 
@@ -101,9 +107,9 @@ public sealed class TableStoreRowSink : ITableRowSink, IAsyncDisposable
     }
 
     /// <inheritdoc />
-    public async Task BeginAsync(IReadOnlyList<string> headers, CancellationToken cancellationToken = default)
+    public async Task BeginAsync(IReadOnlyList<TableColumn> columns, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(headers);
+        ArgumentNullException.ThrowIfNull(columns);
         ObjectDisposedException.ThrowIf(_disposed, this);
 
         if (_begun)
@@ -112,7 +118,21 @@ public sealed class TableStoreRowSink : ITableRowSink, IAsyncDisposable
         }
 
         _begun = true;
-        _columnCount = headers.Count;
+        _columnCount = columns.Count;
+
+        // A column that was declared without a type is one whose values have to be read to find out what
+        // it holds, which is how an imported table stops being made of nothing but text.
+        for (var index = 0; index < columns.Count; index++)
+        {
+            if (columns[index].DataType is not null)
+            {
+                continue;
+            }
+
+            _inferColumn ??= new bool[columns.Count];
+            _inferColumn[index] = true;
+            _inference ??= new ColumnTypeInference();
+        }
 
         _transaction = await _dbContext.Database
             .BeginTransactionAsync(cancellationToken)
@@ -122,7 +142,7 @@ public sealed class TableStoreRowSink : ITableRowSink, IAsyncDisposable
             .ExecuteSqlRawAsync(ClearStoreSql, cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
-        await WriteColumnsAsync(headers, cancellationToken).ConfigureAwait(false);
+        await WriteColumnsAsync(columns, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -167,6 +187,13 @@ public sealed class TableStoreRowSink : ITableRowSink, IAsyncDisposable
             // mapping for DBNull, which is what a bare null argument would be bound as.
             _parameters.Add(new SqliteParameter(parameterName, (object?)value ?? DBNull.Value));
 
+            // The type of a column that named none is read off what goes into it, so it is read here
+            // while the value is still to hand.
+            if (_inferColumn?[columnIndex] == true)
+            {
+                _inference!.Observe(columnIndex, value);
+            }
+
             if (_parameters.Count >= CellsPerBatch)
             {
                 // Safe to flush mid row: the row id is already buffered, so the cells that follow in a
@@ -197,6 +224,10 @@ public sealed class TableStoreRowSink : ITableRowSink, IAsyncDisposable
         }
 
         await FlushAsync(cancellationToken).ConfigureAwait(false);
+
+        // The type of every column that named none is settled before the transaction is committed, so
+        // the store is never left holding a table whose columns are still unread.
+        await WriteInferredTypesAsync(cancellationToken).ConfigureAwait(false);
 
         if (_transaction is not null)
         {
@@ -246,17 +277,63 @@ public sealed class TableStoreRowSink : ITableRowSink, IAsyncDisposable
         _bufferedRows++;
     }
 
-    private async Task WriteColumnsAsync(IReadOnlyList<string> headers, CancellationToken cancellationToken)
+    private async Task WriteColumnsAsync(IReadOnlyList<TableColumn> columns, CancellationToken cancellationToken)
     {
-        for (var index = 0; index < headers.Count; index++)
+        for (var index = 0; index < columns.Count; index++)
         {
             var ordinalPosition = index + 1;
-            var header = headers[index];
+            var column = columns[index];
+
+            // A column that named no type is written as text to begin with. It is retyped once every row
+            // has been read, which is the only point at which the whole of its values is known. Writing it
+            // as text means an import that never completes leaves a table of text rather than a table of
+            // nothing.
+            var dataType = (int)column.EffectiveDataType;
 
             await _dbContext.Database.ExecuteSqlInterpolatedAsync(
                 $"""
                  INSERT INTO COLUMNS (ID, NAME, DATA_TYPE, ORDINAL_POSITION)
-                 VALUES ({ordinalPosition}, {header}, {TextDataType}, {ordinalPosition});
+                 VALUES ({ordinalPosition}, {column.Name}, {dataType}, {ordinalPosition});
+                 """, cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>
+    ///     Settles the type of every column that was declared without one, from the values that were
+    ///     written to it.
+    /// </summary>
+    /// <remarks>
+    ///     A column that reads as text is left alone rather than written back, because text is what it
+    ///     already holds. Nothing about the values is touched either: setting a type says how they are
+    ///     meant to be read, and never rewrites them.
+    /// </remarks>
+    private async Task WriteInferredTypesAsync(CancellationToken cancellationToken)
+    {
+        if (_inference is null || _inferColumn is null)
+        {
+            return;
+        }
+
+        for (var index = 0; index < _columnCount; index++)
+        {
+            if (!_inferColumn[index])
+            {
+                continue;
+            }
+
+            var dataType = _inference.Result(index);
+
+            if (dataType is ColumnDataType.Text)
+            {
+                continue;
+            }
+
+            var ordinalPosition = index + 1;
+            var storedType = (int)dataType;
+
+            await _dbContext.Database.ExecuteSqlInterpolatedAsync(
+                $"""
+                 UPDATE COLUMNS SET DATA_TYPE = {storedType} WHERE ORDINAL_POSITION = {ordinalPosition};
                  """, cancellationToken).ConfigureAwait(false);
         }
     }
