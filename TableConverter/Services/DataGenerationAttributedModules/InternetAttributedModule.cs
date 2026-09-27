@@ -2,6 +2,7 @@ using TableConverter.DataGeneration;
 using TableConverter.DataGeneration.LocaleDataSetsBase;
 using TableConverter.DataGeneration.Modules;
 using TableConverter.Contracts;
+using TableConverter.Utilities.Models;
 
 namespace TableConverter.Services.DataGenerationAttributedModules;
 
@@ -76,8 +77,12 @@ public class InternetAttributedModule(FakerBase faker, LocaleBase locale, Random
         return base.HttpMethod();
     }
 
+    // A status code and a port are numbers written without decoration, so a column of them sorts and
+    // totals as a column of numbers. A version, an IP address and a colour are read as written and stay
+    // text.
     [DataGenerationModuleMethod("Http Status Code",
-        "Generates an HTTP status code based on the specified type. Example: '200'")]
+        "Generates an HTTP status code based on the specified type. Example: '200'",
+        dataType: ColumnDataType.Integer)]
     public override string HttpStatusCode(HttpStatusCodeTypeEnum type = HttpStatusCodeTypeEnum.Informational)
     {
         return base.HttpStatusCode(type);
@@ -123,7 +128,8 @@ public class InternetAttributedModule(FakerBase faker, LocaleBase locale, Random
         return base.Password(length, memorable, pattern, prefix);
     }
 
-    [DataGenerationModuleMethod("Port", "Generates a random port number. Example: '8080'")]
+    [DataGenerationModuleMethod("Port", "Generates a random port number. Example: '8080'",
+        dataType: ColumnDataType.Integer)]
     public override string Port()
     {
         return base.Port();

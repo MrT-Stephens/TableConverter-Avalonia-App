@@ -1,9 +1,11 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using TableConverter.Contracts;
 using TableConverter.DataGeneration;
 using TableConverter.DataGeneration.Modules;
 using TableConverter.Services.DataGenerationAttributedModules;
+using TableConverter.Utilities.Models;
 
 namespace TableConverter.Services;
 
@@ -41,44 +43,32 @@ public class FakerWithAttributedModules(string localeType = "en", int? seed = nu
         ///     Adds a "keyed" column where the column value is generated using a method or property based on the key.
         ///     The key can reference properties or methods, e.g., "Person.FirstName".
         /// </summary>
-        /// <param name="columnName">The name of the column to add.</param>
+        /// <param name="columnName">The name of the column to add, or blank to have one made up.</param>
         /// <param name="key">The key for referencing a method or property (e.g., "Person.FirstName").</param>
         /// <param name="parameters">An array of parameters to pass to the method or property referenced by the key.</param>
         /// <param name="blanksPercentage">The percentage (0-100) of rows that should have a blank value in this column.</param>
         /// <returns>The current builder instance for method chaining.</returns>
+        /// <remarks>
+        ///     The column is declared with the kind of value the method behind the key produces, which is
+        ///     the kind that method names in its <see cref="DataGenerationModuleMethodAttribute" />. That
+        ///     is what keeps a generated table from being nothing but text.
+        /// </remarks>
         public KeyedFakerBuilder AddKeyed(string columnName, string key, object[] parameters,
             int blanksPercentage = 0)
         {
-            if (string.IsNullOrWhiteSpace(columnName))
-                columnName = $"Column-{_actions.SelectMany(kvp => kvp.Value).Count() + 1}";
-
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentException("Key cannot be null or whitespace.", nameof(key));
 
             if (parameters is null)
                 throw new ArgumentNullException(nameof(parameters));
 
-            if (blanksPercentage is < 0 or > 100)
-                throw new ArgumentOutOfRangeException(nameof(blanksPercentage), blanksPercentage,
-                    "Blanks percentage must be between 0 and 100.");
-
-            // Add the adjusted generator to the dictionary for the column name
-            if (!_actions.TryGetValue(columnName, out var generators))
-            {
-                generators = [];
-                _actions[columnName] = generators;
-            }
-
-            generators.Add(AdjustedGenerator);
+            AddColumn(columnName, ResolveDataType(key), GenerateValue, blanksPercentage);
 
             return this;
 
-            // Adjusted generator function
-            string AdjustedGenerator(FakerWithAttributedModules faker)
+            // Generate one value, reading it off the module the key names.
+            string GenerateValue(FakerWithAttributedModules faker)
             {
-                // If the random number is below the blank percentage, return an empty value.
-                if (faker.Randomizer.Number(0, 100) < blanksPercentage)
-                    return string.Empty;
 
                 // Split the key into parts (e.g., "Person.FirstName" => ["Person", "FirstName"])
                 var parts = key.Split('.');
@@ -131,6 +121,44 @@ public class FakerWithAttributedModules(string localeType = "en", int? seed = nu
                         parts, index + 1, methodParameters);
 
                 throw new InvalidOperationException($"Neither method nor property '{currentPart}' found on module.");
+            }
+
+            // Helper method to resolve the kind of value the method named by the key produces.
+            static ColumnDataType ResolveDataType(string key)
+            {
+                var parts = key.Split('.');
+
+                // A key has to name a module and something on it, so anything shorter names nothing.
+                if (parts.Length < 2)
+                    return ColumnDataType.Text;
+
+                var module = typeof(FakerWithAttributedModules)
+                    .GetProperty(parts[0], BindingFlags.Public | BindingFlags.Instance);
+
+                if (module is null)
+                    return ColumnDataType.Text;
+
+                var type = module.PropertyType;
+
+                // Walk the same path the value is read along, but over the types rather than the objects.
+                for (var index = 1; index < parts.Length; index++)
+                {
+                    var method = type.GetMethod(parts[index], BindingFlags.Public | BindingFlags.Instance);
+
+                    // A method ends the path, and it is the one that says what kind of value it produces.
+                    if (method is not null)
+                        return method.GetCustomAttribute<DataGenerationModuleMethodAttribute>()?.DataType
+                               ?? ColumnDataType.Text;
+
+                    var property = type.GetProperty(parts[index], BindingFlags.Public | BindingFlags.Instance);
+
+                    if (property is null)
+                        return ColumnDataType.Text;
+
+                    type = property.PropertyType;
+                }
+
+                return ColumnDataType.Text;
             }
         }
     }

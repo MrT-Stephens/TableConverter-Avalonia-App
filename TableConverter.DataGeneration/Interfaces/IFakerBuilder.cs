@@ -1,5 +1,6 @@
 using TableConverter.DataGeneration.DataModels;
 using TableConverter.Utilities;
+using TableConverter.Utilities.Models;
 
 namespace TableConverter.DataGeneration.Interfaces;
 
@@ -34,6 +35,27 @@ public interface IFakerBuilder<out TFaker> where TFaker : IFaker
     IFakerBuilder<TFaker> Add(string columnName, Func<TFaker, string> valueGenerator, int blacksPercentage = 0);
 
     /// <summary>
+    ///     Adds a rule for generating data for a specific column, declaring the kind of value it holds.
+    /// </summary>
+    /// <param name="columnName">The name of the column for which the rule applies.</param>
+    /// <param name="dataType">The kind of value the generator produces, which the column is declared with.</param>
+    /// <param name="valueGenerator">
+    ///     A function or rule that takes a <typeparamref name="TFaker" /> instance and generates the column's value.
+    /// </param>
+    /// <param name="blanksPercentage">
+    ///     Specifies the percentage (0-100) of rows in which this column will have a blank value. Defaults to 0.
+    /// </param>
+    /// <returns>
+    ///     Returns the current builder instance for method chaining, allowing additional column rules to be added.
+    /// </returns>
+    /// <remarks>
+    ///     Declaring the type is what keeps a generated table from being nothing but text. The column
+    ///     carries this type from the first row, rather than having one read off its values the way an
+    ///     imported column does, because the builder knows what its generators produce.
+    /// </remarks>
+    IFakerBuilder<TFaker> Add(string columnName, ColumnDataType dataType, Func<TFaker, string> valueGenerator, int blanksPercentage = 0);
+
+    /// <summary>
     ///     Adds a conditional rule for generating data for a specific column.
     /// </summary>
     /// <param name="columnName">The name of the column for which the rule applies.</param>
@@ -47,11 +69,15 @@ public interface IFakerBuilder<out TFaker> where TFaker : IFaker
     /// <param name="blankValuePercentage">
     ///     Specifies the percentage (0-100) of rows in which this column will have a blank value. Defaults to 0.
     /// </param>
+    /// <param name="dataType">
+    ///     The kind of value the generator produces, which the column is declared with. Defaults to text.
+    /// </param>
     /// <returns>
     ///     Returns the current builder instance for method chaining, allowing further configuration.
     /// </returns>
     IFakerBuilder<TFaker> AddConditional(string columnName, Func<TFaker, bool> condition,
-        Func<TFaker, string> valueGenerator, int blankValuePercentage = 0);
+        Func<TFaker, string> valueGenerator, int blankValuePercentage = 0,
+        ColumnDataType dataType = ColumnDataType.Text);
 
     /// <summary>
     ///     Generates the configured rows and writes them to <paramref name="sink" />, one row at a time.

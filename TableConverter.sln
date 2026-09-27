@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableConverter.Desktop", "T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableConverter.Browser", "TableConverter.Browser\TableConverter.Browser.csproj", "{B62BF0D7-9DDA-4006-8CE3-0DE45669E4E5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableConverter.Tests", "TableConverter.Tests\TableConverter.Tests.csproj", "{677731AF-2AD6-4E3F-83ED-E584A4496C9D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{B62BF0D7-9DDA-4006-8CE3-0DE45669E4E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B62BF0D7-9DDA-4006-8CE3-0DE45669E4E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B62BF0D7-9DDA-4006-8CE3-0DE45669E4E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{677731AF-2AD6-4E3F-83ED-E584A4496C9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{677731AF-2AD6-4E3F-83ED-E584A4496C9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{677731AF-2AD6-4E3F-83ED-E584A4496C9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{677731AF-2AD6-4E3F-83ED-E584A4496C9D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -2,6 +2,7 @@ using TableConverter.DataGeneration;
 using TableConverter.DataGeneration.LocaleDataSetsBase;
 using TableConverter.DataGeneration.Modules;
 using TableConverter.Contracts;
+using TableConverter.Utilities.Models;
 
 namespace TableConverter.Services.DataGenerationAttributedModules;
 
@@ -69,13 +70,17 @@ public class LocationAttributedModule(FakerBase faker, LocaleBase locale, Random
         return base.Direction(abbreviated);
     }
 
-    [DataGenerationModuleMethod("Latitude", "Generates a random latitude coordinate. Example: '37.7749'")]
+    // A building number can carry a letter ("12A") and a postal code is read as written, so those stay
+    // text. A coordinate is a number however many decimal places it is shown to.
+    [DataGenerationModuleMethod("Latitude", "Generates a random latitude coordinate. Example: '37.7749'",
+        dataType: ColumnDataType.Decimal)]
     public override string Latitude(int min = -90, int max = 90, int precision = 4)
     {
         return base.Latitude(min, max, precision);
     }
 
-    [DataGenerationModuleMethod("Longitude", "Generates a random longitude coordinate. Example: '-122.4194'")]
+    [DataGenerationModuleMethod("Longitude", "Generates a random longitude coordinate. Example: '-122.4194'",
+        dataType: ColumnDataType.Decimal)]
     public override string Longitude(int min = -180, int max = 180, int precision = 4)
     {
         return base.Longitude(min, max, precision);
