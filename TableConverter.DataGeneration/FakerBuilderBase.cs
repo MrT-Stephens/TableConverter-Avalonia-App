@@ -1,4 +1,3 @@
-using TableConverter.DataGeneration.DataModels;
 using TableConverter.DataGeneration.Interfaces;
 using TableConverter.Utilities;
 using TableConverter.Utilities.Models;
@@ -55,7 +54,23 @@ public abstract class FakerBuilderBase<TFaker>(TFaker fakerInstance) : IFakerBui
     public IFakerBuilder<TFaker> Add(string columnName, ColumnDataType dataType, Func<TFaker, string> valueGenerator,
         int blanksPercentage = 0)
     {
-        AddColumn(columnName, dataType, valueGenerator, blanksPercentage);
+        if (string.IsNullOrWhiteSpace(columnName))
+            columnName = $"Column_{_actions.SelectMany(kvp => kvp.Value).Count() + 1}";
+
+        if (valueGenerator is null)
+            throw new ArgumentNullException(nameof(valueGenerator));
+        if (blanksPercentage is < 0 or > 100)
+            throw new ArgumentOutOfRangeException(nameof(blanksPercentage), blanksPercentage,
+                "Blanks percentage must be between 0 and 100.");
+
+        // A name can be given to more than one column, so each name collects its generators in a list.
+        if (!_actions.TryGetValue(columnName, out var generators))
+            _actions[columnName] = generators = [];
+
+        // Blanks are worked out here rather than by the generator, so that every way of adding a column
+        // blanks its values the same way.
+        generators.Add(new ColumnGenerator(dataType, faker =>
+            faker.Randomizer.Number(0, 100) < blanksPercentage ? string.Empty : valueGenerator(faker)));
 
         return this;
     }
@@ -76,13 +91,10 @@ public abstract class FakerBuilderBase<TFaker>(TFaker fakerInstance) : IFakerBui
             throw new ArgumentOutOfRangeException(nameof(blankValuePercentage), blankValuePercentage,
                 "Blank value percentage must be between 0 and 100.");
 
-        return Add(columnName, dataType, faker =>
-        {
-            if (faker.Randomizer.Number(0, 100) < blankValuePercentage || !condition(faker))
-                return string.Empty;
-
-            return valueGenerator(faker);
-        });
+        // The blanks are left to the column, so a conditional column blanks its values the same way any
+        // other column does.
+        return Add(columnName, dataType, faker => condition(faker) ? valueGenerator(faker) : string.Empty,
+            blankValuePercentage);
     }
 
     /// <inheritdoc />
@@ -90,12 +102,15 @@ public abstract class FakerBuilderBase<TFaker>(TFaker fakerInstance) : IFakerBui
     {
         ArgumentNullException.ThrowIfNull(sink);
 
+        // Flattened once, so the headings and every row are built from the same order.
+        var generators = _actions
+            .SelectMany(pair => pair.Value.Select(generator => (Name: pair.Key, Generator: generator)))
+            .ToList();
+
         // Every column names the kind of value it holds, because the builder knows what its generators
         // produce. A generated table is therefore not one whose types have to be read off its values the
-        // way an imported one is. Flattened to match the number of generators for each column.
-        var columns = _actions
-            .SelectMany(pair => pair.Value.Select(generator => new TableColumn(pair.Key, generator.DataType)))
-            .ToList();
+        // way an imported one is.
+        var columns = generators.Select(entry => new TableColumn(entry.Name, entry.Generator.DataType)).ToList();
 
         await sink.BeginAsync(columns, cancellationToken).ConfigureAwait(false);
 
@@ -105,55 +120,11 @@ public abstract class FakerBuilderBase<TFaker>(TFaker fakerInstance) : IFakerBui
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var row = new List<string>();
-
-            foreach (var (_, generators) in _actions)
-                row.AddRange(generators.Select(generator => generator.Generate(FakerInstance)));
+            var row = generators.Select(entry => entry.Generator.Generate(FakerInstance)).ToList();
 
             await sink.WriteRowAsync(row, cancellationToken).ConfigureAwait(false);
         }
 
         await sink.CompleteAsync(cancellationToken).ConfigureAwait(false);
-    }
-
-    /// <summary>
-    ///     Adds a column and the rule that generates its values.
-    /// </summary>
-    /// <param name="columnName">
-    ///     The name of the column, or blank to have one made up from the number of columns added so far.
-    /// </param>
-    /// <param name="dataType">The kind of value the generator produces, which the column is declared with.</param>
-    /// <param name="valueGenerator">The function that produces one value for the column.</param>
-    /// <param name="blanksPercentage">
-    ///     The percentage (0-100) of rows that should have a blank value in this column.
-    /// </param>
-    protected void AddColumn(string columnName, ColumnDataType dataType, Func<TFaker, string> valueGenerator,
-        int blanksPercentage = 0)
-    {
-        if (string.IsNullOrWhiteSpace(columnName))
-            columnName = $"Column_{_actions.SelectMany(kvp => kvp.Value).Count() + 1}";
-
-        if (valueGenerator is null)
-            throw new ArgumentNullException(nameof(valueGenerator));
-        if (blanksPercentage is < 0 or > 100)
-            throw new ArgumentOutOfRangeException(nameof(blanksPercentage), blanksPercentage,
-                "Blanks percentage must be between 0 and 100.");
-
-        // Add the value generator to the list for the column name
-        if (!_actions.TryGetValue(columnName, out var generators))
-        {
-            generators = [];
-            _actions[columnName] = generators;
-        }
-
-        generators.Add(new ColumnGenerator(dataType, AdjustedGenerator));
-
-        return;
-
-        // Adjusted generator to handle blanks percentage
-        string AdjustedGenerator(TFaker faker)
-        {
-            return faker.Randomizer.Number(0, 100) < blanksPercentage ? string.Empty : valueGenerator(faker);
-        }
     }
 }

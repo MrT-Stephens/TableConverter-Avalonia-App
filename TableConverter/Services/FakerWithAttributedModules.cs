@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Reflection;
 using TableConverter.Contracts;
 using TableConverter.DataGeneration;
@@ -62,7 +61,7 @@ public class FakerWithAttributedModules(string localeType = "en", int? seed = nu
             if (parameters is null)
                 throw new ArgumentNullException(nameof(parameters));
 
-            AddColumn(columnName, ResolveDataType(key), GenerateValue, blanksPercentage);
+            Add(columnName, ResolveDataType(key), GenerateValue, blanksPercentage);
 
             return this;
 

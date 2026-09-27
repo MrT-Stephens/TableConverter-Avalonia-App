@@ -1,4 +1,3 @@
-using TableConverter.DataGeneration.DataModels;
 using TableConverter.Utilities;
 using TableConverter.Utilities.Models;
 
@@ -49,9 +48,8 @@ public interface IFakerBuilder<out TFaker> where TFaker : IFaker
     ///     Returns the current builder instance for method chaining, allowing additional column rules to be added.
     /// </returns>
     /// <remarks>
-    ///     Declaring the type is what keeps a generated table from being nothing but text. The column
-    ///     carries this type from the first row, rather than having one read off its values the way an
-    ///     imported column does, because the builder knows what its generators produce.
+    ///     Declaring the type is what keeps a generated table from being nothing but text: the column
+    ///     carries it from the first row rather than having one read off its values.
     /// </remarks>
     IFakerBuilder<TFaker> Add(string columnName, ColumnDataType dataType, Func<TFaker, string> valueGenerator, int blanksPercentage = 0);
 
