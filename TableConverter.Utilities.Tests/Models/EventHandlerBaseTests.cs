@@ -90,6 +90,43 @@ public class EventHandlerBaseTests
     }
 
     [Fact]
+    public void UnsubscribeAll_Removes_A_Lambda_That_Captures_Only_Its_Owner()
+    {
+        // A lambda that captures only `this` needs no closure, so the compiler makes it a private
+        // instance method and the delegate's target is the owner itself. That is what lets UnsubscribeAll
+        // find it: the target it compares against is the owner.
+        var testEvent = new TestEvent();
+        var owner = new SelfSubscribing();
+
+        owner.SubscribeTo(testEvent);
+        testEvent.Publish(EventArgs.Empty);
+        Assert.Equal(1, owner.Count);
+
+        testEvent.UnsubscribeAll(owner);
+        testEvent.Publish(EventArgs.Empty);
+
+        Assert.Equal(1, owner.Count);
+    }
+
+    [Fact]
+    public void UnsubscribeAll_Does_Not_Remove_A_Lambda_That_Captures_Anything_Else()
+    {
+        // A lambda that captures a local needs a closure, so the compiler hoists it into a display class
+        // and the delegate's target is that class - not the object the lambda mentions. UnsubscribeAll
+        // compares targets, so it does not match and the handler stays. Registering through an
+        // EventRegistrar avoids this: it removes the handler it was handed rather than searching for it.
+        var testEvent = new TestEvent();
+        var owner = new Subscriber();
+
+        testEvent.Subscribe((_, args) => owner.OnEvent(null, args));
+
+        testEvent.UnsubscribeAll(owner);
+        testEvent.Publish(EventArgs.Empty);
+
+        Assert.Equal(1, owner.Count);
+    }
+
+    [Fact]
     public void Publish_Allows_A_Handler_To_Unsubscribe_During_Notification()
     {
         // Regression: unsubscribing from inside a handler used to invalidate the publishing loop.
@@ -143,6 +180,28 @@ public class EventHandlerBaseTests
         testEvent.Publish(EventArgs.Empty);
 
         Assert.Equal(1, live.Count);
+    }
+
+    [Fact]
+    public void Publish_Ignores_A_Lambda_Whose_Closure_Was_Collected()
+    {
+        // Handlers are held weakly, so a lambda subscribed straight to an event stops being notified
+        // once nothing else holds its delegate. A lambda that captures only the object it lives on is
+        // kept alive by that object and hides this; one that captures anything else does not, so a
+        // subscription worth keeping belongs on an EventRegistrar, which holds its delegate.
+        var testEvent = new TestEvent();
+        var subscriber = new Subscriber();
+
+        SubscribeCollectibleLambda(testEvent, subscriber);
+
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        GC.Collect();
+
+        // Must not throw; the collected lambda is simply no longer there.
+        testEvent.Publish(EventArgs.Empty);
+
+        Assert.Equal(0, subscriber.Count);
     }
 
     [Fact]
@@ -251,6 +310,13 @@ public class EventHandlerBaseTests
         testEvent.Subscribe(collected.OnEvent);
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void SubscribeCollectibleLambda(TestEvent testEvent, Subscriber subscriber)
+    {
+        // Captures only the subscriber passed in, so nothing but the weak handler refers to the closure.
+        testEvent.Subscribe((_, args) => subscriber.OnEvent(null, args));
+    }
+
     private sealed class TestEvent : EventHandlerBase<EventArgs>;
 
     private sealed class SecondTestEvent : EventHandlerBase<EventArgs>;
@@ -270,6 +336,20 @@ public class EventHandlerBaseTests
         {
             Count++;
             _onEvent?.Invoke();
+        }
+    }
+
+    /// <summary>
+    /// Subscribes a lambda that captures only <see langword="this" />, which is the shape the compiler
+    /// turns into an instance method rather than a closure.
+    /// </summary>
+    private sealed class SelfSubscribing
+    {
+        public int Count { get; private set; }
+
+        public void SubscribeTo(TestEvent testEvent)
+        {
+            testEvent.Subscribe((_, _) => Count++);
         }
     }
 }

@@ -9,9 +9,6 @@ using Avalonia.Controls;
 using Avalonia.Controls.Models.TreeDataGrid;
 using Avalonia.Controls.Selection;
 using Avalonia.Controls.Templates;
-using Avalonia.Data;
-using Avalonia.Layout;
-using Avalonia.Media;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +19,6 @@ using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Configuration;
 using TableConverter.Contracts;
-using TableConverter.Converters;
 using TableConverter.FileConverters.Interfaces;
 using TableConverter.Interfaces;
 using TableConverter.ViewModels.Base;
@@ -36,6 +32,7 @@ using TableConverter.Utilities.Database.Models.TableStore;
 using TableConverter.Utilities.Extensions;
 using TableConverter.Utilities.Interfaces;
 using TableConverter.Utilities.Models;
+using TableConverter.Views.Controls.CellEditors;
 
 namespace TableConverter.ViewModels.Documents;
 
@@ -312,8 +309,15 @@ public partial class TableDataViewModel : BaseDocumentViewModel, ISessionDocumen
     /// </summary>
     /// <param name="header">The column heading, which is the column's name.</param>
     /// <param name="columnIndex">The position of the column within a row's cells.</param>
-    /// <param name="dataType">The type the column was given, which decides how its cells read.</param>
+    /// <param name="dataType">The type the column was given, which decides how its cells read and how they are entered.</param>
     /// <param name="gridLength">The width to give the column.</param>
+    /// <remarks>
+    /// A cell is shown as text laid out the way its column's type reads, and entered with the control
+    /// that type calls for, so a day is picked from a calendar rather than typed and a number is
+    /// stepped rather than written. Nothing is ever rejected for not matching the type, because a typed
+    /// column would otherwise be unusable while its values were still being entered: a value that does
+    /// not read as the type is marked, so the styles can draw it in the theme's error colour.
+    /// </remarks>
     private static TemplateColumn<TModel> CreateTemplateColumn<TModel>(
         object header,
         int columnIndex,
@@ -323,49 +327,9 @@ public partial class TableDataViewModel : BaseDocumentViewModel, ISessionDocumen
     {
         var valuePath = $"Item.Cells[{columnIndex}].Value";
 
-        // A value is never rejected for not matching its column's type, because a typed column would
-        // otherwise be unusable while its values were still being entered. The type decides how the
-        // cell reads: the value is laid out the way its type reads, so a column of numbers is grouped
-        // and lines up on the right the way it would in a spreadsheet, a date is shown in the one form
-        // that cannot be misread, and anything that does not read as the type is marked, so the styles
-        // can draw it in the theme's error colour.
-        var textAlignment = dataType.IsNumeric() ? TextAlignment.Right : TextAlignment.Left;
-        var mismatch = new ColumnValueMismatchConverter(dataType);
-        var format = new ColumnValueFormatConverter(dataType);
-
         return new TemplateColumn<TModel>(header,
-            new FuncDataTemplate<TModel>((_, _) => new TextBlock
-            {
-                VerticalAlignment = VerticalAlignment.Center,
-                TextAlignment = textAlignment,
-                [!TextBlock.TextProperty] = new Binding
-                {
-                    Path = valuePath,
-                    Mode = BindingMode.TwoWay,
-                    Converter = format
-                },
-                [!ColumnValueMismatch.IsMismatchedProperty] = new Binding
-                {
-                    Path = valuePath,
-                    Converter = mismatch
-                }
-            }),
-            new FuncDataTemplate<TModel>((_, _) => new TextBox
-            {
-                VerticalAlignment = VerticalAlignment.Center,
-                TextAlignment = textAlignment,
-                [!TextBox.TextProperty] = new Binding
-                {
-                    Path = valuePath,
-                    Mode = BindingMode.TwoWay,
-                    UpdateSourceTrigger = UpdateSourceTrigger.LostFocus
-                },
-                [!ColumnValueMismatch.IsMismatchedProperty] = new Binding
-                {
-                    Path = valuePath,
-                    Converter = mismatch
-                }
-            }),
+            new FuncDataTemplate<TModel>((_, _) => CellEditorFactory.CreateDisplay(dataType, valuePath)),
+            new FuncDataTemplate<TModel>((_, _) => CellEditorFactory.CreateEditor(dataType, valuePath)),
             gridLength ?? GridLength.Auto,
             new TemplateColumnOptions<TModel>
             {

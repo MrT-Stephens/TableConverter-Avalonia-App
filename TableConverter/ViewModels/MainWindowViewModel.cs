@@ -13,6 +13,7 @@ using TableConverter.Commands.Interfaces;
 using TableConverter.Configuration;
 using TableConverter.Contracts.Events;
 using TableConverter.Interfaces;
+using TableConverter.Utilities;
 using TableConverter.Utilities.Extensions;
 using TableConverter.Utilities.Interfaces;
 using TableConverter.ViewModels.Base;
@@ -28,6 +29,19 @@ public partial class MainWindowViewModel : BaseViewModel
     [ObservableProperty] private IWorkspace _SelectedWorkspace;
     [ObservableProperty] private ObservableCollection<MenuItem> _MenuItems;
     [ObservableProperty] private AppOptions _AppOptions;
+
+    /// <summary>
+    /// The window's subscriptions to the application's own events, kept so they can be released together.
+    /// </summary>
+    /// <remarks>
+    /// The window is the one view model that lives for as long as the application does, so its
+    /// subscriptions are never expected to be given back. They are still held here rather than subscribed
+    /// straight onto the event: a subscription made through a registrar holds its handler, while the
+    /// events themselves hold handlers weakly, so a handler reached only by its own event could be
+    /// collected and the window would quietly stop navigating. Registering also names the window as the
+    /// owner of what it subscribed, which is what a teardown would use.
+    /// </remarks>
+    private readonly IEventRegistrar _eventRegistrar = new EventRegistrar();
 
     #endregion
 
@@ -53,9 +67,9 @@ public partial class MainWindowViewModel : BaseViewModel
 
         SelectedWorkspace = Workspaces.First();
 
-        _eventManager
-            .GetEvent<PageNavigationRequestedEvent>()
-            .Subscribe((_, args) =>
+        _eventRegistrar.RegisterSubscription(
+            _eventManager.GetEvent<PageNavigationRequestedEvent>(),
+            (_, args) =>
             {
                 var workspace = Workspaces.FirstOrDefault(w => w.GetType().Name == args.ViewModelName);
 
@@ -68,11 +82,22 @@ public partial class MainWindowViewModel : BaseViewModel
 
                 args.Action?.Invoke(workspace);
             });
-        
+
         // Ensure all directories exist
         AppOptions.BaseDocumentsPath.EnsureDirectoryExists();
         AppOptions.BaseConfigPath.EnsureDirectoryExists();
     }
     
+    #endregion
+
+    #region IDisposable
+
+    public override void Dispose()
+    {
+        _eventRegistrar.Dispose();
+
+        base.Dispose();
+    }
+
     #endregion
 }
