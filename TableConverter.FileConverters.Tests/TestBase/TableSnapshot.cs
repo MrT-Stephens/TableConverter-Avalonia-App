@@ -188,4 +188,3 @@ public sealed class TableSnapshot : ITableRowSink, ITableRowSource, IEquatable<T
         return true;
     }
 }
-

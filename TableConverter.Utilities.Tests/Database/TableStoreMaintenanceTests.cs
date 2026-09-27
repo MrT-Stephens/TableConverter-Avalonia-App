@@ -472,7 +472,8 @@ public class TableStoreMaintenanceTests
     }
 
     [Fact]
-    public async Task Add_Row_Appends_A_Row_To_A_Table_With_No_Columns()
+    public async Task Add_Row_Appends_A_Row_To_A_TABLE_WITH_NO_COLUMNS()
+
     {
         using var provider = BuildProvider();
         var factory = provider.GetRequiredService<ITableStoreDbContextFactory>();

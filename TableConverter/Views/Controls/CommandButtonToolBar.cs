@@ -85,10 +85,22 @@ public class CommandButtonToolBar : ItemsControl
 
     public CommandButtonToolBar()
     {
-        ItemsPanel = new FuncTemplate<Panel>(() => new StackPanel
+        // This stack is only the fallback for a view which brings no panel of its own, and it follows the
+        // orientation of the toolbar so a vertical one stacks its buttons one above the other.
+        ItemsPanel = new FuncTemplate<Panel>(() =>
         {
-            Orientation = Orientation.Horizontal,
-            Spacing = 10,
+            var panel = new StackPanel
+            {
+                Spacing = 10,
+                [!StackPanel.OrientationProperty] = new Binding
+                {
+                    Path = nameof(Orientation),
+                    Source = this,
+                    Mode = BindingMode.OneWay,
+                },
+            };
+
+            return panel;
         })!;
     }
 

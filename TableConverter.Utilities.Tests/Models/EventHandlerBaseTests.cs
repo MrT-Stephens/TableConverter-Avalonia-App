@@ -191,7 +191,7 @@ public class EventHandlerBaseTests
             }
         })).ToArray();
 
-        await Task.WhenAll(publisher, Task.WhenAll(mutators));
+        Task.WaitAll([publisher, .. mutators]);
 
         Assert.Empty(errors);
     }
@@ -237,7 +237,7 @@ public class EventHandlerBaseTests
     }
 
     [Fact]
-    public void EventManager_Returns_The_Same_Instance_For_The_Same_Event_Type()
+    public void EventManager_Returns_The_Same_Instance_For_The_Same_Event_TYPE()
     {
         var eventManager = new EventManager();
 
@@ -273,4 +273,3 @@ public class EventHandlerBaseTests
         }
     }
 }
-

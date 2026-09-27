@@ -32,4 +32,3 @@ public interface ITableRowSource
     /// </remarks>
     IAsyncEnumerable<string?[]> ReadRowsAsync(CancellationToken cancellationToken = default);
 }
-

@@ -300,4 +300,3 @@ public sealed class TableStoreRowSink : ITableRowSink, IAsyncDisposable
         _parameters.Clear();
     }
 }
-

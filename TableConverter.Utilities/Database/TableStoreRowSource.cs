@@ -146,4 +146,3 @@ public sealed class TableStoreRowSource : ITableRowSource
 
     private readonly record struct CellValue(int RowId, int ColumnId, string? Value);
 }
-

@@ -32,7 +32,7 @@ public class AddRowCommandHandler(
         "Add Row",
         "Add a new row to the table.",
         "AddIcon",
-        "Edit",
+        "Tools",
         0,
         ["Ctrl+Shift+N"],
         canSetLoadingState: true,

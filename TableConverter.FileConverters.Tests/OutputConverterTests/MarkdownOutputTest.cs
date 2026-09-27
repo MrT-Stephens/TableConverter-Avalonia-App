@@ -13,7 +13,7 @@ public class MarkdownOutputTest
     [Fact]
     public async Task Convert_Does_Not_Mutate_The_Caller_Headers_Or_Rows()
     {
-        // Regression: this handler used to bold cells in place, corrupting the caller's table.
+        // Regression: this handler used to bold cells in place, corrupting the caller's TableData.
         var handler = new ConverterHandlerMarkdownOutput
         {
             Options = new ConverterHandlerMarkdownOutputOptions
@@ -127,7 +127,7 @@ public class MarkdownOutputTest
     [Theory]
     [InlineData(ConverterHandlerMarkdownOutputOptions.TableStyles.Normal)]
     [InlineData(ConverterHandlerMarkdownOutputOptions.TableStyles.Simple)]
-    public async Task Convert_Does_Not_Mutate_Input_For_Any_Table_Style(
+    public async Task Convert_Does_Not_Mutate_Input_For_Any_Table_STYLE(
         ConverterHandlerMarkdownOutputOptions.TableStyles style)
     {
         var handler = new ConverterHandlerMarkdownOutput

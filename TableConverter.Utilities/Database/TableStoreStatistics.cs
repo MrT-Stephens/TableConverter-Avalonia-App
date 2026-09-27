@@ -123,4 +123,3 @@ public static class TableStoreStatistics
             statistics);
     }
 }
-

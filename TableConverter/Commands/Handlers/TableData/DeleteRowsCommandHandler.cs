@@ -36,7 +36,7 @@ public class DeleteRowsCommandHandler(
         "Delete Rows",
         "Delete the selected row(s) from the table.",
         "DeleteIcon",
-        "Edit",
+        "Tools",
         0,
         ["Ctrl+Shift+Delete"],
         canSetLoadingState: true,

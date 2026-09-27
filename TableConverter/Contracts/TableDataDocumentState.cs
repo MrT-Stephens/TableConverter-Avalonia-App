@@ -11,4 +11,3 @@ namespace TableConverter.Contracts;
 /// deleted by it), <see langword="false" /> when the user opened an existing file.
 /// </param>
 public sealed record TableDataDocumentState(string Path, string Title, bool IsTemporaryStore);
-

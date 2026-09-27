@@ -12,4 +12,3 @@ public static class DataSourcePlaceholder
 {
     public const string Text = "...";
 }
-

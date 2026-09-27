@@ -36,4 +36,3 @@ public interface ISessionDocument : IPaneDocument
     /// </exception>
     Task RestoreSessionStateAsync(JsonElement state);
 }
-

@@ -23,4 +23,3 @@ public interface ITableStoreFiles
     /// </summary>
     void PruneOrphaned(IEnumerable<string> keepPaths);
 }
-

@@ -4,8 +4,6 @@ using TableConverter.FileConverters.ConverterHandlers;
 using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.Interfaces;
 using TableConverter.FileConverters.Tests.TestBase;
-using TableConverter.FileConverters.Utilities;
-using TableConverter.Utilities;
 
 namespace TableConverter.FileConverters.Tests.OutputConverterTests;
 

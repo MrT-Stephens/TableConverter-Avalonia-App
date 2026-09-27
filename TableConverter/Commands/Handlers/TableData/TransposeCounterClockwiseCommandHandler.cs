@@ -40,4 +40,3 @@ public class TransposeCounterClockwiseCommandHandler(
         canSetLoadingState: true,
         canSetLoadingOnWorkspace: true);
 }
-
