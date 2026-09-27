@@ -114,8 +114,11 @@ public class TableStoreColumnsDataSource(
 
         // A column added from the columns editor changes the shape of the table, so the whole set of
         // columns is remembered rather than only the one added: removing a column renumbers the ones that
-        // follow it, and a step has to describe the table it left behind.
+        // follow it, and a step has to describe the table it left behind. The set is remembered before the
+        // column is there, because a step recorded from a set that already holds the new column would
+        // describe an empty table as what came before it and take the whole table back with it.
         await using var edit = history.BeginEdit(Path, TableEditKind.ColumnsChanged, "Added a column");
+        await edit.CaptureBeforeAsync(TableRegion.Columns()).ConfigureAwait(false);
 
         await using var db = await CreateDbAsync().ConfigureAwait(false);
         await using var transaction = await db.Database.BeginTransactionAsync().ConfigureAwait(false);
@@ -140,7 +143,6 @@ public class TableStoreColumnsDataSource(
             throw;
         }
 
-        await edit.CaptureAfterAsync(TableRegion.Columns()).ConfigureAwait(false);
         await edit.CommitAsync().ConfigureAwait(false);
 
         return true;

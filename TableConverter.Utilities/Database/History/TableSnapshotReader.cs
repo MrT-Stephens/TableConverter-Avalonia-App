@@ -202,6 +202,12 @@ internal static class TableSnapshotReader
         // is a different thing from wanting to know that they hold nothing.
         var captureCells = withCellIds is { Count: > 0 };
 
+        // Only the columns that were named have their values read. A column that was not named keeps a
+        // null set rather than an empty one, because the two say different things: null is a column whose
+        // values were not asked about and must be left alone, while an empty set is a column that was
+        // asked about and holds nothing, whose values are to be cleared.
+        var wantedCellColumns = captureCells ? withCellIds!.ToHashSet() : null;
+
         if (captureCells)
         {
             foreach (var batch in withCellIds!.Distinct().Chunk(RowsPerBatch))
@@ -232,7 +238,7 @@ internal static class TableSnapshotReader
         [
             .. columns.Select(column =>
             {
-                var cells = captureCells
+                var cells = wantedCellColumns?.Contains(column.Id) == true
                     ? cellsByColumn.TryGetValue(column.Id, out var captured) ? captured : []
                     : null;
 
@@ -283,4 +289,3 @@ internal static class TableSnapshotReader
         return new TableSnapshot(columns, rows);
     }
 }
-

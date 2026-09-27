@@ -177,14 +177,16 @@ public class SortByColumnCommandHandler(
 
         await using var db = await databaseContextFactory.CreateDbContextAsync(document.Path);
 
-        // Putting the rows in a different order renumbers them, so what is remembered is the order they
-        // were in rather than the values they hold.
+        // Putting the rows in a different order renumbers them, and a renumbering that lands on the same
+        // range of ids the rows already held leaves the set of ids unchanged - so what is remembered is the
+        // whole table the sort is about to rearrange rather than the order its rows are named in. An
+        // ordering of the ids cannot describe the move, because the ids are the ordering.
         await using var edit = history.BeginEdit(
             document.Path,
             TableEditKind.RowOrderChanged,
             $"Sorted by '{column.Name}' {(isDescending ? "descending" : "ascending")}");
 
-        await edit.CaptureBeforeAsync(TableRegion.RowOrder());
+        await edit.CaptureBeforeAsync(TableRegion.Table());
 
         await using var transaction = await db.Database.BeginTransactionAsync();
 
