@@ -1,5 +1,10 @@
+using System.Buffers.Binary;
+using System.Globalization;
+using System.Security.Cryptography;
+using System.Text;
 using Microsoft.EntityFrameworkCore;
 using TableConverter.Utilities.Database.Contexts;
+using TableConverter.Utilities.Database.History;
 using TableConverter.Utilities.Database.Models.TableStore;
 using TableConverter.Utilities.Models;
 
@@ -34,11 +39,12 @@ public sealed class TableStoreMaintenance
     private const string WhitespaceSql = "CHAR(9) || CHAR(10) || CHAR(11) || CHAR(12) || CHAR(13) || CHAR(32)";
 
     /// <summary>
-    ///     Separates the cells of a row in the signature that rows are grouped by when duplicates are
-    ///     looked for. A unit separator is used rather than a printable character because a stored value
-    ///     can contain any printable one, which would let two different rows share a signature.
+    ///     How a decimal is written when two of them are compared. The digits are written with no
+    ///     thousands grouped and no trailing zeroes, so 1, 1.0 and 1.00 are written the same, and there is
+    ///     a place after the point for every place a decimal can hold, so no precision is rounded away by
+    ///     being compared.
     /// </summary>
-    private const string SignatureSeparatorSql = "CHAR(31)";
+    private const string DecimalTokenFormat = "#0.############################";
 
     /// <summary>
     ///     How many rows a rotation writes per change set, so turning a table that is very wide does not
@@ -70,67 +76,21 @@ public sealed class TableStoreMaintenance
         """;
 
     /// <summary>
-    ///     Reads each row's cells back as one value, which is what two rows are compared by. A row with no
-    ///     cells at all and a cell that holds nothing both read as nothing, so the rows of a table that
-    ///     holds nothing all read as the one repeated signature.
+    ///     The rows that hold no cells at all, which hold nothing and so repeat one another.
     /// </summary>
-    private static readonly string DuplicateSignaturesSql = $"""
-        SELECT
-            R.ID AS ROW_ID,
-            COALESCE((
-                SELECT GROUP_CONCAT(COALESCE(C.VALUE, ''), {SignatureSeparatorSql})
-                FROM (
-                    SELECT VALUE
-                    FROM CELLS
-                    WHERE ROW_ID = R.ID
-                    ORDER BY COLUMN_ID
-                ) AS C
-            ), '') AS SIGNATURE
-        FROM ROWS R
-        """;
-
-    /// <summary>
-    ///     Keeps the lowest row id of every group of signatures, so the first of a set of duplicates is the
-    ///     copy that survives, which is the row a user reading top to bottom would keep.
-    /// </summary>
-    private static readonly string KeepFirstOfEachSignatureSql = $"""
-        WITH Signatures AS (
-            {DuplicateSignaturesSql}
-        ),
-        Keepers AS (
-            SELECT MIN(ROW_ID) AS ROW_ID
-            FROM Signatures
-            GROUP BY SIGNATURE
+    /// <remarks>
+    ///     A row holding no cells is not met while the cells are being read, so the rows holding none are
+    ///     read on their own and given the place they hold among the rows that hold nothing.
+    /// </remarks>
+    private static readonly string RowsWithoutCellsSql = """
+        SELECT ROWS.ID AS Value
+        FROM ROWS
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM CELLS
+            WHERE CELLS.ROW_ID = ROWS.ID
         )
-        """;
-
-    private static readonly string RemoveDuplicateRowsSql = $"""
-        {KeepFirstOfEachSignatureSql}
-        DELETE FROM ROWS
-        WHERE ID NOT IN (SELECT ROW_ID FROM Keepers);
-        """;
-
-    /// <summary>
-    ///     The rows <see cref="RemoveDuplicateRowsSql" /> deletes, so what is about to be removed can be
-    ///     remembered before it is.
-    /// </summary>
-    private static readonly string DuplicateRowIdsSql = $"""
-        {KeepFirstOfEachSignatureSql}
-        SELECT ROW_ID AS Value
-        FROM Signatures
-        WHERE ROW_ID NOT IN (SELECT ROW_ID FROM Keepers)
-        ORDER BY ROW_ID;
-        """;
-
-    /// <summary>
-    ///     Counts the rows <see cref="RemoveDuplicateRowsSql" /> deletes, so what a user is told they are
-    ///     about to lose is worked out the same way as what they lose.
-    /// </summary>
-    private static readonly string CountDuplicateRowsSql = $"""
-        {KeepFirstOfEachSignatureSql}
-        SELECT COUNT(*) AS Value
-        FROM Signatures
-        WHERE ROW_ID NOT IN (SELECT ROW_ID FROM Keepers);
+        ORDER BY ROWS.ID;
         """;
 
     private static readonly string FillEmptyCellsSql = $"""
@@ -244,12 +204,7 @@ public sealed class TableStoreMaintenance
     /// <returns>The number of rows that repeat another row.</returns>
     public async Task<int> CountDuplicateRowsAsync(CancellationToken cancellationToken = default)
     {
-        // The count is aliased to the name the provider reads a scalar result from, so the one row the
-        // statement produces comes back as the number.
-        return await _dbContext.Database
-            .SqlQueryRaw<int>(CountDuplicateRowsSql)
-            .SingleAsync(cancellationToken)
-            .ConfigureAwait(false);
+        return (await FindDuplicateRowIdsAsync(cancellationToken).ConfigureAwait(false)).Count;
     }
 
     /// <summary>
@@ -258,10 +213,112 @@ public sealed class TableStoreMaintenance
     /// <returns>The number of rows that were deleted.</returns>
     public async Task<int> RemoveDuplicateRowsAsync(CancellationToken cancellationToken = default)
     {
-        return await _dbContext.Database
-            .ExecuteSqlRawAsync(RemoveDuplicateRowsSql, cancellationToken)
-            .ConfigureAwait(false);
+        return await _dbContext.Database.RunAsync(async () =>
+        {
+            // The rows that go are named a moment before they go, by the same reading of the values the
+            // count and the undo entry are made from, so the rows removed are exactly the rows a user was
+            // told they would lose.
+            var duplicates = await FindDuplicateRowIdsAsync(cancellationToken).ConfigureAwait(false);
+
+            var deleted = 0;
+
+            // The ids are deleted in batches, so a table whose rows are nearly all repeats is not deleted
+            // through one statement holding every id the table holds.
+            foreach (var batch in duplicates.Chunk(RowsPerBatch))
+            {
+                // The ids were read out of the store, so there is nothing in them that could be read as
+                // anything but a number.
+                var ids = string.Join(",", batch.Select(id => id.ToString(CultureInfo.InvariantCulture)));
+
+#pragma warning disable EF1002
+                deleted += await _dbContext.Database
+                    .ExecuteSqlRawAsync($"DELETE FROM ROWS WHERE ID IN ({ids});", cancellationToken)
+                    .ConfigureAwait(false);
+#pragma warning restore EF1002
+            }
+
+            return deleted;
+        }, cancellationToken).ConfigureAwait(false);
     }
+
+    /// <summary>
+    ///     Puts the rows of the table in the order of one of its columns, so the table reads top to bottom
+    ///     the way that column's values go.
+    /// </summary>
+    /// <param name="columnId">The column whose values the rows are put in order by.</param>
+    /// <param name="dataType">The type of that column, which is what decides how a value reads.</param>
+    /// <param name="descending">Whether the order runs from the greatest value to the least.</param>
+    /// <returns>The number of rows the table holds.</returns>
+    /// <remarks>
+    ///     The order is worked out here rather than in the statement that writes it, because a value only
+    ///     takes its place once it has been read the way its column's type says it should be read, and a
+    ///     statement cannot read a value the way a type does: asked to compare the text "9" with the text
+    ///     "10" a database puts 9 after 10, and asked to compare two dates it puts whichever was written
+    ///     first first, whatever day either of them names. The rows are then put in that order by the same
+    ///     write that replays a change of order from the history, so a sort and its undo are one change.
+    /// </remarks>
+    public async Task<int> SortByColumnAsync(
+        int columnId,
+        ColumnDataType dataType,
+        bool descending,
+        CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.Database.RunAsync(async () =>
+        {
+            // A row's id is the place it sits in, so the rows are read in the order the store already
+            // holds them and put back in the order the column's values go.
+            var rowIds = await _dbContext.Rows
+                .AsNoTracking()
+                .OrderBy(row => row.Id)
+                .Select(row => row.Id)
+                .ToListAsync(cancellationToken)
+                .ConfigureAwait(false);
+
+            if (rowIds.Count == 0)
+            {
+                return 0;
+            }
+
+            var values = await _dbContext.Cells
+                .AsNoTracking()
+                .Where(cell => cell.ColumnId == columnId)
+                .Select(cell => new { cell.RowId, cell.Value })
+                .ToDictionaryAsync(cell => cell.RowId, cell => cell.Value, cancellationToken)
+                .ConfigureAwait(false);
+
+            var keys = rowIds
+                .Select(rowId => ReadSortKey(dataType, rowId, values.GetValueOrDefault(rowId)))
+                .ToList();
+
+            keys.Sort((left, right) => left.CompareTo(right, descending));
+
+            var order = keys.Select(key => key.RowId).ToList();
+
+            if (order.SequenceEqual(rowIds))
+            {
+                // The rows are in order already, so the table is left exactly as it is rather than written
+                // back into the order it is already in.
+                return rowIds.Count;
+            }
+
+            // Where each row ends up: the first row of the order becomes the first row of the table.
+            var places = new Dictionary<int, int>(order.Count);
+
+            for (var index = 0; index < order.Count; index++)
+            {
+                places[order[index]] = index + 1;
+            }
+
+            await TableEditWriter.ReorderRowsAsync(
+                _dbContext,
+                rowIds,
+                rowIds.Select(rowId => places[rowId]).ToList(),
+                cancellationToken).ConfigureAwait(false);
+
+            return rowIds.Count;
+        }, cancellationToken).ConfigureAwait(false);
+    }
+
 
     /// <summary>
     ///     Names the rows that hold a cell <see cref="TrimAsync" /> would change, so what is about to be
@@ -295,7 +352,7 @@ public sealed class TableStoreMaintenance
     /// </summary>
     public async Task<IReadOnlyList<int>> GetDuplicateRowIdsAsync(CancellationToken cancellationToken = default)
     {
-        return await ReadRowIdsAsync(DuplicateRowIdsSql, cancellationToken).ConfigureAwait(false);
+        return await FindDuplicateRowIdsAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -575,6 +632,262 @@ public sealed class TableStoreMaintenance
               AND {NotEmptyCellSql("CELLS.VALUE")}
         )
         """;
+
+    /// <summary>
+    ///     Names the rows that repeat a row above them, which is every row but the first of each set of
+    ///     rows holding the same values.
+    /// </summary>
+    /// <param name="cancellationToken">Token used to cancel the read.</param>
+    /// <returns>The ids of the rows that repeat another row, in the order the grid shows them.</returns>
+    /// <remarks>
+    ///     <para>
+    ///         Two rows match when every cell of one holds the same value as the cell of the other in the
+    ///         same column, and a value is read the way its column's type says it should be read before the
+    ///         two are compared. That is what makes 1 and 1.0 one value in a column of numbers, and a date
+    ///         written one way the same as the same date written another.
+    ///     </para>
+    ///     <para>
+    ///         A row's values are read a row at a time and made into a signature of that row, and the
+    ///         signature is compared by a hash of itself rather than kept whole: a signature holds every
+    ///         value of its row, so keeping the whole of one for each row would cost as much as the rows
+    ///         themselves. The hash is wide enough that two rows that differ cannot share one, so the rows
+    ///         it names really do match.
+    ///     </para>
+    /// </remarks>
+    private async Task<List<int>> FindDuplicateRowIdsAsync(CancellationToken cancellationToken)
+    {
+        var columnTypes = await _dbContext.Columns
+            .AsNoTracking()
+            .Select(column => new { column.Id, column.DataType })
+            .ToDictionaryAsync(column => column.Id, column => column.DataType, cancellationToken)
+            .ConfigureAwait(false);
+
+        // The row a set of repeats leaves behind is the first of them in the order the grid shows, which
+        // is the order of their ids, so the rows are read in that order and the first row seen for a
+        // signature is the one that is kept.
+        var keepers = new Dictionary<(ulong High, ulong Low), int>();
+        var duplicates = new List<int>();
+
+        var signature = new StringBuilder();
+        var rowId = -1;
+        var reading = false;
+
+        var cells = _dbContext.Cells
+            .AsNoTracking()
+            .OrderBy(cell => cell.RowId)
+            .ThenBy(cell => cell.ColumnId)
+            .Select(cell => new { cell.RowId, cell.ColumnId, cell.Value });
+
+        // The cells are read a row at a time rather than loaded, so reading them costs what the row being
+        // read holds rather than what the table holds.
+        await foreach (var cell in cells.AsAsyncEnumerable().WithCancellation(cancellationToken)
+                           .ConfigureAwait(false))
+        {
+            if (!reading || cell.RowId != rowId)
+            {
+                if (reading)
+                {
+                    Remember(rowId, signature.ToString());
+                }
+
+                signature.Clear();
+                rowId = cell.RowId;
+                reading = true;
+            }
+
+            // The column a value belongs to is part of the signature, so a row missing a cell is not read
+            // as a row holding the same value in another column. The length of the value is written before
+            // it, so no value can be made to read as the join of two others.
+            var token = ReadComparisonToken(
+                columnTypes.GetValueOrDefault(cell.ColumnId, ColumnDataType.Text), cell.Value);
+
+            signature.Append(cell.ColumnId).Append(':').Append(token.Length).Append(':').Append(token);
+        }
+
+        if (reading)
+        {
+            Remember(rowId, signature.ToString());
+        }
+
+        // A row holding no cells at all holds nothing and is not met while the cells are read, so the rows
+        // holding none are read on their own and read as holding that same nothing.
+        foreach (var emptyRowId in await ReadRowIdsAsync(RowsWithoutCellsSql, cancellationToken)
+                     .ConfigureAwait(false))
+        {
+            Remember(emptyRowId, string.Empty);
+        }
+
+        // The rows that are removed are named in the order the grid shows them.
+        duplicates.Sort();
+
+        return duplicates;
+
+        void Remember(int id, string values)
+        {
+            if (!keepers.TryAdd(HashSignature(values), id))
+            {
+                // The signature has been met before, so this row repeats the row that was kept.
+                duplicates.Add(id);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Reads a cell's value as the one form two values in the same column are compared by.
+    /// </summary>
+    /// <param name="dataType">The type of the column the value belongs to.</param>
+    /// <param name="text">The value as it was stored.</param>
+    /// <returns>The form of the value that two values are compared by.</returns>
+    /// <remarks>
+    ///     A value that reads as its column's type is read as that type, so two values a reader would call
+    ///     the same value count as the same value however they happen to be written. A value that does not
+    ///     read as the type is left as the text it is, marked so that it can never be read as the same
+    ///     value as one that does: two rows are never called repeats over a value neither of them holds.
+    /// </remarks>
+    private static string ReadComparisonToken(ColumnDataType dataType, string? text)
+    {
+        // A cell holding nothing holds the same nothing whatever its column's type, so a value that is
+        // missing and a value that is empty are not told apart.
+        if (string.IsNullOrEmpty(text))
+        {
+            return "n";
+        }
+
+        if (!dataType.TryReadValue(text, out var typed) || typed is string)
+        {
+            return $"x{text}";
+        }
+
+        return typed switch
+        {
+            long integer => $"i{integer.ToString(CultureInfo.InvariantCulture)}",
+            decimal number => $"d{number.ToString(DecimalTokenFormat, CultureInfo.InvariantCulture)}",
+            bool flag => flag ? "bt" : "bf",
+            DateOnly day => $"y{day.ToString("O", CultureInfo.InvariantCulture)}",
+            DateTime moment => $"m{moment.ToString("O", CultureInfo.InvariantCulture)}",
+            _ => $"x{text}",
+        };
+    }
+
+    /// <summary>
+    ///     Reads a signature as the pair of numbers two signatures are compared by.
+    /// </summary>
+    /// <param name="signature">The values of one row, read into the one string.</param>
+    /// <returns>A hash of the signature, in two halves.</returns>
+    /// <remarks>
+    ///     A signature holds every value of a row, so keeping the whole of one for each row would cost as
+    ///     much as the rows themselves. What is kept is a hash of it instead, and a hash this wide cannot
+    ///     be shared by two signatures that differ, so nothing that differs is ever read as a repeat.
+    /// </remarks>
+    private static (ulong High, ulong Low) HashSignature(string signature)
+    {
+        var digest = SHA256.HashData(Encoding.UTF8.GetBytes(signature));
+
+        return (
+            BinaryPrimitives.ReadUInt64LittleEndian(digest),
+            BinaryPrimitives.ReadUInt64LittleEndian(digest.AsSpan(8)));
+    }
+
+    /// <summary>
+    ///     Reads a row's value from a column as the place it takes in an order.
+    /// </summary>
+    /// <param name="dataType">The type of the column the value belongs to.</param>
+    /// <param name="rowId">The id of the row the value belongs to.</param>
+    /// <param name="text">The value as it was stored.</param>
+    /// <returns>The place the row takes in the order of the column's values.</returns>
+    /// <remarks>
+    ///     A value that reads as its column's type takes its place as that type reads it, so 9 comes
+    ///     before 10 and a date takes its place among the dates. A value holding nothing, or one that does
+    ///     not read as the type, is given a place before the values that do read - the way a database puts
+    ///     a missing value first - and is ordered among the rest by the text it is, so a column whose
+    ///     values do not all read as its type still sorts the same way twice rather than at random.
+    /// </remarks>
+    private static SortKey ReadSortKey(ColumnDataType dataType, int rowId, string? text)
+    {
+        return dataType.TryReadValue(text, out var typed) && typed is not string
+            ? new SortKey(rowId, true, typed, text ?? string.Empty)
+            : new SortKey(rowId, false, null, text ?? string.Empty);
+    }
+
+    /// <summary>
+    ///     Compares two values that have both been read as the same column's type.
+    /// </summary>
+    /// <param name="left">One value, read as the column's type.</param>
+    /// <param name="right">The value to compare it with, read as the column's type.</param>
+    /// <returns>Which of the two comes first.</returns>
+    /// <remarks>
+    ///     The values of one column all read as the one .NET type, so two of them are compared as that
+    ///     type rather than as the text they were written as.
+    /// </remarks>
+    private static int CompareTyped(object? left, object? right)
+    {
+        return (left, right) switch
+        {
+            (long leftInteger, long rightInteger) => leftInteger.CompareTo(rightInteger),
+            (decimal leftNumber, decimal rightNumber) => leftNumber.CompareTo(rightNumber),
+            (bool leftFlag, bool rightFlag) => leftFlag.CompareTo(rightFlag),
+            (DateOnly leftDay, DateOnly rightDay) => leftDay.CompareTo(rightDay),
+            (DateTime leftMoment, DateTime rightMoment) => leftMoment.CompareTo(rightMoment),
+            _ => 0,
+        };
+    }
+
+    /// <summary>
+    ///     Where a row sits in the order of a column: the value read the way the column's type says it
+    ///     should be read, with the row's id kept so that rows holding the same value keep the order they
+    ///     were already in.
+    /// </summary>
+    private readonly struct SortKey
+    {
+        private readonly int _rowId;
+        private readonly bool _readsAsType;
+        private readonly object? _value;
+        private readonly string _text;
+
+        public SortKey(int rowId, bool readsAsType, object? value, string text)
+        {
+            _rowId = rowId;
+            _readsAsType = readsAsType;
+            _value = value;
+            _text = text;
+        }
+
+        /// <summary>The id of the row this is the place of.</summary>
+        public int RowId => _rowId;
+
+        /// <summary>
+        ///     Puts this place before or after another, running the way <paramref name="descending" /> asks.
+        /// </summary>
+        /// <param name="other">The place to compare with.</param>
+        /// <param name="descending">Whether the order runs from the greatest value to the least.</param>
+        /// <returns>Which of the two places comes first.</returns>
+        public int CompareTo(SortKey other, bool descending)
+        {
+            var comparison = CompareValue(other);
+
+            if (comparison != 0)
+            {
+                return descending ? -comparison : comparison;
+            }
+
+            // Two rows holding the same value keep the order they were already in, so a sort moves what it
+            // has to and leaves the rest where they were.
+            return _rowId.CompareTo(other._rowId);
+        }
+
+        private int CompareValue(SortKey other)
+        {
+            if (_readsAsType != other._readsAsType)
+            {
+                return _readsAsType ? 1 : -1;
+            }
+
+            return _readsAsType
+                ? CompareTyped(_value, other._value)
+                : string.CompareOrdinal(_text, other._text);
+        }
+    }
+
 
     /// <summary>
     ///     Reads the ids a statement names, which the statement selects as <c>Value</c> so the provider

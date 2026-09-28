@@ -1,8 +1,5 @@
-using System.Reflection;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using TableConverter.Commands.Handlers.TableData;
 using TableConverter.Utilities;
 using TableConverter.Utilities.Database;
 using TableConverter.Utilities.Database.Extensions;
@@ -14,22 +11,16 @@ using TableConverter.Utilities.Models;
 namespace TableConverter.Tests.History;
 
 /// <summary>
-///     Runs the real statement the sort is carried out with, rather than a stand-in for it, and puts it
-///     through a history step the way the command does. The rows of a freshly written table are numbered
-///     from one, which is the same range the sort renumbers them to, so a step that remembered the row ids
-///     alone would see no change at all and leave the sort unable to be taken back.
+///     Sorts a table the way the command does and puts the sort through a history step, so what the
+///     application does when a user sorts a table is what is checked.
 /// </summary>
 /// <remarks>
-///     The statement is read off the handler by reflection because it is the handler's own, and the point of
-///     the test is that what the application runs is what is checked. A rename of the field shows up as a
-///     failure here rather than as a silently skipped check.
+///     The rows of a freshly written table are numbered from one, which is the same range a sort renumbers
+///     them to, so a step that remembered the row ids alone would see no change at all and leave the sort
+///     unable to be taken back.
 /// </remarks>
 public class SortHistoryTests
 {
-    private static readonly string SortSql = (string)typeof(SortByColumnCommandHandler)
-        .GetField("SortSql", BindingFlags.NonPublic | BindingFlags.Static)!
-        .GetValue(null)!;
-
     private static ServiceProvider BuildProvider()
     {
         var services = new ServiceCollection();
@@ -60,14 +51,14 @@ public class SortHistoryTests
     private static async Task WriteThroughSinkAsync(
         ITableStoreDbContextFactory factory,
         string path,
-        IReadOnlyList<string> headers,
+        IReadOnlyList<TableColumn> columns,
         IReadOnlyList<string?[]> rows)
     {
         await using var dbContext = await factory.CreateDbContextAsync(path);
 
         await using var sink = TableStoreRowSink.Create(dbContext);
 
-        await sink.BeginAsync(headers);
+        await sink.BeginAsync(columns);
 
         foreach (var row in rows)
         {
@@ -104,7 +95,6 @@ public class SortHistoryTests
         ITableHistory history,
         string path,
         string columnName,
-        bool readAsNumber,
         bool descending)
     {
         await using var db = await factory.CreateDbContextAsync(path);
@@ -123,11 +113,10 @@ public class SortHistoryTests
         // does is move values between rows, so the values are what has to be remembered.
         await edit.CaptureBeforeAsync(TableRegion.Table());
 
-        await db.Database.ExecuteSqlRawAsync(
-            SortSql,
-            new SqliteParameter("@COLUMN_ID", column.Id),
-            new SqliteParameter("@READ_AS_NUMBER", readAsNumber ? 1 : 0),
-            new SqliteParameter("@DESCENDING", descending ? 1 : 0));
+        // The order the rows are put in is worked out from the values read as the type the column was
+        // given, which is the same reading the grid and the duplicate pass go by.
+        await TableStoreMaintenance.Create(db)
+            .SortByColumnAsync(column.Id, column.DataType, descending);
 
         return await edit.CommitAsync();
     }
@@ -146,10 +135,10 @@ public class SortHistoryTests
             await WriteThroughSinkAsync(
                 factory,
                 path,
-                ["Name", "Amount"],
+                [new TableColumn("Name", ColumnDataType.Text), new TableColumn("Amount", ColumnDataType.Integer)],
                 [["b", "10"], ["a", "2"], ["c", "100"]]);
 
-            var entry = await SortAsync(factory, history, path, "Amount", readAsNumber: true, descending: false);
+            var entry = await SortAsync(factory, history, path, "Amount", descending: false);
 
             Assert.NotNull(entry);
 
@@ -160,6 +149,104 @@ public class SortHistoryTests
             // Read as text 10 would come before 2; read as the numbers they are, they come in number order.
             Assert.Equal(["a", "b", "c"], rows.Select(row => row[0]));
             Assert.Equal(["2", "10", "100"], rows.Select(row => row[1]));
+        }
+        finally
+        {
+            DeleteStore(path);
+        }
+    }
+
+    [Fact]
+    public async Task Sorting_A_Decimal_Column_Orders_Its_Values_As_Numbers()
+    {
+        using var provider = BuildProvider();
+        var factory = provider.GetRequiredService<ITableStoreDbContextFactory>();
+        var history = provider.GetRequiredService<ITableHistory>();
+
+        var path = NewStorePath();
+
+        try
+        {
+            await WriteThroughSinkAsync(
+                factory,
+                path,
+                [new TableColumn("Amount", ColumnDataType.Decimal)],
+                [["10"], ["9"], ["1,000"]]);
+
+            await SortAsync(factory, history, path, "Amount", descending: false);
+
+            var (_, rows) = await ReadTableAsync(factory, path);
+
+            // Read as text the thousands separator would put 1,000 first, because a comma comes before a
+            // digit; read as the numbers they are, a value with its thousands grouped takes its own place.
+            Assert.Equal(["9"], rows[0]);
+            Assert.Equal(["10"], rows[1]);
+            Assert.Equal(["1,000"], rows[2]);
+        }
+        finally
+        {
+            DeleteStore(path);
+        }
+    }
+
+    [Fact]
+    public async Task Sorting_A_Date_Column_Puts_The_Days_In_Order()
+    {
+        using var provider = BuildProvider();
+        var factory = provider.GetRequiredService<ITableStoreDbContextFactory>();
+        var history = provider.GetRequiredService<ITableHistory>();
+
+        var path = NewStorePath();
+
+        try
+        {
+            await WriteThroughSinkAsync(
+                factory,
+                path,
+                [new TableColumn("Day", ColumnDataType.Date)],
+                [["2026-10-05"], ["2026-2-01"]]);
+
+            await SortAsync(factory, history, path, "Day", descending: false);
+
+            var (_, rows) = await ReadTableAsync(factory, path);
+
+            // Read as text the tenth month would come before the second, because 1 comes before 2; read as
+            // the days they are, the second month comes first.
+            Assert.Equal(["2026-2-01"], rows[0]);
+            Assert.Equal(["2026-10-05"], rows[1]);
+        }
+        finally
+        {
+            DeleteStore(path);
+        }
+    }
+
+    [Fact]
+    public async Task A_Value_That_Does_Not_Read_As_Its_Type_Sorts_Before_The_Values_That_Do()
+    {
+        using var provider = BuildProvider();
+        var factory = provider.GetRequiredService<ITableStoreDbContextFactory>();
+        var history = provider.GetRequiredService<ITableHistory>();
+
+        var path = NewStorePath();
+
+        try
+        {
+            await WriteThroughSinkAsync(
+                factory,
+                path,
+                [new TableColumn("Amount", ColumnDataType.Integer)],
+                [["9"], ["banana"], ["10"]]);
+
+            await SortAsync(factory, history, path, "Amount", descending: false);
+
+            var (_, rows) = await ReadTableAsync(factory, path);
+
+            // A value that does not read as the column's type has no place among the numbers, so it is put
+            // with the values that hold nothing rather than being read as a number it is not.
+            Assert.Equal(["banana"], rows[0]);
+            Assert.Equal(["9"], rows[1]);
+            Assert.Equal(["10"], rows[2]);
         }
         finally
         {
@@ -181,10 +268,10 @@ public class SortHistoryTests
             await WriteThroughSinkAsync(
                 factory,
                 path,
-                ["Name", "Amount"],
+                [new TableColumn("Name", ColumnDataType.Text), new TableColumn("Amount", ColumnDataType.Integer)],
                 [["b", "10"], ["a", "2"], ["c", "100"]]);
 
-            var entry = await SortAsync(factory, history, path, "Amount", readAsNumber: true, descending: false);
+            var entry = await SortAsync(factory, history, path, "Amount", descending: false);
 
             // The rows keep the ids 1, 2 and 3 they were written with, so the step is one that has to be
             // recorded even though the set of ids it left behind is the one it started with.
@@ -235,10 +322,10 @@ public class SortHistoryTests
             await WriteThroughSinkAsync(
                 factory,
                 path,
-                ["Name", "Amount"],
+                [new TableColumn("Name", ColumnDataType.Text), new TableColumn("Amount", ColumnDataType.Integer)],
                 [["b", "10"], ["a", "2"], ["c", "100"]]);
 
-            await SortAsync(factory, history, path, "Amount", readAsNumber: true, descending: true);
+            await SortAsync(factory, history, path, "Amount", descending: true);
 
             var descendingRows = await ReadTableAsync(factory, path);
 
@@ -270,10 +357,10 @@ public class SortHistoryTests
             await WriteThroughSinkAsync(
                 factory,
                 path,
-                ["Name"],
+                [new TableColumn("Name", ColumnDataType.Text)],
                 [["b"], [null], ["a"]]);
 
-            await SortAsync(factory, history, path, "Name", readAsNumber: false, descending: false);
+            await SortAsync(factory, history, path, "Name", descending: false);
 
             var (headers, rows) = await ReadTableAsync(factory, path);
 
@@ -294,3 +381,4 @@ public class SortHistoryTests
         }
     }
 }
+

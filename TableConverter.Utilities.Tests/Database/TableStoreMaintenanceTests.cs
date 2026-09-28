@@ -4,6 +4,7 @@ using TableConverter.Utilities.Database;
 using TableConverter.Utilities.Database.Extensions;
 using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.Utilities.Interfaces;
+using TableConverter.Utilities.Models;
 
 namespace TableConverter.Utilities.Tests.Database;
 
@@ -55,6 +56,30 @@ public class TableStoreMaintenanceTests
         await using var sink = TableStoreRowSink.Create(dbContext);
 
         await sink.BeginAsync(headers);
+
+        foreach (var row in rows)
+        {
+            await sink.WriteRowAsync(row);
+        }
+
+        await sink.CompleteAsync();
+    }
+
+    /// <summary>
+    /// Writes a table whose columns name their own types, so a test can say what a column holds rather
+    /// than leaving the type to be read off the values.
+    /// </summary>
+    private static async Task WriteTypedThroughSinkAsync(
+        ITableStoreDbContextFactory factory,
+        string path,
+        IReadOnlyList<TableColumn> columns,
+        IReadOnlyList<string?[]> rows)
+    {
+        await using var dbContext = await factory.CreateDbContextAsync(path);
+
+        await using var sink = TableStoreRowSink.Create(dbContext);
+
+        await sink.BeginAsync(columns);
 
         foreach (var row in rows)
         {
@@ -545,6 +570,138 @@ public class TableStoreMaintenanceTests
             Assert.Equal(2, second.FilledCount);
             Assert.Equal(1, second.EmptyCount);
             Assert.Equal(2, second.DistinctCount);
+        }
+        finally
+        {
+            DeleteStore(path);
+        }
+    }
+
+    [Fact]
+    public async Task Remove_Duplicate_Rows_Reads_A_Number_As_The_Number_Of_Its_Column()
+    {
+        using var provider = BuildProvider();
+        var factory = provider.GetRequiredService<ITableStoreDbContextFactory>();
+
+        var path = NewStorePath();
+
+        try
+        {
+            await WriteTypedThroughSinkAsync(
+                factory,
+                path,
+                [new TableColumn("Amount", ColumnDataType.Decimal)],
+                [["1"], ["1.0"], ["2"]]);
+
+            await using var dbContext = await factory.CreateDbContextAsync(path);
+
+            // 1 and 1.0 are the one value written two ways, and the column was given the type that says so,
+            // so the second row repeats the first rather than holding a value of its own.
+            Assert.Equal(1, await TableStoreMaintenance.Create(dbContext).RemoveDuplicateRowsAsync());
+
+            var (_, rows) = await ReadTableAsync(factory, path);
+
+            Assert.Equal(2, rows.Count);
+            Assert.Equal(["1"], rows[0]);
+            Assert.Equal(["2"], rows[1]);
+        }
+        finally
+        {
+            DeleteStore(path);
+        }
+    }
+
+    [Fact]
+    public async Task Remove_Duplicate_Rows_Keeps_The_Values_Of_A_Text_Column_Apart()
+    {
+        using var provider = BuildProvider();
+        var factory = provider.GetRequiredService<ITableStoreDbContextFactory>();
+
+        var path = NewStorePath();
+
+        try
+        {
+            await WriteTypedThroughSinkAsync(
+                factory,
+                path,
+                [new TableColumn("Code", ColumnDataType.Text)],
+                [["1"], ["1.0"]]);
+
+            await using var dbContext = await factory.CreateDbContextAsync(path);
+
+            // A text column holds text and nothing else, so 1 and 1.0 are two different codes: the type a
+            // column was given is what decides how its values are read, not what they look like.
+            Assert.Equal(0, await TableStoreMaintenance.Create(dbContext).RemoveDuplicateRowsAsync());
+
+            var (_, rows) = await ReadTableAsync(factory, path);
+
+            Assert.Equal(2, rows.Count);
+        }
+        finally
+        {
+            DeleteStore(path);
+        }
+    }
+
+    [Fact]
+    public async Task Remove_Duplicate_Rows_Reads_A_Day_As_The_Day_Of_Its_Column()
+    {
+        using var provider = BuildProvider();
+        var factory = provider.GetRequiredService<ITableStoreDbContextFactory>();
+
+        var path = NewStorePath();
+
+        try
+        {
+            await WriteTypedThroughSinkAsync(
+                factory,
+                path,
+                [new TableColumn("Day", ColumnDataType.Date)],
+                [["2026-2-01"], ["2026-02-01"], ["2026-03-01"]]);
+
+            await using var dbContext = await factory.CreateDbContextAsync(path);
+
+            // The first two rows name the same day, written with and without the zero that pads it, so the
+            // day they name is what makes them repeats.
+            Assert.Equal(1, await TableStoreMaintenance.Create(dbContext).RemoveDuplicateRowsAsync());
+
+            var (_, rows) = await ReadTableAsync(factory, path);
+
+            Assert.Equal(2, rows.Count);
+            Assert.Equal(["2026-2-01"], rows[0]);
+            Assert.Equal(["2026-03-01"], rows[1]);
+        }
+        finally
+        {
+            DeleteStore(path);
+        }
+    }
+
+    [Fact]
+    public async Task Remove_Duplicate_Rows_Tells_A_Value_That_Does_Not_Read_As_The_Type_From_A_Zero()
+    {
+        using var provider = BuildProvider();
+        var factory = provider.GetRequiredService<ITableStoreDbContextFactory>();
+
+        var path = NewStorePath();
+
+        try
+        {
+            await WriteTypedThroughSinkAsync(
+                factory,
+                path,
+                [new TableColumn("Amount", ColumnDataType.Decimal)],
+                [["0"], ["not a number"]]);
+
+            await using var dbContext = await factory.CreateDbContextAsync(path);
+
+            // A value that does not read as the column's type is compared as the text it is, so a value
+            // that only looks like a number to a lenient reader is never counted as the number 0.
+            Assert.Equal(0, await TableStoreMaintenance.Create(dbContext).RemoveDuplicateRowsAsync());
+
+            var (_, rows) = await ReadTableAsync(factory, path);
+
+            Assert.Equal(2, rows.Count);
         }
         finally
         {
