@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls;
@@ -113,6 +114,9 @@ public partial class TableColumnsEditorViewModel : BaseScopedPaneToolViewModel<T
         ColumnCommands.Add(this[TableDataCommandNames.MoveColumnRight]);
         ColumnCommands.Add(this[TableDataCommandNames.DeleteColumn]);
         
+        // The grid keeps its own record of what is under the cursor, while the commands read the workspace's
+        // selection, so the two are kept in step: whichever row the grid takes up or lets go of is added to
+        // or removed from the selection the commands see.
         _eventRegistrar.RegisterEvent<EventHandler<TreeSelectionModelSelectionChangedEventArgs<DataItem<ColumnEntity>>>>(
             action => TreeDataSource.RowSelection!.SelectionChanged += action,
             action => TreeDataSource.RowSelection!.SelectionChanged -= action, 
@@ -124,6 +128,11 @@ public partial class TableColumnsEditorViewModel : BaseScopedPaneToolViewModel<T
                 UpdateStatisticsAsync().FireAndForget();
             });
 
+        // A reset throws away every column the grid was showing and reads them again, so what the selection
+        // was holding belongs to columns that are no longer part of it. Without dropping it, the selection
+        // would keep the discarded items alongside the ones the new read puts in their place.
+        _eventRegistrar.RegisterCollectionChanged(DataSource.Collection, this, OnColumnCollectionChanged);
+        
         // An edit the store refuses is not written, but the row the grid is showing still holds what was
         // typed: the notice says what was wrong and the columns are read again so the row reads the way the
         // store holds it.
@@ -288,6 +297,44 @@ public partial class TableColumnsEditorViewModel : BaseScopedPaneToolViewModel<T
             : string.Empty;
     }
 
+    /// <summary>
+    ///     Drops the selection when the columns the grid was showing are replaced.
+    /// </summary>
+    private void OnColumnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs args)
+    {
+        if (args.Action is not NotifyCollectionChangedAction.Reset)
+        {
+            return;
+        }
+
+        // The data source raises its change notifications from whichever thread read the store, so the
+        // selection - which belongs to the grid - is only ever touched on the UI thread.
+        if (Dispatcher.UIThread.CheckAccess())
+        {
+            ClearColumnSelection();
+            return;
+        }
+
+        Dispatcher.UIThread.Post(ClearColumnSelection);
+    }
+
+    private void ClearColumnSelection()
+    {
+        if (IsDisposed)
+        {
+            return;
+        }
+
+        if (TreeDataSource.RowSelection is { Count: > 0 } selection)
+        {
+            selection.Clear();
+        }
+
+        // The columns the selection was part of are gone, but the document and the tools it was shared with
+        // are not, so only the columns are dropped.
+        SelectedItems.RemoveAll<DataItem<ColumnEntity>>();
+    }
+
     private void OnEditRejected(ColumnEditRejectedEventArgs args)
     {
         // The store raises this from whichever thread refused the edit, and the notice and the read that
@@ -308,6 +355,11 @@ public partial class TableColumnsEditorViewModel : BaseScopedPaneToolViewModel<T
             return;
         }
 
+        // The row the store refused is the one that was being edited, so it is the column under the cursor.
+        // Its id is taken before the columns are read again, because that read replaces every item the
+        // selection was holding.
+        var columnId = SelectedColumn?.Id;
+
         _toastManager.CreateSimpleInfoToast()
             .OfType(NotificationType.Error)
             .WithTitle("Column Edit Refused")
@@ -315,8 +367,16 @@ public partial class TableColumnsEditorViewModel : BaseScopedPaneToolViewModel<T
             .Queue();
 
         // The grid is still showing what the store refused, so the columns are read again to put the row
-        // back the way the store holds it.
+        // back the way the store holds it. The read resets the grid, which drops the selection the discarded
+        // items were part of, so no stale column is left behind next to the one put back below.
         DataSource.Invalidate();
+
+        // The column is still part of the table, so it is put back under the cursor rather than the row
+        // being dropped from the selection altogether.
+        if (columnId is { } id)
+        {
+            SelectColumnAsync(id).FireAndForget();
+        }
     }
 
     #endregion

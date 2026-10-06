@@ -1,3 +1,4 @@
+using System.Collections.Specialized;
 using Microsoft.Extensions.DependencyInjection;
 using ModelFlow.DataVirtualization;
 using TableConverter.Services.DataSources;
@@ -615,6 +616,51 @@ public class ColumnManagementTests
     }
 
     [Fact]
+    public async Task The_Columns_Are_Read_In_The_Order_The_Store_Keeps_Them_In_Even_After_A_Column_Is_Added()
+    {
+        using var provider = BuildProvider();
+        var factory = provider.GetRequiredService<ITableStoreDbContextFactory>();
+        var history = provider.GetRequiredService<ITableHistory>();
+
+        var path = NewStorePath();
+
+        try
+        {
+            using var uiThread = new InlineUiThread();
+
+            await WriteThroughSinkAsync(factory, path, ThreeTextColumns(), [["a1", "b1", "c1"]]);
+
+            var source = new TableStoreColumnsDataSource(factory, history) { Path = path };
+
+            // Adding a column is what the editor offers beside moving one, and it is the operation that
+            // takes the ordering away from the filter the data source was carrying it in.
+            await source.CreateAsync(new ColumnEntity
+            {
+                Name = string.Empty,
+                DataType = ColumnDataType.Text,
+                DefaultValueForCell = string.Empty,
+            });
+
+            var columnB = await FindColumnAsync(source, "B");
+
+            Assert.NotNull(columnB);
+
+            Assert.True(await source.MoveAsync(columnB, 1));
+
+            // The editor shows the columns in the places they hold, so the read the grid is filled from has
+            // to come back in that order. B and C changed places, so B has to be read after C - reading the
+            // columns in the order of their ids would put B back in front and the move would show nowhere.
+            var names = (await source.GetModelsAtAsync(0, 20)).Select(column => column.Name).ToList();
+
+            Assert.Equal(["A", "C", "B", "Column 1"], names);
+        }
+        finally
+        {
+            DeleteStore(path);
+        }
+    }
+
+    [Fact]
     public async Task Column_Statistics_Count_Blanks_And_Distinct_Values()
     {
         using var provider = BuildProvider();
@@ -655,5 +701,50 @@ public class ColumnManagementTests
             DeleteStore(path);
         }
     }
-}
 
+    [Fact]
+    public async Task Reading_The_Columns_Again_Tells_The_Grid_The_Items_It_Held_Are_Gone()
+    {
+        using var provider = BuildProvider();
+        var factory = provider.GetRequiredService<ITableStoreDbContextFactory>();
+        var history = provider.GetRequiredService<ITableHistory>();
+
+        var path = NewStorePath();
+
+        try
+        {
+            using var uiThread = new InlineUiThread();
+
+            await WriteThroughSinkAsync(factory, path, ThreeTextColumns(), [["a1", "b1", "c1"]]);
+
+            var source = new TableStoreColumnsDataSource(factory, history) { Path = path };
+
+            await source.EnsureInitialisedAsync();
+
+            var notifications = new List<NotifyCollectionChangedAction>();
+
+            void OnChanged(object? sender, NotifyCollectionChangedEventArgs args) => notifications.Add(args.Action);
+
+            source.Collection.CollectionChanged += OnChanged;
+
+            try
+            {
+                // Reading the columns again is what the tool does when the store refuses an edit. The reset
+                // it raises is what tells the selection that the items it was holding were thrown away, so
+                // the tool's own guard can drop them rather than leave the grid pointing at columns the
+                // store no longer has. This is the contract that guard rests on.
+                source.Invalidate();
+
+                Assert.Contains(NotifyCollectionChangedAction.Reset, notifications);
+            }
+            finally
+            {
+                source.Collection.CollectionChanged -= OnChanged;
+            }
+        }
+        finally
+        {
+            DeleteStore(path);
+        }
+    }
+}

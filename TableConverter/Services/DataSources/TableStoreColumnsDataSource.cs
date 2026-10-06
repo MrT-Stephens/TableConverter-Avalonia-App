@@ -84,7 +84,13 @@ public class TableStoreColumnsDataSource(
 
         query = filterSortQuery(query);
 
+        // The editor shows the columns in the order the store keeps them in, so that order is applied
+        // here rather than left to the filter alone. Adding a column clears the filter the ordering used
+        // to be carried by, and the columns would then be read in whatever order the store happens to
+        // hold their rows in - which is the order of their ids, so a column that had been moved would be
+        // read back in the place it held before the move and the grid would show it there.
         return await query
+            .OrderBy(column => column.OrdinalPosition)
             .Skip(offset)
             .Take(count)
             .ToListAsync()
