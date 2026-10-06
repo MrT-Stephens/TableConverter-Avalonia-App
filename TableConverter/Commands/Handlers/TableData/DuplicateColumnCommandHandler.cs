@@ -33,7 +33,8 @@ public class DuplicateColumnCommandHandler(ISukiToastManager toastManager)
     public bool CanExecute(object? parameter, ICommandContext context)
     {
         return context.TryGetSelectedItem<TableColumnsEditorViewModel>(out _)
-               && context.TryGetSelectedItem<DataItem<ColumnEntity>>(out _);
+               && context.TryGetSelectedItems<DataItem<ColumnEntity>>(out var items)
+               && items.Count == 1;
     }
 
     public async Task Execute(object? parameter, ICommandContext context)

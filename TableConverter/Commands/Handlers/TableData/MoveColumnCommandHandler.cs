@@ -47,6 +47,12 @@ public abstract class MoveColumnCommandHandler(ISukiToastManager toastManager)
         {
             return false;
         }
+        
+        if (context.TryGetSelectedItems<DataItem<ColumnEntity>>(out var columns)
+            && columns.Count > 1)
+        {
+            return false;
+        }
 
         // A column can only move towards a place the table has. The places columns hold run from one
         // without gaps, so the column at the front can only move towards the end and the one at the end
