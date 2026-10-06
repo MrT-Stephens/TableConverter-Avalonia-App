@@ -33,8 +33,6 @@ public class TrimWhitespaceCommandHandler(
         "Trim Whitespace",
         "Trim leading and trailing whitespace off every cell.",
         "EditIcon",
-        "Tools",
-        1,
         ["Ctrl+Shift+T"],
         canSetLoadingState: true,
         canSetLoadingOnWorkspace: true);

@@ -31,8 +31,6 @@ public class UndoCommandHandler(
         "Undo",
         "Take back the last change made to the table.",
         "UndoIcon",
-        "Edit",
-        0,
         ["Ctrl+Z"],
         canSetLoadingState: true,
         canSetLoadingOnWorkspace: true);

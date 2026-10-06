@@ -34,8 +34,6 @@ public class RemoveDuplicateRowsCommandHandler(
         "Remove Duplicates",
         "Delete rows that repeat the values of a row above them.",
         "TrashIcon",
-        "Tools",
-        1,
         ["Ctrl+Shift+U"],
         canSetLoadingState: true,
         canSetLoadingOnWorkspace: true);

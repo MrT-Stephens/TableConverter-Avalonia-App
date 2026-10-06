@@ -42,8 +42,6 @@ public class SortByColumnCommandHandler(
         "Sort by Column",
         "Put the rows of the table in the order of one of its columns.",
         "UpDownIcon",
-        "Tools",
-        2,
         ["Ctrl+Shift+S"],
         canSetLoadingState: true,
         canSetLoadingOnWorkspace: true);

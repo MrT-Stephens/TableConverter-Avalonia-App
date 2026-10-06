@@ -31,8 +31,6 @@ public class RedoCommandHandler(
         "Redo",
         "Put back the change that was last taken back.",
         "RedoIcon",
-        "Edit",
-        0,
         ["Ctrl+Y"],
         canSetLoadingState: true,
         canSetLoadingOnWorkspace: true);

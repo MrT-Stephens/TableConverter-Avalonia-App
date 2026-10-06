@@ -33,8 +33,6 @@ public class ClearTableHistoryCommandHandler(
         "Clear History",
         "Throw away the record of the changes made to the table.",
         "TrashIcon",
-        "Edit",
-        0,
         canSetLoadingState: true,
         canSetLoadingOnWorkspace: true);
 

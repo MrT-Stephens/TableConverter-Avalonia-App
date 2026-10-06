@@ -14,8 +14,8 @@
                               BorderThickness="0"
                               CornerRadius="0"
                               IsAnimated="False" />
-            <Menu ItemsSource="{Binding SelectedWorkspace.MainCommands, 
-                      Converter={x:Static converters:CommandInstancesToMenuItemsConverter.Instance}}"/>
+            <Menu ItemsSource="{Binding SelectedWorkspace.MainMenu, 
+                      Converter={x:Static converters:CommandMenuToMenuItemsConverter.Instance}}"/>
         </Panel>
         <sukiUi:SukiSideMenu IsSearchEnabled="False"
                              IsMenuExpanded="False"
@@ -35,4 +35,3 @@
         </sukiUi:SukiSideMenu>
     </DockPanel>
 </UserControl>
-

@@ -27,9 +27,6 @@ public class DuplicateColumnCommandHandler(ISukiToastManager toastManager)
         "Duplicate Column",
         "Add a copy of the selected column beside it, holding what it holds.",
         "DuplicateIcon",
-        "",
-        0,
-        null,
         canSetLoadingState: true,
         canSetLoadingOnWorkspace: true);
 

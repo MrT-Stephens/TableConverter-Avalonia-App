@@ -51,8 +51,6 @@ public class SearchTableDataCommandHandler(
         "Search",
         "Search table data.",
         "SearchIcon",
-        "View",
-        0,
         ["Ctrl+F"],
         canSetLoadingState: true,
         canSetLoadingOnWorkspace: true);

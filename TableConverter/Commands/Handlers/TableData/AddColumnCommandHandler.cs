@@ -23,8 +23,6 @@ public class AddColumnCommandHandler(ISukiToastManager toastManager)
         "Add Column",
         "Add a new column to the table.",
         "PlusIcon",
-        "",
-        0,
         ["Ctrl+Shift+A"],
         canSetLoadingState: true,
         canSetLoadingOnWorkspace: true);

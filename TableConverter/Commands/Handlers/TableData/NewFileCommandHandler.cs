@@ -33,8 +33,6 @@ public class NewFileCommandHandler(
         "New File",
         "Add a new table data file.",
         "AddFile",
-        "File",
-        0,
         ["Ctrl+N"]);
     
     public bool CanExecute(object? parameter, ICommandContext context)

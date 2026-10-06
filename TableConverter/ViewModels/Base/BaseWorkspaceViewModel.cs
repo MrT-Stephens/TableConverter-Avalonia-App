@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using Avalonia;
 using CommunityToolkit.Mvvm.ComponentModel;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
+using TableConverter.Commands.DataModels;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Interfaces;
 using TableConverter.Utilities.Interfaces;
@@ -19,7 +19,7 @@ public abstract partial class BaseWorkspaceViewModel : BaseViewModel, IWorkspace
     [ObservableProperty] private int _Index;
     [ObservableProperty] private bool _IsBusy;
     [ObservableProperty] private string _BusyText;
-    [ObservableProperty] private ObservableCollection<ICommandInstance> _MainCommands;
+    [ObservableProperty] private CommandMenu _MainMenu;
 
     #endregion
 
@@ -41,7 +41,7 @@ public abstract partial class BaseWorkspaceViewModel : BaseViewModel, IWorkspace
             ?? throw new ArgumentNullException(nameof(iconPath), $"Icon resource '{iconPath}' not found.");
         BusyText = string.Empty;
         IsBusy = false;
-        MainCommands = [];
+        MainMenu = new CommandMenu();
     }
 
     #endregion
@@ -62,4 +62,3 @@ public abstract partial class BaseWorkspaceViewModel : BaseViewModel, IWorkspace
     
     #endregion
 }
-

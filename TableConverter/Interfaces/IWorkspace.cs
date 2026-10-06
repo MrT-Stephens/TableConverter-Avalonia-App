@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using TableConverter.Commands.Interfaces;
+﻿using TableConverter.Commands.DataModels;
 
 namespace TableConverter.Interfaces;
 
@@ -15,7 +14,10 @@ public interface IWorkspace
         
     public string BusyText { get; set; }
     
-    public ObservableCollection<ICommandInstance> MainCommands { get; set; }
+    /// <summary>
+    /// The commands this workspace offers in the main menu, grouped and ordered as they are shown.
+    /// </summary>
+    public CommandMenu MainMenu { get; set; }
         
     public void SetBusy(bool isBusy, string busyText = "Loading...");
         

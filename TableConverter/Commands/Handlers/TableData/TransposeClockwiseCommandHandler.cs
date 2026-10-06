@@ -36,8 +36,6 @@ public class TransposeClockwiseCommandHandler(
         "Transpose Clockwise",
         "Turn the table a quarter turn clockwise, so its rows become columns and its columns become rows.",
         "RotateClockwiseIcon",
-        "Tools",
-        2,
         ["Ctrl+Shift+X"],
         canSetLoadingState: true,
         canSetLoadingOnWorkspace: true);

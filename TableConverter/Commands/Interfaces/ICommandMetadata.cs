@@ -31,16 +31,6 @@ public interface ICommandMetadata
     public StreamGeometry? IconPath { get; }
     
     /// <summary>
-    /// Gets the category of the command.
-    /// </summary>
-    public string? Category { get; }
-    
-    /// <summary>
-    /// Index which can be used to identify sub categories.
-    /// </summary>
-    public int? SubCategoryIndex { get; }
-    
-    /// <summary>
     /// Gets the key gestures which can be used to execute the command.
     /// </summary>
     public string[] KeyGestures { get; }

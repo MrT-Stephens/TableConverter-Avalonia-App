@@ -34,8 +34,6 @@ public class ExportFileCommandHandler(
         "Export File",
         "Export the selected table data to any of the supported file types.",
         "ExportFile",
-        "File",
-        2,
         ["Ctrl+E"],
         canSetLoadingOnWorkspace: true);
 

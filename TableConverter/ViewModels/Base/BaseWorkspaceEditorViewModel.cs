@@ -14,6 +14,7 @@ using Avalonia.Controls.Notifications;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using TableConverter.Commands.DataModels;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Contracts.Events;
 using TableConverter.Extensions;
@@ -51,7 +52,7 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
     [ObservableProperty] private IPaneDocument? _SelectedDocument;
     [ObservableProperty] private IPaneTool? _SelectedTool;
     [ObservableProperty] private ToolsSettingsForm _ToolsSettings;
-    [ObservableProperty] private ObservableCollection<ICommandInstance> _MainCommands;
+    [ObservableProperty] private CommandMenu _MainMenu;
 
     #endregion
 
@@ -77,9 +78,9 @@ public abstract partial class BaseWorkspaceEditorViewModel : BaseViewModel, IWor
             ?? throw new ArgumentNullException(nameof(iconPath), $"Icon resource '{iconPath}' not found.");
         Documents = [];
         Tools = [];
-        MainCommands = [];
         BusyText = string.Empty;
         ToolsSettings = new ToolsSettingsForm(Dock.Right, 350);
+        MainMenu = new CommandMenu();
     }
 
     #endregion

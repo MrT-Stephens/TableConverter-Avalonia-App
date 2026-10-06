@@ -122,9 +122,6 @@ public class MoveColumnLeftCommandHandler(ISukiToastManager toastManager)
         "Move Left",
         "Move the selected column one place towards the front of the table.",
         "MoveLeftIcon",
-        "",
-        0,
-        null,
         canSetLoadingState: true,
         canSetLoadingOnWorkspace: true);
 }
@@ -144,9 +141,6 @@ public class MoveColumnRightCommandHandler(ISukiToastManager toastManager)
         "Move Right",
         "Move the selected column one place towards the end of the table.",
         "MoveRightIcon",
-        "",
-        0,
-        null,
         canSetLoadingState: true,
         canSetLoadingOnWorkspace: true);
 }

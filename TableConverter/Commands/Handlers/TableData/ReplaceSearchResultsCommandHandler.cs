@@ -35,8 +35,6 @@ public class ReplaceSearchResultsCommandHandler(
         "Replace",
         "Search table data.",
         "ArrowReturnIcon",
-        "View",
-        0,
         ["Ctrl+R"],
         canSetLoadingState: true,
         canSetLoadingOnWorkspace: true);
