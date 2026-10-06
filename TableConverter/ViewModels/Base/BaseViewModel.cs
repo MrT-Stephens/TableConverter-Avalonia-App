@@ -112,7 +112,10 @@ public abstract partial class BaseViewModel : ObservableValidator, IInitialise, 
 
     public virtual void Initialise()
     {
-        SelectedItems = [];
+        // A view model that was handed a selection to share - a tool given its workspace's selection -
+        // keeps the one it was given, so the items a tool records are the very ones its commands read.
+        // A view model handed nothing starts life with a collection of its own.
+        SelectedItems ??= [];
     }
 
     #endregion

@@ -20,5 +20,13 @@
             </controls:CommandButtonToolBar.ItemsPanel>
         </controls:CommandButtonToolBar>
         <TreeDataGrid Source="{Binding TreeDataSource, Mode=OneWay}" />
+        <Border DockPanel.Dock="Bottom"
+                Margin="0,10,0,0"
+                Padding="10,6"
+                IsVisible="{Binding HasColumnStatistics, Mode=OneWay}"
+                Background="{DynamicResource SukiBackgroundShade}">
+            <TextBlock Text="{Binding StatisticsSummary, Mode=OneWay}"
+                       TextTrimming="CharacterEllipsis" />
+        </Border>
     </DockPanel>
 </UserControl>
