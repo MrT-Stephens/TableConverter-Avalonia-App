@@ -10,23 +10,25 @@
     <DockPanel>
         <controls:CommandButtonToolBar DockPanel.Dock="Top"
                                        Margin="0,0,0,10"
+                                       ShowText="False"
                                        Commands="{Binding ColumnCommands, Mode=OneWay}">
             <controls:CommandButtonToolBar.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <UniformGrid Columns="2"
-                                 ColumnSpacing="10"
-                                 RowSpacing="10" />
+                    <WrapPanel ItemSpacing="10"
+                               LineSpacing="10">
+                    </WrapPanel>
                 </ItemsPanelTemplate>
             </controls:CommandButtonToolBar.ItemsPanel>
         </controls:CommandButtonToolBar>
-        <TreeDataGrid Source="{Binding TreeDataSource, Mode=OneWay}" />
         <Border DockPanel.Dock="Bottom"
                 Margin="0,10,0,0"
                 Padding="10,6"
                 IsVisible="{Binding HasColumnStatistics, Mode=OneWay}"
                 Background="{DynamicResource SukiBackgroundShade}">
             <TextBlock Text="{Binding StatisticsSummary, Mode=OneWay}"
+                       HorizontalAlignment="Center"
                        TextTrimming="CharacterEllipsis" />
         </Border>
+        <TreeDataGrid Source="{Binding TreeDataSource, Mode=OneWay}" />
     </DockPanel>
 </UserControl>
