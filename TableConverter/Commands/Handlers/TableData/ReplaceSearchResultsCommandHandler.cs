@@ -123,6 +123,11 @@ public class ReplaceSearchResultsCommandHandler(
             .Queue();
         
         searchViewModel.DataSource.Invalidate();
+
+        // Replacing a header changes the column names with a statement that never reaches the change
+        // tracker, so no entity change is reported for it and the search settings are refreshed here.
+        await searchViewModel.RefreshColumnNamesAsync();
+
         await tableDataViewModel.InvalidateDataAsync();
     }
 

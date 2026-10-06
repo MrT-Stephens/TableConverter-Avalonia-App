@@ -91,7 +91,7 @@ public partial class TableSearchViewModel : BaseScopedPaneToolViewModel<TableWor
             {
                 DataSource.Path = tableDataViewModel.Path;
                 
-                RefreshColumnNames(tableDataViewModel.Path).FireAndForget();
+                RefreshColumnNamesAsync().FireAndForget();
             }
             else
             {
@@ -102,7 +102,17 @@ public partial class TableSearchViewModel : BaseScopedPaneToolViewModel<TableWor
 
     #endregion
 
-    #region Private Methods
+    #region Column Names
+
+    /// <summary>
+    ///     Reads the column names of the document's table back into the search settings.
+    /// </summary>
+    public Task RefreshColumnNamesAsync()
+    {
+        return string.IsNullOrEmpty(DataSource.Path)
+            ? Task.CompletedTask
+            : RefreshColumnNames(DataSource.Path);
+    }
 
     private async Task RefreshColumnNames(string path)
     {
@@ -113,10 +123,20 @@ public partial class TableSearchViewModel : BaseScopedPaneToolViewModel<TableWor
             .OrderBy(c => c.OrdinalPosition)
             .Select(c => c.Name)
             .ToListAsync();
-        
-        SearchSettings.ColumnNames.Clear();
-        SearchSettings.ColumnNames.Add("All");
-        SearchSettings.ColumnNames.AddRange(columnNames);
+
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            SearchSettings.ColumnNames.Clear();
+            SearchSettings.ColumnNames.Add("All");
+            SearchSettings.ColumnNames.AddRange(columnNames);
+
+            // A column that has been renamed or removed no longer names anything to search in, so the
+            // selection falls back to every column rather than pointing at a name that is not there.
+            if (!SearchSettings.ColumnNames.Contains(SearchSettings.SearchInSpecificColumn))
+            {
+                SearchSettings.SearchInSpecificColumn = "All";
+            }
+        });
     }
 
     private void OnEntityChanged(object? sender, DbEntityChangedEventArgs args)
@@ -128,43 +148,12 @@ public partial class TableSearchViewModel : BaseScopedPaneToolViewModel<TableWor
             return;
         }
 
-        RefreshDataAsync(args.Changes).FireAndForget();
+        // The names are read back from the store rather than patched one change at a time: a column can be
+        // renamed by a statement that never reaches the change tracker - replacing a header does - so
+        // patching would leave the list holding names the store no longer has, and the next change, such as
+        // undoing the replace, would not find the name it expects to replace.
+        RefreshColumnNamesAsync().FireAndForget();
     }
     
-    private async Task RefreshDataAsync(DbEntityChange[] changes)
-    {
-        foreach (var change in changes)
-        {
-            if (change.Entity is not ColumnEntity column)
-            {
-                continue;
-            }
-
-            if (change.State is DbEntityChangeState.Deleted)
-            {
-                await Dispatcher.UIThread.InvokeAsync(() =>
-                {
-                    SearchSettings.ColumnNames.Remove(column.Name);
-                });
-            }
-            else if (change.State is DbEntityChangeState.Added)
-            {
-                await Dispatcher.UIThread.InvokeAsync(() =>
-                {
-                    SearchSettings.ColumnNames.Insert(column.OrdinalPosition - 1, column.Name);
-                });
-            }
-            else if (change.State is DbEntityChangeState.Modified
-                && change.ModifiedProperties.TryGetValue(nameof(ColumnEntity.Name), out var values)
-                && values is { Original: string originalName, Current: string currentName })
-            {
-                await Dispatcher.UIThread.InvokeAsync(() =>
-                {
-                    SearchSettings.ColumnNames.Replace(originalName, currentName);
-                });
-            }
-        }
-    }
-
     #endregion
 }
