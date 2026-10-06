@@ -34,8 +34,8 @@ public class AddRowCommandHandler(
         "Add Row",
         "Add a new row to the table.",
         "AddIcon",
-        "Tools",
-        0,
+        "Edit",
+        1,
         ["Ctrl+Shift+N"],
         canSetLoadingState: true,
         canSetLoadingOnWorkspace: true);
