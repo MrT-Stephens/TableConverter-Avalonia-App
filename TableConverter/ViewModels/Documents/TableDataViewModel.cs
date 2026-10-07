@@ -533,4 +533,39 @@ public partial class TableDataViewModel : BaseDocumentViewModel, ISessionDocumen
     }
 
     #endregion
+
+    /// <summary>
+    /// Puts the grid's selection on one of its rows, so a value found elsewhere - such as by the validation
+    /// panel - can be jumped to.
+    /// </summary>
+    /// <param name="position">The place the row holds in the table, counting from zero.</param>
+    /// <remarks>
+    /// The grid only knows how many rows it holds once the data source has been read, so the count is waited
+    /// for rather than read from a collection that may still be empty. Multi-select is on, so the selection
+    /// is cleared first and the row is chosen on its own.
+    /// </remarks>
+    public async Task SelectCellAsync(int position, CancellationToken cancellationToken = default)
+    {
+        if (TreeDataSource.RowSelection is not { } selection || string.IsNullOrEmpty(Path))
+        {
+            return;
+        }
+
+        await DataSource.EnsureInitialisedAsync().ConfigureAwait(false);
+
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            // The document can be closed, and the table changed underneath, while the data source is being
+            // read, so the place is checked against the rows that are actually there before it is used.
+            if (IsDisposed || position < 0 || position >= DataSource.Collection.Count)
+            {
+                return;
+            }
+
+            selection.Clear();
+
+            // The grid is flat, so a row is addressed by a path of a single step.
+            selection.SelectedIndex = position;
+        });
+    }
 }

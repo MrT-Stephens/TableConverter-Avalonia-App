@@ -109,6 +109,7 @@ public partial class TableColumnsEditorViewModel : BaseScopedPaneToolViewModel<T
         base.Initialise();
         
         ColumnCommands.Add(this[TableDataCommandNames.AddColumn]);
+        ColumnCommands.Add(this[TableDataCommandNames.AddComputedColumn]);
         ColumnCommands.Add(this[TableDataCommandNames.DuplicateColumn]);
         ColumnCommands.Add(this[TableDataCommandNames.MoveColumnLeft]);
         ColumnCommands.Add(this[TableDataCommandNames.MoveColumnRight]);

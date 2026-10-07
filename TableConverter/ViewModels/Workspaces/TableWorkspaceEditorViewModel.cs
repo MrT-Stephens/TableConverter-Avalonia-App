@@ -71,7 +71,18 @@ public partial class TableWorkspaceEditorViewModel : BaseWorkspaceEditorViewMode
                 .Section()
                 .Add(this[TableDataCommandNames.SortByColumn], this[TableDataCommandNames.TransposeClockwise])
                 .Section()
-                .Add(this[TableDataCommandNames.TransposeCounterClockwise]));
+                .Add(this[TableDataCommandNames.TransposeCounterClockwise])
+                .Section()
+                // Joining rewrites the table in place - columns are joined or parted, and the rows or
+                // columns of another table are brought in - so it sits with the tools that change the
+                // table rather than apart from them.
+                .Add(this[TableDataCommandNames.JoinColumns], this[TableDataCommandNames.SplitColumn])
+                .Section()
+                .Add(this[TableDataCommandNames.MergeTable], this[TableDataCommandNames.JoinTable])
+                .Section()
+                // Summarising opens a table of its own rather than changing the one it read, so it sits in a
+                // section apart from the tools that rewrite the table in place.
+                .Add(this[TableDataCommandNames.PivotTable]));
     }
 
     public override IPaneDocument CreateNewDocumentInstance()
