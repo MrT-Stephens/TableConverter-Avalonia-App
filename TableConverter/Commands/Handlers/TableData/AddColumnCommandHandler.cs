@@ -29,7 +29,8 @@ public class AddColumnCommandHandler(ISukiToastManager toastManager)
 
     public bool CanExecute(object? parameter, ICommandContext context)
     {
-        return context.TryGetSelectedItem<TableColumnsEditorViewModel>(out _);
+        return context.TryGetSelectedItem<TableColumnsEditorViewModel>(out var viewModel)
+               && !string.IsNullOrEmpty(viewModel.DataSource.Path);
     }
 
     public async Task Execute(object? parameter, ICommandContext context)
