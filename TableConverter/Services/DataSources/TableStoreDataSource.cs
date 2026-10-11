@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -7,13 +8,16 @@ using Microsoft.EntityFrameworkCore;
 using ModelFlow.DataVirtualization.DataManagement;
 using TableConverter.Services.DataSources.Base;
 using TableConverter.Utilities.Database.Contexts;
+using TableConverter.Utilities.Database.History;
 using TableConverter.Utilities.Database.Models.TableStore;
 using TableConverter.Utilities.Extensions;
 using TableConverter.Utilities.Database.Interfaces;
 
 namespace TableConverter.Services.DataSources;
 
-public class TableStoreDataSource(ITableStoreDbContextFactory databaseContextFactory)
+public class TableStoreDataSource(
+    ITableStoreDbContextFactory databaseContextFactory,
+    ITableHistory history)
     : DataSourceFromPath<RowEntity>(databaseContextFactory, 250, 5)
 {
     private int? _ColumnCount;
@@ -90,12 +94,33 @@ public class TableStoreDataSource(ITableStoreDbContextFactory databaseContextFac
         // The order the rows are read in is the store's own order, which is what makes a row's place in
         // the table its identity: the grid shows the nth row it is given, and the nth row of the store is
         // the one carrying the nth id.
-        return await query
+        var rows = await query
             .OrderBy(row => row.Id)
             .Skip(offset)
             .Take(count)
             .ToListAsync()
             .ConfigureAwait(false);
+
+        // A cell is shown where its column sits, not where the cell's own id falls, and a column that has
+        // been moved keeps its id while changing its place. The store hands the cells of a row back in the
+        // order it keeps them in, which is decided by their ids, so they are put in the order the grid reads
+        // them in here: without this, moving a column would move the headings but leave the values behind
+        // and every value would show under the wrong one.
+        var ordinalByColumnId = await db.Columns
+            .AsNoTracking()
+            .Select(column => new { column.Id, column.OrdinalPosition })
+            .ToDictionaryAsync(column => column.Id, column => column.OrdinalPosition)
+            .ConfigureAwait(false);
+
+        foreach (var row in rows)
+        {
+            // A cell of a column that is no longer there is put at the end rather than thrown away, so a
+            // value the table still holds is never hidden by a column set this read did not see.
+            row.Cells = new ObservableCollection<CellEntity>(
+                row.Cells.OrderBy(cell => ordinalByColumnId.GetValueOrDefault(cell.ColumnId, int.MaxValue)));
+        }
+
+        return rows;
     }
 
     public override async Task<RowEntity?> GetItemAsync(Expression<Func<RowEntity, bool>> predicate)
@@ -148,7 +173,11 @@ public class TableStoreDataSource(ITableStoreDbContextFactory databaseContextFac
         {
             return false;
         }
-        
+
+        // An edit made straight in the grid is a step in the table's history like any other, so it is
+        // described the same way the commands describe theirs.
+        await using var edit = history.BeginEdit(Path, TableEditKind.RowsAdded, "Added a row");
+
         await using var db = await CreateDbAsync().ConfigureAwait(false);
         await using var transaction = await db.Database.BeginTransactionAsync().ConfigureAwait(false);
 
@@ -165,6 +194,11 @@ public class TableStoreDataSource(ITableStoreDbContextFactory databaseContextFac
             throw;
         }
 
+        // A row only has the id it is remembered under once the store has given it one, so it is described
+        // now that it has.
+        await edit.CaptureAfterAsync(TableRegion.Rows([item.Id])).ConfigureAwait(false);
+        await edit.CommitAsync().ConfigureAwait(false);
+
         return true;
     }
 
@@ -174,7 +208,12 @@ public class TableStoreDataSource(ITableStoreDbContextFactory databaseContextFac
         {
             return false;
         }
-        
+
+        // The whole row is described before it is written, because a cell the user edited is not reported
+        // to the data source - only the row it belongs to is - and the diff works out which values moved.
+        await using var edit = history.BeginEdit(Path, TableEditKind.CellsChanged, "Edited a row");
+        await edit.CaptureBeforeAsync(TableRegion.Rows([viewModel.Id])).ConfigureAwait(false);
+
         await using var db = await CreateDbAsync().ConfigureAwait(false);
         await using var transaction = await db.Database.BeginTransactionAsync().ConfigureAwait(false);
 
@@ -224,6 +263,8 @@ public class TableStoreDataSource(ITableStoreDbContextFactory databaseContextFac
             throw;
         }
 
+        await edit.CommitAsync().ConfigureAwait(false);
+
         return true;
     }
 
@@ -233,7 +274,10 @@ public class TableStoreDataSource(ITableStoreDbContextFactory databaseContextFac
         {
             return false;
         }
-        
+
+        await using var edit = history.BeginEdit(Path, TableEditKind.RowsDeleted, "Deleted a row");
+        await edit.CaptureBeforeAsync(TableRegion.Rows([item.Id])).ConfigureAwait(false);
+
         await using var db = await CreateDbAsync().ConfigureAwait(false);
         await using var transaction = await db.Database.BeginTransactionAsync().ConfigureAwait(false);
 
@@ -259,6 +303,8 @@ public class TableStoreDataSource(ITableStoreDbContextFactory databaseContextFac
             await transaction.RollbackAsync().ConfigureAwait(false);
             throw;
         }
+
+        await edit.CommitAsync().ConfigureAwait(false);
 
         return true;
     }

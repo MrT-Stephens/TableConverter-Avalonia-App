@@ -57,7 +57,10 @@ public class NumberModule(FakerBase faker, LocaleBase locale, Randomizer randomi
         return randomBigInt.ToString(CultureInfo.InvariantCulture);
     }
 
-    public virtual string Float(float minNumber = float.MinValue, float maxNumber = float.MaxValue,
+    // A default range that spans the whole of a floating point type cannot be turned into a value: the
+    // span between the two ends of the type overflows it, so what comes back is infinity. The default
+    // is therefore a range that can actually be generated, the same one a price uses.
+    public virtual string Float(float minNumber = 0, float maxNumber = 1000,
         int decimalPlaces = 2)
     {
         if (minNumber > maxNumber)
@@ -69,7 +72,7 @@ public class NumberModule(FakerBase faker, LocaleBase locale, Randomizer randomi
         return Randomizer.Float(minNumber, maxNumber).ToString($"F{decimalPlaces}", CultureInfo.InvariantCulture);
     }
 
-    public virtual string Double(double minNumber = double.MinValue, double maxNumber = double.MaxValue,
+    public virtual string Double(double minNumber = 0, double maxNumber = 1000,
         int decimalPlaces = 2)
     {
         if (minNumber > maxNumber)
@@ -81,7 +84,7 @@ public class NumberModule(FakerBase faker, LocaleBase locale, Randomizer randomi
         return Randomizer.Double(minNumber, maxNumber).ToString($"F{decimalPlaces}", CultureInfo.InvariantCulture);
     }
 
-    public virtual string Decimal(decimal minNumber = decimal.MinValue, decimal maxNumber = decimal.MaxValue,
+    public virtual string Decimal(decimal minNumber = 0, decimal maxNumber = 1000,
         int decimalPlaces = 2)
     {
         if (minNumber > maxNumber)

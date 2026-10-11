@@ -26,8 +26,6 @@ public class DeleteColumnCommandHandler(
         "Delete Column",
         "Delete the selected column(s).",
         "DeleteIcon",
-        "",
-        0,
         ["Ctrl+Shift+D"],
         canSetLoadingState: true,
         canSetLoadingOnWorkspace: true);

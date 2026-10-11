@@ -1,7 +1,9 @@
-﻿using TableConverter.FileConverters.ConverterHandlersOptions;
+﻿using System.Globalization;
+using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
 using TableConverter.FileConverters.Utilities;
 using TableConverter.Utilities;
+using TableConverter.Utilities.Models;
 
 namespace TableConverter.FileConverters.ConverterHandlers;
 
@@ -18,13 +20,13 @@ public class ConverterHandlerSQLOutput : ConverterHandlerOutputAbstract<Converte
 
         await using var writer = TableRowStream.CreateTextWriter(stream);
 
-        var headers = await source.GetHeadersAsync(cancellationToken).ConfigureAwait(false);
+        var columns = await source.GetColumnsAsync(cancellationToken).ConfigureAwait(false);
 
         var quoteType = Options!.QuoteTypes[Options!.SelectedQuoteType];
         var closingQuote = quoteType == "[" ? "]" : quoteType;
 
-        var headersText = string.Join(", ", headers.Select(header =>
-            $"{quoteType}{header.Replace(' ', '_')}{closingQuote}"));
+        var headersText = string.Join(", ", columns.Select(column =>
+            $"{quoteType}{column.Name.Replace(' ', '_')}{closingQuote}"));
 
         if (Options!.InsertMultiRowsAtOnce)
         {
@@ -34,7 +36,7 @@ public class ConverterHandlerSQLOutput : ConverterHandlerOutputAbstract<Converte
 
             await foreach (var row in source.ReadTextRowsAsync(cancellationToken).ConfigureAwait(false))
             {
-                var rowText = BuildRowText(row, headers.Count);
+                var rowText = BuildRowText(row, columns);
 
                 if (!wroteAny)
                 {
@@ -61,7 +63,7 @@ public class ConverterHandlerSQLOutput : ConverterHandlerOutputAbstract<Converte
         {
             await foreach (var row in source.ReadTextRowsAsync(cancellationToken).ConfigureAwait(false))
             {
-                var rowText = BuildRowText(row, headers.Count);
+                var rowText = BuildRowText(row, columns);
 
                 writer.Write($"INSERT INTO " +
                              $"{quoteType}" +
@@ -76,10 +78,36 @@ public class ConverterHandlerSQLOutput : ConverterHandlerOutputAbstract<Converte
         return Result.Success();
     }
 
-    private static string BuildRowText(string[] row, int columnCount)
+    /// <summary>
+    ///     Builds the parenthesised list of values for one row.
+    /// </summary>
+    /// <remarks>
+    ///     A number is written as the bare number rather than as quoted text, so the value lands in the
+    ///     target column as the number it is. Everything else keeps the quoting it has always had, which
+    ///     is what every dialect accepts whatever a column is declared as.
+    /// </remarks>
+    private static string BuildRowText(string[] row, IReadOnlyList<TableColumn> columns)
     {
-        // Iterate the headers so a ragged row is padded rather than producing fewer values than columns.
-        return string.Join(", ", Enumerable.Range(0, columnCount)
-            .Select(j => $"\'{ConverterHandlerUtilities.GetCellValue(row, j).Replace("\'", "\'\'")}\'"));
+        // Iterate the columns so a ragged row is padded rather than producing fewer values than columns.
+        return string.Join(", ", columns.Select((column, index) => BuildCellText(column, row, index)));
+    }
+
+    private static string BuildCellText(TableColumn column, string[] row, int columnIndex)
+    {
+        var value = ConverterHandlerUtilities.GetCellValue(row, columnIndex);
+
+        if (column.TryReadValue(value, out var typed))
+        {
+            switch (typed)
+            {
+                case long integer:
+                    return integer.ToString(CultureInfo.InvariantCulture);
+
+                case decimal number:
+                    return number.ToString(CultureInfo.InvariantCulture);
+            }
+        }
+
+        return $"\'{value.Replace("\'", "\'\'")}\'";
     }
 }

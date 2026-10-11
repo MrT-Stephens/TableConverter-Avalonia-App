@@ -35,8 +35,6 @@ public class ImportFileCommandHandler(
         "Import File",
         "Import table data from any of the supported file types.",
         "ImportFile",
-        "File",
-        1,
         ["Ctrl+I"]);
     
     public bool CanExecute(object? parameter, ICommandContext context)

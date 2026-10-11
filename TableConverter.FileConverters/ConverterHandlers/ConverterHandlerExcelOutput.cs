@@ -1,8 +1,10 @@
-﻿using NPOI.XSSF.UserModel;
+﻿using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
 using TableConverter.FileConverters.ConverterHandlersOptions;
 using TableConverter.FileConverters.DataModels;
 using TableConverter.FileConverters.Utilities;
 using TableConverter.Utilities;
+using TableConverter.Utilities.Models;
 
 namespace TableConverter.FileConverters.ConverterHandlers;
 
@@ -19,7 +21,7 @@ public class ConverterHandlerExcelOutput : ConverterHandlerOutputAbstract<Conver
 
         try
         {
-            var headers = await source.GetHeadersAsync(cancellationToken).ConfigureAwait(false);
+            var columns = await source.GetColumnsAsync(cancellationToken).ConfigureAwait(false);
 
             using var workbook = new XSSFWorkbook();
 
@@ -27,7 +29,12 @@ public class ConverterHandlerExcelOutput : ConverterHandlerOutputAbstract<Conver
 
             var headerRow = sheet.CreateRow(0);
 
-            for (var i = 0; i < headers.Count; i++) headerRow.CreateCell(i).SetCellValue(headers[i] ?? string.Empty);
+            for (var i = 0; i < columns.Count; i++) headerRow.CreateCell(i).SetCellValue(columns[i].Name);
+
+            // A date stored as a date is a number underneath, so it needs a format of its own to be shown
+            // as a date rather than as the serial number a spreadsheet keeps it as.
+            var dateStyle = CreateDateStyle(workbook, "yyyy-mm-dd");
+            var dateTimeStyle = CreateDateStyle(workbook, "yyyy-mm-dd hh:mm:ss");
 
             // Rows are written as they are pulled from the source, so the table is never copied into a
             // second, whole-table structure before the workbook can accept it.
@@ -37,19 +44,19 @@ public class ConverterHandlerExcelOutput : ConverterHandlerOutputAbstract<Conver
             {
                 var row = sheet.CreateRow(rowIndex++);
 
-                for (var columnIndex = 0; columnIndex < headers.Count; columnIndex++)
+                for (var columnIndex = 0; columnIndex < columns.Count; columnIndex++)
                 {
                     // Guard against ragged rows: the caller may supply fewer cells than there are headers.
                     var value = columnIndex < cells.Length ? cells[columnIndex] : string.Empty;
 
-                    row.CreateCell(columnIndex).SetCellValue(value);
+                    SetCellValue(row.CreateCell(columnIndex), columns[columnIndex], value, dateStyle, dateTimeStyle);
                 }
             }
 
             // Auto sizing needs the cells to exist first, and must be applied per column.
             // It relies on a font measurement backend (SkiaSharp) which may not be present in every
             // host, and it is only cosmetic, so a failure here must not fail the whole export.
-            for (var j = 0; j < headers.Count; j++)
+            for (var j = 0; j < columns.Count; j++)
             {
                 try
                 {
@@ -70,5 +77,56 @@ public class ConverterHandlerExcelOutput : ConverterHandlerOutputAbstract<Conver
         {
             return Result.Failure(ex.Message);
         }
+    }
+
+    private static ICellStyle CreateDateStyle(XSSFWorkbook workbook, string format)
+    {
+        var style = workbook.CreateCellStyle();
+        style.DataFormat = workbook.CreateDataFormat().GetFormat(format);
+
+        return style;
+    }
+
+    /// <summary>
+    ///     Writes <paramref name="value" /> into <paramref name="cell" /> as the kind of value the column
+    ///     holds, so a number lands in the workbook as a number and a date as a date rather than both as
+    ///     text.
+    /// </summary>
+    /// <remarks>
+    ///     A value that does not read as its column's type, and a column whose type is not known, are
+    ///     written as the text they already are, so nothing is lost on the way out.
+    /// </remarks>
+    private static void SetCellValue(ICell cell, TableColumn column, string? value, ICellStyle dateStyle,
+        ICellStyle dateTimeStyle)
+    {
+        if (column.TryReadValue(value, out var typed))
+        {
+            switch (typed)
+            {
+                case long integer:
+                    cell.SetCellValue(integer);
+                    return;
+
+                case decimal number:
+                    cell.SetCellValue((double)number);
+                    return;
+
+                case bool flag:
+                    cell.SetCellValue(flag);
+                    return;
+
+                case DateOnly date:
+                    cell.SetCellValue(date.ToDateTime(TimeOnly.MinValue));
+                    cell.CellStyle = dateStyle;
+                    return;
+
+                case DateTime moment:
+                    cell.SetCellValue(moment);
+                    cell.CellStyle = dateTimeStyle;
+                    return;
+            }
+        }
+
+        cell.SetCellValue(value ?? string.Empty);
     }
 }

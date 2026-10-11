@@ -29,8 +29,6 @@ public class OpenFileCommandHandler(
         "Open File",
         "Open an existing table data file.",
         "AddFile",
-        "File",
-        0,
         ["Ctrl+O"]);
     
     public bool CanExecute(object? parameter, ICommandContext context)

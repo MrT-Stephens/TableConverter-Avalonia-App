@@ -13,10 +13,10 @@
                    BackgroundAnimationEnabled="{Binding AppOptions.BackgroundAnimationEnabled, Mode=OneWay}"
                    BackgroundTransitionsEnabled="{Binding AppOptions.BackgroundTransitionEnabled, Mode=OneWay}"
                    CanFullScreen="True"
-                   IsMenuVisible="{Binding !!SelectedWorkspace.MainCommands.Count, Mode=OneWay}">
+                   IsMenuVisible="{Binding !!SelectedWorkspace.MainMenu.Count, Mode=OneWay}">
     <sukiUi:SukiWindow.MenuItems>
-        <Binding Path="SelectedWorkspace.MainCommands"
-                 Converter="{x:Static converters:CommandInstancesToMenuItemsConverter.Instance}"
+        <Binding Path="SelectedWorkspace.MainMenu"
+                 Converter="{x:Static converters:CommandMenuToMenuItemsConverter.Instance}"
                  Mode="OneWay" />
     </sukiUi:SukiWindow.MenuItems>
     <sukiUi:SukiWindow.LogoContent>

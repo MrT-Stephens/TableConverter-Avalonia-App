@@ -5,6 +5,7 @@ using TableConverter.Commands.DataModels;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Extensions;
 using TableConverter.Utilities.Database.Models.TableStore;
+using TableConverter.Utilities.Models;
 using TableConverter.ViewModels.Tools;
 
 namespace TableConverter.Commands.Handlers.TableData;
@@ -22,15 +23,14 @@ public class AddColumnCommandHandler(ISukiToastManager toastManager)
         "Add Column",
         "Add a new column to the table.",
         "PlusIcon",
-        "",
-        0,
         ["Ctrl+Shift+A"],
         canSetLoadingState: true,
         canSetLoadingOnWorkspace: true);
 
     public bool CanExecute(object? parameter, ICommandContext context)
     {
-        return context.TryGetSelectedItem<TableColumnsEditorViewModel>(out _);
+        return context.TryGetSelectedItem<TableColumnsEditorViewModel>(out var viewModel)
+               && !string.IsNullOrEmpty(viewModel.DataSource.Path);
     }
 
     public async Task Execute(object? parameter, ICommandContext context)

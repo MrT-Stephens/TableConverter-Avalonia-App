@@ -93,4 +93,3 @@ public sealed class EventHandlerSubscriptionHandle<TEventArgs>(
 
     public void Remove() => _eventHandler.Unsubscribe(_handler);
 }
-

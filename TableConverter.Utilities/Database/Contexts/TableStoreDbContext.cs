@@ -31,6 +31,16 @@ public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> op
     public DbSet<CellEntity> Cells => Set<CellEntity>();
     public DbSet<SearchResult> SearchResults => Set<SearchResult>();
 
+    /// <summary>
+    ///     The edits made to this store, newest last.
+    /// </summary>
+    /// <remarks>
+    ///     The history lives in the store it describes rather than beside it in memory, so how far a table
+    ///     can be walked back survives the document being closed and does not have to be held for every
+    ///     table that is open at once.
+    /// </remarks>
+    public DbSet<HistoryEntryEntity> History => Set<HistoryEntryEntity>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ColumnEntity>(b =>
@@ -155,6 +165,48 @@ public sealed class TableStoreDbContext(DbContextOptions<TableStoreDbContext> op
             b.Property(x => x.FoundValue)
                 .HasColumnName("FOUND_VALUE")
                 .IsRequired();
+        });
+
+        modelBuilder.Entity<HistoryEntryEntity>(b =>
+        {
+            b.ToTable("TABLE_HISTORY");
+
+            b.HasKey(x => x.Id);
+
+            b.Property(x => x.Id)
+                .HasColumnName("ID")
+                .ValueGeneratedOnAdd();
+
+            b.Property(x => x.Sequence)
+                .HasColumnName("SEQUENCE")
+                .IsRequired();
+
+            // Stored as a number of seconds since the Unix epoch: SQLite has no date type, and every
+            // provider agrees on what an integer is.
+            b.Property(x => x.Timestamp)
+                .HasColumnName("TIMESTAMP")
+                .IsRequired();
+
+            b.Property(x => x.Description)
+                .HasColumnName("DESCRIPTION")
+                .IsRequired();
+
+            b.Property(x => x.Kind)
+                .HasColumnName("KIND")
+                .IsRequired();
+
+            b.Property(x => x.Payload)
+                .HasColumnName("PAYLOAD")
+                .IsRequired();
+
+            b.Property(x => x.IsApplied)
+                .HasColumnName("IS_APPLIED")
+                .IsRequired();
+
+            // The history is read in the order its steps were taken, and the steps that can be undone are
+            // found by whether they are applied, so both are indexed rather than scanned for.
+            b.HasIndex(x => x.Sequence).HasDatabaseName("IDX_TABLE_HISTORY_SEQUENCE");
+            b.HasIndex(x => x.IsApplied).HasDatabaseName("IDX_TABLE_HISTORY_APPLIED");
         });
     }
 

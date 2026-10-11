@@ -66,6 +66,11 @@ public partial class TableUtilitiesViewModel : BaseScopedPaneToolViewModel<Table
         GeneralCommands.Add(this[TableDataCommandNames.TransposeClockwise]);
         GeneralCommands.Add(this[TableDataCommandNames.TransposeCounterClockwise]);
         GeneralCommands.Add(this[TableDataCommandNames.SortByColumn]);
+        GeneralCommands.Add(this[TableDataCommandNames.JoinColumns]);
+        GeneralCommands.Add(this[TableDataCommandNames.SplitColumn]);
+        GeneralCommands.Add(this[TableDataCommandNames.MergeTable]);
+        GeneralCommands.Add(this[TableDataCommandNames.JoinTable]);
+        GeneralCommands.Add(this[TableDataCommandNames.PivotTable]);
     }
 
     protected override void OnSelectedDocumentChanged(IWorkspace workspace, 

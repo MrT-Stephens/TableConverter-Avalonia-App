@@ -1,7 +1,9 @@
+using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using NPOI.XWPF.UserModel;
 using TableConverter.FileConverters.ConverterHandlers;
 using TableConverter.FileConverters.ConverterHandlersOptions;
+using TableConverter.Utilities.Models;
 
 namespace TableConverter.FileConverters.Tests.OutputConverterTests;
 
@@ -81,6 +83,37 @@ public class ExcelOutputTest
 
         // header + 5 data rows
         Assert.Equal(6, sheet.PhysicalNumberOfRows);
+    }
+
+    [Fact]
+    public async Task Convert_Writes_Numeric_Cells_For_A_Typed_Column()
+    {
+        var handler = CreateHandler();
+
+        using var stream = new MemoryStream();
+
+        IReadOnlyList<TableColumn> columns =
+        [
+            new TableColumn("Name", ColumnDataType.Text),
+            new TableColumn("Age", ColumnDataType.Integer)
+        ];
+
+        var result = await Utils.ConvertTypedToStreamAsync(handler, columns, [["Alice", "30"]], stream);
+
+        Assert.True(result.IsSuccess, result.Error);
+
+        stream.Position = 0;
+
+        using var workbook = new XSSFWorkbook(stream);
+        var row = workbook.GetSheetAt(0).GetRow(1);
+
+        // The age lands as a number the spreadsheet can add up, not as the text "30".
+        Assert.Equal(CellType.Numeric, row.GetCell(1).CellType);
+        Assert.Equal(30d, row.GetCell(1).NumericCellValue);
+
+        // A text column is still written as text.
+        Assert.Equal(CellType.String, row.GetCell(0).CellType);
+        Assert.Equal("Alice", row.GetCell(0).StringCellValue);
     }
 }
 

@@ -147,6 +147,8 @@ public class App : Application
         views.AddView<TableSearchView, TableSearchViewModel>(services);
         views.AddView<DataGenerationOptionsView, DataGenerationOptionsViewModel>(services);
         views.AddView<TableColumnsEditorView, TableColumnsEditorViewModel>(services);
+        views.AddView<HistoryView, HistoryViewModel>(services);
+        views.AddView<ValidationView, TableValidationViewModel>(services);
         // Misc
         views.AddView<DataGenerationTypesSelectionListView, DataGenerationTypesSelectionListViewModel>(services);
         views.AddView<DataGenerationTypesSelectionView, DataGenerationTypesSelectionViewModel>(services);

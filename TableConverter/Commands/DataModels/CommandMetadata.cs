@@ -47,12 +47,6 @@ public record CommandMetadata : ICommandMetadata
     /// <param name="iconName">
     /// The name of the icon resource for the command.
     /// </param>
-    /// <param name="category">
-    /// The category of the command.
-    /// </param>
-    /// <param name="subCategoryIndex">
-    /// Index which can be used to identify sub categories.
-    /// </param>
     /// <param name="keyGestures">
     /// The key gestures which can be used to execute the command.
     /// </param>
@@ -72,8 +66,6 @@ public record CommandMetadata : ICommandMetadata
         string title, 
         string description, 
         string iconName, 
-        string category = "", 
-        int? subCategoryIndex = null, 
         string[]? keyGestures = null, 
         bool canSetLoadingState = false,
         bool canSetLoadingOnWorkspace = false,
@@ -83,8 +75,6 @@ public record CommandMetadata : ICommandMetadata
         Title = title;
         Description = description;
         IconName = iconName;
-        Category = category;
-        SubCategoryIndex = subCategoryIndex;
         KeyGestures = keyGestures ?? [];
         CanSetLoadingState = canSetLoadingState;
         CanSetLoadingOnWorkspace = canSetLoadingOnWorkspace;
@@ -103,11 +93,6 @@ public record CommandMetadata : ICommandMetadata
     /// <inheritdoc />
     public string? IconName { get; }
     
-    /// <inheritdoc />
-    public string? Category { get; }
-
-    /// <inheritdoc />
-    public int? SubCategoryIndex { get; }
 
     /// <inheritdoc />
     public string[] KeyGestures { get; }

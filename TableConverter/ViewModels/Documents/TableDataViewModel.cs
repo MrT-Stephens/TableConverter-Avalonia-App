@@ -9,9 +9,6 @@ using Avalonia.Controls;
 using Avalonia.Controls.Models.TreeDataGrid;
 using Avalonia.Controls.Selection;
 using Avalonia.Controls.Templates;
-using Avalonia.Data;
-using Avalonia.Layout;
-using Avalonia.Media;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +19,6 @@ using SukiUI.Toasts;
 using TableConverter.Commands.Interfaces;
 using TableConverter.Configuration;
 using TableConverter.Contracts;
-using TableConverter.Converters;
 using TableConverter.FileConverters.Interfaces;
 using TableConverter.Interfaces;
 using TableConverter.ViewModels.Base;
@@ -31,10 +27,13 @@ using TableConverter.Services.DataSources;
 using TableConverter.Utilities;
 using TableConverter.Utilities.Database;
 using TableConverter.Utilities.Database.Events;
+using TableConverter.Utilities.Database.History;
 using TableConverter.Utilities.Database.Interfaces;
 using TableConverter.Utilities.Database.Models.TableStore;
 using TableConverter.Utilities.Extensions;
 using TableConverter.Utilities.Interfaces;
+using TableConverter.Utilities.Models;
+using TableConverter.Views.Controls.CellEditors;
 
 namespace TableConverter.ViewModels.Documents;
 
@@ -89,13 +88,14 @@ public partial class TableDataViewModel : BaseDocumentViewModel, ISessionDocumen
         ISukiDialogManager dialogManager,
         ISukiToastManager toastManager,
         ITableStoreDbContextFactory dbContextFactory,
+        ITableHistory history,
         IOptions<AppOptions> appOptions)
         : base(commandManager, eventManager, dialogManager, toastManager)
     {
         _appOptions = appOptions;
         _dbContextFactory = dbContextFactory;
         Path = string.Empty;
-        DataSource = new TableStoreDataSource(_dbContextFactory);
+        DataSource = new TableStoreDataSource(_dbContextFactory, history);
         TreeDataSource = new FlatTreeDataGridSource<DataItem<RowEntity>>(DataSource.Collection);
         TreeDataSource.RowSelection!.SingleSelect = false; 
         DataSource.Path = Path;
@@ -311,8 +311,15 @@ public partial class TableDataViewModel : BaseDocumentViewModel, ISessionDocumen
     /// </summary>
     /// <param name="header">The column heading, which is the column's name.</param>
     /// <param name="columnIndex">The position of the column within a row's cells.</param>
-    /// <param name="dataType">The type the column was given, which decides how its cells read.</param>
+    /// <param name="dataType">The type the column was given, which decides how its cells read and how they are entered.</param>
     /// <param name="gridLength">The width to give the column.</param>
+    /// <remarks>
+    /// A cell is shown as text laid out the way its column's type reads, and entered with the control
+    /// that type calls for, so a day is picked from a calendar rather than typed and a number is
+    /// stepped rather than written. Nothing is ever rejected for not matching the type, because a typed
+    /// column would otherwise be unusable while its values were still being entered: a value that does
+    /// not read as the type is marked, so the styles can draw it in the theme's error colour.
+    /// </remarks>
     private static TemplateColumn<TModel> CreateTemplateColumn<TModel>(
         object header,
         int columnIndex,
@@ -322,46 +329,9 @@ public partial class TableDataViewModel : BaseDocumentViewModel, ISessionDocumen
     {
         var valuePath = $"Item.Cells[{columnIndex}].Value";
 
-        // A value is never rejected for not matching its column's type, because a typed column would
-        // otherwise be unusable while its values were still being entered. The type only decides how the
-        // cell reads: numbers are right aligned, so a column of them lines up the way it would in a
-        // spreadsheet, and anything that does not read as the type is marked, so the styles can draw it
-        // in the theme's error colour.
-        var textAlignment = dataType.IsNumeric() ? TextAlignment.Right : TextAlignment.Left;
-        var mismatch = new ColumnValueMismatchConverter(dataType);
-
         return new TemplateColumn<TModel>(header,
-            new FuncDataTemplate<TModel>((_, _) => new TextBlock
-            {
-                VerticalAlignment = VerticalAlignment.Center,
-                TextAlignment = textAlignment,
-                [!TextBlock.TextProperty] = new Binding
-                {
-                    Path = valuePath,
-                    Mode = BindingMode.TwoWay
-                },
-                [!ColumnValueMismatch.IsMismatchedProperty] = new Binding
-                {
-                    Path = valuePath,
-                    Converter = mismatch
-                }
-            }),
-            new FuncDataTemplate<TModel>((_, _) => new TextBox
-            {
-                VerticalAlignment = VerticalAlignment.Center,
-                TextAlignment = textAlignment,
-                [!TextBox.TextProperty] = new Binding
-                {
-                    Path = valuePath,
-                    Mode = BindingMode.TwoWay,
-                    UpdateSourceTrigger = UpdateSourceTrigger.LostFocus
-                },
-                [!ColumnValueMismatch.IsMismatchedProperty] = new Binding
-                {
-                    Path = valuePath,
-                    Converter = mismatch
-                }
-            }),
+            new FuncDataTemplate<TModel>((_, _) => CellEditorFactory.CreateDisplay(dataType, valuePath)),
+            new FuncDataTemplate<TModel>((_, _) => CellEditorFactory.CreateEditor(dataType, valuePath)),
             gridLength ?? GridLength.Auto,
             new TemplateColumnOptions<TModel>
             {
@@ -563,4 +533,39 @@ public partial class TableDataViewModel : BaseDocumentViewModel, ISessionDocumen
     }
 
     #endregion
+
+    /// <summary>
+    /// Puts the grid's selection on one of its rows, so a value found elsewhere - such as by the validation
+    /// panel - can be jumped to.
+    /// </summary>
+    /// <param name="position">The place the row holds in the table, counting from zero.</param>
+    /// <remarks>
+    /// The grid only knows how many rows it holds once the data source has been read, so the count is waited
+    /// for rather than read from a collection that may still be empty. Multi-select is on, so the selection
+    /// is cleared first and the row is chosen on its own.
+    /// </remarks>
+    public async Task SelectCellAsync(int position, CancellationToken cancellationToken = default)
+    {
+        if (TreeDataSource.RowSelection is not { } selection || string.IsNullOrEmpty(Path))
+        {
+            return;
+        }
+
+        await DataSource.EnsureInitialisedAsync().ConfigureAwait(false);
+
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            // The document can be closed, and the table changed underneath, while the data source is being
+            // read, so the place is checked against the rows that are actually there before it is used.
+            if (IsDisposed || position < 0 || position >= DataSource.Collection.Count)
+            {
+                return;
+            }
+
+            selection.Clear();
+
+            // The grid is flat, so a row is addressed by a path of a single step.
+            selection.SelectedIndex = position;
+        });
+    }
 }

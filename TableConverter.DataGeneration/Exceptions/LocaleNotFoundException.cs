@@ -25,4 +25,3 @@ public sealed class LocaleNotFoundException : Exception
         return $"An exception occurred while resolving the locale '{LocaleType}'. Inner message: '{Message}'.";
     }
 }
-

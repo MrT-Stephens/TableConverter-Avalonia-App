@@ -1,0 +1,116 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:TableConverter.ViewModels.Tools"
+             xmlns:controls="clr-namespace:TableConverter.Views.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TableConverter.Views.Tools.HistoryView"
+             x:DataType="viewModels:HistoryViewModel">
+    <Grid RowDefinitions="Auto,*"
+          RowSpacing="10">
+        <controls:CommandButtonToolBar Grid.Row="0"
+                                       Commands="{Binding HistoryCommands, Mode=OneWay}">
+            <controls:CommandButtonToolBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Columns="2"
+                                 RowSpacing="10"
+                                 ColumnSpacing="10" />
+                </ItemsPanelTemplate>
+            </controls:CommandButtonToolBar.ItemsPanel>
+        </controls:CommandButtonToolBar>
+        <ScrollViewer Grid.Row="1"
+                      HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="4"
+                        Grid.IsSharedSizeScope="True">
+                <TextBlock Classes="Caption"
+                           TextWrapping="Wrap"
+                           IsVisible="{Binding !HasEntries}"
+                           Text="No changes have been made to this table yet." />
+
+                <!-- The steps that are done to the table, the newest of which the table is sitting after. -->
+                <ItemsControl ItemsSource="{Binding AppliedEntries, Mode=OneWay}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="viewModels:HistoryEntryViewModel">
+                            <Grid ColumnSpacing="8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto"
+                                                      SharedSizeGroup="HistoryTime" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <PathIcon Grid.Column="0"
+                                          Width="12"
+                                          Height="12"
+                                          VerticalAlignment="Center"
+                                          Data="{Binding Icon, Mode=OneWay}" />
+                                <TextBlock Grid.Column="1"
+                                           Classes="Caption"
+                                           VerticalAlignment="Center"
+                                           Text="{Binding Time, Mode=OneWay}" />
+                                <TextBlock Grid.Column="2"
+                                           TextWrapping="Wrap"
+                                           VerticalAlignment="Center"
+                                           Text="{Binding Description, Mode=OneWay}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- The point the table is currently sitting at: everything above it is done, everything
+                     below it has been taken back. -->
+                <Grid ColumnDefinitions="Auto,Auto,*"
+                      ColumnSpacing="8"
+                      Margin="0,4"
+                      IsVisible="{Binding HasEntries, Mode=OneWay}">
+                    <Border Grid.Column="0"
+                            Width="8"
+                            Height="8"
+                            CornerRadius="4"
+                            VerticalAlignment="Center"
+                            Background="{DynamicResource SukiPrimaryColor}" />
+                    <TextBlock Grid.Column="1"
+                               Classes="Caption"
+                               VerticalAlignment="Center"
+                               Text="Current position" />
+                    <Border Grid.Column="2"
+                            Height="1"
+                            Opacity="0.4"
+                            VerticalAlignment="Center"
+                            Background="{DynamicResource SukiPrimaryColor}" />
+                </Grid>
+
+                <!-- The steps that have been taken back, oldest first, which redoing puts back in order. -->
+                <ItemsControl ItemsSource="{Binding UndoneEntries, Mode=OneWay}"
+                              Opacity="0.45">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="viewModels:HistoryEntryViewModel">
+                            <Grid ColumnSpacing="8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto"
+                                                      SharedSizeGroup="HistoryTime" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <PathIcon Grid.Column="0"
+                                          Width="12"
+                                          Height="12"
+                                          VerticalAlignment="Center"
+                                          Data="{Binding Icon, Mode=OneWay}" />
+                                <TextBlock Grid.Column="1"
+                                           Classes="Caption"
+                                           VerticalAlignment="Center"
+                                           Text="{Binding Time, Mode=OneWay}" />
+                                <TextBlock Grid.Column="2"
+                                           TextWrapping="Wrap"
+                                           VerticalAlignment="Center"
+                                           Text="{Binding Description, Mode=OneWay}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

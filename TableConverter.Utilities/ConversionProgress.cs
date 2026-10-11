@@ -43,4 +43,3 @@ public readonly record struct ConversionProgress(long Processed, long? Total)
     /// </summary>
     public double? Percent => Fraction * 100d;
 }
-

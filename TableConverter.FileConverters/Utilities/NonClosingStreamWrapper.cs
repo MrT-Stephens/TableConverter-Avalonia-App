@@ -58,4 +58,3 @@ public sealed class NonClosingStreamWrapper(Stream inner) : Stream
         base.Dispose(disposing);
     }
 }
-

@@ -55,7 +55,7 @@ public class RandomizerTest
     }
 
     [Fact]
-    public void Bytes_Fills_The_Whole_Buffer_Under_Concurrent_Use()
+    public void Bytes_Fills_The_Whole_buffer_Under_Concurrent_Use()
     {
         var random = new Randomizer(3);
         var buffers = new byte[64][];

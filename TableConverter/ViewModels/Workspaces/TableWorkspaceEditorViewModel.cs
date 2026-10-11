@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using TableConverter.Commands.DataModels;
 using TableConverter.Commands.Handlers.TableData;
 using TableConverter.Extensions;
 using TableConverter.Interfaces;
@@ -43,22 +44,45 @@ public partial class TableWorkspaceEditorViewModel : BaseWorkspaceEditorViewMode
     public override void Initialise()
     {
         base.Initialise();
-        
-        MainCommands.Add(this[TableDataCommandNames.NewFile]);
-        MainCommands.Add(this[TableDataCommandNames.ImportFile]);
-        MainCommands.Add(this[TableDataCommandNames.ExportFile]);
-        MainCommands.Add(this[TableDataCommandNames.Search]);
-        MainCommands.Add(this[TableDataCommandNames.OpenFile]);
 
-        // The table tools are commands too, so the same actions are offered by the workspace menu and by the
-        // table utilities tool, with one implementation behind both.
-        MainCommands.Add(this[TableDataCommandNames.AddRow]);
-        MainCommands.Add(this[TableDataCommandNames.DeleteRows]);
-        MainCommands.Add(this[TableDataCommandNames.TrimWhitespace]);
-        MainCommands.Add(this[TableDataCommandNames.RemoveDuplicateRows]);
-        MainCommands.Add(this[TableDataCommandNames.TransposeClockwise]);
-        MainCommands.Add(this[TableDataCommandNames.TransposeCounterClockwise]);
-        MainCommands.Add(this[TableDataCommandNames.SortByColumn]);
+        // The main menu is composed here rather than described by each command, so what each group holds,
+        // what order the groups run in and where the commands sit within them are all decided in one
+        // place. Groups and commands are shown in the order they are added, and a command left out is
+        // simply not offered by the menu.
+        MainMenu = new CommandMenu()
+            .Group("File", group => group
+                .Add(this[TableDataCommandNames.NewFile], this[TableDataCommandNames.OpenFile])
+                .Section()
+                .Add(this[TableDataCommandNames.ImportFile])
+                .Section()
+                .Add(this[TableDataCommandNames.ExportFile]))
+            .Group("Edit", group => group
+                // Undo and redo walk the table's own history rather than the grid's, so they are offered
+                // by the workspace menu and bound to the familiar keys.
+                .Add(this[TableDataCommandNames.Undo], this[TableDataCommandNames.Redo])
+                .Section()
+                .Add(this[TableDataCommandNames.AddRow], this[TableDataCommandNames.DeleteRows]))
+            .Group("View", group => group
+                .Add(this[TableDataCommandNames.Search]))
+            .Group("Tools", group => group
+                // The table tools are commands too, so the same actions are offered by the workspace menu
+                // and by the table utilities tool, with one implementation behind both.
+                .Add(this[TableDataCommandNames.TrimWhitespace], this[TableDataCommandNames.RemoveDuplicateRows])
+                .Section()
+                .Add(this[TableDataCommandNames.SortByColumn], this[TableDataCommandNames.TransposeClockwise])
+                .Section()
+                .Add(this[TableDataCommandNames.TransposeCounterClockwise])
+                .Section()
+                // Joining rewrites the table in place - columns are joined or parted, and the rows or
+                // columns of another table are brought in - so it sits with the tools that change the
+                // table rather than apart from them.
+                .Add(this[TableDataCommandNames.JoinColumns], this[TableDataCommandNames.SplitColumn])
+                .Section()
+                .Add(this[TableDataCommandNames.MergeTable], this[TableDataCommandNames.JoinTable])
+                .Section()
+                // Summarising opens a table of its own rather than changing the one it read, so it sits in a
+                // section apart from the tools that rewrite the table in place.
+                .Add(this[TableDataCommandNames.PivotTable]));
     }
 
     public override IPaneDocument CreateNewDocumentInstance()

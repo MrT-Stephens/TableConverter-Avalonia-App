@@ -2,6 +2,7 @@ using TableConverter.DataGeneration;
 using TableConverter.DataGeneration.LocaleDataSetsBase;
 using TableConverter.DataGeneration.Modules;
 using TableConverter.Contracts;
+using TableConverter.Utilities.Models;
 
 namespace TableConverter.Services.DataGenerationAttributedModules;
 
@@ -12,50 +13,58 @@ public class NumberAttributedModule(FakerBase faker, LocaleBase locale, Randomiz
     : NumberModule(faker, locale, randomizer)
 {
     [DataGenerationModuleMethod("Integer",
-        "Generates a random integer between the specified minimum and maximum values. Default: minNumber = int.MinValue, maxNumber = int.MaxValue.")]
+        "Generates a random integer between the specified minimum and maximum values. Default: minNumber = int.MinValue, maxNumber = int.MaxValue.",
+        dataType: ColumnDataType.Integer)]
     public override string Integer(int minNumber = int.MinValue, int maxNumber = int.MaxValue)
     {
         return base.Integer(minNumber, maxNumber);
     }
 
     [DataGenerationModuleMethod("Long",
-        "Generates a random long integer between the specified minimum and maximum values. Default: minNumber = long.MinValue, maxNumber = long.MaxValue.")]
+        "Generates a random long integer between the specified minimum and maximum values. Default: minNumber = long.MinValue, maxNumber = long.MaxValue.",
+        dataType: ColumnDataType.Integer)]
     public override string Long(long minNumber = long.MinValue, long maxNumber = long.MaxValue)
     {
         return base.Long(minNumber, maxNumber);
     }
 
     [DataGenerationModuleMethod("BigInteger",
-        "Generates a random BigInteger. No fixed range is defined for BigInteger, as it can represent any arbitrarily large or small number.")]
+        "Generates a random BigInteger. No fixed range is defined for BigInteger, as it can represent any arbitrarily large or small number.",
+        dataType: ColumnDataType.Decimal)]
     public override string BigInteger(string minNumber = "0", string maxNumber = "9999999999999999999999999999")
     {
         return base.BigInteger(minNumber, maxNumber);
     }
 
     [DataGenerationModuleMethod("Float",
-        "Generates a random floating-point number between the specified minimum and maximum values. Default: minNumber = float.MinValue, maxNumber = float.MaxValue. The result is rounded to the specified number of decimal places.")]
-    public override string Float(float minNumber = float.MinValue, float maxNumber = float.MaxValue,
+        "Generates a random floating-point number between the specified minimum and maximum values. Default: minNumber = 0, maxNumber = 1000. The result is rounded to the specified number of decimal places.",
+        dataType: ColumnDataType.Decimal)]
+    public override string Float(float minNumber = 0, float maxNumber = 1000,
         int decimalPlaces = 2)
     {
         return base.Float(minNumber, maxNumber, decimalPlaces);
     }
 
     [DataGenerationModuleMethod("Double",
-        "Generates a random double-precision floating-point number between the specified minimum and maximum values. Default: minNumber = double.MinValue, maxNumber = double.MaxValue. The result is rounded to the specified number of decimal places.")]
-    public override string Double(double minNumber = double.MinValue, double maxNumber = double.MaxValue,
+        "Generates a random double-precision floating-point number between the specified minimum and maximum values. Default: minNumber = 0, maxNumber = 1000. The result is rounded to the specified number of decimal places.",
+        dataType: ColumnDataType.Decimal)]
+    public override string Double(double minNumber = 0, double maxNumber = 1000,
         int decimalPlaces = 2)
     {
         return base.Double(minNumber, maxNumber, decimalPlaces);
     }
 
     [DataGenerationModuleMethod("Decimal",
-        "Generates a random decimal number between the specified minimum and maximum values. Default: minNumber = decimal.MinValue, maxNumber = decimal.MaxValue. The result is rounded to the specified number of decimal places.")]
-    public override string Decimal(decimal minNumber = decimal.MinValue, decimal maxNumber = decimal.MaxValue,
+        "Generates a random decimal number between the specified minimum and maximum values. Default: minNumber = 0, maxNumber = 1000. The result is rounded to the specified number of decimal places.",
+        dataType: ColumnDataType.Decimal)]
+    public override string Decimal(decimal minNumber = 0, decimal maxNumber = 1000,
         int decimalPlaces = 2)
     {
         return base.Decimal(minNumber, maxNumber, decimalPlaces);
     }
 
+    // Binary, octal, hexadecimal and roman numerals are written in number systems that no column type
+    // reads, and a percent carries its own sign by default, so these five stay text.
     [DataGenerationModuleMethod("Binary",
         "Generates a random binary number (string representation) between the specified minimum and maximum values. Default: minNumber = 0, maxNumber = 255.")]
     public override string Binary(int minNumber = 0, int maxNumber = 255)
@@ -93,7 +102,8 @@ public class NumberAttributedModule(FakerBase faker, LocaleBase locale, Randomiz
     }
 
     [DataGenerationModuleMethod("Prime Number",
-        "Generates a random prime number between the specified minimum and maximum values. Default: minNumber = 2, maxNumber = 100.")]
+        "Generates a random prime number between the specified minimum and maximum values. Default: minNumber = 2, maxNumber = 100.",
+        dataType: ColumnDataType.Integer)]
     public override long PrimeNumber(long minNumber = 1, long maxNumber = long.MaxValue)
     {
         return base.PrimeNumber(minNumber, maxNumber);

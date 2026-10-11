@@ -42,4 +42,3 @@ public interface IDocumentSession
     /// <param name="states">The captured state of every open document of that type.</param>
     void Save(string documentType, IEnumerable<JsonElement> states);
 }
-

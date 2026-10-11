@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using TableConverter.Utilities.Database.Contexts;
 using TableConverter.Utilities.Database.Models.TableStore;
+using TableConverter.Utilities.Models;
 
 namespace TableConverter.Utilities.Database;
 
@@ -123,4 +124,3 @@ public static class TableStoreStatistics
             statistics);
     }
 }
-

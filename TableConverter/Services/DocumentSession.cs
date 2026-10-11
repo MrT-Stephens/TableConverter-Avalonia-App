@@ -145,4 +145,3 @@ public sealed class DocumentSession : IDocumentSession
         public DocumentSessionEntry[]? Entries { get; set; }
     }
 }
-

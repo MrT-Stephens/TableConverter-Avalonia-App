@@ -2,6 +2,7 @@ using TableConverter.DataGeneration;
 using TableConverter.DataGeneration.LocaleDataSetsBase;
 using TableConverter.DataGeneration.Modules;
 using TableConverter.Contracts;
+using TableConverter.Utilities.Models;
 
 namespace TableConverter.Services.DataGenerationAttributedModules;
 
@@ -24,7 +25,8 @@ public class CommerceAttributedModule(FakerBase faker, LocaleBase locale, Random
     }
 
     [DataGenerationModuleMethod("Price",
-        "Generates a random price between the given range. Includes support for decimals and custom currency symbols.")]
+        "Generates a random price between the given range. Includes support for decimals and custom currency symbols.",
+        dataType: ColumnDataType.Decimal)]
     public override string Price(decimal minNumber = 0, decimal maxNumber = 1000, int decimalPlaces = 2,
         string symbol = "")
     {
